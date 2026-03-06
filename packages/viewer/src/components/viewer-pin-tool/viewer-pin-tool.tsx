@@ -23,6 +23,7 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
 interface StateMap {
   shouldClearDepthBuffers?: boolean;
+  shouldClearFeatureMaps?: boolean;
 }
 
 @Component({
@@ -107,6 +108,12 @@ export class ViewerPinTool {
   protected watchModeChange(): void {
     this.pinController?.setToolMode(this.mode);
     this.setupInteractionHandler();
+
+    if (this.mode === 'edit') {
+      this.setFeatureMaps();
+    } else {
+      this.resetFeatureMaps();
+    }
   }
 
   /**
@@ -143,8 +150,10 @@ export class ViewerPinTool {
   protected watchPinsChange(): void {
     if (this.pins.length > 0) {
       this.setDepthBuffers();
+      this.setFeatureMaps();
     } else {
       this.resetDepthBuffers();
+      this.resetFeatureMaps();
     }
   }
 
@@ -154,6 +163,7 @@ export class ViewerPinTool {
   protected connectedCallback(): void {
     this.setupInteractionHandler();
     this.setDepthBuffers();
+    this.setFeatureMaps();
   }
 
   /**
@@ -164,6 +174,7 @@ export class ViewerPinTool {
     this.setupController();
     this.setupInteractionHandler();
     this.setDepthBuffers();
+    this.setFeatureMaps();
 
     this.pinModel.onEntitiesChanged((entities) => {
       this.pins = entities;
@@ -188,6 +199,7 @@ export class ViewerPinTool {
     this.clearInteractionHandler();
     this.clearModelListeners();
     this.resetDepthBuffers();
+    this.resetFeatureMaps();
   }
 
   /**
@@ -200,6 +212,7 @@ export class ViewerPinTool {
   ): void {
     this.setupInteractionHandler();
     this.setDepthBuffers();
+    this.setFeatureMaps();
 
     if (oldViewer != null) {
       oldViewer.removeEventListener(
@@ -313,6 +326,24 @@ export class ViewerPinTool {
     if (this.stateMap.shouldClearDepthBuffers && this.viewer != null) {
       this.viewer.depthBuffers = undefined;
       this.stateMap.shouldClearDepthBuffers = undefined;
+    }
+  }
+
+  private setFeatureMaps(): void {
+    if (
+      (this.pins.length > 0 || this.mode === 'edit') &&
+      this.viewer != null &&
+      this.viewer.featureMaps == null
+    ) {
+      this.stateMap.shouldClearFeatureMaps = true;
+      this.viewer.featureMaps = 'final';
+    }
+  }
+
+  private resetFeatureMaps(): void {
+    if (this.stateMap.shouldClearFeatureMaps && this.viewer != null) {
+      this.viewer.featureMaps = undefined;
+      this.stateMap.shouldClearFeatureMaps = undefined;
     }
   }
 }
