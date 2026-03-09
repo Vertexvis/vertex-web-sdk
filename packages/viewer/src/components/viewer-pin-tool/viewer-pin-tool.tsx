@@ -284,15 +284,15 @@ export class ViewerPinTool {
     const xOffset = hostStyles
       .getPropertyValue('--viewer-pin-tool-initial-label-offset-x')
       .trim();
-    const xOffsetAsNumber = isFinite(parseInt(xOffset))
-      ? parseInt(xOffset)
+    const xOffsetAsNumber = Number.isFinite(Number.parseInt(xOffset))
+      ? Number.parseInt(xOffset)
       : 20;
 
     const yOffset = hostStyles
       .getPropertyValue('--viewer-pin-tool-initial-label-offset-y')
       .trim();
-    const yOffsetAsNumber = isFinite(parseInt(yOffset))
-      ? parseInt(yOffset)
+    const yOffsetAsNumber = Number.isFinite(Number.parseInt(yOffset))
+      ? Number.parseInt(yOffset)
       : 20;
 
     this.clearInteractionHandler();

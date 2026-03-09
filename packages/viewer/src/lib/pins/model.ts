@@ -81,10 +81,10 @@ export class PinModel {
   private entities: Record<string, Pin> = {};
   private selectedPinId?: string;
 
-  private entityAdded = new EventDispatcher<Pin>();
-  private entityUpdated = new EventDispatcher<Pin>();
-  private entitiesChanged = new EventDispatcher<Pin[]>();
-  private selectionChanged = new EventDispatcher<string | undefined>();
+  private readonly entityAdded = new EventDispatcher<Pin>();
+  private readonly entityUpdated = new EventDispatcher<Pin>();
+  private readonly entitiesChanged = new EventDispatcher<Pin[]>();
+  private readonly selectionChanged = new EventDispatcher<string | undefined>();
 
   /**
    * Registers an entity to be drawn in the canvas
