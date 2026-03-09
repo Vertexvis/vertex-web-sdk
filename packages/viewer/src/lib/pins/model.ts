@@ -82,6 +82,7 @@ export class PinModel {
   private selectedPinId?: string;
 
   private entityAdded = new EventDispatcher<Pin>();
+  private entityUpdated = new EventDispatcher<Pin>();
   private entitiesChanged = new EventDispatcher<Pin[]>();
   private selectionChanged = new EventDispatcher<string | undefined>();
 
@@ -186,10 +187,10 @@ export class PinModel {
   }
 
   /**
-   * Sets the set of entities to be placed with the model.
+   * Updates a pin in the model.
    *
-   * @param pin A pin to set
-   * @returns `true` if the entity has been set
+   * @param pin A pin to update
+   * @returns `true` if the entity has been updated
    */
   public updatePin(pin: Pin): boolean {
     const pinById = this.getPinById(pin.id);
@@ -199,6 +200,7 @@ export class PinModel {
         [pin.id]: pin,
       };
       this.entitiesChanged.emit(this.getPins());
+      this.entityUpdated.emit(pin);
 
       return true;
     }
@@ -228,6 +230,17 @@ export class PinModel {
   }
 
   /**
+   * Registers an event listener that will be invoked when a pin
+   * is updated in the model.
+   *
+   * @param listener The listener to add.
+   * @returns A disposable that can be used to remove the listener.
+   */
+  public onEntityUpdated(listener: Listener<Pin>): Disposable {
+    return this.entityUpdated.on(listener);
+  }
+
+  /**
    * Registers an event listener that will be invoked when the model's
    * pin selection changes
    *
@@ -239,7 +252,7 @@ export class PinModel {
   }
 
   /**
-   * Sets the selected pin Id
+   * Sets the selected pin id
    * @param pinId
    */
   public setSelectedPin(pinId?: string): void {
