@@ -280,12 +280,20 @@ export class ViewerPinTool {
 
   private setupInteractionHandler(): void {
     const hostStyles = window.getComputedStyle(this.hostEl);
+
     const xOffset = hostStyles
       .getPropertyValue('--viewer-pin-tool-initial-label-offset-x')
       .trim();
+    const xOffsetAsNumber = Number.isFinite(Number.parseInt(xOffset))
+      ? Number.parseInt(xOffset)
+      : 20;
+
     const yOffset = hostStyles
       .getPropertyValue('--viewer-pin-tool-initial-label-offset-y')
       .trim();
+    const yOffsetAsNumber = Number.isFinite(Number.parseInt(yOffset))
+      ? Number.parseInt(yOffset)
+      : 20;
 
     this.clearInteractionHandler();
 
@@ -294,8 +302,8 @@ export class ViewerPinTool {
         this.viewer?.registerInteractionHandler(
           new PinsInteractionHandler(
             this.pinController,
-            parseInt(xOffset),
-            parseInt(yOffset)
+            xOffsetAsNumber,
+            yOffsetAsNumber
           )
         );
     }
@@ -310,8 +318,7 @@ export class ViewerPinTool {
   }
 
   private updateViewport(): void {
-    const rect = getMarkupBoundingClientRect(this.hostEl);
-    this.elementBounds = rect;
+    this.elementBounds = getMarkupBoundingClientRect(this.hostEl);
   }
 
   private setDepthBuffers(): void {
