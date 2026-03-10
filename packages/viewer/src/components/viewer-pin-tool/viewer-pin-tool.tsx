@@ -169,6 +169,7 @@ export class ViewerPinTool {
     this.setupInteractionHandler();
     this.setDepthBuffers();
     this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
   }
 
   /**
@@ -180,6 +181,7 @@ export class ViewerPinTool {
     this.setupInteractionHandler();
     this.setDepthBuffers();
     this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
 
     this.pinModel.onEntitiesChanged((entities) => {
       this.pins = entities;
@@ -205,6 +207,7 @@ export class ViewerPinTool {
     this.clearModelListeners();
     this.resetDepthBuffers();
     this.resetFeatureMaps();
+    this.resetCameraAndKeyboardControls();
   }
 
   /**
@@ -218,6 +221,7 @@ export class ViewerPinTool {
     this.setupInteractionHandler();
     this.setDepthBuffers();
     this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
 
     if (oldViewer != null) {
       oldViewer.removeEventListener(
