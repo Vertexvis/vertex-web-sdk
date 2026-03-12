@@ -24,6 +24,8 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 interface StateMap {
   shouldClearDepthBuffers?: boolean;
   shouldClearFeatureMaps?: boolean;
+  shouldClearCameraControls?: boolean;
+  shouldClearKeyboardControls?: boolean;
 }
 
 @Component({
@@ -112,8 +114,10 @@ export class ViewerPinTool {
 
     if (this.mode === 'edit') {
       this.setFeatureMaps();
+      this.setCameraAndKeyboardControls();
     } else {
       this.resetFeatureMaps();
+      this.resetCameraAndKeyboardControls();
     }
   }
 
@@ -165,6 +169,7 @@ export class ViewerPinTool {
     this.setupInteractionHandler();
     this.setDepthBuffers();
     this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
   }
 
   /**
@@ -176,6 +181,7 @@ export class ViewerPinTool {
     this.setupInteractionHandler();
     this.setDepthBuffers();
     this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
 
     this.pinModel.onEntitiesChanged((entities) => {
       this.pins = entities;
@@ -201,6 +207,7 @@ export class ViewerPinTool {
     this.clearModelListeners();
     this.resetDepthBuffers();
     this.resetFeatureMaps();
+    this.resetCameraAndKeyboardControls();
   }
 
   /**
@@ -214,6 +221,7 @@ export class ViewerPinTool {
     this.setupInteractionHandler();
     this.setDepthBuffers();
     this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
 
     if (oldViewer != null) {
       oldViewer.removeEventListener(
@@ -354,6 +362,36 @@ export class ViewerPinTool {
     if (this.stateMap.shouldClearFeatureMaps && this.viewer != null) {
       this.viewer.featureMaps = undefined;
       this.stateMap.shouldClearFeatureMaps = undefined;
+    }
+  }
+
+  private setCameraAndKeyboardControls(): void {
+    if (this.mode === 'edit' && this.viewer != null) {
+      // Check camera controls
+      if (this.viewer.cameraControls) {
+        this.stateMap.shouldClearCameraControls = true;
+        this.viewer.cameraControls = false;
+      }
+
+      // Check keyboard controls
+      if (this.viewer.keyboardControls) {
+        this.stateMap.shouldClearKeyboardControls = true;
+        this.viewer.keyboardControls = false;
+      }
+    }
+  }
+
+  private resetCameraAndKeyboardControls(): void {
+    if (this.viewer != null) {
+      if (this.stateMap.shouldClearCameraControls) {
+        this.viewer.cameraControls = true;
+        this.stateMap.shouldClearCameraControls = undefined;
+      }
+
+      if (this.stateMap.shouldClearKeyboardControls) {
+        this.viewer.keyboardControls = true;
+        this.stateMap.shouldClearKeyboardControls = undefined;
+      }
     }
   }
 }
