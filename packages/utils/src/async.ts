@@ -90,7 +90,7 @@ export async function timeout(...args: unknown[]): Promise<unknown> {
   }
 }
 
-interface RetryOptions {
+export interface RetryOptions {
   /**
    * An array of delays that are used between each retry attempt.
    */

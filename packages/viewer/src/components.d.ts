@@ -1496,7 +1496,7 @@ export namespace Components {
      */
     pinController?: PinController;
     /**
-     * Gives focus to the the component's internal text input.
+     * Gives focus to the component's internal text input.
      */
     setFocus: () => Promise<void>;
     submit: () => Promise<void>;
