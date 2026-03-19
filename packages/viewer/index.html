@@ -1,97 +1,102 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Viewer SDK Playground</title>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-  <title>Viewer SDK Playground</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-    rel="stylesheet" />
+    <link rel="stylesheet" href="/dist/viewer/viewer.css" />
+    <script type="module" src="/dist/viewer/viewer.esm.js"></script>
+    <script nomodule src="/dist/viewer.js"></script>
 
-  <link rel="stylesheet" href="/dist/viewer/viewer.css" />
-  <script type="module" src="/dist/viewer/viewer.esm.js"></script>
-  <script nomodule src="/dist/viewer.js"></script>
+    <style>
+      html,
+      body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
 
-  <style>
-    html,
-    body {
-      font-family: Roboto, Arial, Helvetica, sans-serif;
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
+      .app {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
 
-    .app {
-      display: flex;
-      width: 100%;
-      height: 100%;
-    }
+      .tree {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        flex-shrink: 0;
+        border-right: 1px solid lightgray;
+      }
 
-    .tree {
-      display: flex;
-      flex-direction: column;
-      width: 300px;
-      flex-shrink: 0;
-      border-right: 1px solid lightgray;
-    }
+      .workarea {
+        width: 100%;
+        height: 100%;
+      }
 
-    .workarea {
-      width: 100%;
-      height: 100%;
-      display: flex;
-    }
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
 
-    #viewer {
-      width: 100%;
-      height: 100%;
-    }
+      #scene-tree {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
 
-    #scene-tree {
-      width: 100%;
-      height: 100%;
-    }
+    <script type="module">
+      window.addEventListener('DOMContentLoaded', () => {
+        main();
+      });
 
-    #swap {
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      z-index: 999;
-    }
-  </style>
+      async function main() {
+        await window.customElements.whenDefined('vertex-viewer');
 
-  <script type="module">
-    import { SceneTreeController } from '/dist/viewer/vertex-scene-tree.entry.js'
+        const viewer = document.getElementById('viewer');
+        const tree = document.getElementById('scene-tree');
+      }
+    </script>
+  </head>
 
-    window.addEventListener('DOMContentLoaded', () => {
-      main();
-    });
+  <body>
+    <div class="app">
+      <div class="tree">
+        <vertex-scene-tree
+          id="scene-tree"
+          viewer-selector="#viewer"
+        >
+        </vertex-scene-tree>
+      </div>
+      <div class="workarea">
+        <vertex-viewer
+          id="viewer"
+          src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+        >
+          <vertex-viewer-default-toolbar
+            placement="bottom-left"
+          ></vertex-viewer-default-toolbar>
 
-    async function main() {
-      await window.customElements.whenDefined('vertex-viewer');
-
-      const viewer = document.getElementById('viewer');
-      const tree = document.getElementById('scene-tree');
-
-      viewer.config = { flags: { logWsMessages: true } };
-    }
-  </script>
-</head>
-
-<body>
-  <div class="app">
-    <div class="workarea">
-      <vertex-scene-tree config-env="platdev"></vertex-scene-tree>
-
-      <vertex-viewer id="viewer" src="urn:vertex:stream-key:FEPXU6Qff3r0JSh2764ovuRHYWUoj32rueOz" config-env="platdev">
-        <vertex-viewer-toolbar placement="top-right">
-          <vertex-viewer-view-cube class="view-cube"></vertex-viewer-view-cube>
-        </vertex-viewer-toolbar>
-      </vertex-viewer>
+          <vertex-viewer-toolbar placement="top-right">
+            <vertex-viewer-view-cube
+              class="view-cube"
+            ></vertex-viewer-view-cube>
+          </vertex-viewer-toolbar>
+        </vertex-viewer>
+      </div>
     </div>
-  </div>
-</body>
-
+  </body>
 </html>
