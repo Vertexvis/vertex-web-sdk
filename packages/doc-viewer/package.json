@@ -1,0 +1,64 @@
+{
+  "name": "@vertexvis/doc-viewer",
+  "version": "0.24.3",
+  "description": "The Vertex SDK for viewing documents.",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "es2015": "dist/esm/index.mjs",
+  "es2017": "dist/esm/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/doc-viewer/doc-viewer.esm.js",
+  "license": "MIT",
+  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
+  },
+  "files": [
+    "dist/",
+    "loader/",
+    "LICENSE"
+  ],
+  "private": "true",
+  "scripts": {
+    "prebuild": "cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./src/assets",
+    "build": "stencil build",
+    "prestart": "cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./src/assets",
+    "start": "stencil build --dev --watch --serve",
+    "dev": "yarn start",
+    "format": "yarn lint --fix",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",
+    "test": "stencil test --spec --maxWorkers=50%",
+    "test:watch": "stencil test --spec --watchAll --maxWorkers=50%",
+    "test:ci": "stencil test --spec --coverage",
+    "test:coverage": "stencil test --spec --coverage --maxWorkers=50%",
+    "generate": "stencil generate",
+    "generate:docs": "../../scripts/generate_docs.sh",
+    "release:stage": "yarn generate:docs"
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.27.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.5",
+    "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
+    "abortcontroller-polyfill": "^1.7.8",
+    "eslint": "^8.57.1",
+    "jest": "^29.7.0",
+    "jest-cli": "^29.7.0",
+    "tslib": "^2.1.0",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@vertexvis/geometry": "^0.24.2",
+    "@vertexvis/utils": "^0.24.2",
+    "classnames": "^2.5.1",
+    "pdfjs-dist": "^5.4.449",
+    "resize-observer": "^1.0.4"
+  }
+}
