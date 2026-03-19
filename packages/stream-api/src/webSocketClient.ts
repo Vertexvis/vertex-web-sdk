@@ -35,6 +35,13 @@ export class WebSocketClientImpl implements WebSocketClient {
 
   public async connect(descriptor: ConnectionDescriptor): Promise<void> {
     const id = UUID.create();
+
+    // Ensure that any existing websocket connection has been closed prior
+    // to opening a new one to ensure we don't leave open connections.
+    if (this.webSocket != null) {
+      this.close();
+    }
+
     this.webSocket = new WebSocket(descriptor.url, descriptor.protocols);
     this.webSocket.binaryType = 'arraybuffer';
 

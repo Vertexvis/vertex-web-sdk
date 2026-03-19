@@ -52,6 +52,7 @@ import {
   Reconnecting,
   ViewerStreamState,
 } from './state';
+import { retryIfNotAborted } from './utils';
 
 type StreamResult = Omit<
   Connected,
@@ -107,6 +108,7 @@ export class ViewerStream extends StreamApi {
   private config: Config;
   private clientId: string | undefined;
   private deviceId: string | undefined;
+  private abortController?: AbortController;
 
   private state: ViewerStreamState = { type: 'disconnected' };
   private pausedState?: Connected;
@@ -347,7 +349,14 @@ export class ViewerStream extends StreamApi {
     );
     console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
 
-    const controller = new AbortController();
+    // Ensure that any previous attempt to initiate a WebSocket connection has been
+    // aborted prior to attempting to create a new connection. This prevents scenarios
+    // where a previously initiated connection attempt is still in the `connecting`
+    // state and gets closed, and the `Async.retry` utility attempts to connect again.
+    this.abortController?.abort();
+    const newAbortController = new AbortController();
+    this.abortController = newAbortController;
+
     const settings = getStreamSettings(this.config);
     this.updateState({
       type,
@@ -355,17 +364,26 @@ export class ViewerStream extends StreamApi {
       connection: {
         dispose: () => {
           this.dispose();
-          controller.abort();
+          newAbortController.abort();
         },
       },
     });
 
     const connection = await Async.abort(
-      controller.signal,
-      Async.retry(() => this.connect(descriptor, settings), {
-        maxRetries,
-        delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
-      })
+      newAbortController.signal,
+      retryIfNotAborted(
+        newAbortController.signal,
+        () => this.connect(descriptor, settings),
+        {
+          dispose: () => {
+            // Intentional empty dispose to prevent typing mismatches.
+          },
+        },
+        {
+          maxRetries,
+          delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
+        }
+      )
     ).catch((e) => {
       throw new WebsocketConnectionError(
         'Websocket connection failed.',
