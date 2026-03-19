@@ -410,7 +410,7 @@ export class Viewer {
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
-   * This event can be used in combination with the {@link VertexViewer.scene scene} method
+   * This event can be used in combination with the `scene` method
    * to query for items at the point of the tap.
    *
    * @see {@link Scene.raycaster Scene.raycaster} for more information.

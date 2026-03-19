@@ -62,4 +62,18 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      // @typescript-eslint/typescript-estree v5.9.x does not support TypeScript 5's
+      // decorator AST changes (decorators moved from node.decorators to node.modifiers).
+      // This causes the ESTree produced for Stencil component files to be missing both
+      // decorator references and the export modifier, resulting in false-positive
+      // "defined but never used" errors for decorator imports and component class names.
+      // TypeScript compilation (tsc) still catches real unused-variable issues here.
+      files: ['src/components/**/*.tsx'],
+      rules: {
+        '@typescript-eslint/no-unused-vars': 'off',
+      },
+    },
+  ],
 };

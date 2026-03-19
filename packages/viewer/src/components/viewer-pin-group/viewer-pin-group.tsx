@@ -3,6 +3,7 @@ import {
   Fragment,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
+  JSX,
   Listen,
   Prop,
   State,
