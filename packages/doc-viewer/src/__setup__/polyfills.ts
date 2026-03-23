@@ -5,7 +5,8 @@ import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
 
 import { ResizeObserver } from 'resize-observer';
 
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 (global as any).ResizeObserver = ResizeObserver;
 
 (global as any).MessageEvent = class extends Event {
@@ -29,7 +30,7 @@ import { ResizeObserver } from 'resize-observer';
 };
 
 (global as any).MutationObserver = class {
-  constructor() {}
-  disconnect() {}
-  observe() {}
+  public constructor() {}
+  public disconnect(): void {}
+  public observe(): void {}
 };

@@ -1,11 +1,13 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const triggerResizeObserver = jest.fn();
 (global as any).ResizeObserver = class {
   private fn;
-  constructor(fn: (entries: ResizeObserverEntry[]) => void) {
+
+  public disconnect = jest.fn();
+  public observe = jest.fn();
+  public trigger = triggerResizeObserver.mockImplementation((entries: ResizeObserverEntry[]) => this.fn(entries));
+
+  public constructor(fn: (entries: ResizeObserverEntry[]) => void) {
     this.fn = fn;
   }
-  disconnect = jest.fn()
-  observe = jest.fn()
-  trigger = triggerResizeObserver.mockImplementation((entries: ResizeObserverEntry[]) => this.fn(entries))
 };
