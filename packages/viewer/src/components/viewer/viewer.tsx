@@ -1780,6 +1780,7 @@ export class Viewer {
         const disposable = this.getStream().onStateChanged((state) => {
           if (state.type === 'connected') {
             resolve(state);
+            this.updateStreamAttributes();
           }
         });
 
