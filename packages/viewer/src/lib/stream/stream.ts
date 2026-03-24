@@ -668,7 +668,7 @@ export class ViewerStream extends StreamApi {
       );
     } catch (e) {
       throw new SceneRenderError(
-        `Frame timed out after ${timeoutInSeconds / 1000}s`,
+        `Frame timed out after ${timeoutInSeconds}s`,
         e instanceof Error ? e : undefined
       );
     } finally {
