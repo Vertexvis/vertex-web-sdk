@@ -57,7 +57,7 @@
     "@vertexvis/geometry": "^0.24.2",
     "@vertexvis/utils": "^0.24.2",
     "classnames": "^2.5.1",
-    "pdfjs-dist": "^5.4.449",
+    "pdfjs-dist": "^5.5.207",
     "resize-observer": "^1.0.4"
   }
 }

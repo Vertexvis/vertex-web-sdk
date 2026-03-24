@@ -5,7 +5,7 @@ import jestConfig from './jest-shared.config';
 export const config: Config = {
   namespace: 'doc-viewer',
   preamble: copyright(),
-  globalScript: 'src/polyfill/resize-observer.ts',
+  globalScript: 'src/polyfill/index.ts',
   globalStyle: 'src/css/global.css',
   outputTargets: [
     {
