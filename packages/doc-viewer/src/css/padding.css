@@ -1,0 +1,19 @@
+:root {
+  --padding-1: 0.25em;
+  --padding-2: 0.5em;
+  --padding-3: 0.75em;
+  --padding-4: 1em;
+  --padding-5: 1.25em;
+  --padding-6: 1.5em;
+  --padding-7: 1.75em;
+  --padding-8: 2em;
+
+  --abs-padding-1: 0.25rem;
+  --abs-padding-2: 0.5rem;
+  --abs-padding-3: 0.75rem;
+  --abs-padding-4: 1rem;
+  --abs-padding-5: 1.25rem;
+  --abs-padding-6: 1.5rem;
+  --abs-padding-7: 1.75rem;
+  --abs-padding-8: 2rem;
+}

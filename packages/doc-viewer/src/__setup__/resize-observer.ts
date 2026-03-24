@@ -5,9 +5,7 @@ export const triggerResizeObserver = jest.fn();
 
   public disconnect = jest.fn();
   public observe = jest.fn();
-  public trigger = triggerResizeObserver.mockImplementation(
-    (entries: ResizeObserverEntry[]) => this.fn(entries)
-  );
+  public trigger = triggerResizeObserver.mockImplementation((entries: ResizeObserverEntry[]) => this.fn(entries));
 
   public constructor(fn: (entries: ResizeObserverEntry[]) => void) {
     this.fn = fn;

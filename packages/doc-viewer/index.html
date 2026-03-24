@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+    <title>Stencil Component Starter</title>
+
+    <link rel="stylesheet" href="/dist/doc-viewer/doc-viewer.css" />
+    <script type="module" src="/dist/doc-viewer/doc-viewer.esm.js"></script>
+    <script nomodule src="/dist/doc-viewer.js"></script>
+
+    <style>
+      html,
+      body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .app {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      vertex-document-viewer {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <vertex-document-viewer src="{ PDF_URL }">
+      </vertex-document-viewer> 
+   </div>
+  </body>
+</html>
