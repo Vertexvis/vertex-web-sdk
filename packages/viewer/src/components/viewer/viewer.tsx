@@ -43,6 +43,7 @@ import { Environment } from '../../lib/environment';
 import {
   ComponentInitializationError,
   InteractionHandlerError,
+  MissingJWTError,
   ViewerInitializationError,
 } from '../../lib/errors';
 import {
@@ -1071,10 +1072,9 @@ export class Viewer {
 
   private emitConnectionChange(status: ConnectionStatus): void {
     if (status.status === 'connected') {
-      // NOTE: Uncomment once FSS is deployed.
-      // if (status.jwt.length === 0) {
-      //   throw new MissingJWTError('JWT is empty');
-      // }
+      if (status.jwt.length === 0) {
+        throw new MissingJWTError('JWT is empty');
+      }
     }
     this.connectionChange.emit(status);
   }
@@ -1701,7 +1701,7 @@ export class Viewer {
   private handleAnnotationSetsChange(numberOfAnnotationSets: number): void {
     if (
       numberOfAnnotationSets > 0 &&
-      this.getStreamAttributes().depthBuffers == null
+      this.getDepthBufferStreamAttributesValue() == null
     ) {
       // Annotation sets are present in the viewer, but depth buffers are not being requested.
       // The annotation sets require the depth buffers to render, so turn on depth buffers.

@@ -103,6 +103,8 @@ export class ViewerStream extends StreamApi {
 
   private dimensions: Dimensions.Dimensions;
   private streamAttributes: StreamAttributes;
+  private streamAttributesInitialized: boolean;
+
   private enableTemporalRefinement: boolean;
   private frameBgColor: Color3;
   private config: Config;
@@ -121,6 +123,7 @@ export class ViewerStream extends StreamApi {
 
     this.dimensions = Dimensions.create(0, 0);
     this.streamAttributes = {};
+    this.streamAttributesInitialized = false;
     this.enableTemporalRefinement = opts.enableTemporalRefinement ?? true;
     this.frameBgColor = Color.create(255, 255, 255);
     this.config = parseAndValidateConfig('platprod');
@@ -187,16 +190,21 @@ export class ViewerStream extends StreamApi {
       );
     }
 
+    const streamAttributesAreDifferent = !deepEqual(
+      this.streamAttributes,
+      fields.streamAttributes
+    );
     if (
       fields.streamAttributes != null &&
-      !deepEqual(this.streamAttributes, fields.streamAttributes)
+      (streamAttributesAreDifferent || !this.streamAttributesInitialized)
     ) {
       this.streamAttributes = fields.streamAttributes;
-      this.ifState('connected', () =>
+      this.ifState('connected', () => {
         this.updateStream({
           streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
-        })
-      );
+        });
+        this.streamAttributesInitialized = true;
+      });
     }
 
     if (
