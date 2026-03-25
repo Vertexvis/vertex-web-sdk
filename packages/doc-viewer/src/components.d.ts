@@ -27,8 +27,9 @@ export namespace Components {
         "panByDelta": (delta: Point.Point) => Promise<void>;
         /**
           * The provider used to create the document API and renderer.
+          * @default new PdfJsProvider()
          */
-        "provider"?: DocumentProvider;
+        "provider": DocumentProvider;
         /**
           * An optional value that will debounce image updates when resizing this viewer element.
           * @default 100
@@ -65,6 +66,7 @@ declare namespace LocalJSX {
         "interactionMode"?: InteractionMode;
         /**
           * The provider used to create the document API and renderer.
+          * @default new PdfJsProvider()
          */
         "provider"?: DocumentProvider;
         /**

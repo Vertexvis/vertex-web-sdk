@@ -73,12 +73,20 @@ export abstract class DocumentApi<T extends DocumentApiState = DocumentApiState>
       const renderedWidth = contentDimensions.width * baseScale * (zoomPercentage / 100);
       const renderedHeight = contentDimensions.height * baseScale * (zoomPercentage / 100);
 
-      const minX = Math.min(0, viewport.width - renderedWidth);
-      const maxX = Math.max(0, viewport.width - renderedWidth);
-      const minY = Math.min(0, viewport.height - renderedHeight);
-      const maxY = Math.max(0, viewport.height - renderedHeight);
+      // Minimum values for the offset of the underlying content to keep it visible in the viewport.
+      // In the case of a document with dimensions of { width: 100, height: 100 } and a viewport of { width: 50, height: 50 },
+      // the minimum offset would be { x: -25, y: -25 }. Using this minimum offset, the viewport is "placed"
+      // in the bottom right corner of the viewport, by shifting the content underneath up and to the left.
+      const minimumOffsetX = Math.min(0, viewport.width - renderedWidth);
+      const minimumOffsetY = Math.min(0, viewport.height - renderedHeight);
 
-      return Point.create(Math.max(minX, Math.min(maxX, offset.x)), Math.max(minY, Math.min(maxY, offset.y)));
+      // Maximum values for the offset of the underlying content to keep it visible in the viewport.
+      // These values will always be 0, as this represents "placing" the viewport in the top left corner
+      // of the document.
+      const maximumOffsetX = 0;
+      const maximumOffsetY = 0;
+
+      return Point.create(Math.max(minimumOffsetX, Math.min(maximumOffsetX, offset.x)), Math.max(minimumOffsetY, Math.min(maximumOffsetY, offset.y)));
     }
     return offset;
   }

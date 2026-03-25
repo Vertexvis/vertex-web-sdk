@@ -34,12 +34,8 @@ export class PanInteractionHandler implements Disposable {
     const deltaX = -event.deltaX / 2;
     const deltaY = -event.deltaY / 2;
 
-    if (deltaX !== 0) {
-      this.api.panByDelta(Point.create(deltaX, 0));
-    }
-
-    if (deltaY !== 0) {
-      this.api.panByDelta(Point.create(0, deltaY));
+    if (deltaX !== 0 || deltaY !== 0) {
+      this.api.panByDelta(Point.create(deltaX, deltaY));
     }
   }
 

@@ -28,7 +28,7 @@ export class VertexDocumentViewer {
   /**
    * The provider used to create the document API and renderer.
    */
-  @Prop({ mutable: true }) public provider?: DocumentProvider;
+  @Prop({ mutable: true }) public provider: DocumentProvider = new PdfJsProvider();
 
   /**
    * The interaction mode for the viewer. When set to `'pan'`, click and drag
@@ -71,6 +71,12 @@ export class VertexDocumentViewer {
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
   }
 
+  protected componentShouldUpdate(newValue: unknown, oldValue: unknown, propName: string): boolean {
+    // Ignore updates to the documentState property, as it is only intended to reflect the current state
+    // of the document and should not trigger a rerender.
+    return propName !== 'documentState';
+  }
+
   protected componentDidLoad(): void {
     this.resizeObserver?.observe(this.hostEl);
 
@@ -98,9 +104,6 @@ export class VertexDocumentViewer {
   protected async handleSrcChange(): Promise<void> {
     if (this.src != null && this.canvasEl != null) {
       this.clearCurrentDocument();
-
-      const provider = this.provider ?? new PdfJsProvider();
-      this.provider = provider;
 
       const { api, renderer } = this.provider.create(this.canvasEl);
       this.documentApi = api;
