@@ -979,12 +979,6 @@ export class Viewer {
 
       this.calculateComponentDimensions();
 
-      this.stream.update({
-        streamAttributes: this.getStreamAttributes(),
-        config: parseAndValidateConfig(this.configEnv, this.config),
-        dimensions: this.dimensions,
-        frameBgColor: this.getBackgroundColor(),
-      });
       await this.stream?.load(
         urn,
         this.clientId,
@@ -992,6 +986,14 @@ export class Viewer {
         this.getResolvedConfig(),
         options?.cameraType
       );
+
+      await this.stream.update({
+        streamAttributes: this.getStreamAttributes(),
+        config: parseAndValidateConfig(this.configEnv, this.config),
+        dimensions: this.dimensions,
+        frameBgColor: this.getBackgroundColor(),
+      });
+
       this.sceneReady.emit();
 
       if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {
@@ -1780,7 +1782,6 @@ export class Viewer {
         const disposable = this.getStream().onStateChanged((state) => {
           if (state.type === 'connected') {
             resolve(state);
-            this.updateStreamAttributes();
           }
         });
 
