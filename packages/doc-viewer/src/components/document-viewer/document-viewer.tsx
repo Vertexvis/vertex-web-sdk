@@ -90,11 +90,28 @@ export class VertexDocumentViewer {
     this.clearCurrentDocument();
   }
 
+  /**
+   * Pans the currently loaded document by the specified delta.
+   *
+   * This method will be bounded to the visible portion of the document to ensure
+   * at least a portion of the document is always visible, and the `canvas` does not
+   * appear blank.
+   *
+   * @param delta The delta to pan the document by.
+   */
   @Method()
   public async panByDelta(delta: Point.Point): Promise<void> {
     await this.documentApi?.panByDelta(delta);
   }
 
+  /**
+   * Zooms the currently loaded document to the specified zoom percentage.
+   *
+   * This method will automatically adjust existing offsets to maintain the
+   * same center point of the document where possible.
+   *
+   * @param percentage The zoom percentage to set.
+   */
   @Method()
   public async zoomTo(percentage: number): Promise<void> {
     await this.documentApi?.zoomTo(percentage);

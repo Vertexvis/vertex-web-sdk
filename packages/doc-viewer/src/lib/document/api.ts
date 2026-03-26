@@ -40,12 +40,31 @@ export abstract class DocumentApi<T extends DocumentApiState = DocumentApiState>
     }
   }
 
+  /**
+   * Updates the pan offset for this API, and emits new state with the updated
+   * offset.
+   *
+   * This method will be bounded to the visible portion of the document to ensure
+   * at least a portion of the document is always visible, and the `canvas` does not
+   * appear blank.
+   *
+   * @param delta The delta to pan the document by.
+   */
   public async panByDelta(delta: Point.Point): Promise<void> {
     const panOffset = this.constrainPanOffset(Point.add(this.state.panOffset, delta), this.state.zoomPercentage);
 
     this.updateState({ panOffset } as Partial<T>);
   }
 
+  /**
+   * Updates the zoom percentage for this API, and emits new state with the updated
+   * percentage and adjusted pan offset.
+   *
+   * This method will automatically adjust existing offsets to maintain the
+   * same center point of the document where possible.
+   *
+   * @param percentage The zoom percentage to set.
+   */
   public async zoomTo(percentage: number): Promise<void> {
     const { viewport, zoomPercentage, panOffset } = this.state;
 
@@ -53,7 +72,11 @@ export abstract class DocumentApi<T extends DocumentApiState = DocumentApiState>
       const constrainedZoom = Math.min(Math.max(MIN_ZOOM_PERCENTAGE, percentage), MAX_ZOOM_PERCENTAGE);
       const zoomRatio = constrainedZoom / zoomPercentage;
 
-      // Scale the center of the viewport by the updated zoom ratio to maintain the same center point.
+      // Scale the current pan offset relative to the updated zoom percentage to maintain the same center point.
+      // To do this, the center point of the viewport is scaled inversely to the zoom ratio to adjust the center point
+      // up and to the left when zooming in, and down and to the right when zooming out. This accounts for the underlying
+      // document becoming larger and needing to offset the content less for the same center point, or vice versa for
+      // zooming out causing the document to become smaller.
       const scaledOffset = Point.add(Point.scaleProportional(Dimensions.center(viewport), 1 - zoomRatio), Point.scaleProportional(panOffset, zoomRatio));
       const constrainedOffset = this.constrainPanOffset(scaledOffset, constrainedZoom);
 
