@@ -1,20 +1,22 @@
 import { Dimensions } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
-import * as pdfjs from 'pdfjs-dist';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 import { DocumentRenderer } from '../document/renderer';
 import { PdfJsApi, PdfJsApiState } from './pdfjs-api';
 
 interface PdfJsRendererState {
-  readonly pages: Record<number, pdfjs.PDFPageProxy>;
+  pages: Record<number, pdfjs.PDFPageProxy>;
+  pendingStateChange?: PdfJsApiState;
+  rendering: boolean;
 }
 
 export class PdfJsRenderer extends DocumentRenderer {
   private stateChangedDisposable: Disposable;
-  private state: PdfJsRendererState = { pages: {} };
+  private state: PdfJsRendererState = { pages: {}, rendering: false };
 
-  public constructor(private api: PdfJsApi, private canvas: HTMLCanvasElement) {
-    super();
+  public constructor(api: PdfJsApi, canvas: HTMLCanvasElement) {
+    super(api, canvas);
 
     this.handleStateChanged = this.handleStateChanged.bind(this);
 
@@ -26,36 +28,46 @@ export class PdfJsRenderer extends DocumentRenderer {
   }
 
   private async handleStateChanged(state: PdfJsApiState): Promise<void> {
-    await this.loadPage(state);
+    await this.renderPage(state);
   }
 
-  private async loadPage(state: PdfJsApiState): Promise<void> {
-    const { document, loadedPageNumber, viewport } = state;
+  private async renderPage(state: PdfJsApiState): Promise<void> {
+    const { document, loadedPageNumber, viewport, panOffset, zoomPercentage } = state;
+
+    if (this.state.rendering) {
+      this.state.pendingStateChange = state;
+      return;
+    }
 
     if (document != null && loadedPageNumber != null) {
-      const existingPage = this.state.pages[loadedPageNumber];
+      this.state.rendering = true;
 
-      if (existingPage == null) {
+      if (this.state.pages[loadedPageNumber] == null) {
         this.state.pages[loadedPageNumber] = await document.getPage(loadedPageNumber);
       }
 
-      const pageToLoad = this.state.pages[loadedPageNumber];
+      const page = this.state.pages[loadedPageNumber];
       const dimensions = viewport ?? Dimensions.create(0, 0);
-      const pageBaseViewport = pageToLoad.getViewport({ scale: 1 });
-      const scaleX = Math.max(0.1, dimensions.width / pageBaseViewport.width);
-      const scaleY = Math.max(0.1, dimensions.height / pageBaseViewport.height);
+      const baseViewport = page.getViewport({ scale: 1 });
+      const scaleX = dimensions.width / baseViewport.width;
+      const scaleY = dimensions.height / baseViewport.height;
+      const baseScale = Math.max(0.1, Math.min(scaleX, scaleY));
 
-      const scaled = pageToLoad.getViewport({
-        scale: Math.min(scaleX, scaleY),
+      const scaled = page.getViewport({
+        scale: baseScale * (zoomPercentage / 100),
+        offsetX: panOffset.x,
+        offsetY: panOffset.y,
       });
 
-      this.state.pages[loadedPageNumber].render({
+      await page.render({
         canvas: this.canvas,
         viewport: scaled,
         intent: 'display',
         background: '#ffffff',
         optionalContentConfigPromise: document.getOptionalContentConfig(),
-      });
+      }).promise;
+
+      this.state.rendering = false;
     }
   }
 }

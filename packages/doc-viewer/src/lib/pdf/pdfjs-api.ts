@@ -1,29 +1,25 @@
-import { Dimensions } from '@vertexvis/geometry';
-import * as pdfjs from 'pdfjs-dist';
+import { Dimensions, Point } from '@vertexvis/geometry';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-import { DocumentApi } from '../document/api';
+import { DocumentApi, DocumentApiState } from '../document/api';
 import { fromUri } from '../types/loadableResource';
 
-export interface PdfJsApiState {
+export interface PdfJsApiState extends DocumentApiState {
   readonly document?: pdfjs.PDFDocumentProxy;
-  readonly loadedPageNumber?: number;
-  readonly viewport?: Dimensions.Dimensions;
 }
 
 export class PdfJsApi extends DocumentApi<PdfJsApiState> {
   public constructor() {
-    super();
+    super({
+      panOffset: Point.create(0, 0),
+      zoomPercentage: 100,
+    });
 
     pdfjs.GlobalWorkerOptions.workerSrc = '/dist/assets/pdf.worker.min.mjs';
   }
 
-  public async updateViewport(dimensions: Dimensions.Dimensions): Promise<void> {
-    if (this.state?.viewport == null || !Dimensions.isEqual(this.state?.viewport, dimensions)) {
-      this.updateState({
-        ...this.state,
-        viewport: dimensions,
-      });
-    }
+  public dispose(): void {
+    this.state.document?.destroy();
   }
 
   public async load(uri: string): Promise<void> {
@@ -32,19 +28,17 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> {
     if (resource.resource.type === 'url') {
       const document = await pdfjs.getDocument(resource.resource.url).promise;
 
-      this.updateState({
-        ...this.state,
-        document,
-      });
+      this.updateState({ document });
     } else {
       throw new Error('Invalid resource URI provided. Expected a URL to retrieve a PDF.');
     }
   }
 
   public async loadPage(pageNumber: number): Promise<void> {
-    this.updateState({
-      ...this.state,
-      loadedPageNumber: pageNumber,
-    });
+    const page = await this.state.document?.getPage(pageNumber);
+    const baseViewport = page?.getViewport({ scale: 1 });
+    const contentDimensions = baseViewport != null ? Dimensions.create(baseViewport.width, baseViewport.height) : undefined;
+
+    this.updateState({ loadedPageNumber: pageNumber, contentDimensions });
   }
 }
