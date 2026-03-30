@@ -191,12 +191,7 @@ export class ViewerStream extends StreamApi {
       this.streamAttributes,
       fields.streamAttributes
     );
-    const streamIsConnected = this.state.type === 'connected';
-    if (
-      fields.streamAttributes != null &&
-      streamAttributesAreDifferent &&
-      streamIsConnected
-    ) {
+    if (fields.streamAttributes != null && streamAttributesAreDifferent) {
       this.streamAttributes = fields.streamAttributes;
       this.ifState('connected', () =>
         this.updateStream({
