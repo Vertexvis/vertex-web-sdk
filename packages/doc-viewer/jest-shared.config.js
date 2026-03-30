@@ -13,7 +13,7 @@ module.exports = {
   },
   roots: ['<rootDir>/src/'],
   moduleNameMapper: {
-    '^pdfjs-dist$': '<rootDir>/src/__mocks__/pdfjs-mock.ts',
+    '^pdfjs-dist/legacy/build/pdf\\.mjs$': '<rootDir>/src/__mocks__/pdfjs-mock.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/src/__setup__/polyfills.ts', '<rootDir>/src/__setup__/resize-observer.ts'],
 };
