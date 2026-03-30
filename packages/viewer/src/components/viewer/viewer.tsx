@@ -985,7 +985,6 @@ export class Viewer {
         dimensions: this.dimensions,
         frameBgColor: this.getBackgroundColor(),
       });
-
       await this.stream?.load(
         urn,
         this.clientId,
@@ -993,7 +992,6 @@ export class Viewer {
         this.getResolvedConfig(),
         options?.cameraType
       );
-
       this.sceneReady.emit();
 
       if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {

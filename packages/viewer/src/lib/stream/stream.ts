@@ -325,7 +325,6 @@ export class ViewerStream extends StreamApi {
     resource: Resource,
     cameraType?: FrameCameraType
   ): Promise<void> {
-    console.log('connectWithNewStream');
     return this.openWebsocketStream(resource, 'connecting', () =>
       this.requestNewStream(resource, cameraType)
     );
