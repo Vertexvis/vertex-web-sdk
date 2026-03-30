@@ -22,12 +22,14 @@ Annotations can optionally be scoped to a specific model view.
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        const modelViewId = 'model-view-id';
-        const response = await viewer.pmi.listAnnotations({ modelViewId });
+        viewer.addEventListener('sceneReady', async () => {
+          const modelViewId = 'model-view-id';
+          const response = await viewer.pmi.listAnnotations({ modelViewId });
 
-        // `listAnnotations` returns an object containing an array of `PmiAnnotation`s (`response.annotations`),
-        // along with paging data (`paging`). Each `PmiAnnotation` object will contain an `id` and `displayName`.
-        console.log(response.annotations.map((a) => `${a.displayName}: ${a.id}`));
+          // `listAnnotations` returns an object containing an array of `PmiAnnotation`s (`response.annotations`),
+          // along with paging data (`paging`). Each `PmiAnnotation` object will contain an `id` and `displayName`.
+          console.log(response.annotations.map((a) => `${a.displayName}: ${a.id}`));
+        });
       }
 
       main();
@@ -53,16 +55,22 @@ by this method can also be configured using the `size` option (default page size
       async function main() {
         const viewer = document.querySelector('#viewer');
         
-        const firstPageResponse = await viewer.pmi.listAnnotations({
-          size: 25,
-        });
-        const secondPageResponse = await viewer.pmi.listAnnotations({
-          cursor: firstPageResponse.paging.next,
-          size: 25,
-        });
+        viewer.addEventListener('sceneReady', async () => {
+          const modelViewId = 'model-view-id';
 
-        console.log('First Page:', firstPageResponse.annotations.map((a) => `${a.displayName}: ${a.id}`));
-        console.log('Second Page:', secondPageResponse.annotations.map((a) => `${a.displayName}: ${a.id}`));
+          const firstPageResponse = await viewer.pmi.listAnnotations({
+            modelViewId,
+            size: 25,
+          });
+          const secondPageResponse = await viewer.pmi.listAnnotations({
+            modelViewId,
+            cursor: firstPageResponse.paging.next,
+            size: 25,
+          });
+
+          console.log('First Page:', firstPageResponse.annotations.map((a) => `${a.displayName}: ${a.id}`));
+          console.log('Second Page:', secondPageResponse.annotations.map((a) => `${a.displayName}: ${a.id}`));
+        });
       }
 
       main();
@@ -91,32 +99,35 @@ PMI annotations currently support being selected, shown, or hidden.
         
         const sceneItemId = 'scene-item-id';
 
-        const modelViewsResponse = await viewer.modelViews.listByItem(sceneItemId, {
-          hasAnnotations: true,
-        });
-
-        // Load a model view and select the first annotation present
-        if (mvResponse.modelViews.length > 0) {
-          const modelView = mvResponse.modelViews[0];
-
-          await viewer.modelViews.load(sceneItemId, modelView.id);
-
-          const pmiResponse = await viewer.pmi.listAnnotations({
-            modelViewId: modelView.id,
+        viewer.addEventListener('sceneReady', async () => {
+          const modelViewsResponse = await viewer.modelViews.listByItem(sceneItemId, {
+            hasAnnotations: true,
           });
 
-          if (pmiResponse.annotations.length > 0) {
-            const annotation = pmiResponse.annotations[0];
+          // Load a model view and select the first annotation present
+          if (modelViewsResponse.modelViews.length > 0) {
+            const modelView = modelViewsResponse.modelViews[0];
 
-            await viewer
-              .elements((op) =>
-                op.annotations
-                  .where((q) => q.withAnnotationId(annotation.id))
-                  .select()
-              )
-              .execute();
+            await viewer.modelViews.load(sceneItemId, modelView.id);
+
+            const pmiResponse = await viewer.pmi.listAnnotations({
+              modelViewId: modelView.id,
+            });
+
+            if (pmiResponse.annotations.length > 0) {
+              const annotation = pmiResponse.annotations[0];
+
+              const scene = await viewer.scene();
+              await scene
+                .elements((op) =>
+                  op.annotations
+                    .where((q) => q.withAnnotationId(annotation.id))
+                    .select()
+                )
+                .execute();
+            }
           }
-        }
+        });
       }
 
       main();
@@ -156,7 +167,8 @@ the annotation.
           if (result.hits && result.hits.length > 0 && result.hits[0].annotationId != null) {
             const hit = result.hits[0];
 
-            await viewer
+            const scene = await viewer.scene();
+            await scene
               .elements((op) =>
                 op.annotations
                   .where((q) => q.withAnnotationId(hit.annotationId.hex))
@@ -166,15 +178,17 @@ the annotation.
           }
         });
 
-        const modelViewsResponse = await viewer.modelViews.listByItem(sceneItemId, {
-          hasAnnotations: true,
+        viewer.addEventListener('sceneReady', async () => {
+          const modelViewsResponse = await viewer.modelViews.listByItem(sceneItemId, {
+            hasAnnotations: true,
+          });
+
+          if (modelViewsResponse.modelViews.length > 0) {
+            const modelView = modelViewsResponse.modelViews[0];
+
+            await viewer.modelViews.load(sceneItemId, modelView.id);
+          }
         });
-
-        if (mvResponse.modelViews.length > 0) {
-          const modelView = mvResponse.modelViews[0];
-
-          await viewer.modelViews.load(sceneItemId, modelView.id);
-        }
       }
 
       main();

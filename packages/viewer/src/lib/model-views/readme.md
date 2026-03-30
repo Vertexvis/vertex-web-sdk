@@ -22,12 +22,14 @@ page of results.
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        const sceneItemId = 'scene-item-id';
-        const response = await viewer.modelViews.listByItem(sceneItemId);
+        viewer.addEventListener('sceneReady', async () => {
+          const sceneItemId = 'scene-item-id';
+          const response = await viewer.modelViews.listByItem(sceneItemId);
 
-        // `listByItem` returns an object containing an array of `ModelView`s (`response.modelViews`),
-        // along with paging data (`paging`). Each `ModelView` object will contain an `id` and `displayName`.
-        console.log(response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+          // `listByItem` returns an object containing an array of `ModelView`s (`response.modelViews`),
+          // along with paging data (`paging`). Each `ModelView` object will contain an `id` and `displayName`.
+          console.log(response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+        });
       }
 
       main();
@@ -53,17 +55,19 @@ by this method can also be configured using the `size` option (default page size
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        const sceneItemId = 'scene-item-id';
-        const firstPageResponse = await viewer.modelViews.listByItem(sceneItemId, {
-          size: 25,
+        viewer.addEventListener('sceneReady', async () => {
+          const sceneItemId = 'scene-item-id';
+          const firstPageResponse = await viewer.modelViews.listByItem(sceneItemId, {
+            size: 25,
+          });
+          const secondPageResponse = await viewer.modelViews.listByItem(sceneItemId, {
+            cursor: firstPageResponse.paging.next,
+            size: 25,
+          });
+  
+          console.log('First Page:', firstPageResponse.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+          console.log('Second Page:', secondPageResponse.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
         });
-        const secondPageResponse = await viewer.modelViews.listByItem(sceneItemId, {
-          cursor: firstPageResponse.paging.next,
-          size: 25,
-        });
-
-        console.log('First Page:', firstPageResponse.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
-        console.log('Second Page:', secondPageResponse.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
       }
 
       main();
@@ -89,12 +93,14 @@ and can be filtered out using the `hasAnnotations` flag.
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        const sceneItemId = 'scene-item-id';
-        const response = await viewer.modelViews.listByItem(sceneItemId, {
-          hasAnnotations: true,
-        });
+        viewer.addEventListener('sceneReady', async () => {
+          const sceneItemId = 'scene-item-id';
+          const response = await viewer.modelViews.listByItem(sceneItemId, {
+            hasAnnotations: true,
+          });
 
-        console.log(response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+          console.log(response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+        });
       }
 
       main();
@@ -119,14 +125,16 @@ to reflect the state captured by the model view, including camera orientation an
       async function main() {
         const viewer = document.querySelector('#viewer');
 
-        const sceneItemId = 'scene-item-id';
-        const response = await viewer.modelViews.listByItem(sceneItemId);
+        viewer.addEventListener('sceneReady', async () => {
+          const sceneItemId = 'scene-item-id';
+          const response = await viewer.modelViews.listByItem(sceneItemId);
 
-        if (response.modelViews.length > 0) {
-          const modelView = response.modelViews[0];
+          if (response.modelViews.length > 0) {
+            const modelView = response.modelViews[0];
 
-          await viewer.modelViews.load(sceneItemId, modelView.id);
-        }
+            await viewer.modelViews.load(sceneItemId, modelView.id);
+          }
+        });
       }
 
       main();
@@ -137,8 +145,7 @@ to reflect the state captured by the model view, including camera orientation an
 
 ## Unloading a Model View
 
-The `unload` method removes any previously loaded model view and resets the
-scene to its initial state.
+The `unload` method removes any previously loaded model view and clears any loaded annotations.
 
 **Example:** Unloading the current model view.
 
@@ -155,16 +162,18 @@ scene to its initial state.
 
         unload.addEventListener('click', viewer.modelViews.unload);
 
-        // Load a model view using the previous example to be able to unload the model
-        // when clicking `Unload Model View`.
-        const sceneItemId = 'scene-item-id';
-        const response = await viewer.modelViews.listByItem(sceneItemId);
+        viewer.addEventListener('sceneReady', async () => {
+          // Load a model view using the previous example to be able to unload the model
+          // when clicking `Unload Model View`.
+          const sceneItemId = 'scene-item-id';
+          const response = await viewer.modelViews.listByItem(sceneItemId);
 
-        if (response.modelViews.length > 0) {
-          const modelView = response.modelViews[0];
+          if (response.modelViews.length > 0) {
+            const modelView = response.modelViews[0];
 
-          await viewer.modelViews.load(sceneItemId, modelView.id);
-        }
+            await viewer.modelViews.load(sceneItemId, modelView.id);
+          }
+        });
       }
 
       main();

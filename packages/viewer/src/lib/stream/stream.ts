@@ -158,18 +158,19 @@ export class ViewerStream extends StreamApi {
     deviceId: string | undefined,
     config: Config = parseAndValidateConfig('platprod'),
     cameraType?: FrameCameraType
-  ): Promise<void> {
+  ): Promise<ViewerStreamState> {
     this.clientId = clientId;
     this.deviceId = deviceId;
     this.config = config;
 
     if (this.state.type === 'disconnected') {
-      return this.loadIfDisconnected(urn, cameraType);
+      await this.loadIfDisconnected(urn, cameraType);
     } else if (this.state.type === 'connection-failed') {
-      return this.loadIfDisconnected(urn, cameraType);
+      await this.loadIfDisconnected(urn, cameraType);
     } else {
-      return this.loadIfConnectingOrConnected(urn, this.state, cameraType);
+      await this.loadIfConnectingOrConnected(urn, this.state, cameraType);
     }
+    return this.state;
   }
 
   public update(fields: UpdateFields): void {
