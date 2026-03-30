@@ -5,17 +5,41 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { DocumentProvider } from "./lib/document/provider";
+import { InteractionMode } from "./components/document-viewer/document-viewer";
+import { DocumentApiState } from "./lib/document/api";
+import { Point } from "@vertexvis/geometry";
+export { DocumentProvider } from "./lib/document/provider";
+export { InteractionMode } from "./components/document-viewer/document-viewer";
+export { DocumentApiState } from "./lib/document/api";
+export { Point } from "@vertexvis/geometry";
 export namespace Components {
     interface VertexDocumentViewer {
+        /**
+          * Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.
+         */
+        "documentState"?: DocumentApiState;
+        /**
+          * The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.
+          * @default 'pan'
+         */
+        "interactionMode": InteractionMode;
+        "panByDelta": (delta: Point.Point) => Promise<void>;
+        /**
+          * The provider used to create the document API and renderer.
+          * @default new PdfJsProvider()
+         */
+        "provider": DocumentProvider;
         /**
           * An optional value that will debounce image updates when resizing this viewer element.
           * @default 100
          */
         "resizeDebounce": number;
         /**
-          * A URI of the document to load when the component is mounted in the DOM tree. Currently only URLs are supported.
+          * A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.
          */
         "src"?: string;
+        "zoomTo": (percentage: number) => Promise<void>;
     }
 }
 declare global {
@@ -32,18 +56,33 @@ declare global {
 declare namespace LocalJSX {
     interface VertexDocumentViewer {
         /**
+          * Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.
+         */
+        "documentState"?: DocumentApiState;
+        /**
+          * The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.
+          * @default 'pan'
+         */
+        "interactionMode"?: InteractionMode;
+        /**
+          * The provider used to create the document API and renderer.
+          * @default new PdfJsProvider()
+         */
+        "provider"?: DocumentProvider;
+        /**
           * An optional value that will debounce image updates when resizing this viewer element.
           * @default 100
          */
         "resizeDebounce"?: number;
         /**
-          * A URI of the document to load when the component is mounted in the DOM tree. Currently only URLs are supported.
+          * A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.
          */
         "src"?: string;
     }
 
     interface VertexDocumentViewerAttributes {
         "src": string;
+        "interactionMode": InteractionMode;
         "resizeDebounce": number;
     }
 

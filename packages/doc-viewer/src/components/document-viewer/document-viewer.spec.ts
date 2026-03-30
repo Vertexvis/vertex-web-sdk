@@ -1,7 +1,7 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
 
-import { mockGetDocument, mockGetPage, mockGetViewport, mockRenderPage } from '../../__mocks__/pdfjs-mock';
+import { mockGetDocument, mockGetPage, mockGetViewport, mockPageRender } from '../../__mocks__/pdfjs-mock';
 import { triggerResizeObserver } from '../../__setup__/resize-observer';
 import { VertexDocumentViewer } from './document-viewer';
 
@@ -39,11 +39,11 @@ describe('vertex-document-viewer', () => {
 
     expect(mockGetDocument).toHaveBeenCalledWith(mockSrc);
     expect(mockGetPage).toHaveBeenCalledWith(1);
-    expect(mockRenderPage).toHaveBeenCalled();
+    expect(mockPageRender).toHaveBeenCalled();
   });
 
   it('updates dimensions when the the element is resized', async () => {
-    const mockSrc = 'https://vertex3d.com';
+    const mockSrc = 'https';
 
     const { root } = await newSpecPage({
       components: [VertexDocumentViewer],
@@ -54,9 +54,13 @@ describe('vertex-document-viewer', () => {
 
     viewer.resizeDebounce = 0;
 
-    expect(mockGetViewport).toHaveBeenCalledTimes(2);
+    // Three expected calls represent:
+    // - Initial loading of the base document viewport and storage in the API
+    // - Retrieval of the document viewport when rendering the first page
+    // - Retrieval of the document viewport with a scalar based on the viewer viewport
+    expect(mockGetViewport).toHaveBeenCalledTimes(3);
     expect(mockGetViewport).toHaveBeenCalledWith(expect.objectContaining({ scale: 1 }));
-    expect(mockRenderPage).toHaveBeenCalledWith(
+    expect(mockPageRender).toHaveBeenCalledWith(
       expect.objectContaining({
         viewport: expect.objectContaining({
           width: 100,
@@ -74,9 +78,9 @@ describe('vertex-document-viewer', () => {
     ]);
     await Async.delay(1);
 
-    expect(mockGetViewport).toHaveBeenCalledTimes(4);
+    expect(mockGetViewport).toHaveBeenCalledTimes(5);
     expect(mockGetViewport).toHaveBeenCalledWith(expect.objectContaining({ scale: 0.25 }));
-    expect(mockRenderPage).toHaveBeenCalledWith(
+    expect(mockPageRender).toHaveBeenCalledWith(
       expect.objectContaining({
         viewport: expect.objectContaining({
           width: 25,

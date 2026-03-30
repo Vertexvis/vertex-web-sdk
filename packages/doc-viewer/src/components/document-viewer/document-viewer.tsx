@@ -1,13 +1,17 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Component, Element, h, Host, Prop, Watch } from '@stencil/core';
-import { Dimensions } from '@vertexvis/geometry';
+import { Component, Element, h, Host, Method, Prop, Watch } from '@stencil/core';
+import { Dimensions, Point } from '@vertexvis/geometry';
+import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
-import { DocumentApi } from '../../lib/document/api';
+import { DocumentApi, DocumentApiState } from '../../lib/document/api';
+import { DocumentProvider } from '../../lib/document/provider';
 import { DocumentRenderer } from '../../lib/document/renderer';
 import { getElementBoundingClientRect } from '../../lib/dom';
-import { PdfJsApi } from '../../lib/pdf/pdfjs-api';
-import { PdfJsRenderer } from '../../lib/pdf/pdfjs-renderer';
+import { PanInteractionHandler } from '../../lib/interactions/pan-interaction-handler';
+import { PdfJsProvider } from '../../lib/pdf/pdfjs-provider';
+
+export type InteractionMode = 'none' | 'pan';
 
 @Component({
   tag: 'vertex-document-viewer',
@@ -17,9 +21,27 @@ import { PdfJsRenderer } from '../../lib/pdf/pdfjs-renderer';
 export class VertexDocumentViewer {
   /**
    * A URI of the document to load when the component is mounted in the DOM tree.
-   * Currently only URLs are supported.
+   * Currently only supports URLs for client-side rendering.
    */
   @Prop() public src?: string;
+
+  /**
+   * The provider used to create the document API and renderer.
+   */
+  @Prop({ mutable: true }) public provider: DocumentProvider = new PdfJsProvider();
+
+  /**
+   * The interaction mode for the viewer. When set to `'pan'`, click and drag
+   * will pan the document. When set to `'none'`, no pointer interactions
+   * are registered.
+   */
+  @Prop() public interactionMode: InteractionMode = 'pan';
+
+  /**
+   * Common state of the current document. This value includes information common to all
+   * types of documents, including state like zoom percentage, viewport definition, and offsets.
+   */
+  @Prop({ mutable: true }) public documentState?: DocumentApiState;
 
   /**
    * An optional value that will debounce image updates when resizing
@@ -39,36 +61,82 @@ export class VertexDocumentViewer {
 
   private documentRenderer?: DocumentRenderer;
   private documentApi?: DocumentApi;
+  private panInteractionHandler?: PanInteractionHandler;
+  private documentApiStateChangedDisposable?: Disposable;
 
   protected componentWillLoad(): void {
     this.handleElementResize = this.handleElementResize.bind(this);
+    this.handleDocumentApiStateChanged = this.handleDocumentApiStateChanged.bind(this);
 
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
+  }
+
+  protected componentShouldUpdate(newValue: unknown, oldValue: unknown, propName: string): boolean {
+    // Ignore updates to the documentState property, as it is only intended to reflect the current state
+    // of the document and should not trigger a rerender.
+    return propName !== 'documentState';
   }
 
   protected componentDidLoad(): void {
     this.resizeObserver?.observe(this.hostEl);
 
     this.updateComponentDimensions();
-    this.handleUrlChange();
+    this.handleSrcChange();
   }
 
   protected disconnectedCallback(): void {
     this.resizeObserver?.disconnect();
+
+    this.clearCurrentDocument();
+  }
+
+  /**
+   * Pans the currently loaded document by the specified delta.
+   *
+   * This method will be bounded to the visible portion of the document to ensure
+   * at least a portion of the document is always visible, and the `canvas` does not
+   * appear blank.
+   *
+   * @param delta The delta to pan the document by.
+   */
+  @Method()
+  public async panByDelta(delta: Point.Point): Promise<void> {
+    await this.documentApi?.panByDelta(delta);
+  }
+
+  /**
+   * Zooms the currently loaded document to the specified zoom percentage.
+   *
+   * This method will automatically adjust existing offsets to maintain the
+   * same center point of the document where possible.
+   *
+   * @param percentage The zoom percentage to set.
+   */
+  @Method()
+  public async zoomTo(percentage: number): Promise<void> {
+    await this.documentApi?.zoomTo(percentage);
   }
 
   @Watch('src')
-  protected async handleUrlChange(): Promise<void> {
+  protected async handleSrcChange(): Promise<void> {
     if (this.src != null && this.canvasEl != null) {
-      this.documentRenderer?.dispose();
+      this.clearCurrentDocument();
 
-      this.documentApi = new PdfJsApi();
-      this.documentRenderer = new PdfJsRenderer(this.documentApi, this.canvasEl);
+      const { api, renderer } = this.provider.create(this.canvasEl);
+      this.documentApi = api;
+      this.documentRenderer = renderer;
+      this.updateInteractionHandler();
+      this.updateDocumentApiListeners();
 
       await this.documentApi.updateViewport(this.dimensions);
       await this.documentApi.load(this.src);
       await this.documentApi.loadPage(1);
     }
+  }
+
+  @Watch('interactionMode')
+  protected handleInteractionModeChange(): void {
+    this.updateInteractionHandler();
   }
 
   public render(): void {
@@ -86,6 +154,29 @@ export class VertexDocumentViewer {
         </div>
       </Host>
     );
+  }
+
+  private clearCurrentDocument(): void {
+    this.documentRenderer?.dispose();
+    this.documentApi?.dispose();
+    this.panInteractionHandler?.dispose();
+    this.documentApiStateChangedDisposable?.dispose();
+  }
+
+  private handleDocumentApiStateChanged(state: DocumentApiState): void {
+    this.documentState = state;
+  }
+
+  private updateDocumentApiListeners(): void {
+    this.documentApiStateChangedDisposable = this.documentApi?.onStateChanged(this.handleDocumentApiStateChanged);
+  }
+
+  private updateInteractionHandler(): void {
+    this.panInteractionHandler?.dispose();
+
+    if (this.interactionMode === 'pan' && this.canvasEl != null && this.documentApi != null) {
+      this.panInteractionHandler = new PanInteractionHandler(this.canvasEl, this.documentApi);
+    }
   }
 
   private updateComponentDimensions(dimensions?: Dimensions.Dimensions): void {
