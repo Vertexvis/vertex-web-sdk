@@ -80,7 +80,7 @@ interface GracefulReconnectOptions<T = void> {
 }
 
 export async function gracefulReconnect<T = void>(
-  { viewer, stream, ws }: ViewerStreamOperationCtx,
+  { stream, ws }: ViewerStreamOperationCtx,
   { beforeReconnect }: GracefulReconnectOptions<T> = {}
 ): Promise<T | undefined> {
   jest

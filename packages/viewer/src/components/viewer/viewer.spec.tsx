@@ -330,6 +330,9 @@ describe('vertex-viewer', () => {
       });
 
       await loadViewerStreamKey(key1, { stream, ws, viewer });
+
+      expect(viewer.frame).not.toBeUndefined();
+
       await viewer.unload();
 
       expect(viewer.frame).toBeUndefined();

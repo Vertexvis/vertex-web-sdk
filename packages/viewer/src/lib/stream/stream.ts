@@ -172,7 +172,7 @@ export class ViewerStream extends StreamApi {
     }
   }
 
-  public async update(fields: UpdateFields): Promise<void> {
+  public update(fields: UpdateFields): void {
     this.frameBgColor = fields.frameBgColor
       ? fields.frameBgColor
       : this.frameBgColor;
@@ -212,7 +212,7 @@ export class ViewerStream extends StreamApi {
       this.enableTemporalRefinement = fields.enableTemporalRefinement;
 
       if (this.state.type === 'connected') {
-        await this.closeAndReconnect(this.state);
+        this.closeAndReconnect(this.state);
       }
     }
   }
@@ -325,6 +325,7 @@ export class ViewerStream extends StreamApi {
     resource: Resource,
     cameraType?: FrameCameraType
   ): Promise<void> {
+    console.log('connectWithNewStream');
     return this.openWebsocketStream(resource, 'connecting', () =>
       this.requestNewStream(resource, cameraType)
     );
