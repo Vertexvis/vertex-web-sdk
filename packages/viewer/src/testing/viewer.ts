@@ -18,7 +18,7 @@ interface ViewerStreamOperationCtx {
 
 interface LoadViewerStreamKeyOptions {
   token?: string;
-  beforeConnected?: VoidFunction;
+  beforeConnected?: VoidFunction | (() => Promise<void>);
 }
 
 export const key1 = 'urn:vertex:stream-key:123';
@@ -64,7 +64,7 @@ export async function loadViewerStreamKey(
   // Emit frame drawn on next event loop
   await connecting;
   await Async.delay(10);
-  beforeConnected?.();
+  await beforeConnected?.();
   ws.receiveMessage(
     encode(
       StreamFixtures.Requests.drawFrame({
