@@ -34,6 +34,6 @@ async function main() {
 
   await loadViewerWithQueryParams(viewer, {
     streamKey: '7jad6i-cr4cQiFNlOzHdhzRj-KnkrKKa-_ED',
-    env: 'platdev',
+    env: 'platprod',
   });
 }
