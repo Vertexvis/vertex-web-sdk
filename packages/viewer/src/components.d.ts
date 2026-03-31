@@ -241,7 +241,7 @@ export namespace Components {
      */
     overScanCount: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     * A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.
      * @example
      * ```html
      * <script>
@@ -2265,7 +2265,7 @@ declare namespace LocalJSX {
      */
     overScanCount?: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     * A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.
      * @example
      * ```html
      * <script>

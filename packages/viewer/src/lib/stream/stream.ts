@@ -187,10 +187,11 @@ export class ViewerStream extends StreamApi {
       );
     }
 
-    if (
-      fields.streamAttributes != null &&
-      !deepEqual(this.streamAttributes, fields.streamAttributes)
-    ) {
+    const streamAttributesAreDifferent = !deepEqual(
+      this.streamAttributes,
+      fields.streamAttributes
+    );
+    if (fields.streamAttributes != null && streamAttributesAreDifferent) {
       this.streamAttributes = fields.streamAttributes;
       this.ifState('connected', () =>
         this.updateStream({
