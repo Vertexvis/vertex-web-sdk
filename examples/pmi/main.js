@@ -2,7 +2,7 @@ import { loadViewerWithQueryParams } from '../helpers.js';
 import { createModelViewListItem } from './dom.js';
 import { selectFromViewer } from './operations.js';
 
-const SCENE_ITEM_ID = 'ee959628-b9a2-4b46-aa51-8646929468d1';
+const SCENE_ITEM_ID = '151d4b91-5901-4ef0-a9a1-577291a853c4';
 
 window.addEventListener('DOMContentLoaded', () => {
   main();
@@ -33,7 +33,7 @@ async function main() {
   });
 
   await loadViewerWithQueryParams(viewer, {
-    streamKey: '7jad6i-cr4cQiFNlOzHdhzRj-KnkrKKa-_ED',
+    streamKey: 'X7mxgqyT9zBMRpOmb-P3N_sIMhCK1QlPVmsT',
     env: 'platprod',
   });
 }
