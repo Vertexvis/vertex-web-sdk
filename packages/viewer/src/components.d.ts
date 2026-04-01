@@ -548,7 +548,7 @@ export namespace Components {
      */
     configEnv: Environment;
     /**
-     * Specifies some options related to presentation of cross-sections
+     * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
      */
     crossSectioning?: CrossSectioningOptions;
     /**
@@ -589,7 +589,7 @@ export namespace Components {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross-sections that are in a frame.
      *
      * Possible values are:   * `undefined`: A feature map is never requested.
      *
@@ -2535,7 +2535,7 @@ declare namespace LocalJSX {
      */
     configEnv?: Environment;
     /**
-     * Specifies some options related to presentation of cross-sections
+     * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
      */
     crossSectioning?: CrossSectioningOptions;
     /**
@@ -2575,7 +2575,7 @@ declare namespace LocalJSX {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross-sections that are in a frame.
      *
      * Possible values are:   * `undefined`: A feature map is never requested.
      *

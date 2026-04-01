@@ -24,6 +24,10 @@ export namespace Components {
           * @default 'pan'
          */
         "interactionMode": InteractionMode;
+        /**
+          * Pans the currently loaded document by the specified delta.  This method will be bounded to the visible portion of the document to ensure at least a portion of the document is always visible, and the `canvas` does not appear blank.
+          * @param delta The delta to pan the document by.
+         */
         "panByDelta": (delta: Point.Point) => Promise<void>;
         /**
           * The provider used to create the document API and renderer.
@@ -39,6 +43,10 @@ export namespace Components {
           * A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.
          */
         "src"?: string;
+        /**
+          * Zooms the currently loaded document to the specified zoom percentage.  This method will automatically adjust existing offsets to maintain the same center point of the document where possible.
+          * @param percentage The zoom percentage to set.
+         */
         "zoomTo": (percentage: number) => Promise<void>;
     }
 }
