@@ -302,14 +302,18 @@ export class Viewer {
   public sceneComparison?: SceneComparisonOptions;
 
   /**
-   * Specifies some options related to presentation of cross-sections
+   * Specifies options related to presentation of cross-sections.
+   * Defaults to showing the cross-section with an end cap that matches the part color.
    */
   @Prop({ attribute: null })
-  public crossSectioning?: CrossSectioningOptions;
+  public crossSectioning?: CrossSectioningOptions = {
+    endCapEnabled: true,
+    endCapColor: undefined,
+  };
 
   /**
    * Specifies when a feature map is returned from rendering. Feature maps
-   * include information about the surfaces, edges and cross sections that are
+   * include information about the surfaces, edges and cross-sections that are
    * in a frame.
    *
    * Possible values are:
