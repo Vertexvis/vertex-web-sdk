@@ -1,5 +1,4 @@
-import { selectAnnotation } from './operations.js';
-import { updateAnnotationVisibility } from './operations.js';
+import { selectAnnotation, updateAnnotationVisibility } from './operations.js';
 
 // Helpers for managing DOM elements associated to loaded model views and PMI annotations.
 

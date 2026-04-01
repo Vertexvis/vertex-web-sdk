@@ -139,8 +139,8 @@ PMI annotations currently support being selected, shown, or hidden.
 ## Performing operations through the Viewer
 
 When a model view is loaded, its associated annotations will also be displayed in the 3D viewer.
-These annotations can be interacted with in a similar manner to visible geometry in the scene.
-Using the `tap` event on the viewer along with the scene's `raycaster`. When a hit request is made,
+These annotations can be interacted with in a similar manner to visible geometry in the scene by
+using the `tap` event on the viewer along with the scene's `raycaster`. When a hit request is made,
 the associated `Hit` will include an `annotationId` which can be used to perform operations on
 the annotation.
 
