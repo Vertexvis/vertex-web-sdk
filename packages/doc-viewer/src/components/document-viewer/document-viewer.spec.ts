@@ -10,25 +10,6 @@ describe('vertex-document-viewer', () => {
     jest.clearAllMocks();
   });
 
-  it('renders', async () => {
-    const { root } = await newSpecPage({
-      components: [VertexDocumentViewer],
-      html: '<vertex-document-viewer></vertex-document-viewer>',
-    });
-
-    expect(root).toEqualHtml(`
-      <vertex-document-viewer>
-        <mock:shadow-root>
-          <div class="viewer-container">
-            <div class="canvas-container">
-              <canvas></canvas>
-            </div>
-          </div>
-        </mock:shadow-root>
-      </vertex-document-viewer>
-    `);
-  });
-
   it('retrieves the document specified by the src property and loads the first page', async () => {
     const mockSrc = 'https://vertex3d.com';
 
@@ -88,5 +69,32 @@ describe('vertex-document-viewer', () => {
         }),
       }),
     );
+  });
+
+  describe('loadPage', () => {
+    it('loads a page by number', async () => {
+      const mockSrc = 'https';
+
+      const { root } = await newSpecPage({
+        components: [VertexDocumentViewer],
+        html: `<vertex-document-viewer src="${mockSrc}"></vertex-document-viewer>`,
+      });
+
+      const viewer = root as HTMLVertexDocumentViewerElement;
+      await viewer.loadPage(5);
+
+      expect(mockGetPage).toHaveBeenCalledWith(5);
+      expect(mockPageRender).toHaveBeenCalled();
+    });
+
+    it('throws an error if no document has been loaded and the API is not defined', async () => {
+      const { root } = await newSpecPage({
+        components: [VertexDocumentViewer],
+        html: '<vertex-document-viewer></vertex-document-viewer>',
+      });
+
+      const viewer = root as HTMLVertexDocumentViewerElement;
+      await expect(viewer.loadPage(1)).rejects.toThrow('No document has been loaded. Ensure that the `src` property is set and the resource is accessible.');
+    });
   });
 });

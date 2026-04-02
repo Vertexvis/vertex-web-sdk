@@ -101,7 +101,7 @@ export class VertexDocumentViewer {
    */
   @Method()
   public async panByDelta(delta: Point.Point): Promise<void> {
-    await this.documentApi?.panByDelta(delta);
+    await this.getDocumentApi().panByDelta(delta);
   }
 
   /**
@@ -114,7 +114,22 @@ export class VertexDocumentViewer {
    */
   @Method()
   public async zoomTo(percentage: number): Promise<void> {
-    await this.documentApi?.zoomTo(percentage);
+    await this.getDocumentApi().zoomTo(percentage);
+  }
+
+  /**
+   * Loads a specific page of the currently loaded document.
+   *
+   * Note that any offset applied by panning the document will be reset when loading
+   * a new page.
+   *
+   * @param pageNumber The page number to load.
+   */
+  @Method()
+  public async loadPage(pageNumber: number): Promise<void> {
+    const documentApi = this.getDocumentApi();
+
+    await documentApi.loadPage(pageNumber);
   }
 
   @Watch('src')
@@ -151,9 +166,19 @@ export class VertexDocumentViewer {
           >
             <canvas ref={el => (this.canvasEl = el)} />
           </div>
+
+          <slot></slot>
         </div>
       </Host>
     );
+  }
+
+  private getDocumentApi(): DocumentApi {
+    if (this.documentApi == null) {
+      throw new Error('No document has been loaded. Ensure that the `src` property is set and the resource is accessible.');
+    }
+
+    return this.documentApi;
   }
 
   private clearCurrentDocument(): void {

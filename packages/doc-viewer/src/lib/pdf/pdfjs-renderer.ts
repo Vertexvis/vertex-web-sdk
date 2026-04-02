@@ -53,9 +53,17 @@ export class PdfJsRenderer extends DocumentRenderer {
       const scaleY = dimensions.height / baseViewport.height;
       const baseScale = Math.max(0.1, Math.min(scaleX, scaleY));
 
+      // If the zoom percentage or viewport dimensions result in a situation where the content
+      // has been scaled down to a point where the horizontal dimension is smaller than the viewport,
+      // adjust the current panOffset by the difference between the viewport width and the scaled width.
+      // This ensures that the content is always centered in the viewport horizontally.
+      const effectiveScale = baseScale * (zoomPercentage / 100);
+      const scaledWidth = baseViewport.width * effectiveScale;
+      const centerOffsetX = Math.max(0, (dimensions.width - scaledWidth) / 2);
+
       const scaled = page.getViewport({
-        scale: baseScale * (zoomPercentage / 100),
-        offsetX: panOffset.x,
+        scale: effectiveScale,
+        offsetX: panOffset.x + centerOffsetX,
         offsetY: panOffset.y,
       });
 
@@ -63,7 +71,6 @@ export class PdfJsRenderer extends DocumentRenderer {
         canvas: this.canvas,
         viewport: scaled,
         intent: 'display',
-        background: '#ffffff',
         optionalContentConfigPromise: document.getOptionalContentConfig(),
       }).promise;
 

@@ -25,6 +25,11 @@ export namespace Components {
          */
         "interactionMode": InteractionMode;
         /**
+          * Loads a specific page of the currently loaded document.  Note that any offset applied by panning the document will be reset when loading a new page.
+          * @param pageNumber The page number to load.
+         */
+        "loadPage": (pageNumber: number) => Promise<void>;
+        /**
           * Pans the currently loaded document by the specified delta.  This method will be bounded to the visible portion of the document to ensure at least a portion of the document is always visible, and the `canvas` does not appear blank.
           * @param delta The delta to pan the document by.
          */

@@ -20,7 +20,7 @@ export const mockGetDocument = jest.fn((): any => ({
 }));
 
 export const mockPdfDocument = {
-  numPages: 1,
+  numPages: 10,
   getPage: mockGetPage,
   getOptionalContentConfig: jest.fn(),
   destroy: mockDestroy,

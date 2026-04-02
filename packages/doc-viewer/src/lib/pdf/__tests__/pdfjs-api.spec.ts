@@ -57,6 +57,20 @@ describe('PdfJsApi', () => {
         }),
       );
     });
+
+    it('throws an error if the page number is less than 1', async () => {
+      const api = new PdfJsApi();
+      await api.load('https');
+
+      await expect(api.loadPage(0)).rejects.toThrow('Unable to load page 0. The provided page number must be greater than 0.');
+    });
+
+    it('throws an error if the page number is greater than the total number of pages in the document', async () => {
+      const api = new PdfJsApi();
+      await api.load('https');
+
+      await expect(api.loadPage(100)).rejects.toThrow('Unable to load page 100. The document only has 10 page(s).');
+    });
   });
 
   describe('dispose', () => {

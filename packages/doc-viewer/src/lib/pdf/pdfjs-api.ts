@@ -28,17 +28,25 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> {
     if (resource.resource.type === 'url') {
       const document = await pdfjs.getDocument(resource.resource.url).promise;
 
-      this.updateState({ document });
+      this.updateState({ document, totalPageCount: document.numPages });
     } else {
       throw new Error('Invalid resource URI provided. Expected a URL to retrieve a PDF.');
     }
   }
 
   public async loadPage(pageNumber: number): Promise<void> {
+    const totalPageCount = this.state.totalPageCount ?? 1;
+
+    if (pageNumber <= 0) {
+      throw new Error(`Unable to load page ${pageNumber}. The provided page number must be greater than 0.`);
+    } else if (pageNumber > totalPageCount) {
+      throw new Error(`Unable to load page ${pageNumber}. The document only has ${totalPageCount} page(s).`);
+    }
+
     const page = await this.state.document?.getPage(pageNumber);
     const baseViewport = page?.getViewport({ scale: 1 });
     const contentDimensions = baseViewport != null ? Dimensions.create(baseViewport.width, baseViewport.height) : undefined;
 
-    this.updateState({ loadedPageNumber: pageNumber, contentDimensions });
+    this.updateState({ loadedPageNumber: pageNumber, contentDimensions, panOffset: Point.create(0, 0) });
   }
 }
