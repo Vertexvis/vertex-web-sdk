@@ -10,6 +10,7 @@ export interface DocumentApiState {
   readonly contentDimensions?: Dimensions.Dimensions;
   readonly panOffset: Point.Point;
   readonly loadedPageNumber?: number;
+  readonly totalPageCount?: number;
 }
 
 /**
