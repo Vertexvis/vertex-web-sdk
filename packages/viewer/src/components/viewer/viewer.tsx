@@ -989,17 +989,20 @@ export class Viewer {
         dimensions: this.dimensions,
         frameBgColor: this.getBackgroundColor(),
       });
-      await this.stream?.load(
+      const state = await this.stream?.load(
         urn,
         this.clientId,
         this.getDeviceId(),
         this.getResolvedConfig(),
         options?.cameraType
       );
-      this.sceneReady.emit();
 
-      if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {
-        this.annotations?.connect(EXPERIMENTAL_annotationPollingIntervalInMs);
+      if (state.type === 'connected') {
+        this.sceneReady.emit();
+
+        if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {
+          this.annotations?.connect(EXPERIMENTAL_annotationPollingIntervalInMs);
+        }
       }
     } else {
       throw new ViewerInitializationError(

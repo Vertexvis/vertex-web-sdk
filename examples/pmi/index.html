@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+  <head>
+    <title>PMI</title>
+
+    <!-- Live reload script -->
+    <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+
+    <script type="module" src="main.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer/viewer.css"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer/viewer.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer.js"
+    ></script>
+
+    <style>
+      html,
+      body {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      .left-panel {
+        display: flex;
+        flex-direction: column;
+        width: 33vw;
+        height: 100%;
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.1);
+        z-index: 10;
+      }
+
+      #model-view-list {
+        height: 50%;
+        overflow-y: auto;
+      }
+
+      #annotation-list {
+        height: 50%;
+        overflow-y: auto;
+      }
+
+      .model-view-list-header,
+      .annotation-list-header {
+        padding: 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .annotation-list-header {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      button {
+        width: 100%;
+        padding: 8px;
+        cursor: pointer;
+        border: none;
+        background-color: transparent;
+      }
+
+      #annotation-list button {
+        height: 100%;
+      }
+
+      .model-view-list-item {
+        text-align: left;
+      }
+
+      .annotation-list-item {
+        display: grid;
+        grid-template-columns: 0.75fr 0.25fr;
+        align-items: center;
+      }
+
+      .annotation-list-item-select-button {
+        text-align: left;
+      }
+
+      .model-view-list-item:not(.selected):hover,
+      .annotation-list-item:not(.selected):hover {
+        background-color: #b3e0f0;
+        cursor: pointer;
+      }
+      
+      .selected {
+        background-color: #4db8db;
+      }
+
+      #loading-layer {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        display: none;
+      }
+
+      #loading-layer.visible {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #viewer {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      #instructions {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 1rem;
+      }
+
+      #instructions-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      #instructions-close {
+        width: 2rem;
+        height: 2rem;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        border-radius: 100%;
+      }
+
+      #instructions-close:hover {
+        background-color: #b3e0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-panel">
+        <div class="model-view-list-header">Model Views</div>
+        <div id="model-view-list"></div>
+        <div class="annotation-list-header">PMI Annotations</div>
+        <div id="annotation-list"></div>
+      </div>
+      
+      <vertex-viewer
+        id="viewer"
+        class="viewer"
+      >
+        <vertex-viewer-default-toolbar
+          data-viewer="viewer"
+          placement="top-left"
+        ></vertex-viewer-default-toolbar>
+
+        <vertex-viewer-layer id="loading-layer">
+          <vertex-viewer-spinner></vertex-viewer-spinner>
+        </vertex-viewer-layer>
+      </vertex-viewer>
+
+    </div>
+    <div id="instructions">
+      <div id="instructions-header">
+        <strong>Instructions</strong>
+        <button id="instructions-close">
+          <vertex-viewer-icon name="close-circle" size="sm"></vertex-viewer-icon>
+        </button>
+      </div>
+
+      <div id="instructions-content">
+        <div>To get started, follow these steps:</div>
+        <br />
+        <div>- Click a model view to load it into the viewer and display all associated PMI annotations.</div>
+        <div>- Click a PMI annotation's name to select it from the list.</div>
+        <div>- Click a PMI annotation in the viewer to select it from the viewer.</div>
+        <div>- Click the visibility button to the right of the annotation's name to toggle its visibility.</div>
+      </div>
+    </div>
+  </body>
+</html>
