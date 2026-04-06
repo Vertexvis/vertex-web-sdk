@@ -14,9 +14,14 @@ interface PdfJsRendererState {
 export class PdfJsRenderer extends DocumentRenderer {
   private stateChangedDisposable: Disposable;
   private state: PdfJsRendererState = { pages: {}, rendering: false };
+  private offscreenCanvas: HTMLCanvasElement;
 
   public constructor(api: PdfJsApi, canvas: HTMLCanvasElement) {
     super(api, canvas);
+
+    // Render pages using an offscreen canvas to avoid flickering that can occur for
+    // PDFs with annotations.
+    this.offscreenCanvas = document.createElement('canvas');
 
     this.handleStateChanged = this.handleStateChanged.bind(this);
 
@@ -32,7 +37,7 @@ export class PdfJsRenderer extends DocumentRenderer {
   }
 
   private async renderPage(state: PdfJsApiState): Promise<void> {
-    const { document, loadedPageNumber, viewport, panOffset, zoomPercentage } = state;
+    const { document, loadedPageNumber, viewport, panOffset, zoomPercentage, optionalContentConfig } = state;
 
     if (this.state.rendering) {
       this.state.pendingStateChange = state;
@@ -48,9 +53,10 @@ export class PdfJsRenderer extends DocumentRenderer {
 
       const page = this.state.pages[loadedPageNumber];
       const dimensions = viewport ?? Dimensions.create(0, 0);
+      const scaledDimensions = Dimensions.scale(window.devicePixelRatio, window.devicePixelRatio, dimensions);
       const baseViewport = page.getViewport({ scale: 1 });
-      const scaleX = dimensions.width / baseViewport.width;
-      const scaleY = dimensions.height / baseViewport.height;
+      const scaleX = scaledDimensions.width / baseViewport.width;
+      const scaleY = scaledDimensions.height / baseViewport.height;
       const baseScale = Math.max(0.1, Math.min(scaleX, scaleY));
 
       // If the zoom percentage or viewport dimensions result in a situation where the content
@@ -59,7 +65,7 @@ export class PdfJsRenderer extends DocumentRenderer {
       // This ensures that the content is always centered in the viewport horizontally.
       const effectiveScale = baseScale * (zoomPercentage / 100);
       const scaledWidth = baseViewport.width * effectiveScale;
-      const centerOffsetX = Math.max(0, (dimensions.width - scaledWidth) / 2);
+      const centerOffsetX = Math.max(0, (scaledDimensions.width - scaledWidth) / 2);
 
       const scaled = page.getViewport({
         scale: effectiveScale,
@@ -67,12 +73,21 @@ export class PdfJsRenderer extends DocumentRenderer {
         offsetY: panOffset.y,
       });
 
+      this.offscreenCanvas.width = this.canvas.width;
+      this.offscreenCanvas.height = this.canvas.height;
+
       await page.render({
-        canvas: this.canvas,
+        canvas: this.offscreenCanvas,
         viewport: scaled,
         intent: 'display',
-        optionalContentConfigPromise: document.getOptionalContentConfig(),
+        optionalContentConfigPromise: optionalContentConfig != null ? Promise.resolve(optionalContentConfig) : undefined,
       }).promise;
+
+      const ctx = this.canvas.getContext('2d');
+      if (ctx != null) {
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.drawImage(this.offscreenCanvas, 0, 0);
+      }
 
       this.state.rendering = false;
     }

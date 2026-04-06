@@ -1,10 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Component, Element, h, Host, Method, Prop, Watch } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, Watch } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { DocumentApi, DocumentApiState } from '../../lib/document/api';
+import { DocumentLayersController } from '../../lib/document/layers/controller';
 import { DocumentProvider } from '../../lib/document/provider';
 import { DocumentRenderer } from '../../lib/document/renderer';
 import { getElementBoundingClientRect } from '../../lib/dom';
@@ -44,10 +45,24 @@ export class VertexDocumentViewer {
   @Prop({ mutable: true }) public documentState?: DocumentApiState;
 
   /**
+   * Controller for interacting with layers in the currently loaded document.
+   *
+   * This controller will automatically be created along with the loaded document.
+   * Note that the methods available on this controller will only be supported if
+   * the underlying document type supports layers.
+   */
+  @Prop({ mutable: true }) public layers?: DocumentLayersController;
+
+  /**
    * An optional value that will debounce image updates when resizing
    * this viewer element.
    */
   @Prop() public resizeDebounce = 100;
+
+  /**
+   * Emits an event when the document is ready to be interacted with.
+   */
+  @Event() public documentReady!: EventEmitter<void>;
 
   @Element() private hostEl!: HTMLElement;
 
@@ -140,12 +155,15 @@ export class VertexDocumentViewer {
       const { api, renderer } = this.provider.create(this.canvasEl);
       this.documentApi = api;
       this.documentRenderer = renderer;
+      this.layers = new DocumentLayersController(api);
       this.updateInteractionHandler();
       this.updateDocumentApiListeners();
 
       await this.documentApi.updateViewport(this.dimensions);
       await this.documentApi.load(this.src);
       await this.documentApi.loadPage(1);
+
+      this.documentReady.emit();
     }
   }
 
@@ -164,7 +182,7 @@ export class VertexDocumentViewer {
               'enable-pointer-events ': window.PointerEvent != null,
             })}
           >
-            <canvas ref={el => (this.canvasEl = el)} />
+            <canvas role="presentation" ref={el => (this.canvasEl = el)} />
           </div>
 
           <slot></slot>
@@ -186,6 +204,7 @@ export class VertexDocumentViewer {
     this.documentApi?.dispose();
     this.panInteractionHandler?.dispose();
     this.documentApiStateChangedDisposable?.dispose();
+    this.layers = undefined;
   }
 
   private handleDocumentApiStateChanged(state: DocumentApiState): void {
@@ -208,8 +227,10 @@ export class VertexDocumentViewer {
     this.dimensions = dimensions ?? getElementBoundingClientRect(this.hostEl);
 
     if (this.canvasEl != null) {
-      this.canvasEl.width = this.dimensions.width;
-      this.canvasEl.height = this.dimensions.height;
+      this.canvasEl.width = Math.floor(this.dimensions.width * window.devicePixelRatio);
+      this.canvasEl.height = Math.floor(this.dimensions.height * window.devicePixelRatio);
+      this.canvasEl.style.width = `${this.dimensions.width}px`;
+      this.canvasEl.style.height = `${this.dimensions.height}px`;
     }
   }
 

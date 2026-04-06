@@ -8,10 +8,12 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { DocumentProvider } from "./lib/document/provider";
 import { InteractionMode } from "./components/document-viewer/document-viewer";
 import { DocumentApiState } from "./lib/document/api";
+import { DocumentLayersController } from "./lib/document/layers/controller";
 import { Point } from "@vertexvis/geometry";
 export { DocumentProvider } from "./lib/document/provider";
 export { InteractionMode } from "./components/document-viewer/document-viewer";
 export { DocumentApiState } from "./lib/document/api";
+export { DocumentLayersController } from "./lib/document/layers/controller";
 export { Point } from "@vertexvis/geometry";
 export namespace Components {
     interface VertexDocumentViewer {
@@ -24,6 +26,10 @@ export namespace Components {
           * @default 'pan'
          */
         "interactionMode": InteractionMode;
+        /**
+          * Controller for interacting with layers in the currently loaded document.  This controller will automatically be created along with the loaded document. Note that the methods available on this controller will only be supported if the underlying document type supports layers.
+         */
+        "layers"?: DocumentLayersController;
         /**
           * Loads a specific page of the currently loaded document.  Note that any offset applied by panning the document will be reset when loading a new page.
           * @param pageNumber The page number to load.
@@ -55,8 +61,23 @@ export namespace Components {
         "zoomTo": (percentage: number) => Promise<void>;
     }
 }
+export interface VertexDocumentViewerCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLVertexDocumentViewerElement;
+}
 declare global {
+    interface HTMLVertexDocumentViewerElementEventMap {
+        "documentReady": void;
+    }
     interface HTMLVertexDocumentViewerElement extends Components.VertexDocumentViewer, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLVertexDocumentViewerElementEventMap>(type: K, listener: (this: HTMLVertexDocumentViewerElement, ev: VertexDocumentViewerCustomEvent<HTMLVertexDocumentViewerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLVertexDocumentViewerElementEventMap>(type: K, listener: (this: HTMLVertexDocumentViewerElement, ev: VertexDocumentViewerCustomEvent<HTMLVertexDocumentViewerElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLVertexDocumentViewerElement: {
         prototype: HTMLVertexDocumentViewerElement;
@@ -77,6 +98,14 @@ declare namespace LocalJSX {
           * @default 'pan'
          */
         "interactionMode"?: InteractionMode;
+        /**
+          * Controller for interacting with layers in the currently loaded document.  This controller will automatically be created along with the loaded document. Note that the methods available on this controller will only be supported if the underlying document type supports layers.
+         */
+        "layers"?: DocumentLayersController;
+        /**
+          * Emits an event when the document is ready to be interacted with.
+         */
+        "onDocumentReady"?: (event: VertexDocumentViewerCustomEvent<void>) => void;
         /**
           * The provider used to create the document API and renderer.
           * @default new PdfJsProvider()
