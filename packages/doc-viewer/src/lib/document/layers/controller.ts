@@ -12,16 +12,29 @@ export class DocumentLayersController {
     }
   }
 
+  /**
+   * Returns a boolean indicating whether the document supports layers.
+   */
   public get enabled(): boolean {
     return this.apiSupportsLayers;
   }
 
+  /**
+   * Retrieves the layers of the document.
+   *
+   * @throws {Error} if the loaded document does not support layers.
+   */
   public async getLayers(): Promise<DocumentLayer[]> {
     return this.getApi().getLayers();
   }
 
-  public async setLayerVisibility(layerId: string, visible: boolean): Promise<void> {
-    return this.getApi().setLayerVisibility(layerId, visible);
+  /**
+   * Sets the visibility of a layer by ID.
+   *
+   * @throws {Error} if the loaded document does not support layers.
+   */
+  public async setLayerVisibility(id: string, visible: boolean): Promise<void> {
+    return this.getApi().setLayerVisibility(id, visible);
   }
 
   private getApi(): LayerSupportedApi {
