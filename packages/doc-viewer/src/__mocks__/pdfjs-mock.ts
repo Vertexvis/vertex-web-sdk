@@ -1,5 +1,9 @@
 import type { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs';
 
+export class MockOptionalContentConfig extends Map {
+  public setVisibility = jest.fn();
+}
+
 export const mockGetViewport = jest.fn(() => ({ width: 100, height: 100 }));
 
 export const mockPageRender = jest.fn(() => ({ promise: Promise.resolve() }));
@@ -22,7 +26,7 @@ export const mockGetDocument = jest.fn((): any => ({
 export const mockPdfDocument = {
   numPages: 10,
   getPage: mockGetPage,
-  getOptionalContentConfig: jest.fn(() => Promise.resolve(new Map())),
+  getOptionalContentConfig: jest.fn(() => Promise.resolve(new MockOptionalContentConfig())),
   destroy: mockDestroy,
 } as unknown as PDFDocumentProxy;
 

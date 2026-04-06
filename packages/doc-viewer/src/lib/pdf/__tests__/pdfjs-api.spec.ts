@@ -2,7 +2,7 @@ jest.mock('../../types/loadableResource', () => ({
   fromUri: jest.fn(() => ({ resource: { type: 'url', url: 'https' } })),
 }));
 
-import { mockDestroy, mockGetDocument, mockGetPage } from '../../../__mocks__/pdfjs-mock';
+import { mockDestroy, mockGetDocument, mockGetPage, MockOptionalContentConfig } from '../../../__mocks__/pdfjs-mock';
 import { fromUri } from '../../types/loadableResource';
 import { PdfJsApi } from '../pdfjs-api';
 
@@ -60,6 +60,7 @@ describe('PdfJsApi', () => {
 
     it('throws an error if the page number is less than 1', async () => {
       const api = new PdfJsApi();
+
       await api.load('https');
 
       await expect(api.loadPage(0)).rejects.toThrow('Unable to load page 0. The provided page number must be greater than 0.');
@@ -67,9 +68,58 @@ describe('PdfJsApi', () => {
 
     it('throws an error if the page number is greater than the total number of pages in the document', async () => {
       const api = new PdfJsApi();
+
       await api.load('https');
 
       await expect(api.loadPage(100)).rejects.toThrow('Unable to load page 100. The document only has 10 page(s).');
+    });
+  });
+
+  describe('getLayers', () => {
+    it('returns the layers of the document', async () => {
+      const api = new PdfJsApi();
+      const mockLayerIds = new Array(10).fill(undefined).map((_, index) => `layer-${index}`);
+      const mockOptionalContentConfig = new MockOptionalContentConfig();
+      const mockPdfDocument = {
+        numPages: 1,
+        getPage: mockGetPage,
+        getOptionalContentConfig: jest.fn(() => Promise.resolve(mockOptionalContentConfig)),
+      };
+
+      mockLayerIds.forEach(layerId => {
+        mockOptionalContentConfig.set(layerId, { name: layerId, visible: true });
+      });
+      mockGetDocument.mockReturnValueOnce({ promise: Promise.resolve(mockPdfDocument) });
+
+      await api.load('https');
+
+      expect(api.getLayers()).toEqual(mockLayerIds.map(layerId => ({ id: layerId, name: layerId, visible: true })));
+    });
+  });
+
+  describe('setLayerVisibility', () => {
+    it('sets the visibility of a layer', async () => {
+      const api = new PdfJsApi();
+      const mockOptionalContentConfig = new MockOptionalContentConfig();
+      const mockPdfDocument = {
+        numPages: 1,
+        getPage: mockGetPage,
+        getOptionalContentConfig: jest.fn(() => Promise.resolve(mockOptionalContentConfig)),
+      };
+
+      mockOptionalContentConfig.set('layer-1', { name: 'layer-1', visible: true });
+      mockGetDocument.mockReturnValueOnce({ promise: Promise.resolve(mockPdfDocument) });
+
+      await api.load('https');
+      api.setLayerVisibility('layer-1', true);
+
+      expect(mockOptionalContentConfig.setVisibility).toHaveBeenCalledWith('layer-1', true);
+    });
+
+    it('throws an error if no document has been loaded', async () => {
+      const api = new PdfJsApi();
+
+      expect(() => api.setLayerVisibility('layer-1', true)).toThrow('No document has been loaded. Unable to set layer visibility.');
     });
   });
 

@@ -1,2 +1,2 @@
 export * from './controller';
-export * from './layers';
+export * from './types';

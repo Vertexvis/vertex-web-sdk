@@ -1,5 +1,5 @@
 import { DocumentApi } from '../api';
-import { apiSupportsLayers, DocumentLayer, LayerSupportedApi } from './layers';
+import { apiSupportsLayers, DocumentLayer, LayerSupportedApi } from './types';
 
 export class DocumentLayersController {
   private apiSupportsLayers = false;
