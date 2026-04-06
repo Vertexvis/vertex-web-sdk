@@ -62,7 +62,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     const tool = viewer.querySelector(
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
-    const teleportTool = tool.shadowRoot?.querySelector(
+    const teleportTool = tool.querySelector(
       'vertex-viewer-teleport-tool'
     ) as HTMLVertexViewerTeleportToolElement;
 
@@ -86,7 +86,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     const tool = viewer.querySelector(
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
-    const teleportTool = tool.shadowRoot?.querySelector(
+    const teleportTool = tool.querySelector(
       'vertex-viewer-teleport-tool'
     ) as HTMLVertexViewerTeleportToolElement;
 
@@ -110,7 +110,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     const tool = viewer.querySelector(
       'vertex-viewer-walk-mode-tool'
     ) as HTMLVertexViewerWalkModeToolElement;
-    const teleportTool = tool.shadowRoot?.querySelector(
+    const teleportTool = tool.querySelector(
       'vertex-viewer-teleport-tool'
     ) as HTMLVertexViewerTeleportToolElement;
 

@@ -18,6 +18,25 @@
 
 ## Methods
 
+### `loadPage(pageNumber: number) => Promise<void>`
+
+Loads a specific page of the currently loaded document.
+
+Note that any offset applied by panning the document will be reset when loading
+a new page.
+
+#### Parameters
+
+| Name         | Type     | Description              |
+| ------------ | -------- | ------------------------ |
+| `pageNumber` | `number` | The page number to load. |
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `panByDelta(delta: Point.Point) => Promise<void>`
 
 Pans the currently loaded document by the specified delta.
