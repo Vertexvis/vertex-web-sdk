@@ -94,6 +94,16 @@ export class ModelViewController {
    * the scene view.
    */
   public async unload(): Promise<void> {
-    this.stream.updateModelView({}, true);
+    await this.stream.updateModelView({}, true);
+
+    // Clear any cross-section added from the model view
+    await this.stream.updateCrossSectioning(
+      {
+        crossSectioning: {
+          sectionPlanes: [],
+        },
+      },
+      true
+    );
   }
 }
