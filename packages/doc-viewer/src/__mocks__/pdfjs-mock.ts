@@ -22,7 +22,7 @@ export const mockGetDocument = jest.fn((): any => ({
 export const mockPdfDocument = {
   numPages: 10,
   getPage: mockGetPage,
-  getOptionalContentConfig: jest.fn(),
+  getOptionalContentConfig: jest.fn(() => Promise.resolve(new Map())),
   destroy: mockDestroy,
 } as unknown as PDFDocumentProxy;
 

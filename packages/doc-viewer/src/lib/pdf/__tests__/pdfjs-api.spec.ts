@@ -17,7 +17,7 @@ describe('PdfJsApi', () => {
       const mockPdfDocument = {
         numPages: 1,
         getPage: mockGetPage,
-        getOptionalContentConfig: jest.fn(),
+        getOptionalContentConfig: jest.fn(() => Promise.resolve(new Map())),
       };
 
       mockGetDocument.mockReturnValueOnce({ promise: Promise.resolve(mockPdfDocument) });
