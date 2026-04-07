@@ -91,9 +91,12 @@ export abstract class DocumentApi<T extends DocumentApiState = DocumentApiState>
     const { viewport, contentDimensions } = this.state;
 
     if (viewport != null && contentDimensions != null) {
+      // Scale the viewport by the device pixel ratio to ensure that documents are rendered sharply on all devices.
+      const scaledViewport = Dimensions.scale(window.devicePixelRatio, window.devicePixelRatio, viewport);
+
       // Constrain the offset based on the original content dimensions to prevent scenarios where
       // content winds up rendered outside of the viewport (i.e. the viewport shows as blank).
-      const baseScale = Math.min(viewport.width / contentDimensions.width, viewport.height / contentDimensions.height);
+      const baseScale = Math.min(scaledViewport.width / contentDimensions.width, scaledViewport.height / contentDimensions.height);
       const renderedWidth = contentDimensions.width * baseScale * (zoomPercentage / 100);
       const renderedHeight = contentDimensions.height * baseScale * (zoomPercentage / 100);
 
@@ -101,8 +104,8 @@ export abstract class DocumentApi<T extends DocumentApiState = DocumentApiState>
       // In the case of a document with dimensions of { width: 100, height: 100 } and a viewport of { width: 50, height: 50 },
       // the minimum offset would be { x: -25, y: -25 }. Using this minimum offset, the viewport is "placed"
       // in the bottom right corner of the viewport, by shifting the content underneath up and to the left.
-      const minimumOffsetX = Math.min(0, viewport.width - renderedWidth);
-      const minimumOffsetY = Math.min(0, viewport.height - renderedHeight);
+      const minimumOffsetX = Math.min(0, scaledViewport.width - renderedWidth);
+      const minimumOffsetY = Math.min(0, scaledViewport.height - renderedHeight);
 
       // Maximum values for the offset of the underlying content to keep it visible in the viewport.
       // These values will always be 0, as this represents "placing" the viewport in the top left corner

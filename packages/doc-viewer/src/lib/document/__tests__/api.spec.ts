@@ -64,5 +64,25 @@ describe('DocumentApi', () => {
 
       expect(mockStateChanged).toHaveBeenCalledWith(expect.objectContaining({ panOffset: Point.create(-25, -25) }));
     });
+
+    it('incorporates the device pixel ratio when constraining the pan offset', async () => {
+      const originalDevicePixelRatio = window.devicePixelRatio;
+      const mockStateChanged = jest.fn();
+      const api = new MockDocumentApi({
+        zoomPercentage: 150,
+        panOffset: Point.create(0, 0),
+        viewport: Dimensions.create(50, 50),
+        contentDimensions: Dimensions.create(100, 100),
+      });
+
+      Object.defineProperty(window, 'devicePixelRatio', { value: 2 });
+
+      api.onStateChanged(mockStateChanged);
+      await api.panByDelta(Point.create(-500, -500));
+
+      expect(mockStateChanged).toHaveBeenCalledWith(expect.objectContaining({ panOffset: Point.create(-50, -50) }));
+
+      Object.defineProperty(window, 'devicePixelRatio', { value: originalDevicePixelRatio });
+    });
   });
 });
