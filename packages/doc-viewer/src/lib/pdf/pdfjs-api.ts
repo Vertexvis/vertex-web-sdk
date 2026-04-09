@@ -23,6 +23,8 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport
       panOffset: Point.create(0, 0),
       zoomPercentage: 100,
     });
+
+    pdfjs.GlobalWorkerOptions.workerSrc = config?.pdfJs.workerSrc ?? getWorkerSrc();
   }
 
   public dispose(): void {
@@ -30,8 +32,6 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport
   }
 
   public async load(uri: string): Promise<void> {
-    await this.initializeWorkerSrc();
-
     const resource = fromUri(uri);
 
     if (resource.resource.type === 'url') {
@@ -50,8 +50,6 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport
   }
 
   public async loadPage(pageNumber: number): Promise<void> {
-    await this.initializeWorkerSrc();
-
     const totalPageCount = this.state.totalPageCount ?? 1;
 
     if (pageNumber <= 0) {
@@ -84,13 +82,5 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport
       optionalContentConfig,
       layers: Array.from(optionalContentConfig).map(([id, group]) => ({ id, name: group.name ?? id, visible: group.visible })),
     });
-  }
-
-  private async initializeWorkerSrc(): Promise<void> {
-    const workerSrc = await getWorkerSrc(this.config);
-
-    if (workerSrc) {
-      pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
-    }
   }
 }

@@ -20,7 +20,7 @@ export { Point } from "@vertexvis/geometry";
 export namespace Components {
     interface VertexDocumentViewer {
         /**
-          * Configuration values for the document viewer. See {@link Config} for more information on the available configuration options.
+          * Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.
          */
         "config"?: PartialConfig;
         /**
@@ -96,7 +96,7 @@ declare global {
 declare namespace LocalJSX {
     interface VertexDocumentViewer {
         /**
-          * Configuration values for the document viewer. See {@link Config} for more information on the available configuration options.
+          * Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.
          */
         "config"?: PartialConfig;
         /**

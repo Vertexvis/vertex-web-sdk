@@ -52,10 +52,29 @@ createApp(App).use(VertexDocumentViewerPlugin).mount('#app');
 
 Lastly, use the component wrappers in one of your Vue components.
 
-```jsx
+```tsx
+<script setup lang="ts">
+  import { onMounted, ref } from 'vue';
+  import workerSrc from '@vertexvis/doc-viewer/assets/pdf.worker.min.mjs?url';
+  
+  const viewer = ref<HTMLVertexDocumentViewerElement | null>(null);
+
+  onMounted(async () => {
+    if (viewer.value != null) {
+      // Configure the PDF.js worker source relative to your application's build
+      viewer.value.config = {
+        pdfJs: {
+          workerSrc
+        }
+      }
+    }
+  });
+</script>
+
 <template>
   <vertex-document-viewer
     id="document-viewer"
+    ref="viewer"
     src="https://{{ DOCUMENT_URL }}"
   >
   </vertex-document-viewer>

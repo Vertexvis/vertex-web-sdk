@@ -20,7 +20,33 @@
   "bugs": {
     "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/index.cjs.js",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./dist/components": {
+      "import": "./dist/components/index.js",
+      "default": "./dist/components/index.js"
+    },
+    "./dist/components/*": {
+      "import": "./dist/components/*",
+      "default": "./dist/components/*"
+    },
+    "./loader": {
+      "types": "./loader/index.d.ts",
+      "import": "./loader/index.js",
+      "default": "./loader/index.js"
+    },
+    "./assets/pdf.worker.min.mjs": {
+      "import": "./assets/pdf.worker.min.mjs",
+      "default": "./assets/pdf.worker.min.mjs"
+    }
+  },
   "files": [
+    "assets/",
     "dist/",
     "loader/",
     "LICENSE"

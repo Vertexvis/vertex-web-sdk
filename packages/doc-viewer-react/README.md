@@ -38,14 +38,28 @@ Next, add one of the components to your React component.
 ```jsx
 import React from 'react';
 import { VertexDocumentViewer } from '@vertexvis/doc-viewer-react';
+import workerSrc from '@vertexvis/doc-viewer/assets/pdf.worker.min.mjs';
 
 export function App() {
   return (
     <div>
-      <VertexDocumentViewer src="https://{{ DOCUMENT_URL }}" />
+      <VertexDocumentViewer config={{ pdfJs: { workerSrc } }} src="https://{{ DOCUMENT_URL }}" />
     </div>
   );
 }
+```
+
+### Note with Webpack builds
+
+Webpack will not recognize the `import workerSrc from '@vertexvis/doc-viewer/assets/pdf.worker.min.mjs';` import as
+an asset URL by default. This can cause Webpack to attempt to treat this file as a module and display warnings. To
+resolve this, the following can be added to your webpack config to indicate this file is an asset:
+
+```
+{
+  test: /pdf\.worker\.min\.mjs$/,
+  type: 'asset/resource',
+},
 ```
 
 ## Documentation
