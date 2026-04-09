@@ -4,6 +4,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
+import { Config, PartialConfig } from '../../lib/config';
 import { DocumentApi, DocumentApiState } from '../../lib/document/api';
 import { DocumentLayersController } from '../../lib/document/layers/controller';
 import { DocumentProvider } from '../../lib/document/provider';
@@ -52,6 +53,12 @@ export class VertexDocumentViewer {
    * the underlying document type supports layers.
    */
   @Prop({ mutable: true }) public layers?: DocumentLayersController;
+
+  /**
+   * Configuration values for the document viewer. See {@link Config} for more information
+   * on the available configuration options.
+   */
+  @Prop() public config?: PartialConfig;
 
   /**
    * An optional value that will debounce image updates when resizing

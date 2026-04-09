@@ -7,13 +7,21 @@
 
 ## Properties
 
-| Property          | Attribute          | Description                                                                                                                                                                     | Type                            | Default               |
-| ----------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | --------------------- |
-| `documentState`   | --                 | Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets. | `DocumentApiState \| undefined` | `undefined`           |
-| `interactionMode` | `interaction-mode` | The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.                   | `"none" \| "pan"`               | `'pan'`               |
-| `provider`        | --                 | The provider used to create the document API and renderer.                                                                                                                      | `DocumentProvider`              | `new PdfJsProvider()` |
-| `resizeDebounce`  | `resize-debounce`  | An optional value that will debounce image updates when resizing this viewer element.                                                                                           | `number`                        | `100`                 |
-| `src`             | `src`              | A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.                                            | `string \| undefined`           | `undefined`           |
+| Property          | Attribute          | Description                                                                                                                                                                                                                                                                        | Type                                    | Default               |
+| ----------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------- |
+| `documentState`   | --                 | Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.                                                                                                    | `DocumentApiState \| undefined`         | `undefined`           |
+| `interactionMode` | `interaction-mode` | The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.                                                                                                                      | `"none" \| "pan"`                       | `'pan'`               |
+| `layers`          | --                 | Controller for interacting with layers in the currently loaded document.  This controller will automatically be created along with the loaded document. Note that the methods available on this controller will only be supported if the underlying document type supports layers. | `DocumentLayersController \| undefined` | `undefined`           |
+| `provider`        | --                 | The provider used to create the document API and renderer.                                                                                                                                                                                                                         | `DocumentProvider`                      | `new PdfJsProvider()` |
+| `resizeDebounce`  | `resize-debounce`  | An optional value that will debounce image updates when resizing this viewer element.                                                                                                                                                                                              | `number`                                | `100`                 |
+| `src`             | `src`              | A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.                                                                                                                                               | `string \| undefined`                   | `undefined`           |
+
+
+## Events
+
+| Event           | Description                                                      | Type                |
+| --------------- | ---------------------------------------------------------------- | ------------------- |
+| `documentReady` | Emits an event when the document is ready to be interacted with. | `CustomEvent<void>` |
 
 
 ## Methods
