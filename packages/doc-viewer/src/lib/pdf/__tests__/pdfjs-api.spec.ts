@@ -1,6 +1,7 @@
 jest.mock('../../types/loadableResource', () => ({
   fromUri: jest.fn(() => ({ resource: { type: 'url', url: 'https' } })),
 }));
+jest.mock('../util/worker-src');
 
 import { mockDestroy, mockGetDocument, mockGetPage, MockOptionalContentConfig } from '../../../__mocks__/pdfjs-mock';
 import { fromUri } from '../../types/loadableResource';

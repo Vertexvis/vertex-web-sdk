@@ -1,3 +1,5 @@
+jest.mock('../../../pdf/util/worker-src');
+
 import { Point } from '@vertexvis/geometry';
 
 import { mockGetDocument, mockGetPage, MockOptionalContentConfig } from '../../../../__mocks__/pdfjs-mock';

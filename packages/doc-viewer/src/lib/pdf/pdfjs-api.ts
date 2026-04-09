@@ -6,6 +6,7 @@ import { Config } from '../config';
 import { DocumentApi, DocumentApiState } from '../document/api';
 import { DocumentLayer, LayerSupport } from '../document/layers';
 import { fromUri } from '../types/loadableResource';
+import { getWorkerSrc } from './util/worker-src';
 
 export interface PdfJsApiState extends DocumentApiState {
   readonly document?: pdfjs.PDFDocumentProxy;
@@ -29,7 +30,7 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport
   }
 
   public async load(uri: string): Promise<void> {
-    await this.setupWorkerSrc();
+    await this.initializeWorkerSrc();
 
     const resource = fromUri(uri);
 
@@ -49,7 +50,7 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport
   }
 
   public async loadPage(pageNumber: number): Promise<void> {
-    await this.setupWorkerSrc();
+    await this.initializeWorkerSrc();
 
     const totalPageCount = this.state.totalPageCount ?? 1;
 
@@ -85,60 +86,11 @@ export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport
     });
   }
 
-  private async setupWorkerSrc(): Promise<void> {
-    if (this.workerSrcInitialized) {
-      return;
+  private async initializeWorkerSrc(): Promise<void> {
+    const workerSrc = await getWorkerSrc(this.config);
+
+    if (workerSrc) {
+      pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
     }
-
-    if (this.config?.pdfJs.workerSrc) {
-      pdfjs.GlobalWorkerOptions.workerSrc = this.config.pdfJs.workerSrc;
-      this.workerSrcInitialized = true;
-      return;
-    } else {
-      const srcCandidates = this.getBuildTypeWorkerSrcCandidateProviders();
-
-      for (const srcProvider of srcCandidates) {
-        try {
-          const src = srcProvider();
-          const response = await fetch(src);
-
-          if (response?.ok) {
-            pdfjs.GlobalWorkerOptions.workerSrc = src;
-            this.workerSrcInitialized = true;
-            break;
-          }
-        } catch (e) {
-          // Ignore failures to retrieve the worker source, as some failures may be expected depending on the build type.
-        }
-      }
-
-      if (!this.workerSrcInitialized) {
-        throw new Error('Failed to initialize the worker source.');
-      }
-    }
-  }
-
-  private getBuildTypeWorkerSrcCandidateProviders(): Array<() => string> {
-    // There are a number of possible approaches for loading the worker source, and this set of URLs attempts to
-    // cover approaches that work for a few different build tools. A config value can be provided to override this
-    // behavior, but the default behavior attempts to work with as many build tools as possible.
-    // Note that these are set up as providers to prevent exceptions when attempting to create the URL object.
-    const relativeUrlBasedStringProvider = (): string => new URL('./assets/pdf.worker.min.mjs', import.meta.url).toString();
-    const absolutePathStringProvider = (): string => '/dist/doc-viewer/assets/pdf.worker.min.mjs';
-    const parentUrlBasedStringProvider = (): string => new URL('../doc-viewer/assets/pdf.worker.min.mjs', import.meta.url).toString();
-
-    const isEsmBuild = import.meta.url.includes('/dist/esm/');
-    const isCustomElementBuild = import.meta.url.includes('/dist/components/');
-    const isDistBuild = import.meta.url.includes('/dist/doc-viewer/');
-
-    if (isEsmBuild) {
-      return [parentUrlBasedStringProvider, relativeUrlBasedStringProvider, absolutePathStringProvider];
-    } else if (isDistBuild) {
-      return [absolutePathStringProvider, relativeUrlBasedStringProvider, parentUrlBasedStringProvider];
-    } else if (isCustomElementBuild) {
-      return [relativeUrlBasedStringProvider, parentUrlBasedStringProvider, absolutePathStringProvider];
-    }
-
-    return [relativeUrlBasedStringProvider, parentUrlBasedStringProvider, absolutePathStringProvider];
   }
 }
