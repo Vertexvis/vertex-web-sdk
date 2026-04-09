@@ -6,7 +6,6 @@ import { Config } from '../config';
 import { DocumentApi, DocumentApiState } from '../document/api';
 import { DocumentLayer, LayerSupport } from '../document/layers';
 import { fromUri } from '../types/loadableResource';
-import { getWorkerSrc } from './util/worker-src';
 
 export interface PdfJsApiState extends DocumentApiState {
   readonly document?: pdfjs.PDFDocumentProxy;
@@ -16,15 +15,13 @@ export interface PdfJsApiState extends DocumentApiState {
 }
 
 export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport {
-  private workerSrcInitialized = false;
-
   public constructor(private readonly config?: Config) {
     super({
       panOffset: Point.create(0, 0),
       zoomPercentage: 100,
     });
 
-    pdfjs.GlobalWorkerOptions.workerSrc = config?.pdfJs.workerSrc ?? getWorkerSrc();
+    pdfjs.GlobalWorkerOptions.workerSrc = config?.pdfJs.workerSrc ?? './assets/pdf.worker.min.mjs';
   }
 
   public dispose(): void {
