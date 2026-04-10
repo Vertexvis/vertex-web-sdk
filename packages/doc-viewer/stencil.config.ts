@@ -4,7 +4,6 @@ import { vueOutputTarget } from '@stencil/vue-output-target';
 import copy from 'rollup-plugin-copy';
 
 import jestConfig from './jest-shared.config';
-import path from 'path';
 
 export const config: Config = {
   namespace: 'doc-viewer',
@@ -57,7 +56,7 @@ export const config: Config = {
           },
         ],
       }),
-    ]
+    ],
   },
   testing: { ...jestConfig },
   extras: {
