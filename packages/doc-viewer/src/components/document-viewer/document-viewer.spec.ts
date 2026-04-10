@@ -1,5 +1,3 @@
-jest.mock('../../lib/pdf/util/worker-src');
-
 import { newSpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
 
