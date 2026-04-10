@@ -53,9 +53,9 @@
   ],
   "private": "true",
   "scripts": {
-    "prebuild": "cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
+    "prebuild": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "build": "stencil build",
-    "prestart": "cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
+    "prestart": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "start": "stencil build --dev --watch --serve",
     "dev": "yarn start",
     "format": "yarn lint --fix",
