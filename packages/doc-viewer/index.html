@@ -30,26 +30,6 @@
         height: 100%;
       }
 
-      #layers-sidebar {
-        display: flex;
-        flex-direction: column;
-        width: 200px;
-        height: 100%;
-        background-color: #eeeeee;
-        border-right: 1px solid #cccccc;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-
-      .layer.enabled {
-        background-color: #4db8db;
-      }
-
-      .layer {
-        white-space: nowrap;
-        background-color: #cccccc;
-      }
-
       svg {
         fill: currentColor;
       }
@@ -102,7 +82,6 @@
         const zoomOutButton = document.getElementById('zoom-out-button');
         const loadNextPageButton = document.getElementById('load-next-page');
         const loadPreviousPageButton = document.getElementById('load-previous-page');
-        const layersSidebar = document.getElementById('layers-sidebar');
 
         modeButton.addEventListener('click', () => {
           const updatedInteractionMode = documentViewer.interactionMode === 'pan' ? 'none' : 'pan';
@@ -129,40 +108,6 @@
         loadPreviousPageButton.addEventListener('click', async () => {
           await documentViewer.loadPage(documentViewer.documentState.loadedPageNumber - 1);
         });
-
-        documentViewer.addEventListener('documentReady', () => {
-          if (documentViewer.layers.enabled) {
-            documentViewer.layers.getLayers().then(layers => {
-              layers.forEach(layer => {
-                const layerElement = document.createElement('div');
-
-                layerElement.classList.add('layer')
-                layerElement.textContent = layer.name;
-                layerElement.addEventListener('click', () => {
-                  const updatedVisible = !layerElement.classList.contains('enabled');
-
-                  console.log('updatedVisible', updatedVisible);
-
-                  documentViewer.layers.setLayerVisibility(layer.id, updatedVisible);
-
-                  if (updatedVisible) {
-                    layerElement.classList.add('enabled');
-                  } else {
-                    layerElement.classList.remove('enabled');
-                  }
-                });
-
-                if (layer.visible) {
-                  layerElement.classList.add('enabled');
-                }
-
-                layersSidebar.appendChild(layerElement);
-              });
-            });
-          } else {
-            layersSidebar.style.display = 'none';
-          }
-        });
       }
 
 
@@ -171,10 +116,7 @@
   </head>
   <body>
     <div class="app">
-      <div id="layers-sidebar"></div>
-
-      <vertex-document-viewer src="https://vertex-permanent-storage-platdev-us-west-2.s3.us-west-2.amazonaws.com/35470bfb-d048-4c8a-9be5-c5530f991450/files/2a85241c-eb38-4cea-9d20-e3d98a01bc35?response-cache-control=max-age%3D86400&response-content-disposition=attachment%3B%20filename%3D%22has_layers_floorplan.pdf%22&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFIaCXVzLXdlc3QtMiJGMEQCIGnHVnxem2TDIxY77rxz%2FIjM%2BrHfXHa770j7s0aE4RBlAiAgcVfxMHU0TtO0PjY%2Ba21hliIbjmch6PkUhjxgY9AwgSqTBQgbEAQaDDkyNTg3ODc0Nzg5MiIMKxwX3g9e3x%2BM44TFKvAEAu2w3%2BKQOG3rGBXPIMYtcaQxkZ78jDLMWVZGbi1yQ%2B252qh4zaBQ8cJZPQUKgQ2fnuz77HH5vb7sRMUSXF%2FsP0lms0tBCVd27hdEKMJolA%2F66mYqsT30aa4jsF2zPH9ZgeElfvu8lJpMvlnRY%2F2vSBSW8at%2FlNq9WT8wfVd0d4hZODhl0726xScy5CpfaWpDxnypU54XsNuXdM5RvB8LB3J63DKMZCkCUH5228W5EbtGT8%2BkyhQ7BrVQ9FlsVwAXeCj%2BUmlN9jNXZMi51nuCQmbd88ZZGeW54hQKXYP1qDZz255KXz09zqijllqT6VMBGl652wLeUFAqXiqQg1BgI9%2F6PxKamGmxdWFU47hAqrxkDIyS8xrIsAVy7DY1GMc%2FYUYve98efLvo1ZTuANTPsKT7nlF5GuBGoSwRY6cDy6iodXIsCTZ9MZi43Q2s6rNMjl9fo41BE%2B8AA5HQFQR4c0E2mTXylnCaZcyO9IggsImC%2Bmi4DnsR5Xfmmrxu%2Fgah7iXXIZbDHzuJyWridtpJLA6VE3k5ANRg1oScdOaBd%2BAn5ymLN2qq3ILT7dzEYkqSDfhSJ52ssqSmMCFbYXFPLklM85uohtVZc8iq%2BW10MvzNtdcnWvGFMC3nXJoO5of3gQj9RTlWYgiHSvRiNQsflyivo7oh7qK2ni2VHGjO0hU6uDaJjY8JY6jKiB9gpid85y%2FL0By04D1z4ZXpqvp0obp4l7cUfjLkIx7qOrvFoYXmdzYaI3NDz5rNh614LsOUNREMas%2FF8yFzhSnZfXtYeL%2BjaKY5Ymk7hC5p%2Bqky9FB8PTjjjGKs96qw5xjOr3nkMJTS384GOqgBEteavqCt6Aw9cb08oZEJ7pT4NglXUOYvBLHYw4dLZNMEUuXhjhX0K%2BNso4oyeGWmFwU1nkzzBVZfszE18Zc71KEvdMGYUH1Lff93fTCodx26%2BCknj4k0%2BnhAVTjd2TqPyK0a3pssibmVOLpD1p8IQipaUPSGOZwVK%2Bcbey5Pkds7yDmApvzo6nN3oAswdjFuBNPXiwn9xOK3n1kJbR86%2F9JdXlmA%2BWUI&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260409T195227Z&X-Amz-SignedHeaders=host&X-Amz-Credential=ASIA5PEVMQL2CWDM6INU%2F20260409%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Expires=86400&X-Amz-Signature=4cac3a5bef84996db366c8f145c6ec41afddf47ef781accdbf74841ed879786e">
-        <vertex-viewer-markup-tool style="z-index: 10"></vertex-viewer-markup-tool>
+      <vertex-document-viewer src="{ PDF_URL }">
       </vertex-document-viewer> 
 
       <div class="toolbar">
