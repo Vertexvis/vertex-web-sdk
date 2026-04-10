@@ -55,6 +55,7 @@
   "scripts": {
     "prebuild": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "build": "stencil build",
+    "postbuild": "cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "prestart": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "start": "stencil build --dev --watch --serve",
     "dev": "yarn start",
@@ -78,7 +79,6 @@
     "eslint": "^8.57.1",
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
-    "rollup-plugin-copy": "^3.5.0",
     "tslib": "^2.1.0",
     "typescript": "~5.8.3"
   },

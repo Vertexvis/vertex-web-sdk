@@ -1,7 +1,6 @@
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
 import { vueOutputTarget } from '@stencil/vue-output-target';
-import copy from 'rollup-plugin-copy';
 
 import jestConfig from './jest-shared.config';
 
@@ -46,18 +45,6 @@ export const config: Config = {
       type: 'docs-readme',
     },
   ],
-  rollupPlugins: {
-    after: [
-      copy({
-        targets: [
-          {
-            src: 'assets/**',
-            dest: 'dist/assets',
-          },
-        ],
-      }),
-    ],
-  },
   testing: { ...jestConfig },
   extras: {
     enableImportInjection: true,
