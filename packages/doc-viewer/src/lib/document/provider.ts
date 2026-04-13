@@ -1,3 +1,4 @@
+import { Config } from '../config';
 import { DocumentApi } from './api';
 import { DocumentRenderer } from './renderer';
 
@@ -13,5 +14,5 @@ export interface DocumentInterface {
  * image on the provided canvas element.
  */
 export interface DocumentProvider {
-  create(canvas: HTMLCanvasElement): DocumentInterface;
+  create(canvas: HTMLCanvasElement, config?: Config): DocumentInterface;
 }

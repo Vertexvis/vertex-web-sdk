@@ -9,14 +9,20 @@ import { DocumentProvider } from "./lib/document/provider";
 import { InteractionMode } from "./components/document-viewer/document-viewer";
 import { DocumentApiState } from "./lib/document/api";
 import { DocumentLayersController } from "./lib/document/layers/controller";
+import { PartialConfig } from "./lib/config";
 import { Point } from "@vertexvis/geometry";
 export { DocumentProvider } from "./lib/document/provider";
 export { InteractionMode } from "./components/document-viewer/document-viewer";
 export { DocumentApiState } from "./lib/document/api";
 export { DocumentLayersController } from "./lib/document/layers/controller";
+export { PartialConfig } from "./lib/config";
 export { Point } from "@vertexvis/geometry";
 export namespace Components {
     interface VertexDocumentViewer {
+        /**
+          * Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.
+         */
+        "config"?: PartialConfig;
         /**
           * Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.
          */
@@ -89,6 +95,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface VertexDocumentViewer {
+        /**
+          * Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.
+         */
+        "config"?: PartialConfig;
         /**
           * Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.
          */

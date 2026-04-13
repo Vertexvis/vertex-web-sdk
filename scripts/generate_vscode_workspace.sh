@@ -14,7 +14,7 @@ workspace_file="./vertex-web-sdks.code-workspace"
 
 update_workspace_projects() {
   tmp_workspace_file="$workspace_file.tmp"
-  packages=`jq -r '.workspaces[]' $package_file`
+  packages=`jq -r '.workspaces.packages[]' $package_file`
   package_directories=($packages)
 
   folders='[ '

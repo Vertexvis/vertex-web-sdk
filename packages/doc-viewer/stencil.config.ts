@@ -1,4 +1,6 @@
 import { Config } from '@stencil/core';
+import { reactOutputTarget } from '@stencil/react-output-target';
+import { vueOutputTarget } from '@stencil/vue-output-target';
 
 import jestConfig from './jest-shared.config';
 
@@ -8,13 +10,21 @@ export const config: Config = {
   globalScript: 'src/polyfill/index.ts',
   globalStyle: 'src/css/global.css',
   outputTargets: [
+    reactOutputTarget({
+      stencilPackageName: '@vertexvis/doc-viewer',
+      outDir: '../doc-viewer-react/src/generated',
+    }),
+    vueOutputTarget({
+      componentCorePackage: '@vertexvis/doc-viewer',
+      proxiesFile: '../doc-viewer-vue/src/generated/components.ts',
+    }),
     {
       type: 'dist',
       esmLoaderPath: '../loader',
       copy: [
         {
           src: '**/pdf.worker.min.mjs',
-          dest: 'dist/assets',
+          dest: 'assets',
           warn: true,
         },
       ],
@@ -26,7 +36,7 @@ export const config: Config = {
       copy: [
         {
           src: '**/pdf.worker.min.mjs',
-          dest: 'dist/assets',
+          dest: 'dist/components/assets',
           warn: true,
         },
       ],
