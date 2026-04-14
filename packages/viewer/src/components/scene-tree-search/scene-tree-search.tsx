@@ -64,11 +64,17 @@ export class SceneTreeSearch {
   public value = '';
 
   /**
-   * An event that is emitted when a user has inputted or cleared the search
+   * An event that is emitted when a user has changed or cleared the search
    * term. The event may be delayed according to the current `debounce` value.
    */
   @Event({ bubbles: true })
   public search!: EventEmitter<string>;
+
+  /**
+   * An event that is emitted when a search has completed.
+   */
+  @Event({ bubbles: true })
+  public searchCompleted!: EventEmitter<string>;
 
   @State()
   private focused = false;
@@ -234,6 +240,12 @@ export class SceneTreeSearch {
 
     this.onStateChangeDisposable = this.controller?.onStateChange.on(
       (state) => {
+        // If a search was previously being performed, but has now finished,
+        // emit the event that the search has completed.
+        if (this.isSearching && !state.isSearching) {
+          this.searchCompleted.emit(this.value);
+        }
+
         this.isSearching = state.isSearching;
       }
     );

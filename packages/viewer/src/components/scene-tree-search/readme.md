@@ -29,9 +29,10 @@ functionality will need to be wired programmatically to
 
 ## Events
 
-| Event    | Description                                                                                                                                       | Type                  |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `search` | An event that is emitted when a user has inputted or cleared the search term. The event may be delayed according to the current `debounce` value. | `CustomEvent<string>` |
+| Event             | Description                                                                                                                                      | Type                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
+| `search`          | An event that is emitted when a user has changed or cleared the search term. The event may be delayed according to the current `debounce` value. | `CustomEvent<string>` |
+| `searchCompleted` | An event that is emitted when a search has completed.                                                                                            | `CustomEvent<string>` |
 
 
 ## Methods
