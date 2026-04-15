@@ -2,6 +2,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { OptionalContentConfig } from 'pdfjs-dist/types/src/display/optional_content_config.d.js';
 
+import { Config } from '../config';
 import { DocumentApi, DocumentApiState } from '../document/api';
 import { DocumentLayer, LayerSupport } from '../document/layers';
 import { fromUri } from '../types/loadableResource';
@@ -14,13 +15,13 @@ export interface PdfJsApiState extends DocumentApiState {
 }
 
 export class PdfJsApi extends DocumentApi<PdfJsApiState> implements LayerSupport {
-  public constructor() {
+  public constructor(private readonly config?: Config) {
     super({
       panOffset: Point.create(0, 0),
       zoomPercentage: 100,
     });
 
-    pdfjs.GlobalWorkerOptions.workerSrc = '/dist/assets/pdf.worker.min.mjs';
+    pdfjs.GlobalWorkerOptions.workerSrc = config?.pdfJs.workerSrc ?? './assets/pdf.worker.min.mjs';
   }
 
   public dispose(): void {

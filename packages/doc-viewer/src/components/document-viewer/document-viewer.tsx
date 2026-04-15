@@ -4,6 +4,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
+import { PartialConfig } from '../../lib/config';
 import { DocumentApi, DocumentApiState } from '../../lib/document/api';
 import { DocumentLayersController } from '../../lib/document/layers/controller';
 import { DocumentProvider } from '../../lib/document/provider';
@@ -52,6 +53,12 @@ export class VertexDocumentViewer {
    * the underlying document type supports layers.
    */
   @Prop({ mutable: true }) public layers?: DocumentLayersController;
+
+  /**
+   * Configuration values for the document viewer. See {@link Config} for more information
+   * on the available configuration options.
+   */
+  @Prop() public config?: PartialConfig;
 
   /**
    * An optional value that will debounce image updates when resizing
@@ -152,7 +159,7 @@ export class VertexDocumentViewer {
     if (this.src != null && this.canvasEl != null) {
       this.clearCurrentDocument();
 
-      const { api, renderer } = this.provider.create(this.canvasEl);
+      const { api, renderer } = this.provider.create(this.canvasEl, this.config);
       this.documentApi = api;
       this.documentRenderer = renderer;
       this.layers = new DocumentLayersController(api);
@@ -165,6 +172,12 @@ export class VertexDocumentViewer {
 
       this.documentReady.emit();
     }
+  }
+
+  @Watch('config')
+  protected handleConfigChange(): void {
+    this.clearCurrentDocument();
+    this.handleSrcChange();
   }
 
   @Watch('interactionMode')
