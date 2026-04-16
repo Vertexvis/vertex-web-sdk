@@ -24,6 +24,9 @@ import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 
 interface StateMap {
   shouldClearDepthBuffers?: boolean;
+  shouldClearFeatureMaps?: boolean;
+  shouldClearCameraControls?: boolean;
+  shouldClearKeyboardControls?: boolean;
 }
 
 @Component({
@@ -96,6 +99,7 @@ export class ViewerPinTool {
 
   private registeredInteractionHandler?: Promise<Disposable>;
   private onEntitiesChangedHandler?: Disposable;
+  private onEntityAddedHandler?: Disposable;
 
   private resizeObserver?: ResizeObserver;
 
@@ -108,6 +112,14 @@ export class ViewerPinTool {
   protected watchModeChange(): void {
     this.pinController?.setToolMode(this.mode);
     this.setupInteractionHandler();
+
+    if (this.mode === 'edit') {
+      this.setFeatureMaps();
+      this.setCameraAndKeyboardControls();
+    } else {
+      this.resetFeatureMaps();
+      this.resetCameraAndKeyboardControls();
+    }
   }
 
   /**
@@ -144,8 +156,10 @@ export class ViewerPinTool {
   protected watchPinsChange(): void {
     if (this.pins.length > 0) {
       this.setDepthBuffers();
+      this.setFeatureMaps();
     } else {
       this.resetDepthBuffers();
+      this.resetFeatureMaps();
     }
   }
 
@@ -155,6 +169,8 @@ export class ViewerPinTool {
   protected connectedCallback(): void {
     this.setupInteractionHandler();
     this.setDepthBuffers();
+    this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
   }
 
   /**
@@ -165,6 +181,8 @@ export class ViewerPinTool {
     this.setupController();
     this.setupInteractionHandler();
     this.setDepthBuffers();
+    this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
 
     this.pinModel.onEntitiesChanged((entities) => {
       this.pins = entities;
@@ -189,6 +207,8 @@ export class ViewerPinTool {
     this.clearInteractionHandler();
     this.clearModelListeners();
     this.resetDepthBuffers();
+    this.resetFeatureMaps();
+    this.resetCameraAndKeyboardControls();
   }
 
   /**
@@ -201,6 +221,8 @@ export class ViewerPinTool {
   ): void {
     this.setupInteractionHandler();
     this.setDepthBuffers();
+    this.setFeatureMaps();
+    this.setCameraAndKeyboardControls();
 
     if (oldViewer != null) {
       oldViewer.removeEventListener(
@@ -267,12 +289,20 @@ export class ViewerPinTool {
 
   private setupInteractionHandler(): void {
     const hostStyles = window.getComputedStyle(this.hostEl);
+
     const xOffset = hostStyles
       .getPropertyValue('--viewer-pin-tool-initial-label-offset-x')
       .trim();
+    const xOffsetAsNumber = Number.isFinite(Number.parseInt(xOffset))
+      ? Number.parseInt(xOffset)
+      : 20;
+
     const yOffset = hostStyles
       .getPropertyValue('--viewer-pin-tool-initial-label-offset-y')
       .trim();
+    const yOffsetAsNumber = Number.isFinite(Number.parseInt(yOffset))
+      ? Number.parseInt(yOffset)
+      : 20;
 
     this.clearInteractionHandler();
 
@@ -281,8 +311,8 @@ export class ViewerPinTool {
         this.viewer?.registerInteractionHandler(
           new PinsInteractionHandler(
             this.pinController,
-            parseInt(xOffset),
-            parseInt(yOffset)
+            xOffsetAsNumber,
+            yOffsetAsNumber
           )
         );
     }
@@ -291,12 +321,13 @@ export class ViewerPinTool {
   private clearModelListeners(): void {
     this.onEntitiesChangedHandler?.dispose();
     this.onEntitiesChangedHandler = undefined;
+    this.onEntityAddedHandler?.dispose();
+    this.onEntityAddedHandler = undefined;
     this.resizeObserver?.disconnect();
   }
 
   private updateViewport(): void {
-    const rect = getMarkupBoundingClientRect(this.hostEl);
-    this.elementBounds = rect;
+    this.elementBounds = getMarkupBoundingClientRect(this.hostEl);
   }
 
   private setDepthBuffers(): void {
@@ -314,6 +345,54 @@ export class ViewerPinTool {
     if (this.stateMap.shouldClearDepthBuffers && this.viewer != null) {
       this.viewer.depthBuffers = undefined;
       this.stateMap.shouldClearDepthBuffers = undefined;
+    }
+  }
+
+  private setFeatureMaps(): void {
+    if (
+      (this.pins.length > 0 || this.mode === 'edit') &&
+      this.viewer != null &&
+      this.viewer.featureMaps == null
+    ) {
+      this.stateMap.shouldClearFeatureMaps = true;
+      this.viewer.featureMaps = 'final';
+    }
+  }
+
+  private resetFeatureMaps(): void {
+    if (this.stateMap.shouldClearFeatureMaps && this.viewer != null) {
+      this.viewer.featureMaps = undefined;
+      this.stateMap.shouldClearFeatureMaps = undefined;
+    }
+  }
+
+  private setCameraAndKeyboardControls(): void {
+    if (this.mode === 'edit' && this.viewer != null) {
+      // Check camera controls
+      if (this.viewer.cameraControls) {
+        this.stateMap.shouldClearCameraControls = true;
+        this.viewer.cameraControls = false;
+      }
+
+      // Check keyboard controls
+      if (this.viewer.keyboardControls) {
+        this.stateMap.shouldClearKeyboardControls = true;
+        this.viewer.keyboardControls = false;
+      }
+    }
+  }
+
+  private resetCameraAndKeyboardControls(): void {
+    if (this.viewer != null) {
+      if (this.stateMap.shouldClearCameraControls) {
+        this.viewer.cameraControls = true;
+        this.stateMap.shouldClearCameraControls = undefined;
+      }
+
+      if (this.stateMap.shouldClearKeyboardControls) {
+        this.viewer.keyboardControls = true;
+        this.stateMap.shouldClearKeyboardControls = undefined;
+      }
     }
   }
 }

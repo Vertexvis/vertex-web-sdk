@@ -1,5 +1,5 @@
 import { loadViewerWithQueryParams } from '../helpers.js';
-import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.x/dist/esm/loader.mjs';
+import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/esm/loader.mjs';
 
 // Keep track of selected columns at module scope
 const selectedColumns = new Set();

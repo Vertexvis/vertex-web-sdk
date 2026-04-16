@@ -161,4 +161,106 @@ describe('vertex-viewer-pin-tool', () => {
 
     expect(toolEl.viewer.depthBuffers).toEqual(undefined);
   });
+
+  it('sets feature maps, camera controls, and keyboard controls when changing modes', async () => {
+    const page = await newSpecPage({
+      components: [ViewerPinTool, ViewerPinGroup],
+      template: () => (
+        <vertex-viewer-pin-tool
+          id="vertex-viewer-pin-tool"
+          mode="view"
+          tool="pin-text"
+        ></vertex-viewer-pin-tool>
+      ),
+    });
+    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+    toolEl.viewer = {
+      ...viewer,
+      addEventListener: jest.fn(),
+      frame: {
+        scene: {
+          camera: {
+            projectionViewMatrix: Matrix4.makeIdentity(),
+          },
+        },
+      },
+      rotateAroundTapPoint: false,
+      cameraControls: true,
+      keyboardControls: true,
+    } as unknown as HTMLVertexViewerElement;
+
+    expect(toolEl.viewer.featureMaps).toEqual(undefined);
+    expect(toolEl.viewer.cameraControls).toEqual(true);
+    expect(toolEl.viewer.keyboardControls).toEqual(true);
+
+    // Enter edit mode
+    toolEl.mode = 'edit';
+
+    await page.waitForChanges();
+
+    expect(toolEl.viewer.featureMaps).toEqual('final');
+    expect(toolEl.viewer.cameraControls).toEqual(false);
+    expect(toolEl.viewer.keyboardControls).toEqual(false);
+
+    // Exit edit mode
+    toolEl.mode = 'view';
+
+    await page.waitForChanges();
+
+    expect(toolEl.viewer.featureMaps).toEqual(undefined);
+    expect(toolEl.viewer.cameraControls).toEqual(true);
+    expect(toolEl.viewer.keyboardControls).toEqual(true);
+  });
+
+  it('does not set feature maps, camera controls, and keyboard controls when exiting edit mode if not overridden', async () => {
+    const page = await newSpecPage({
+      components: [ViewerPinTool, ViewerPinGroup],
+      template: () => (
+        <vertex-viewer-pin-tool
+          id="vertex-viewer-pin-tool"
+          mode="view"
+          tool="pin-text"
+        ></vertex-viewer-pin-tool>
+      ),
+    });
+    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+    toolEl.viewer = {
+      ...viewer,
+      addEventListener: jest.fn(),
+      frame: {
+        scene: {
+          camera: {
+            projectionViewMatrix: Matrix4.makeIdentity(),
+          },
+        },
+      },
+      rotateAroundTapPoint: false,
+      featureMaps: 'final',
+      cameraControls: false,
+      keyboardControls: false,
+    } as unknown as HTMLVertexViewerElement;
+
+    expect(toolEl.viewer.featureMaps).toEqual('final');
+    expect(toolEl.viewer.cameraControls).toEqual(false);
+    expect(toolEl.viewer.keyboardControls).toEqual(false);
+
+    // Enter edit mode
+    toolEl.mode = 'edit';
+
+    await page.waitForChanges();
+
+    expect(toolEl.viewer.featureMaps).toEqual('final');
+    expect(toolEl.viewer.cameraControls).toEqual(false);
+    expect(toolEl.viewer.keyboardControls).toEqual(false);
+
+    // Exit edit mode
+    toolEl.mode = 'view';
+
+    await page.waitForChanges();
+
+    // Should not change since they were not overridden when entering edit mode
+    expect(toolEl.viewer.featureMaps).toEqual('final');
+    expect(toolEl.viewer.cameraControls).toEqual(false);
+    expect(toolEl.viewer.keyboardControls).toEqual(false);
+  });
 });

@@ -43,6 +43,7 @@
     "@vertexwebsdk/build": "0.24.3",
     "eslint": "^8.57.1",
     "jest": "^27.5.1",
+    "jest-cli": "^27.5.1",
     "rollup": "^2.80.0",
     "ts-jest": "^27.1.4",
     "tslib": "^2.1.0",

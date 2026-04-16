@@ -52,6 +52,7 @@ import {
   Reconnecting,
   ViewerStreamState,
 } from './state';
+import { retryIfNotAborted } from './utils';
 
 type StreamResult = Omit<
   Connected,
@@ -107,6 +108,7 @@ export class ViewerStream extends StreamApi {
   private config: Config;
   private clientId: string | undefined;
   private deviceId: string | undefined;
+  private abortController?: AbortController;
 
   private state: ViewerStreamState = { type: 'disconnected' };
   private pausedState?: Connected;
@@ -156,18 +158,19 @@ export class ViewerStream extends StreamApi {
     deviceId: string | undefined,
     config: Config = parseAndValidateConfig('platprod'),
     cameraType?: FrameCameraType
-  ): Promise<void> {
+  ): Promise<ViewerStreamState> {
     this.clientId = clientId;
     this.deviceId = deviceId;
     this.config = config;
 
     if (this.state.type === 'disconnected') {
-      return this.loadIfDisconnected(urn, cameraType);
+      await this.loadIfDisconnected(urn, cameraType);
     } else if (this.state.type === 'connection-failed') {
-      return this.loadIfDisconnected(urn, cameraType);
+      await this.loadIfDisconnected(urn, cameraType);
     } else {
-      return this.loadIfConnectingOrConnected(urn, this.state, cameraType);
+      await this.loadIfConnectingOrConnected(urn, this.state, cameraType);
     }
+    return this.state;
   }
 
   public update(fields: UpdateFields): void {
@@ -185,10 +188,11 @@ export class ViewerStream extends StreamApi {
       );
     }
 
-    if (
-      fields.streamAttributes != null &&
-      !deepEqual(this.streamAttributes, fields.streamAttributes)
-    ) {
+    const streamAttributesAreDifferent = !deepEqual(
+      this.streamAttributes,
+      fields.streamAttributes
+    );
+    if (fields.streamAttributes != null && streamAttributesAreDifferent) {
       this.streamAttributes = fields.streamAttributes;
       this.ifState('connected', () =>
         this.updateStream({
@@ -347,7 +351,14 @@ export class ViewerStream extends StreamApi {
     );
     console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
 
-    const controller = new AbortController();
+    // Ensure that any previous attempt to initiate a WebSocket connection has been
+    // aborted prior to attempting to create a new connection. This prevents scenarios
+    // where a previously initiated connection attempt is still in the `connecting`
+    // state and gets closed, and the `Async.retry` utility attempts to connect again.
+    this.abortController?.abort();
+    const newAbortController = new AbortController();
+    this.abortController = newAbortController;
+
     const settings = getStreamSettings(this.config);
     this.updateState({
       type,
@@ -355,17 +366,26 @@ export class ViewerStream extends StreamApi {
       connection: {
         dispose: () => {
           this.dispose();
-          controller.abort();
+          newAbortController.abort();
         },
       },
     });
 
     const connection = await Async.abort(
-      controller.signal,
-      Async.retry(() => this.connect(descriptor, settings), {
-        maxRetries,
-        delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
-      })
+      newAbortController.signal,
+      retryIfNotAborted(
+        newAbortController.signal,
+        () => this.connect(descriptor, settings),
+        {
+          dispose: () => {
+            // Intentional empty dispose to prevent typing mismatches.
+          },
+        },
+        {
+          maxRetries,
+          delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
+        }
+      )
     ).catch((e) => {
       throw new WebsocketConnectionError(
         'Websocket connection failed.',
@@ -650,7 +670,7 @@ export class ViewerStream extends StreamApi {
       );
     } catch (e) {
       throw new SceneRenderError(
-        `Frame timed out after ${timeoutInSeconds / 1000}s`,
+        `Frame timed out after ${timeoutInSeconds}s`,
         e instanceof Error ? e : undefined
       );
     } finally {

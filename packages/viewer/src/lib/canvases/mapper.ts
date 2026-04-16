@@ -117,7 +117,7 @@ const mapFreeformItem2d: M.Func<PBFreeformItem2d.AsObject, FreeformItem2d> =
       M.mapProp('strokeStyle', M.ifDefined(mapStrokeStyle)),
       M.mapProp('fillStyle', M.ifDefined(mapFillStyle))
     ),
-    ([positions, fillStyle, strokeStyle]) => ({
+    ([positions, strokeStyle, fillStyle]) => ({
       type: 'freeform-2d',
       positions,
       strokeStyle,

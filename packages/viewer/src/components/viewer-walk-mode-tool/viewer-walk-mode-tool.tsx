@@ -234,15 +234,12 @@ export class ViewerWalkModeTool {
       if (slottedTeleportTool != null) {
         this.stateMap.teleportTool = slottedTeleportTool;
       } else {
-        const slot: HTMLSlotElement | undefined =
-          this.hostEl?.shadowRoot?.querySelector(
-            'slot[name="teleport-tool"]'
-          ) ?? undefined;
-
         this.stateMap.teleportTool = document.createElement(
           'vertex-viewer-teleport-tool'
         );
-        slot?.appendChild(this.stateMap.teleportTool);
+        this.stateMap.teleportTool.slot = 'teleport-tool';
+
+        this.hostEl?.appendChild(this.stateMap.teleportTool);
       }
     }
   }

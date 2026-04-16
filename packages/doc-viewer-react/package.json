@@ -1,0 +1,49 @@
+{
+  "name": "@vertexvis/doc-viewer-react",
+  "version": "0.24.3",
+  "description": "React bindings for the Vertex Document Viewer SDK.",
+  "license": "MIT",
+  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vertexvis/vertex-web-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
+  },
+  "main": "./dist/bundle.cjs.js",
+  "module": "./dist/bundle.esm.js",
+  "typings": "./dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "clean": "rm -fr ./dist && mkdir ./dist",
+    "prebuild": "yarn clean",
+    "build": "rollup --config rollup.config.js",
+    "format": "yarn lint --fix",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
+    "test": "echo 'No unit tests defined'",
+    "test:ci": "yarn test:coverage",
+    "test:coverage": "echo 'No unit tests defined'"
+  },
+  "dependencies": {
+    "@stencil/react-output-target": "^1.4.2",
+    "@vertexvis/doc-viewer": "0.24.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
+    "eslint": "^8.57.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tslib": "^2.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.3.0 <19.0.0",
+    "react-dom": ">=16.3.0 <19.0.0",
+    "tslib": ">=2.1.0"
+  }
+}

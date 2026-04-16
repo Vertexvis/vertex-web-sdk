@@ -126,7 +126,7 @@ export class SceneTree {
   public viewer?: HTMLVertexViewerElement | null;
 
   /**
-   * A callback that is invoked immediately before a row is about to rendered.
+   * A callback that is invoked immediately before a row is about to be rendered.
    * This callback can return additional data that can be bound to in a
    * template.
    *

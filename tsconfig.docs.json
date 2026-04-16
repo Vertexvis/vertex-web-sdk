@@ -8,6 +8,9 @@
     "**/*.spec.ts",
     "**/*.spec.tsx",
     "packages/viewer-react",
-    "packages/viewer-vue"
+    "packages/viewer-vue",
+    "packages/doc-viewer-react",
+    "packages/doc-viewer-vue",
+    "packages/doc-viewer"
   ]
 }

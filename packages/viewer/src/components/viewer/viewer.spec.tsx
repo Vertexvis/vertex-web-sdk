@@ -307,6 +307,59 @@ describe('vertex-viewer', () => {
         })
       );
     });
+
+    it('only emits a scene ready event if the stream connects successfully', async () => {
+      const { stream, ws } = makeViewerStream();
+      const viewer = await newViewerSpec({
+        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
+      });
+
+      const onConnectionChange = jest.fn();
+      const onSceneReady = jest.fn();
+      viewer.addEventListener('connectionChange', onConnectionChange);
+      viewer.addEventListener('sceneReady', onSceneReady);
+
+      let loadPromiseResolve: VoidFunction = jest.fn();
+      const loadPromise = new Promise<void>((resolve) => {
+        loadPromiseResolve = resolve;
+      });
+
+      // Intentionally wait for a promise that only resolves at the end of the test to verify
+      // that the scene ready event is only emitted if the stream connects successfully.
+      loadViewerStreamKey(
+        key1,
+        { viewer, stream, ws },
+        { token, beforeConnected: async () => loadPromise }
+      );
+
+      await Async.delay(1);
+      expect(onConnectionChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: { status: 'connecting' },
+        })
+      );
+
+      onConnectionChange.mockClear();
+      await loadViewerStreamKey(key2, { viewer, stream, ws }, { token });
+
+      await Async.delay(1);
+      expect(onConnectionChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: { status: 'connecting' },
+        })
+      );
+      expect(onConnectionChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: { status: 'connected', jwt: token },
+        })
+      );
+      expect(onSceneReady).toHaveBeenCalledTimes(1);
+
+      expect(viewer.token).toBe(token);
+      expect(viewer.frame).toBeDefined();
+
+      loadPromiseResolve();
+    });
   });
 
   describe(Viewer.prototype.unload, () => {
@@ -330,6 +383,9 @@ describe('vertex-viewer', () => {
       });
 
       await loadViewerStreamKey(key1, { stream, ws, viewer });
+
+      expect(viewer.frame).not.toBeUndefined();
+
       await viewer.unload();
 
       expect(viewer.frame).toBeUndefined();

@@ -30,10 +30,18 @@
     "examples:start": "http-server -c-1 examples/ & livereload ./examples/ --wait 1000",
     "examples:scaffold": "./bin/run scaffold"
   },
-  "workspaces": [
-    "internal/*",
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "internal/*",
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/@stencil/react-output-target",
+      "**/@stencil/react-output-target/**",
+      "**/@stencil/vue-output-target",
+      "**/@stencil/vue-output-target/**"
+    ]
+  },
   "resolutions": {
     "@types/react": "^19",
     "minimatch": "^6.2.3",

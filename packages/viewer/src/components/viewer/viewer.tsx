@@ -43,6 +43,7 @@ import { Environment } from '../../lib/environment';
 import {
   ComponentInitializationError,
   InteractionHandlerError,
+  MissingJWTError,
   ViewerInitializationError,
 } from '../../lib/errors';
 import {
@@ -301,14 +302,18 @@ export class Viewer {
   public sceneComparison?: SceneComparisonOptions;
 
   /**
-   * Specifies some options related to presentation of cross-sections
+   * Specifies options related to presentation of cross-sections.
+   * Defaults to showing the cross-section with an end cap that matches the part color.
    */
   @Prop({ attribute: null })
-  public crossSectioning?: CrossSectioningOptions;
+  public crossSectioning?: CrossSectioningOptions = {
+    endCapEnabled: true,
+    endCapColor: undefined,
+  };
 
   /**
    * Specifies when a feature map is returned from rendering. Feature maps
-   * include information about the surfaces, edges and cross sections that are
+   * include information about the surfaces, edges and cross-sections that are
    * in a frame.
    *
    * Possible values are:
@@ -984,17 +989,20 @@ export class Viewer {
         dimensions: this.dimensions,
         frameBgColor: this.getBackgroundColor(),
       });
-      await this.stream?.load(
+      const state = await this.stream?.load(
         urn,
         this.clientId,
         this.getDeviceId(),
         this.getResolvedConfig(),
         options?.cameraType
       );
-      this.sceneReady.emit();
 
-      if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {
-        this.annotations?.connect(EXPERIMENTAL_annotationPollingIntervalInMs);
+      if (state.type === 'connected') {
+        this.sceneReady.emit();
+
+        if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {
+          this.annotations?.connect(EXPERIMENTAL_annotationPollingIntervalInMs);
+        }
       }
     } else {
       throw new ViewerInitializationError(
@@ -1071,10 +1079,9 @@ export class Viewer {
 
   private emitConnectionChange(status: ConnectionStatus): void {
     if (status.status === 'connected') {
-      // NOTE: Uncomment once FSS is deployed.
-      // if (status.jwt.length === 0) {
-      //   throw new MissingJWTError('JWT is empty');
-      // }
+      if (status.jwt.length === 0) {
+        throw new MissingJWTError('JWT is empty');
+      }
     }
     this.connectionChange.emit(status);
   }
@@ -1701,7 +1708,7 @@ export class Viewer {
   private handleAnnotationSetsChange(numberOfAnnotationSets: number): void {
     if (
       numberOfAnnotationSets > 0 &&
-      this.getStreamAttributes().depthBuffers == null
+      this.getDepthBufferStreamAttributesValue() == null
     ) {
       // Annotation sets are present in the viewer, but depth buffers are not being requested.
       // The annotation sets require the depth buffers to render, so turn on depth buffers.

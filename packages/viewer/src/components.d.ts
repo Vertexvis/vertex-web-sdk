@@ -372,7 +372,7 @@ export namespace Components {
      */
     overScanCount: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     * A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.
      * @example
      * ```html
      * <script>
@@ -713,7 +713,7 @@ export namespace Components {
      */
     configEnv: Environment;
     /**
-     * Specifies some options related to presentation of cross-sections
+     * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
      */
     crossSectioning?: CrossSectioningOptions;
     /**
@@ -757,7 +757,7 @@ export namespace Components {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross-sections that are in a frame.
      *
      * Possible values are:   * `undefined`: A feature map is never requested.
      *
@@ -1764,7 +1764,7 @@ export namespace Components {
      */
     pinController?: PinController;
     /**
-     * Gives focus to the the component's internal text input.
+     * Gives focus to the component's internal text input.
      */
     setFocus: () => Promise<void>;
     submit: () => Promise<void>;
@@ -3749,7 +3749,7 @@ declare namespace LocalJSX {
      */
     overScanCount?: number;
     /**
-     * A callback that is invoked immediately before a row is about to rendered. This callback can return additional data that can be bound to in a template.
+     * A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.
      * @example
      * ```html
      * <script>
@@ -4056,7 +4056,7 @@ declare namespace LocalJSX {
      */
     configEnv?: Environment;
     /**
-     * Specifies some options related to presentation of cross-sections
+     * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
      */
     crossSectioning?: CrossSectioningOptions;
     /**
@@ -4099,7 +4099,7 @@ declare namespace LocalJSX {
      */
     featureLines?: FeatureLineOptions;
     /**
-     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross sections that are in a frame.
+     * Specifies when a feature map is returned from rendering. Feature maps include information about the surfaces, edges and cross-sections that are in a frame.
      *
      * Possible values are:   * `undefined`: A feature map is never requested.
      *
