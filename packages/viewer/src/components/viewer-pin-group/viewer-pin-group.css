@@ -90,6 +90,11 @@
   color: var(--viewer-annotations-pin-color);
   cursor: pointer;
   transition: opacity 0.3s ease-in;
+
+  /**
+   * Place bottom point of the pin at the location instead of the middle of the pin
+   */
+  transform: translate(0px, -12px);
 }
 
 .pin-selected {
