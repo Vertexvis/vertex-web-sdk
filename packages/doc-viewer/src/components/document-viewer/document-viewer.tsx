@@ -28,6 +28,16 @@ export class VertexDocumentViewer {
   @Prop() public src?: string;
 
   /**
+   * The ID of the loaded `Document`. This ID is required to enable persistence of
+   * annotations.
+   *
+   * Note that this is different than a `File` ID within the Vertex Platform, and must
+   * be created separately using the `/documents` endpoints.
+   * See https://docs.vertex3d.com/ for more details.
+   */
+  @Prop({ reflect: true }) public documentId?: string;
+
+  /**
    * The provider used to create the document API and renderer.
    */
   @Prop({ mutable: true }) public provider: DocumentProvider = new PdfJsProvider();
