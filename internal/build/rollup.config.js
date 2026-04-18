@@ -1,8 +1,8 @@
+import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import fs from 'fs';
 import { builtinModules } from 'module';
 import path from 'path';
-import commonjs from '@rollup/plugin-commonjs';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import ts from 'typescript';
 
 function loadTsConfig(tsconfigPath) {

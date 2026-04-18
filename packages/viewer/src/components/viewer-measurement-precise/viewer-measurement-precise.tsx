@@ -31,7 +31,8 @@ export class ViewerMeasurementPrecise {
    * component.
    */
   @Prop()
-  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
+  public measurementOverlays: MeasurementOverlayManager =
+    new MeasurementOverlayManager();
 
   /**
    * The controller that is responsible for performing measurements and updating

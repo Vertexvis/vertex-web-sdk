@@ -6,9 +6,7 @@ import { ImageScaleProvider } from '../scenes';
 import { KeyInteraction } from './keyInteraction';
 import { TapEventDetails } from './tapEventDetails';
 
-export class FlyToPartKeyInteraction
-  implements KeyInteraction<TapEventDetails>
-{
+export class FlyToPartKeyInteraction implements KeyInteraction<TapEventDetails> {
   public constructor(
     private stream: StreamApi,
     private configProvider: ConfigProvider,

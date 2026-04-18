@@ -413,9 +413,7 @@ export class NotSceneItemQuery extends RootQuery {
   }
 }
 
-export class PmiAnnotationRootQuery
-  implements AnnotationQuery<SingleAnnotationQuery>
-{
+export class PmiAnnotationRootQuery implements AnnotationQuery<SingleAnnotationQuery> {
   public constructor(private inverted: boolean = false) {}
 
   /**
@@ -507,7 +505,10 @@ export class AllQuery extends TerminalQuery {
 }
 
 export class SceneTreeRangeQuery extends TerminalQuery {
-  public constructor(private range: SceneTreeRange, inverted: boolean) {
+  public constructor(
+    private range: SceneTreeRange,
+    inverted: boolean
+  ) {
     super(inverted);
   }
 
@@ -566,7 +567,10 @@ export class AllVisibleQuery extends TerminalQuery {
 }
 
 export class PointQuery extends TerminalQuery {
-  public constructor(private point: Point.Point, inverted: boolean) {
+  public constructor(
+    private point: Point.Point,
+    inverted: boolean
+  ) {
     super(inverted);
   }
 
@@ -619,7 +623,10 @@ export class BulkQuery extends TerminalQuery {
 }
 
 class SingleSceneItemQuery extends TerminalQuery implements BooleanQuery {
-  public constructor(private query: QueryExpression, inverted: boolean) {
+  public constructor(
+    private query: QueryExpression,
+    inverted: boolean
+  ) {
     super(inverted);
   }
 
@@ -708,7 +715,10 @@ class SingleAnnotationQuery
   extends TerminalQuery
   implements BooleanAnnotationQuery
 {
-  public constructor(private query: QueryExpression, inverted: boolean) {
+  public constructor(
+    private query: QueryExpression,
+    inverted: boolean
+  ) {
     super(inverted);
   }
 

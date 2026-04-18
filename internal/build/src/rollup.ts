@@ -1,7 +1,7 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import * as fs from 'fs';
+import * as path from 'path';
 import type { OutputOptions, Plugin, RollupOptions } from 'rollup';
 import { terser } from 'rollup-plugin-terser';
 import ts from 'typescript';
@@ -44,9 +44,9 @@ interface OutputConfig {
   globals?: OutputOptions['globals'];
 }
 
-type PluginContextLike = {
+interface PluginContextLike {
   error(message: string): never;
-};
+}
 
 function createTypeScriptPlugin({
   cwd = process.cwd(),

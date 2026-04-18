@@ -13,7 +13,7 @@ describe(FlyToPartKeyInteraction, () => {
   streamApi.flyTo = jest.fn(async () => ({ flyTo: {} }));
   const flyToPartKeyInteraction = new FlyToPartKeyInteraction(
     streamApi,
-    () => ({ animation: { durationMs: 500 } } as Config),
+    () => ({ animation: { durationMs: 500 } }) as Config,
     () => Point.create(1, 1)
   );
 

@@ -59,8 +59,7 @@ export interface SceneItemsExecutionOptions extends SceneExecutionOptions {
 }
 
 export interface ApplySceneViewStateOptions
-  extends SceneElementsExecutionOptions,
-    CameraRenderOptions {
+  extends SceneElementsExecutionOptions, CameraRenderOptions {
   waitForAnimation?: boolean;
   cameraTypeOverride?: CameraType;
 }
