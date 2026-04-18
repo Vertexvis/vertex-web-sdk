@@ -5,7 +5,6 @@ import workers from '@vertexvis/rollup-plugin-web-workers';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import typescript2 from 'rollup-plugin-typescript2';
 
 import jestConfig from './jest-shared.config';
 
@@ -16,12 +15,7 @@ export const config: Config = {
   preamble: copyright(),
   plugins: [
     workers({
-      plugins: [
-        commonjs(),
-        resolve({ browser: true }),
-        typescript2(),
-        terser(),
-      ],
+      plugins: [commonjs(), resolve({ browser: true }), terser()],
     }),
   ],
   globalScript: 'src/polyfill/resize-observer.ts',
