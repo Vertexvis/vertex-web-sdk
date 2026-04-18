@@ -8,8 +8,8 @@
     "lerna": "^6.6.2",
     "livereload": "^0.9.1",
     "semver": "^7.5.2",
-    "typedoc": "^0.22.17",
-    "typescript": "^5.0.0"
+    "typedoc": "^0.28.14",
+    "typescript": "^5.2.0"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc",
