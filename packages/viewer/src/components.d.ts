@@ -714,6 +714,7 @@ export namespace Components {
     configEnv: Environment;
     /**
      * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
+     * @default {     endCapEnabled: true,     endCapColor: undefined,   }
      */
     crossSectioning?: CrossSectioningOptions;
     /**
@@ -2128,8 +2129,9 @@ export interface VertexSceneTreeCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexSceneTreeElement;
 }
-export interface VertexSceneTreeNotificationBannerCustomEvent<T>
-  extends CustomEvent<T> {
+export interface VertexSceneTreeNotificationBannerCustomEvent<
+  T,
+> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexSceneTreeNotificationBannerElement;
 }
@@ -2141,8 +2143,9 @@ export interface VertexSceneTreeTableCellCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexSceneTreeTableCellElement;
 }
-export interface VertexSceneTreeTableLayoutCustomEvent<T>
-  extends CustomEvent<T> {
+export interface VertexSceneTreeTableLayoutCustomEvent<
+  T,
+> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexSceneTreeTableLayoutElement;
 }
@@ -2174,8 +2177,9 @@ export interface VertexViewerMarkupCircleCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerMarkupCircleElement;
 }
-export interface VertexViewerMarkupFreeformCustomEvent<T>
-  extends CustomEvent<T> {
+export interface VertexViewerMarkupFreeformCustomEvent<
+  T,
+> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerMarkupFreeformElement;
 }
@@ -2183,8 +2187,9 @@ export interface VertexViewerMarkupToolCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerMarkupToolElement;
 }
-export interface VertexViewerMeasurementDistanceCustomEvent<T>
-  extends CustomEvent<T> {
+export interface VertexViewerMeasurementDistanceCustomEvent<
+  T,
+> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerMeasurementDistanceElement;
 }
@@ -2196,8 +2201,9 @@ export interface VertexViewerTeleportToolCustomEvent<T> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerTeleportToolElement;
 }
-export interface VertexViewerTransformWidgetCustomEvent<T>
-  extends CustomEvent<T> {
+export interface VertexViewerTransformWidgetCustomEvent<
+  T,
+> extends CustomEvent<T> {
   detail: T;
   target: HTMLVertexViewerTransformWidgetElement;
 }
@@ -2211,8 +2217,7 @@ declare global {
     firstRowRendered: void;
   }
   interface HTMLVertexSceneTreeElement
-    extends Components.VertexSceneTree,
-      HTMLStencilElement {
+    extends Components.VertexSceneTree, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexSceneTreeElementEventMap>(
       type: K,
       listener: (
@@ -2271,10 +2276,9 @@ declare global {
    * A notification banner that displays a message and an action button.
    */
   interface HTMLVertexSceneTreeNotificationBannerElement
-    extends Components.VertexSceneTreeNotificationBanner,
-      HTMLStencilElement {
+    extends Components.VertexSceneTreeNotificationBanner, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap
+      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap,
     >(
       type: K,
       listener: (
@@ -2301,7 +2305,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap
+      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap,
     >(
       type: K,
       listener: (
@@ -2336,8 +2340,7 @@ declare global {
     search: string;
   }
   interface HTMLVertexSceneTreeSearchElement
-    extends Components.VertexSceneTreeSearch,
-      HTMLStencilElement {
+    extends Components.VertexSceneTreeSearch, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexSceneTreeSearchElementEventMap>(
       type: K,
       listener: (
@@ -2364,7 +2367,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexSceneTreeSearchElementEventMap
+      K extends keyof HTMLVertexSceneTreeSearchElementEventMap,
     >(
       type: K,
       listener: (
@@ -2403,10 +2406,9 @@ declare global {
     cellLoaded: void;
   }
   interface HTMLVertexSceneTreeTableCellElement
-    extends Components.VertexSceneTreeTableCell,
-      HTMLStencilElement {
+    extends Components.VertexSceneTreeTableCell, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap
+      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap,
     >(
       type: K,
       listener: (
@@ -2433,7 +2435,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap
+      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap,
     >(
       type: K,
       listener: (
@@ -2465,15 +2467,13 @@ declare global {
     new (): HTMLVertexSceneTreeTableCellElement;
   };
   interface HTMLVertexSceneTreeTableColumnElement
-    extends Components.VertexSceneTreeTableColumn,
-      HTMLStencilElement {}
+    extends Components.VertexSceneTreeTableColumn, HTMLStencilElement {}
   var HTMLVertexSceneTreeTableColumnElement: {
     prototype: HTMLVertexSceneTreeTableColumnElement;
     new (): HTMLVertexSceneTreeTableColumnElement;
   };
   interface HTMLVertexSceneTreeTableHeaderElement
-    extends Components.VertexSceneTreeTableHeader,
-      HTMLStencilElement {}
+    extends Components.VertexSceneTreeTableHeader, HTMLStencilElement {}
   var HTMLVertexSceneTreeTableHeaderElement: {
     prototype: HTMLVertexSceneTreeTableHeaderElement;
     new (): HTMLVertexSceneTreeTableHeaderElement;
@@ -2483,10 +2483,9 @@ declare global {
     columnsResized: number[];
   }
   interface HTMLVertexSceneTreeTableLayoutElement
-    extends Components.VertexSceneTreeTableLayout,
-      HTMLStencilElement {
+    extends Components.VertexSceneTreeTableLayout, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap
+      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap,
     >(
       type: K,
       listener: (
@@ -2513,7 +2512,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap
+      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap,
     >(
       type: K,
       listener: (
@@ -2545,22 +2544,19 @@ declare global {
     new (): HTMLVertexSceneTreeTableLayoutElement;
   };
   interface HTMLVertexSceneTreeTableResizeDividerElement
-    extends Components.VertexSceneTreeTableResizeDivider,
-      HTMLStencilElement {}
+    extends Components.VertexSceneTreeTableResizeDivider, HTMLStencilElement {}
   var HTMLVertexSceneTreeTableResizeDividerElement: {
     prototype: HTMLVertexSceneTreeTableResizeDividerElement;
     new (): HTMLVertexSceneTreeTableResizeDividerElement;
   };
   interface HTMLVertexSceneTreeToolbarElement
-    extends Components.VertexSceneTreeToolbar,
-      HTMLStencilElement {}
+    extends Components.VertexSceneTreeToolbar, HTMLStencilElement {}
   var HTMLVertexSceneTreeToolbarElement: {
     prototype: HTMLVertexSceneTreeToolbarElement;
     new (): HTMLVertexSceneTreeToolbarElement;
   };
   interface HTMLVertexSceneTreeToolbarGroupElement
-    extends Components.VertexSceneTreeToolbarGroup,
-      HTMLStencilElement {}
+    extends Components.VertexSceneTreeToolbarGroup, HTMLStencilElement {}
   var HTMLVertexSceneTreeToolbarGroupElement: {
     prototype: HTMLVertexSceneTreeToolbarGroupElement;
     new (): HTMLVertexSceneTreeToolbarGroupElement;
@@ -2583,8 +2579,7 @@ declare global {
     dimensionschange: Dimensions.Dimensions;
   }
   interface HTMLVertexViewerElement
-    extends Components.VertexViewer,
-      HTMLStencilElement {
+    extends Components.VertexViewer, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexViewerElementEventMap>(
       type: K,
       listener: (
@@ -2637,8 +2632,7 @@ declare global {
     new (): HTMLVertexViewerElement;
   };
   interface HTMLVertexViewerAnnotationCalloutElement
-    extends Components.VertexViewerAnnotationCallout,
-      HTMLStencilElement {}
+    extends Components.VertexViewerAnnotationCallout, HTMLStencilElement {}
   var HTMLVertexViewerAnnotationCalloutElement: {
     prototype: HTMLVertexViewerAnnotationCalloutElement;
     new (): HTMLVertexViewerAnnotationCalloutElement;
@@ -2653,10 +2647,9 @@ declare global {
    * contained by and intersecting with (inclusive) the box.
    */
   interface HTMLVertexViewerBoxQueryToolElement
-    extends Components.VertexViewerBoxQueryTool,
-      HTMLStencilElement {
+    extends Components.VertexViewerBoxQueryTool, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap
+      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap,
     >(
       type: K,
       listener: (
@@ -2683,7 +2676,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap
+      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap,
     >(
       type: K,
       listener: (
@@ -2715,15 +2708,13 @@ declare global {
     new (): HTMLVertexViewerBoxQueryToolElement;
   };
   interface HTMLVertexViewerButtonElement
-    extends Components.VertexViewerButton,
-      HTMLStencilElement {}
+    extends Components.VertexViewerButton, HTMLStencilElement {}
   var HTMLVertexViewerButtonElement: {
     prototype: HTMLVertexViewerButtonElement;
     new (): HTMLVertexViewerButtonElement;
   };
   interface HTMLVertexViewerDefaultToolbarElement
-    extends Components.VertexViewerDefaultToolbar,
-      HTMLStencilElement {}
+    extends Components.VertexViewerDefaultToolbar, HTMLStencilElement {}
   var HTMLVertexViewerDefaultToolbarElement: {
     prototype: HTMLVertexViewerDefaultToolbarElement;
     new (): HTMLVertexViewerDefaultToolbarElement;
@@ -2740,8 +2731,7 @@ declare global {
    * individual DOM element within a local 3D scene.
    */
   interface HTMLVertexViewerDomElementElement
-    extends Components.VertexViewerDomElement,
-      HTMLStencilElement {
+    extends Components.VertexViewerDomElement, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexViewerDomElementElementEventMap>(
       type: K,
       listener: (
@@ -2768,7 +2758,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerDomElementElementEventMap
+      K extends keyof HTMLVertexViewerDomElementElementEventMap,
     >(
       type: K,
       listener: (
@@ -2803,8 +2793,7 @@ declare global {
     propertyChange: void;
   }
   interface HTMLVertexViewerDomGroupElement
-    extends Components.VertexViewerDomGroup,
-      HTMLStencilElement {
+    extends Components.VertexViewerDomGroup, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexViewerDomGroupElementEventMap>(
       type: K,
       listener: (
@@ -2831,7 +2820,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerDomGroupElementEventMap
+      K extends keyof HTMLVertexViewerDomGroupElementEventMap,
     >(
       type: K,
       listener: (
@@ -2868,29 +2857,25 @@ declare global {
    * objects in a local 3D scene that is synced with a remote rendered scene.
    */
   interface HTMLVertexViewerDomRendererElement
-    extends Components.VertexViewerDomRenderer,
-      HTMLStencilElement {}
+    extends Components.VertexViewerDomRenderer, HTMLStencilElement {}
   var HTMLVertexViewerDomRendererElement: {
     prototype: HTMLVertexViewerDomRendererElement;
     new (): HTMLVertexViewerDomRendererElement;
   };
   interface HTMLVertexViewerHitResultIndicatorElement
-    extends Components.VertexViewerHitResultIndicator,
-      HTMLStencilElement {}
+    extends Components.VertexViewerHitResultIndicator, HTMLStencilElement {}
   var HTMLVertexViewerHitResultIndicatorElement: {
     prototype: HTMLVertexViewerHitResultIndicatorElement;
     new (): HTMLVertexViewerHitResultIndicatorElement;
   };
   interface HTMLVertexViewerIconElement
-    extends Components.VertexViewerIcon,
-      HTMLStencilElement {}
+    extends Components.VertexViewerIcon, HTMLStencilElement {}
   var HTMLVertexViewerIconElement: {
     prototype: HTMLVertexViewerIconElement;
     new (): HTMLVertexViewerIconElement;
   };
   interface HTMLVertexViewerLayerElement
-    extends Components.VertexViewerLayer,
-      HTMLStencilElement {}
+    extends Components.VertexViewerLayer, HTMLStencilElement {}
   var HTMLVertexViewerLayerElement: {
     prototype: HTMLVertexViewerLayerElement;
     new (): HTMLVertexViewerLayerElement;
@@ -2915,8 +2900,7 @@ declare global {
       | undefined;
   }
   interface HTMLVertexViewerMarkupElement
-    extends Components.VertexViewerMarkup,
-      HTMLStencilElement {
+    extends Components.VertexViewerMarkup, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexViewerMarkupElementEventMap>(
       type: K,
       listener: (
@@ -2978,10 +2962,9 @@ declare global {
     viewRendered: void;
   }
   interface HTMLVertexViewerMarkupArrowElement
-    extends Components.VertexViewerMarkupArrow,
-      HTMLStencilElement {
+    extends Components.VertexViewerMarkupArrow, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap
+      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap,
     >(
       type: K,
       listener: (
@@ -3008,7 +2991,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap
+      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap,
     >(
       type: K,
       listener: (
@@ -3045,10 +3028,9 @@ declare global {
     viewRendered: void;
   }
   interface HTMLVertexViewerMarkupCircleElement
-    extends Components.VertexViewerMarkupCircle,
-      HTMLStencilElement {
+    extends Components.VertexViewerMarkupCircle, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap
+      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap,
     >(
       type: K,
       listener: (
@@ -3075,7 +3057,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap
+      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap,
     >(
       type: K,
       listener: (
@@ -3112,10 +3094,9 @@ declare global {
     viewRendered: void;
   }
   interface HTMLVertexViewerMarkupFreeformElement
-    extends Components.VertexViewerMarkupFreeform,
-      HTMLStencilElement {
+    extends Components.VertexViewerMarkupFreeform, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap
+      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap,
     >(
       type: K,
       listener: (
@@ -3142,7 +3123,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap
+      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap,
     >(
       type: K,
       listener: (
@@ -3178,8 +3159,7 @@ declare global {
     markupEnd: Markup;
   }
   interface HTMLVertexViewerMarkupToolElement
-    extends Components.VertexViewerMarkupTool,
-      HTMLStencilElement {
+    extends Components.VertexViewerMarkupTool, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexViewerMarkupToolElementEventMap>(
       type: K,
       listener: (
@@ -3206,7 +3186,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupToolElementEventMap
+      K extends keyof HTMLVertexViewerMarkupToolElementEventMap,
     >(
       type: K,
       listener: (
@@ -3238,8 +3218,7 @@ declare global {
     new (): HTMLVertexViewerMarkupToolElement;
   };
   interface HTMLVertexViewerMeasurementDetailsElement
-    extends Components.VertexViewerMeasurementDetails,
-      HTMLStencilElement {}
+    extends Components.VertexViewerMeasurementDetails, HTMLStencilElement {}
   var HTMLVertexViewerMeasurementDetailsElement: {
     prototype: HTMLVertexViewerMeasurementDetailsElement;
     new (): HTMLVertexViewerMeasurementDetailsElement;
@@ -3249,10 +3228,9 @@ declare global {
     editEnd: EditEndEventDetails;
   }
   interface HTMLVertexViewerMeasurementDistanceElement
-    extends Components.VertexViewerMeasurementDistance,
-      HTMLStencilElement {
+    extends Components.VertexViewerMeasurementDistance, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap
+      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap,
     >(
       type: K,
       listener: (
@@ -3279,7 +3257,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap
+      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap,
     >(
       type: K,
       listener: (
@@ -3311,29 +3289,25 @@ declare global {
     new (): HTMLVertexViewerMeasurementDistanceElement;
   };
   interface HTMLVertexViewerMeasurementLineElement
-    extends Components.VertexViewerMeasurementLine,
-      HTMLStencilElement {}
+    extends Components.VertexViewerMeasurementLine, HTMLStencilElement {}
   var HTMLVertexViewerMeasurementLineElement: {
     prototype: HTMLVertexViewerMeasurementLineElement;
     new (): HTMLVertexViewerMeasurementLineElement;
   };
   interface HTMLVertexViewerMeasurementOverlaysElement
-    extends Components.VertexViewerMeasurementOverlays,
-      HTMLStencilElement {}
+    extends Components.VertexViewerMeasurementOverlays, HTMLStencilElement {}
   var HTMLVertexViewerMeasurementOverlaysElement: {
     prototype: HTMLVertexViewerMeasurementOverlaysElement;
     new (): HTMLVertexViewerMeasurementOverlaysElement;
   };
   interface HTMLVertexViewerMeasurementPreciseElement
-    extends Components.VertexViewerMeasurementPrecise,
-      HTMLStencilElement {}
+    extends Components.VertexViewerMeasurementPrecise, HTMLStencilElement {}
   var HTMLVertexViewerMeasurementPreciseElement: {
     prototype: HTMLVertexViewerMeasurementPreciseElement;
     new (): HTMLVertexViewerMeasurementPreciseElement;
   };
   interface HTMLVertexViewerPinGroupElement
-    extends Components.VertexViewerPinGroup,
-      HTMLStencilElement {}
+    extends Components.VertexViewerPinGroup, HTMLStencilElement {}
   var HTMLVertexViewerPinGroupElement: {
     prototype: HTMLVertexViewerPinGroupElement;
     new (): HTMLVertexViewerPinGroupElement;
@@ -3344,8 +3318,7 @@ declare global {
     labelBlurred: string | undefined;
   }
   interface HTMLVertexViewerPinLabelElement
-    extends Components.VertexViewerPinLabel,
-      HTMLStencilElement {
+    extends Components.VertexViewerPinLabel, HTMLStencilElement {
     addEventListener<K extends keyof HTMLVertexViewerPinLabelElementEventMap>(
       type: K,
       listener: (
@@ -3372,7 +3345,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerPinLabelElementEventMap
+      K extends keyof HTMLVertexViewerPinLabelElementEventMap,
     >(
       type: K,
       listener: (
@@ -3404,22 +3377,19 @@ declare global {
     new (): HTMLVertexViewerPinLabelElement;
   };
   interface HTMLVertexViewerPinLabelLineElement
-    extends Components.VertexViewerPinLabelLine,
-      HTMLStencilElement {}
+    extends Components.VertexViewerPinLabelLine, HTMLStencilElement {}
   var HTMLVertexViewerPinLabelLineElement: {
     prototype: HTMLVertexViewerPinLabelLineElement;
     new (): HTMLVertexViewerPinLabelLineElement;
   };
   interface HTMLVertexViewerPinToolElement
-    extends Components.VertexViewerPinTool,
-      HTMLStencilElement {}
+    extends Components.VertexViewerPinTool, HTMLStencilElement {}
   var HTMLVertexViewerPinToolElement: {
     prototype: HTMLVertexViewerPinToolElement;
     new (): HTMLVertexViewerPinToolElement;
   };
   interface HTMLVertexViewerSpinnerElement
-    extends Components.VertexViewerSpinner,
-      HTMLStencilElement {}
+    extends Components.VertexViewerSpinner, HTMLStencilElement {}
   var HTMLVertexViewerSpinnerElement: {
     prototype: HTMLVertexViewerSpinnerElement;
     new (): HTMLVertexViewerSpinnerElement;
@@ -3433,10 +3403,9 @@ declare global {
    * This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
    */
   interface HTMLVertexViewerTeleportToolElement
-    extends Components.VertexViewerTeleportTool,
-      HTMLStencilElement {
+    extends Components.VertexViewerTeleportTool, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerTeleportToolElementEventMap
+      K extends keyof HTMLVertexViewerTeleportToolElementEventMap,
     >(
       type: K,
       listener: (
@@ -3463,7 +3432,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerTeleportToolElementEventMap
+      K extends keyof HTMLVertexViewerTeleportToolElementEventMap,
     >(
       type: K,
       listener: (
@@ -3495,15 +3464,13 @@ declare global {
     new (): HTMLVertexViewerTeleportToolElement;
   };
   interface HTMLVertexViewerToolbarElement
-    extends Components.VertexViewerToolbar,
-      HTMLStencilElement {}
+    extends Components.VertexViewerToolbar, HTMLStencilElement {}
   var HTMLVertexViewerToolbarElement: {
     prototype: HTMLVertexViewerToolbarElement;
     new (): HTMLVertexViewerToolbarElement;
   };
   interface HTMLVertexViewerToolbarGroupElement
-    extends Components.VertexViewerToolbarGroup,
-      HTMLStencilElement {}
+    extends Components.VertexViewerToolbarGroup, HTMLStencilElement {}
   var HTMLVertexViewerToolbarGroupElement: {
     prototype: HTMLVertexViewerToolbarGroupElement;
     new (): HTMLVertexViewerToolbarGroupElement;
@@ -3515,10 +3482,9 @@ declare global {
     interactionStarted: void;
   }
   interface HTMLVertexViewerTransformWidgetElement
-    extends Components.VertexViewerTransformWidget,
-      HTMLStencilElement {
+    extends Components.VertexViewerTransformWidget, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap
+      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap,
     >(
       type: K,
       listener: (
@@ -3545,7 +3511,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap
+      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap,
     >(
       type: K,
       listener: (
@@ -3577,8 +3543,7 @@ declare global {
     new (): HTMLVertexViewerTransformWidgetElement;
   };
   interface HTMLVertexViewerViewCubeElement
-    extends Components.VertexViewerViewCube,
-      HTMLStencilElement {}
+    extends Components.VertexViewerViewCube, HTMLStencilElement {}
   var HTMLVertexViewerViewCubeElement: {
     prototype: HTMLVertexViewerViewCubeElement;
     new (): HTMLVertexViewerViewCubeElement;
@@ -3591,10 +3556,9 @@ declare global {
    * intended for walking through a model instead of orbiting a model.
    */
   interface HTMLVertexViewerWalkModeToolElement
-    extends Components.VertexViewerWalkModeTool,
-      HTMLStencilElement {
+    extends Components.VertexViewerWalkModeTool, HTMLStencilElement {
     addEventListener<
-      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap
+      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap,
     >(
       type: K,
       listener: (
@@ -3621,7 +3585,7 @@ declare global {
       options?: boolean | AddEventListenerOptions
     ): void;
     removeEventListener<
-      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap
+      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap,
     >(
       type: K,
       listener: (
@@ -4057,6 +4021,7 @@ declare namespace LocalJSX {
     configEnv?: Environment;
     /**
      * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
+     * @default {     endCapEnabled: true,     endCapColor: undefined,   }
      */
     crossSectioning?: CrossSectioningOptions;
     /**

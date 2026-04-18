@@ -33,6 +33,7 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
+    "@stencil/vue-output-target": "^0.13.1",
     "@vertexvis/viewer": "0.24.3"
   },
   "devDependencies": {
