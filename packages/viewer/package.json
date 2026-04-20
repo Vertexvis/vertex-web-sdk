@@ -72,7 +72,7 @@
     "requestidlecallback-polyfill": "^1.0.2",
     "resize-observer": "^1.0.4",
     "threads": "^1.7.0",
-    "tslib": "^2.1.0"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@stencil/react-output-target": "^1.4.2",
@@ -98,6 +98,6 @@
     "ts-jest": "^27.1.4",
     "ts-toolbelt": "^9.6.0",
     "typedoc": "^0.28.14",
-    "typescript": "^5.0.0"
+    "typescript": "^5.2.0"
   }
 }
