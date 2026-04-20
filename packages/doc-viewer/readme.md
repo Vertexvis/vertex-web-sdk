@@ -9,9 +9,7 @@ This project contains Vertex's 2D Viewer SDK. Vertex is a cloud platform for
 rendering large 3D models. See [Vertex's website][vertex] for more information.
 
 Our 2D viewer is distributed as a set of standards-based [web components] that
-can run in any browser supporting the Custom Elements v1 specification. For
-browsers that do not support the Custom Elements v1 spec, a polyfill will
-automatically be used.
+can run in modern browsers matching this project's Browserslist targets.
 
 [vertex]: https://www.vertexvis.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components
