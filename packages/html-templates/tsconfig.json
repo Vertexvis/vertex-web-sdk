@@ -3,7 +3,7 @@
   "extends": "@vertexwebsdk/build/tsconfig-web",
   "compilerOptions": {
     "downlevelIteration": true,
-    "target": "es2017"
+    "target": "ES2023",
   },
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules"],
 }

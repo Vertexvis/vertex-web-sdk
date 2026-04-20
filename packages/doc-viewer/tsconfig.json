@@ -6,12 +6,8 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "target": "es2017"
+    "target": "ES2023",
   },
-  "include": [
-    "src",
-    "types/*.d.ts",
-    "src/components.d.ts"
-  ],
-  "exclude": ["dist", "node_modules"]
+  "include": ["src", "types/*.d.ts", "src/components.d.ts"],
+  "exclude": ["dist", "node_modules"],
 }
