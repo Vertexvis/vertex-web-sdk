@@ -3784,9 +3784,15 @@ declare namespace LocalJSX {
      */
     disabled?: boolean;
     /**
-     * An event that is emitted when a user has inputted or cleared the search term. The event may be delayed according to the current `debounce` value.
+     * An event that is emitted when a user has changed or cleared the search term. The event may be delayed according to the current `debounce` value.
      */
     onSearch?: (event: VertexSceneTreeSearchCustomEvent<string>) => void;
+    /**
+     * An event that is emitted when a search has completed.
+     */
+    onSearchCompleted?: (
+      event: VertexSceneTreeSearchCustomEvent<string>
+    ) => void;
     /**
      * Placeholder text if `value` is empty.
      * @default undefined
