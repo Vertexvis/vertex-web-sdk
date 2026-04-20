@@ -2338,6 +2338,7 @@ declare global {
   };
   interface HTMLVertexSceneTreeSearchElementEventMap {
     search: string;
+    searchCompleted: string;
   }
   interface HTMLVertexSceneTreeSearchElement
     extends Components.VertexSceneTreeSearch, HTMLStencilElement {
