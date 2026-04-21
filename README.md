@@ -48,10 +48,7 @@ These examples make use of more modern EcmaScript features. You'll need a browse
 
 - Run `yarn examples:start` to spin up a local development environment.
 - Open your browser to <http://localhost:8080> to browse the examples. The development environment supports live refresh, so any changes you make the examples will automatically refresh your browser.
-
-### Contributing Examples
-
-We provide a script that you can run to create a new example. Run `yarn examples:scaffold [name]` to create a new example.
+- Run `yarn examples:start:local` to serve the repository root instead when an example needs to load local package build output such as `/packages/viewer/dist/...`. Open examples from paths like <http://localhost:8080/examples/pmi/>.
 
 ## Building
 

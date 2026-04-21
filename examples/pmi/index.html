@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xml:lang="en">
   <head>
     <title>PMI</title>
@@ -8,6 +8,10 @@
 
     <script type="module" src="main.js"></script>
 
+    <!--
+      To test local changes change from CDN urls to local paths. For example:
+     `https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/` to `/packages/viewer/`
+    -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer/viewer.css"
@@ -100,7 +104,7 @@
         background-color: #b3e0f0;
         cursor: pointer;
       }
-      
+
       .selected {
         background-color: #4db8db;
       }
@@ -164,11 +168,8 @@
         <div class="annotation-list-header">PMI Annotations</div>
         <div id="annotation-list"></div>
       </div>
-      
-      <vertex-viewer
-        id="viewer"
-        class="viewer"
-      >
+
+      <vertex-viewer id="viewer" class="viewer">
         <vertex-viewer-default-toolbar
           data-viewer="viewer"
           placement="top-left"
@@ -178,23 +179,33 @@
           <vertex-viewer-spinner></vertex-viewer-spinner>
         </vertex-viewer-layer>
       </vertex-viewer>
-
     </div>
     <div id="instructions">
       <div id="instructions-header">
         <strong>Instructions</strong>
         <button id="instructions-close">
-          <vertex-viewer-icon name="close-circle" size="sm"></vertex-viewer-icon>
+          <vertex-viewer-icon
+            name="close-circle"
+            size="sm"
+          ></vertex-viewer-icon>
         </button>
       </div>
 
       <div id="instructions-content">
         <div>To get started, follow these steps:</div>
         <br />
-        <div>- Click a model view to load it into the viewer and display all associated PMI annotations.</div>
+        <div>
+          - Click a model view to load it into the viewer and display all
+          associated PMI annotations.
+        </div>
         <div>- Click a PMI annotation's name to select it from the list.</div>
-        <div>- Click a PMI annotation in the viewer to select it from the viewer.</div>
-        <div>- Click the visibility button to the right of the annotation's name to toggle its visibility.</div>
+        <div>
+          - Click a PMI annotation in the viewer to select it from the viewer.
+        </div>
+        <div>
+          - Click the visibility button to the right of the annotation's name to
+          toggle its visibility.
+        </div>
       </div>
     </div>
   </body>
