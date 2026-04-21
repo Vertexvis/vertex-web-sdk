@@ -351,9 +351,7 @@ export class Viewer {
    * @internal
    */
   @Prop({ mutable: true })
-  public stencilBuffer: StencilBufferManager = new StencilBufferManager(
-    this.hostElement
-  );
+  public stencilBuffer!: StencilBufferManager;
 
   /**
    * Represents the current viewport of the viewer. The viewport represents the
@@ -550,6 +548,8 @@ export class Viewer {
    * @ignore
    */
   protected connectedCallback(): void {
+    this.stencilBuffer ??= new StencilBufferManager(this.hostElement);
+
     this.visibilityObserver = new VisibilityObserver(
       this.handleVisibilityChange
     );
