@@ -28,7 +28,7 @@
     "validate": "yarn build && yarn test && yarn lint",
     "version:bump": "./scripts/version_bump.sh",
     "examples:start": "http-server -c-1 examples/ & livereload ./examples/ --wait 1000",
-    "examples:start:local": "http-server -c-1 . & livereload ./examples/ ./packages/ --wait 1000",
+    "examples:start:local": "http-server -c-1 . & livereload ./examples/ ./packages/ --wait 1000"
   },
   "workspaces": {
     "packages": [
