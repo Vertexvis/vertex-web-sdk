@@ -3,8 +3,8 @@
   "extends": "@vertexvis/typescript-config-vertexvis/tsconfig-web",
   "compilerOptions": {
     "importHelpers": true,
-    "target": "ES2023",
-    "lib": ["DOM", "ES2023"],
+    "target": "ES2022",
+    "lib": ["DOM", "esnext"],
   },
   "exclude": ["dist", "node_modules"],
 }
