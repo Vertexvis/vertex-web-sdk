@@ -10,6 +10,8 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { JSX } from '@vertexvis/doc-viewer';
 
 import { stampTemplateWithId } from '../../lib/templates';
 import {
@@ -92,7 +94,7 @@ export class ViewerMarkupTool {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
 
   /**
    * The style of the starting anchor. This defaults to none.

@@ -3,7 +3,7 @@
   "version": "0.24.3",
   "description": "The Vertex SDK for viewing models.",
   "license": "MIT",
-  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
   "repository": {
     "type": "git",
@@ -48,7 +48,8 @@
   },
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
-    "@stencil/core": "^2.16.1",
+    "@stencil/core": "^3.4.1",
+    "@vertexvis/doc-viewer": "^0.24.3",
     "@vertexvis/frame-streaming-protos": "^0.17.0",
     "@vertexvis/geometry": "0.24.3",
     "@vertexvis/html-templates": "0.24.3",

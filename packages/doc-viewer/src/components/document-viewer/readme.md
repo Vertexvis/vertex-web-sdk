@@ -7,15 +7,16 @@
 
 ## Properties
 
-| Property          | Attribute          | Description                                                                                                                                                                                                                                                                        | Type                                    | Default               |
-| ----------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------- |
-| `config`          | --                 | Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.                                                                                                                                                     | `Config \| undefined`                   | `undefined`           |
-| `documentState`   | --                 | Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.                                                                                                    | `DocumentApiState \| undefined`         | `undefined`           |
-| `interactionMode` | `interaction-mode` | The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.                                                                                                                      | `"none" \| "pan"`                       | `'pan'`               |
-| `layers`          | --                 | Controller for interacting with layers in the currently loaded document.  This controller will automatically be created along with the loaded document. Note that the methods available on this controller will only be supported if the underlying document type supports layers. | `DocumentLayersController \| undefined` | `undefined`           |
-| `provider`        | --                 | The provider used to create the document API and renderer.                                                                                                                                                                                                                         | `DocumentProvider`                      | `new PdfJsProvider()` |
-| `resizeDebounce`  | `resize-debounce`  | An optional value that will debounce image updates when resizing this viewer element.                                                                                                                                                                                              | `number`                                | `100`                 |
-| `src`             | `src`              | A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.                                                                                                                                               | `string \| undefined`                   | `undefined`           |
+| Property          | Attribute          | Description                                                                                                                                                                                                                                                                            | Type                                    | Default               |
+| ----------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------- |
+| `config`          | --                 | Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.                                                                                                                                                         | `Config \| undefined`                   | `undefined`           |
+| `documentId`      | `document-id`      | The ID of the loaded `Document`. This ID is required to enable persistence of annotations.  Note that this is different than a `File` ID within the Vertex Platform, and must be created separately using the `/documents` endpoints. See https://docs.vertex3d.com/ for more details. | `string \| undefined`                   | `undefined`           |
+| `documentState`   | --                 | Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.                                                                                                        | `DocumentApiState \| undefined`         | `undefined`           |
+| `interactionMode` | `interaction-mode` | The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.                                                                                                                          | `"none" \| "pan"`                       | `'pan'`               |
+| `layers`          | --                 | Controller for interacting with layers in the currently loaded document.  This controller will automatically be created along with the loaded document. Note that the methods available on this controller will only be supported if the underlying document type supports layers.     | `DocumentLayersController \| undefined` | `undefined`           |
+| `provider`        | --                 | The provider used to create the document API and renderer.                                                                                                                                                                                                                             | `DocumentProvider`                      | `new PdfJsProvider()` |
+| `resizeDebounce`  | `resize-debounce`  | An optional value that will debounce image updates when resizing this viewer element.                                                                                                                                                                                                  | `number`                                | `100`                 |
+| `src`             | `src`              | A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.                                                                                                                                                   | `string \| undefined`                   | `undefined`           |
 
 
 ## Events
@@ -65,6 +66,26 @@ appear blank.
 Type: `Promise<void>`
 
 
+
+### `registerInteractionHandler(interactionHandler: InteractionHandler) => Promise<Disposable>`
+
+Registers and initializes an interaction handler with the document viewer. Returns a
+`Disposable` that should be used to deregister the interaction handler.
+
+`InteractionHandler`s are used to build custom mouse and touch interactions.
+
+#### Parameters
+
+| Name                 | Type                 | Description                          |
+| -------------------- | -------------------- | ------------------------------------ |
+| `interactionHandler` | `InteractionHandler` | The interaction handler to register. |
+
+#### Returns
+
+Type: `Promise<Disposable>`
+
+A promise containing the disposable to use to
+deregister the handler.
 
 ### `zoomTo(percentage: number) => Promise<void>`
 

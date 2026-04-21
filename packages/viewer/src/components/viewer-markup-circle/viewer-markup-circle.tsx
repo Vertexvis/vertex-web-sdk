@@ -78,7 +78,7 @@ export class ViewerMarkupCircle {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -158,7 +158,7 @@ export class ViewerMarkupCircle {
    */
   @Watch('viewer')
   protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement
+    newViewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement
   ): Promise<void> {
     this.registeredHandler?.dispose();
     this.registeredHandler = undefined;

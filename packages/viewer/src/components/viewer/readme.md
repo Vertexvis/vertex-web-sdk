@@ -58,7 +58,7 @@
 
 ## Methods
 
-### `addCursor(cursor: Cursor, priority?: number | undefined) => Promise<Disposable>`
+### `addCursor(cursor: Cursor, priority?: number) => Promise<Disposable>`
 
 Adds a cursor to the viewer, and displays it if the cursor has the highest
 priority.
@@ -115,7 +115,7 @@ Type: `Promise<boolean>`
 
 
 
-### `load(urn: string, options?: LoadOptions | undefined) => Promise<void>`
+### `load(urn: string, options?: LoadOptions) => Promise<void>`
 
 Loads the given scene into the viewer and return a `Promise` that
 resolves when the scene has been loaded. The specified scene is
