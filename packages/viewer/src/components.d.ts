@@ -130,6 +130,131 @@ import { WalkModeController } from './lib/walk-mode/controller';
 import { TransformController } from './lib/transforms/controller';
 import { ModifierKey } from './lib/types/keys';
 import { Drawable } from './lib/transforms/drawable';
+export {
+  FilterOptions,
+  MetadataKey,
+  RowArg,
+  RowDataProvider,
+  SceneTreeOperationOptions,
+  ScrollToOptions,
+  SelectItemOptions,
+} from './components/scene-tree/types';
+export { Config, PartialConfig } from './lib/config';
+export { Environment } from './lib/environment';
+export {
+  FilterTreeOptions,
+  SceneTreeController,
+} from './components/scene-tree/lib/controller';
+export { SceneTreeErrorDetails } from './components/scene-tree/lib/errors';
+export { Row } from './components/scene-tree/lib/row';
+export { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+export { SceneTreeOperationHandler } from './components/scene-tree/lib/handlers';
+export { SceneTreeCellHoverController } from './components/scene-tree-table-layout/lib/hover-controller';
+export { SceneTreeTableCellEventDetails } from './components/scene-tree-table-cell/scene-tree-table-cell';
+export { DomScrollToOptions } from './components/scene-tree-table-layout/lib/dom';
+export { FrameCameraType } from './lib/types/frameCamera';
+export {
+  CrossSectioningOptions,
+  FeatureHighlightOptions,
+  FeatureLineOptions,
+  FrameType,
+  PhantomOptions,
+  SceneComparisonOptions,
+  SelectionHighlightingOptions,
+} from './interfaces';
+export { Frame, FrameCameraBase } from './lib/types/frame';
+export { ViewerStream } from './lib/stream/stream';
+export {
+  AngleUnitType,
+  DepthBuffer,
+  DistanceUnitType,
+  EntityType,
+  FrameCameraBase as FrameCameraBase1,
+  FramePerspectiveCamera,
+  Orientation,
+  StencilBufferManager,
+  Viewport,
+} from './lib/types';
+export {
+  AnnotationController,
+  AnnotationState,
+} from './lib/annotations/controller';
+export { ModelViewController } from './lib/model-views/controller';
+export { PmiController } from './lib/pmi';
+export { SceneItemController } from './lib/scene-items/controller';
+export { CanvasController } from './lib/canvases';
+export { TapEventDetails } from './lib/interactions/tapEventDetails';
+export { ConnectionStatus, LoadOptions } from './components/viewer/viewer';
+export {
+  Dimensions,
+  Euler,
+  Matrix4,
+  Point,
+  Quaternion,
+  Rectangle,
+  Vector3,
+} from '@vertexvis/geometry';
+export { Color, Disposable } from '@vertexvis/utils';
+export { InteractionHandler } from './lib/interactions/interactionHandler';
+export { KeyInteraction } from './lib/interactions/keyInteraction';
+export { Cursor } from './lib/cursors';
+export { BaseInteractionHandler } from './lib/interactions/baseInteractionHandler';
+export { Scene } from './lib/scenes/scene';
+export { CalloutAnnotationData } from './lib/annotations/annotation';
+export { ViewerIconSize } from './components/viewer-icon/viewer-icon';
+export { VolumeIntersectionQueryController } from './lib/volume-intersection/controller';
+export { VolumeIntersectionQueryModel } from './lib/volume-intersection/model';
+export {
+  VolumeIntersectionQueryMode,
+  VolumeIntersectionQueryType,
+} from './components/viewer-box-query-tool/types';
+export {
+  ViewerToolbarDirection,
+  ViewerToolbarPlacement,
+} from './components/viewer-toolbar/types';
+export { ViewerToolbarGroupDirection } from './components/viewer-toolbar-group/types';
+export { ViewerDomRendererDrawMode } from './components/viewer-dom-renderer/viewer-dom-renderer';
+export {
+  ViewerIconName,
+  ViewerIconSize as ViewerIconSize1,
+} from './components/viewer-icon/viewer-icon';
+export { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
+export { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
+export { Markup, MarkupInteraction } from './lib/types/markup';
+export { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
+export { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
+export { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform/viewer-markup-freeform';
+export { ViewerMarkupToolType as ViewerMarkupToolType1 } from './components/viewer-markup-tool/viewer-markup-tool';
+export {
+  MeasurementController,
+  MeasurementModel,
+  MeasurementOutcome,
+  MeasurementOverlayManager,
+  MeasurementResult,
+} from './lib/measurement';
+export { Formatter } from './lib/formatter';
+export {
+  EditBeginEventDetails,
+  EditEndEventDetails,
+  ViewerMeasurementDistanceElementMetrics,
+  ViewerMeasurementDistanceMode,
+} from './components/viewer-measurement-distance/viewer-measurement-distance';
+export { Anchor } from './components/viewer-measurement-distance/utils';
+export { PointToPointHitProvider } from './components/viewer-measurement-distance/interactions';
+export {
+  Pin,
+  PinModel,
+  TextPin,
+  ViewerPinToolMode,
+  ViewerPinToolType,
+} from './lib/pins/model';
+export { PinController } from './lib/pins/controller';
+export { SpinnerSize } from './components/viewer-spinner/viewer-spinner';
+export { ViewerTeleportMode, WalkModeModel } from './lib/walk-mode/model';
+export { WalkModeController } from './lib/walk-mode/controller';
+export { TransformController } from './lib/transforms/controller';
+export { ModifierKey } from './lib/types/keys';
+export { Drawable } from './lib/transforms/drawable';
 export namespace Components {
   interface VertexSceneTree {
     /**
@@ -284,7 +409,7 @@ export namespace Components {
      */
     selectFilteredItems: (
       term: string,
-      options?: SceneTreeOperationOptions | undefined
+      options?: SceneTreeOperationOptions
     ) => Promise<void>;
     /**
      * Performs an API call that will select the item associated to the given row or row index.
@@ -321,6 +446,9 @@ export namespace Components {
      */
     viewerSelector?: string;
   }
+  /**
+   * A notification banner that displays a message and an action button.
+   */
   interface VertexSceneTreeNotificationBanner {
     /**
      * The label of the action button.
@@ -510,10 +638,7 @@ export namespace Components {
      * @returns A disposable that can be used to remove the cursor.
      * @see See {@link CursorManager} for constants to pass to `priority`.
      */
-    addCursor: (
-      cursor: Cursor,
-      priority?: number | undefined
-    ) => Promise<Disposable>;
+    addCursor: (cursor: Cursor, priority?: number) => Promise<Disposable>;
     /**
      * The annotation controller for accessing annotations associated with the scene view.
      * @readonly
@@ -635,7 +760,7 @@ export namespace Components {
      * @param urn The URN of the resource to load.
      * @param options Optional configurations when loading the scene. cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used.
      */
-    load: (urn: string, options?: LoadOptions | undefined) => Promise<void>;
+    load: (urn: string, options?: LoadOptions) => Promise<void>;
     /**
      * The controller for accessing model views associated with the scene view.
      * @readonly
@@ -781,6 +906,12 @@ export namespace Components {
      */
     iconSize: ViewerIconSize;
   }
+  /**
+   * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
+   * a query for items in a specific area of the viewer. This tool then allows for an
+   * operation to be performed on the items contained (exclusive) by the box or both
+   * contained by and intersecting with (inclusive) the box.
+   */
   interface VertexViewerBoxQueryTool {
     /**
      * The controller that is responsible for performing operations using the volume intersection query defined by the drawn box and updating the model.
@@ -834,6 +965,12 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  /**
+   * The `ViewerDomElement` is responsible for managing a
+   * `<vertex-viewer-dom-element>` element. These elements are intended to be
+   * added as children to a `<vertex-viewer-dom-renderer>` and represent an
+   * individual DOM element within a local 3D scene.
+   */
   interface VertexViewerDomElement {
     /**
      * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
@@ -950,6 +1087,11 @@ export namespace Components {
      */
     scaleJson: string;
   }
+  /**
+   * The `ViewerDomRenderer` is responsible for managing a
+   * `<vertex-viewer-dom-renderer>` element. This element supports drawing DOM
+   * objects in a local 3D scene that is synced with a remote rendered scene.
+   */
   interface VertexViewerDomRenderer {
     /**
      * The current camera of the frame.
@@ -1010,7 +1152,7 @@ export namespace Components {
      *
      * A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
      */
-    size?: ViewerIconSize;
+    size?: ViewerIconSize1;
   }
   interface VertexViewerLayer {
     /**
@@ -1023,8 +1165,8 @@ export namespace Components {
      * Adds a new markup as a child to this component. A new markup component will be created from the template specified by `arrow-template-id`, `circle-template-id`, or if undefined a default element will be created.
      * @param markup The markup to add.
      * @returns The markup element that was created.
-     * @see {@link ViewerMarkups.arrowTemplateId }
-     * @see {@link ViewerMarkups.circleTemplateId }
+     * @see {@link arrowTemplateId}
+     * @see {@link circleTemplateId}
      */
     addMarkup: (
       markup: Markup
@@ -1057,7 +1199,7 @@ export namespace Components {
      * Returns the markup element associated to the given ID.
      * @param id The ID of the markup element to return.
      * @returns A markup element, or `undefined`.
-     * @see {@link ViewerMarkup.getMarkupElements}
+     * @see {@link getMarkupElements}
      */
     getMarkupElement: (
       id: string
@@ -1070,7 +1212,7 @@ export namespace Components {
     /**
      * Returns a list of markup elements that are children of this component.
      * @returns A list of all markups.
-     * @see {@link ViewerMarkup.getMarkupElement}
+     * @see {@link getMarkupElement}
      */
     getMarkupElements: () => Promise<
       Array<
@@ -1256,7 +1398,7 @@ export namespace Components {
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
-    tool: ViewerMarkupToolType;
+    tool: ViewerMarkupToolType1;
     /**
      * The viewer to connect to markup.
      *
@@ -1554,6 +1696,11 @@ export namespace Components {
      */
     size?: SpinnerSize;
   }
+  /**
+   * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
+   * around a model, which is particularly useful for walking through a model.
+   * This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
+   */
   interface VertexViewerTeleportTool {
     /**
      * The duration of animations, in milliseconds. Defaults to `500`.
@@ -1763,6 +1910,10 @@ export namespace Components {
      */
     zPositiveLabel: string;
   }
+  /**
+   * The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
+   * intended for walking through a model instead of orbiting a model.
+   */
   interface VertexViewerWalkModeTool {
     /**
      * The `WalkModeController` responsible for controlling `KeyBinding`s and excluded elements, as well as updating the `WalkModeModel` with various configuration settings.
@@ -1887,6 +2038,9 @@ declare global {
     prototype: HTMLVertexSceneTreeElement;
     new (): HTMLVertexSceneTreeElement;
   };
+  /**
+   * A notification banner that displays a message and an action button.
+   */
   interface HTMLVertexSceneTreeNotificationBannerElement
     extends Components.VertexSceneTreeNotificationBanner,
       HTMLStencilElement {}
@@ -1964,6 +2118,12 @@ declare global {
     prototype: HTMLVertexViewerAnnotationCalloutElement;
     new (): HTMLVertexViewerAnnotationCalloutElement;
   };
+  /**
+   * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
+   * a query for items in a specific area of the viewer. This tool then allows for an
+   * operation to be performed on the items contained (exclusive) by the box or both
+   * contained by and intersecting with (inclusive) the box.
+   */
   interface HTMLVertexViewerBoxQueryToolElement
     extends Components.VertexViewerBoxQueryTool,
       HTMLStencilElement {}
@@ -1985,6 +2145,12 @@ declare global {
     prototype: HTMLVertexViewerDefaultToolbarElement;
     new (): HTMLVertexViewerDefaultToolbarElement;
   };
+  /**
+   * The `ViewerDomElement` is responsible for managing a
+   * `<vertex-viewer-dom-element>` element. These elements are intended to be
+   * added as children to a `<vertex-viewer-dom-renderer>` and represent an
+   * individual DOM element within a local 3D scene.
+   */
   interface HTMLVertexViewerDomElementElement
     extends Components.VertexViewerDomElement,
       HTMLStencilElement {}
@@ -1999,6 +2165,11 @@ declare global {
     prototype: HTMLVertexViewerDomGroupElement;
     new (): HTMLVertexViewerDomGroupElement;
   };
+  /**
+   * The `ViewerDomRenderer` is responsible for managing a
+   * `<vertex-viewer-dom-renderer>` element. This element supports drawing DOM
+   * objects in a local 3D scene that is synced with a remote rendered scene.
+   */
   interface HTMLVertexViewerDomRendererElement
     extends Components.VertexViewerDomRenderer,
       HTMLStencilElement {}
@@ -2132,6 +2303,11 @@ declare global {
     prototype: HTMLVertexViewerSpinnerElement;
     new (): HTMLVertexViewerSpinnerElement;
   };
+  /**
+   * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
+   * around a model, which is particularly useful for walking through a model.
+   * This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
+   */
   interface HTMLVertexViewerTeleportToolElement
     extends Components.VertexViewerTeleportTool,
       HTMLStencilElement {}
@@ -2167,6 +2343,10 @@ declare global {
     prototype: HTMLVertexViewerViewCubeElement;
     new (): HTMLVertexViewerViewCubeElement;
   };
+  /**
+   * The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
+   * intended for walking through a model instead of orbiting a model.
+   */
   interface HTMLVertexViewerWalkModeToolElement
     extends Components.VertexViewerWalkModeTool,
       HTMLStencilElement {}
@@ -2297,6 +2477,9 @@ declare namespace LocalJSX {
      */
     viewerSelector?: string;
   }
+  /**
+   * A notification banner that displays a message and an action button.
+   */
   interface VertexSceneTreeNotificationBanner {
     /**
      * The label of the action button.
@@ -2744,6 +2927,12 @@ declare namespace LocalJSX {
      */
     iconSize?: ViewerIconSize;
   }
+  /**
+   * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
+   * a query for items in a specific area of the viewer. This tool then allows for an
+   * operation to be performed on the items contained (exclusive) by the box or both
+   * contained by and intersecting with (inclusive) the box.
+   */
   interface VertexViewerBoxQueryTool {
     /**
      * The controller that is responsible for performing operations using the volume intersection query defined by the drawn box and updating the model.
@@ -2803,6 +2992,12 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
+  /**
+   * The `ViewerDomElement` is responsible for managing a
+   * `<vertex-viewer-dom-element>` element. These elements are intended to be
+   * added as children to a `<vertex-viewer-dom-renderer>` and represent an
+   * individual DOM element within a local 3D scene.
+   */
   interface VertexViewerDomElement {
     /**
      * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
@@ -2939,6 +3134,11 @@ declare namespace LocalJSX {
      */
     scaleJson?: string;
   }
+  /**
+   * The `ViewerDomRenderer` is responsible for managing a
+   * `<vertex-viewer-dom-renderer>` element. This element supports drawing DOM
+   * objects in a local 3D scene that is synced with a remote rendered scene.
+   */
   interface VertexViewerDomRenderer {
     /**
      * The current camera of the frame.
@@ -2999,7 +3199,7 @@ declare namespace LocalJSX {
      *
      * A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
      */
-    size?: ViewerIconSize;
+    size?: ViewerIconSize1;
   }
   interface VertexViewerLayer {
     /**
@@ -3284,7 +3484,7 @@ declare namespace LocalJSX {
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
      */
-    tool?: ViewerMarkupToolType;
+    tool?: ViewerMarkupToolType1;
     /**
      * The viewer to connect to markup.
      *
@@ -3596,6 +3796,11 @@ declare namespace LocalJSX {
      */
     size?: SpinnerSize;
   }
+  /**
+   * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
+   * around a model, which is particularly useful for walking through a model.
+   * This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
+   */
   interface VertexViewerTeleportTool {
     /**
      * The duration of animations, in milliseconds. Defaults to `500`.
@@ -3827,6 +4032,10 @@ declare namespace LocalJSX {
      */
     zPositiveLabel?: string;
   }
+  /**
+   * The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
+   * intended for walking through a model instead of orbiting a model.
+   */
   interface VertexViewerWalkModeTool {
     /**
      * The `WalkModeController` responsible for controlling `KeyBinding`s and excluded elements, as well as updating the `WalkModeModel` with various configuration settings.
@@ -3918,6 +4127,9 @@ declare module '@stencil/core' {
     interface IntrinsicElements {
       'vertex-scene-tree': LocalJSX.VertexSceneTree &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeElement>;
+      /**
+       * A notification banner that displays a message and an action button.
+       */
       'vertex-scene-tree-notification-banner': LocalJSX.VertexSceneTreeNotificationBanner &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeNotificationBannerElement>;
       'vertex-scene-tree-search': LocalJSX.VertexSceneTreeSearch &
@@ -3940,16 +4152,33 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
       'vertex-viewer-annotation-callout': LocalJSX.VertexViewerAnnotationCallout &
         JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationCalloutElement>;
+      /**
+       * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
+       * a query for items in a specific area of the viewer. This tool then allows for an
+       * operation to be performed on the items contained (exclusive) by the box or both
+       * contained by and intersecting with (inclusive) the box.
+       */
       'vertex-viewer-box-query-tool': LocalJSX.VertexViewerBoxQueryTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerBoxQueryToolElement>;
       'vertex-viewer-button': LocalJSX.VertexViewerButton &
         JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
       'vertex-viewer-default-toolbar': LocalJSX.VertexViewerDefaultToolbar &
         JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
+      /**
+       * The `ViewerDomElement` is responsible for managing a
+       * `<vertex-viewer-dom-element>` element. These elements are intended to be
+       * added as children to a `<vertex-viewer-dom-renderer>` and represent an
+       * individual DOM element within a local 3D scene.
+       */
       'vertex-viewer-dom-element': LocalJSX.VertexViewerDomElement &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
       'vertex-viewer-dom-group': LocalJSX.VertexViewerDomGroup &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomGroupElement>;
+      /**
+       * The `ViewerDomRenderer` is responsible for managing a
+       * `<vertex-viewer-dom-renderer>` element. This element supports drawing DOM
+       * objects in a local 3D scene that is synced with a remote rendered scene.
+       */
       'vertex-viewer-dom-renderer': LocalJSX.VertexViewerDomRenderer &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
       'vertex-viewer-hit-result-indicator': LocalJSX.VertexViewerHitResultIndicator &
@@ -3988,6 +4217,11 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerPinToolElement>;
       'vertex-viewer-spinner': LocalJSX.VertexViewerSpinner &
         JSXBase.HTMLAttributes<HTMLVertexViewerSpinnerElement>;
+      /**
+       * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
+       * around a model, which is particularly useful for walking through a model.
+       * This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
+       */
       'vertex-viewer-teleport-tool': LocalJSX.VertexViewerTeleportTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerTeleportToolElement>;
       'vertex-viewer-toolbar': LocalJSX.VertexViewerToolbar &
@@ -3998,6 +4232,10 @@ declare module '@stencil/core' {
         JSXBase.HTMLAttributes<HTMLVertexViewerTransformWidgetElement>;
       'vertex-viewer-view-cube': LocalJSX.VertexViewerViewCube &
         JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
+      /**
+       * The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
+       * intended for walking through a model instead of orbiting a model.
+       */
       'vertex-viewer-walk-mode-tool': LocalJSX.VertexViewerWalkModeTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerWalkModeToolElement>;
     }

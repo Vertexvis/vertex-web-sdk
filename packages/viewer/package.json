@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
-    "@stencil/core": "^2.16.1",
+    "@stencil/core": "^3.4.2",
     "@vertexvis/frame-streaming-protos": "^0.17.0",
     "@vertexvis/geometry": "0.24.3",
     "@vertexvis/html-templates": "0.24.3",
@@ -75,7 +75,7 @@
     "tslib": "^2.1.0"
   },
   "devDependencies": {
-    "@stencil/react-output-target": "^0.5.3",
+    "@stencil/react-output-target": "1.4.2",
     "@stencil/vue-output-target": "^0.8.6",
     "@types/chance": "^1.1.1",
     "@types/google-protobuf": "^3.15.12",

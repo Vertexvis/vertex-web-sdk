@@ -255,6 +255,12 @@ attribute.
 <!-- Auto Generated Below -->
 
 
+## Overview
+
+The `ViewerDomRenderer` is responsible for managing a
+`<vertex-viewer-dom-renderer>` element. This element supports drawing DOM
+objects in a local 3D scene that is synced with a remote rendered scene.
+
 ## Properties
 
 | Property                  | Attribute                    | Description                                                                                                                                                                                                                                                                                                                                                                    | Type                                   | Default     |

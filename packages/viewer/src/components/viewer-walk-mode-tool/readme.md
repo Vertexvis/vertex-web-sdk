@@ -5,6 +5,11 @@
 <!-- Auto Generated Below -->
 
 
+## Overview
+
+The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
+intended for walking through a model instead of orbiting a model.
+
 ## Properties
 
 | Property       | Attribute       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Type                                                                   | Default               |

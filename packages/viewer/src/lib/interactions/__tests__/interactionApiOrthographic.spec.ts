@@ -24,7 +24,7 @@ import {
   Viewport,
 } from '../../types';
 import { Frame } from '../../types/frame';
-import { InteractionApi } from '../interactionApi';
+import { InteractionApi, SceneProvider } from '../interactionApi';
 import { InteractionApiOrthographic } from '../interactionApiOrthographic';
 
 describe(InteractionApiOrthographic, () => {
@@ -33,7 +33,6 @@ describe(InteractionApiOrthographic, () => {
   const emitLongPress = jest.fn();
   const emitInteractionStarted = jest.fn();
   const emitInteractionFinished = jest.fn();
-  const emitCameraChanged = jest.fn();
   const streamApi = new StreamApi();
   const sceneId = random.guid();
   const sceneViewId = random.guid();
@@ -67,15 +66,14 @@ describe(InteractionApiOrthographic, () => {
       streamApi,
       new CursorManager(),
       interactionConfigProvider,
-      sceneProvider,
+      sceneProvider as unknown as SceneProvider,
       frameProvider,
       viewportProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
       { emit: emitLongPress },
       { emit: emitInteractionStarted },
-      { emit: emitInteractionFinished },
-      { emit: emitCameraChanged }
+      { emit: emitInteractionFinished }
     );
   });
 

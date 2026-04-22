@@ -1974,10 +1974,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@stencil/core@^2.16.1":
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/@stencil/core/-/core-2.16.1.tgz#f6752026af72a10356d5b1f27e2db6b1ee0c730f"
-  integrity sha512-s/UJp9qxExL3DyQPT70kiuWeb3AdjbUZM+5lEIXn30I2DLcLYPOPXfsoWJODieQywq+3vPiLZeIdkoqjf6jcSw==
+"@stencil/core@^3.4.2":
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/@stencil/core/-/core-3.4.2.tgz#57ce7f71fe18c2ec0967821bec667fc453cca962"
+  integrity sha512-FAUhUVaakCy29nU2GwO/HQBRV1ihPRvncz3PUc8oR+UJLAxGabTmP8PLY7wvHfbw+Cvi4VXfJFTBvdfDu6iKPQ==
 
 "@stencil/core@^4.27.1":
   version "4.43.3"
@@ -1993,12 +1993,7 @@
     "@rollup/rollup-win32-arm64-msvc" "4.44.0"
     "@rollup/rollup-win32-x64-msvc" "4.44.0"
 
-"@stencil/react-output-target@^0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@stencil/react-output-target/-/react-output-target-0.5.3.tgz#2a7186b7ba6c8721f92f4200e414b70854030d79"
-  integrity sha512-68jwRp35CjAcwhTJ9yFD/3n+jrHOqvEH2jreVuPVvZK+4tkhPlYlwz0d1E1RlF3jyifUSfdkWUGgXIEy8Fo3yw==
-
-"@stencil/react-output-target@^1.4.2":
+"@stencil/react-output-target@1.4.2", "@stencil/react-output-target@^1.4.2":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@stencil/react-output-target/-/react-output-target-1.4.2.tgz#f53b88c3c84f3955eb13ea1140febbe98f8af696"
   integrity sha512-XH/kRsfBbEbBYYCCVpDsuw/bpfEvq7YSDoKy2yOmf/GI4iGxwZbOml0IHpgMOwa6ggL/lCwA1GuwH+T3wla8Fg==

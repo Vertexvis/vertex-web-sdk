@@ -10,6 +10,7 @@ import {
   buildSceneElementOperationOnItem,
   toPbSceneViewStateFeatures,
 } from '../mapper';
+import { SceneViewStateFeature } from '../scene';
 
 describe(buildSceneElementOperationOnItem, () => {
   it('maps operations', () => {
@@ -203,7 +204,9 @@ describe(toPbSceneViewStateFeatures, () => {
   });
 
   it('maps to invalid when unknown feature given', () => {
-    expect(toPbSceneViewStateFeatures(['Not a feature'])).toMatchObject([
+    expect(
+      toPbSceneViewStateFeatures(['Not a feature' as SceneViewStateFeature])
+    ).toMatchObject([
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_INVALID,
     ]);
