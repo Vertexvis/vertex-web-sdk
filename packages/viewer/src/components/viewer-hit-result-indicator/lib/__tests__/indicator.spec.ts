@@ -132,7 +132,9 @@ function updateFrameCameraPosition(
       baseFrame.scene.boundingBox,
       baseFrame.scene.crossSection,
       baseFrame.scene.worldOrientation,
-      baseFrame.scene.hasChanged
+      baseFrame.scene.hasChanged,
+      baseFrame.scene.sceneViewSummary,
+      baseFrame.scene.modelViewId
     ),
     makeDepthImagePng(100, 50),
     makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0))

@@ -613,7 +613,7 @@ describe(TransformWidget, () => {
     };
     const unscaled = new TransformWidget(canvas);
     const scaled = new TransformWidget(canvas, {
-      sizes,
+      scalars: sizes,
     });
 
     const frame = makePerspectiveFrame();

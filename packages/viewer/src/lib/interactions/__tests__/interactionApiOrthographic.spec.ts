@@ -24,7 +24,7 @@ import {
   Viewport,
 } from '../../types';
 import { Frame } from '../../types/frame';
-import { InteractionApi } from '../interactionApi';
+import {InteractionApi, SceneProvider} from '../interactionApi';
 import { InteractionApiOrthographic } from '../interactionApiOrthographic';
 
 describe(InteractionApiOrthographic, () => {
@@ -67,15 +67,14 @@ describe(InteractionApiOrthographic, () => {
       streamApi,
       new CursorManager(),
       interactionConfigProvider,
-      sceneProvider,
+      sceneProvider as unknown as SceneProvider,
       frameProvider,
       viewportProvider,
       { emit: emitTap },
       { emit: emitDoubleTap },
       { emit: emitLongPress },
       { emit: emitInteractionStarted },
-      { emit: emitInteractionFinished },
-      { emit: emitCameraChanged }
+      { emit: emitInteractionFinished }
     );
   });
 

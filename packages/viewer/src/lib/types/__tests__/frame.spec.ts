@@ -151,8 +151,9 @@ describe(Frame, () => {
   it('should include the ID on a copy', () => {
     const frame = new Frame(
       [],
+      "",
       2,
-      {} as Dimensions,
+      Dimensions.create(1, 1),
       new FrameImage(makeImageAttributes(1, 2), new Uint8Array()),
       {} as FrameScene,
       undefined,

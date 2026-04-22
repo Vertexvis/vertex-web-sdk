@@ -70,8 +70,7 @@ describe(InteractionApi, () => {
       props.doubleTapEmitter ?? { emit: emitDoubleTap },
       props.longPressEmitter ?? { emit: emitLongPress },
       props.interactionStartedEmitter ?? { emit: emitInteractionStarted },
-      props.interactionFinishedEmitter ?? { emit: emitInteractionFinished },
-      props.cameraChangedEmitter ?? { emit: emitCameraChanged }
+      props.interactionFinishedEmitter ?? { emit: emitInteractionFinished }
     );
   }
 

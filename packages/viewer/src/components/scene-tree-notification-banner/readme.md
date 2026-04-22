@@ -5,6 +5,10 @@
 <!-- Auto Generated Below -->
 
 
+## Overview
+
+A notification banner that displays a message and an action button.
+
 ## Properties
 
 | Property      | Attribute      | Description                           | Type                  | Default     |

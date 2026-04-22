@@ -203,6 +203,7 @@ describe(toPbSceneViewStateFeatures, () => {
   });
 
   it('maps to invalid when unknown feature given', () => {
+    // @ts-ignore
     expect(toPbSceneViewStateFeatures(['Not a feature'])).toMatchObject([
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_INVALID,
