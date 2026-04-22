@@ -43,7 +43,7 @@ export interface SvgShadowProps {
 
 export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({ id }) => {
   return (
-    <filter id={id} filterUnits="userSpaceOnUse">
+    <filter id={id}>
       <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
       <feOffset dx="0" dy="1" result="offsetblur" />
       <feFlood flood-color="#000000" flood-opacity="0.25" />

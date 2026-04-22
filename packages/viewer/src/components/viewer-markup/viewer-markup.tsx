@@ -11,7 +11,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Point } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 
 import { stampTemplateWithId } from '../../lib/templates';
 import {
@@ -102,6 +102,34 @@ export class ViewerMarkup {
    */
   @Prop({ mutable: true })
   public endLineAnchorStyle: LineAnchorStyle = 'arrow-triangle';
+
+  /**
+   * The original viewport dimensions where this markup was created. This value is used
+   * to determine where the markup should be rendered relative to the current viewport,
+   * enabling some markup to appear "off-screen".
+   *
+   * When provided, all NDC values will be considered relative to this viewport.
+   */
+  @Prop()
+  public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * The current offset of the visible viewport. This value is used to determine where
+   * markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+   *
+   * When provided, all computed coordinates will be offset by this amount.
+   */
+  @Prop()
+  public offset?: Point.Point;
+
+  /**
+   * The scale to render this markup at. This value is used to scale the element's bounds
+   * along with any `offset` to determine the final computed coordinates.
+   *
+   * When provided, all computed coordinates will be scaled by this amount.
+   */
+  @Prop()
+  public scale?: number;
 
   /**
    * Dispatched when a new markup is added, either through user interaction
@@ -344,6 +372,9 @@ export class ViewerMarkup {
    * @ignore
    */
   @Watch('viewer')
+  @Watch('originatingViewport')
+  @Watch('offset')
+  @Watch('scale')
   protected async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined
   ): Promise<void> {
@@ -606,6 +637,9 @@ export class ViewerMarkup {
       | HTMLVertexViewerMarkupFreeformElement
   ): void {
     element.viewer = this.viewer;
+    element.originatingViewport = this.originatingViewport;
+    element.offset = this.offset;
+    element.scale = this.scale;
     element.classList.add('viewer-markup__markup');
   }
 
@@ -620,6 +654,9 @@ export class ViewerMarkup {
       tool.viewer = this.viewer;
       tool.startLineAnchorStyle = this.startLineAnchorStyle;
       tool.endLineAnchorStyle = this.endLineAnchorStyle;
+      tool.originatingViewport = this.originatingViewport;
+      tool.offset = this.offset;
+      tool.scale = this.scale;
     }
   }
 

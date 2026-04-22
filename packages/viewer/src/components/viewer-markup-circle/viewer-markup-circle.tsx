@@ -10,7 +10,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { MarkupInteraction } from '../../lib/types/markup';
@@ -79,6 +79,34 @@ export class ViewerMarkupCircle {
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
+
+  /**
+   * The original viewport dimensions where this markup was created. This value is used
+   * to determine where the markup should be rendered relative to the current viewport,
+   * enabling some markup to appear "off-screen".
+   *
+   * When provided, all NDC values will be considered relative to this viewport.
+   */
+  @Prop()
+  public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * The current offset of the visible viewport. This value is used to determine where
+   * markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+   *
+   * When provided, all computed coordinates will be offset by this amount.
+   */
+  @Prop()
+  public offset?: Point.Point;
+
+  /**
+   * The scale to render this markup at. This value is used to scale the element's bounds
+   * along with any `offset` to determine the final computed coordinates.
+   *
+   * When provided, all computed coordinates will be scaled by this amount.
+   */
+  @Prop()
+  public scale?: number;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -193,11 +221,16 @@ export class ViewerMarkupCircle {
 
   public render(): h.JSX.IntrinsicElements {
     if (this.bounds != null && this.elementBounds != null) {
+      const effectiveScale = this.scale ?? 1;
       const relativeBounds = translateRectToScreen(
         this.bounds,
-        this.elementBounds
+        this.elementBounds,
+        this.originatingViewport,
+        effectiveScale
       );
       const center = Rectangle.center(relativeBounds);
+      const offsetX = (this.offset?.x ?? 0) / window.devicePixelRatio;
+      const offsetY = (this.offset?.y ?? 0) / window.devicePixelRatio;
 
       return (
         <Host>
@@ -205,7 +238,10 @@ export class ViewerMarkupCircle {
             <defs>
               <SvgShadow id="circle-shadow" />
             </defs>
-            <g filter="url(#circle-shadow)">
+            <g
+              transform={`translate(${offsetX} ${offsetY})`}
+              filter="url(#circle-shadow)"
+            >
               <ellipse
                 class="ellipse"
                 cx={center.x}

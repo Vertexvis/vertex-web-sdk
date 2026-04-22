@@ -74,6 +74,9 @@ export interface VertexDocumentViewerCustomEvent<T> extends CustomEvent<T> {
 declare global {
     interface HTMLVertexDocumentViewerElementEventMap {
         "documentReady": void;
+        "documentStateChanged": DocumentApiState;
+        "pageLoaded": DocumentApiState;
+        "pageDrawn": DocumentApiState;
     }
     interface HTMLVertexDocumentViewerElement extends Components.VertexDocumentViewer, HTMLStencilElement {
         addEventListener<K extends keyof HTMLVertexDocumentViewerElementEventMap>(type: K, listener: (this: HTMLVertexDocumentViewerElement, ev: VertexDocumentViewerCustomEvent<HTMLVertexDocumentViewerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -116,6 +119,18 @@ declare namespace LocalJSX {
           * Emits an event when the document is ready to be interacted with.
          */
         "onDocumentReady"?: (event: VertexDocumentViewerCustomEvent<void>) => void;
+        /**
+          * Emits an event when the document state changes.
+         */
+        "onDocumentStateChanged"?: (event: VertexDocumentViewerCustomEvent<DocumentApiState>) => void;
+        /**
+          * Emits an event when a page has been drawn to the canvas.
+         */
+        "onPageDrawn"?: (event: VertexDocumentViewerCustomEvent<DocumentApiState>) => void;
+        /**
+          * Emits an event when a page has been loaded or reloaded prior to being drawn to the canvas.
+         */
+        "onPageLoaded"?: (event: VertexDocumentViewerCustomEvent<DocumentApiState>) => void;
         /**
           * The provider used to create the document API and renderer.
           * @default new PdfJsProvider()

@@ -41,14 +41,42 @@ export function getBoundingBox2dAnchorPosition(
   }
 }
 
+export function getShadowDimensions(
+  originatingViewport?: Dimensions.Dimensions,
+  scale = 1
+): Dimensions.Dimensions | undefined {
+  if (originatingViewport != null) {
+    return Dimensions.scale(scale, scale, originatingViewport);
+  }
+  return undefined;
+}
+
 export function translatePointToScreen(
   pt: Point.Point,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  contentDimensions: Dimensions.Dimensions = canvasDimensions,
+  scale = 1
 ): Point.Point {
-  const scaleFactor = canvasDimensions.height;
-  return Point.add(
+  const scaleX = canvasDimensions.width / contentDimensions.width;
+  const scaleY = canvasDimensions.height / contentDimensions.height;
+  const dimensionsScale = Math.min(scaleX, scaleY);
+  const effectiveScale = dimensionsScale * scale;
+
+  const scaleFactor = contentDimensions.height;
+  const scaledPoint = Point.add(
     Point.scale(pt, scaleFactor, scaleFactor),
-    Dimensions.center(canvasDimensions)
+    Dimensions.center(contentDimensions)
+  );
+
+  const scaledContentWidth = contentDimensions.width * effectiveScale;
+  const centerOffsetX = Math.max(
+    0,
+    (canvasDimensions.width - scaledContentWidth) / 2
+  );
+
+  return Point.create(
+    scaledPoint.x * effectiveScale + centerOffsetX,
+    scaledPoint.y * effectiveScale
   );
 }
 
@@ -63,9 +91,17 @@ export function translatePointToBounds(
 
 export function translateDimensionsToScreen(
   dimensions: Dimensions.Dimensions,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  contentDimensions: Dimensions.Dimensions = canvasDimensions,
+  scale = 1
 ): Dimensions.Dimensions {
-  const scaleFactor = canvasDimensions.height;
+  const scaleX = canvasDimensions.width / contentDimensions.width;
+  const scaleY = canvasDimensions.height / contentDimensions.height;
+  const dimensionsScale = Math.min(scaleX, scaleY);
+  const effectiveScale = dimensionsScale * scale;
+
+  const scaleFactor = contentDimensions.height * effectiveScale;
+
   return Dimensions.scale(scaleFactor, scaleFactor, dimensions);
 }
 
@@ -77,10 +113,22 @@ export function translateDimensionsToScreen(
  */
 export function translateRectToScreen(
   rect: Rectangle.Rectangle,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  contentDimensions?: Dimensions.Dimensions,
+  scale?: number
 ): Rectangle.Rectangle {
-  const position = translatePointToScreen(rect, canvasDimensions);
-  const dimensions = translateDimensionsToScreen(rect, canvasDimensions);
+  const position = translatePointToScreen(
+    rect,
+    canvasDimensions,
+    contentDimensions,
+    scale
+  );
+  const dimensions = translateDimensionsToScreen(
+    rect,
+    canvasDimensions,
+    contentDimensions,
+    scale
+  );
   return Rectangle.fromPointAndDimensions(position, dimensions);
 }
 
