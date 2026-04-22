@@ -67,26 +67,6 @@ Type: `Promise<void>`
 
 
 
-### `registerInteractionHandler(interactionHandler: InteractionHandler) => Promise<Disposable>`
-
-Registers and initializes an interaction handler with the document viewer. Returns a
-`Disposable` that should be used to deregister the interaction handler.
-
-`InteractionHandler`s are used to build custom mouse and touch interactions.
-
-#### Parameters
-
-| Name                 | Type                 | Description                          |
-| -------------------- | -------------------- | ------------------------------------ |
-| `interactionHandler` | `InteractionHandler` | The interaction handler to register. |
-
-#### Returns
-
-Type: `Promise<Disposable>`
-
-A promise containing the disposable to use to
-deregister the handler.
-
 ### `zoomTo(percentage: number) => Promise<void>`
 
 Zooms the currently loaded document to the specified zoom percentage.

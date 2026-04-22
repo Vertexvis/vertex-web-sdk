@@ -1,9 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Component,
   Element,
   Event,
   EventEmitter,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
   Method,

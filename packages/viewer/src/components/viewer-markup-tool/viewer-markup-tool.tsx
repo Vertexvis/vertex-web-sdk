@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Component,
   Element,
@@ -13,7 +14,6 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // import * as DocViewer from '@vertexvis/doc-viewer';
-
 import { stampTemplateWithId } from '../../lib/templates';
 import {
   ArrowMarkup,

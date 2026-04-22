@@ -7,14 +7,11 @@ import {
   makePerspectiveFrame,
 } from '../../../testing/fixtures';
 import { Config } from '../../config';
-import {CameraTypeEncoder, fromPbFrameOrThrow} from '../../mappers';
+import { CameraTypeEncoder, fromPbFrameOrThrow } from '../../mappers';
 import { Scene } from '../../scenes';
-import * as ColorMaterial from '../../scenes/colorMaterial';
 import { Frame, Orientation } from '../../types';
 import { FlyToPositionKeyInteraction } from '../flyToPositionKeyInteraction';
 import { TapEventDetails } from '../tapEventDetails';
-import {vertexvis} from "@vertexvis/frame-streaming-protos";
-import CameraType = vertexvis.protobuf.stream.CameraType;
 
 describe(FlyToPositionKeyInteraction, () => {
   const streamApi = new StreamApi();
@@ -33,7 +30,7 @@ describe(FlyToPositionKeyInteraction, () => {
       streamApi,
       frame,
       fromPbFrameOrThrow(Orientation.DEFAULT),
-      "orthographic" as unknown as CameraTypeEncoder,
+      'orthographic' as unknown as CameraTypeEncoder,
       () => Point.create(1, 1),
       Dimensions.create(50, 50),
       sceneId,

@@ -619,12 +619,6 @@ Type: `Promise<void>`
 Performs an API call that will collapse the node associated to the
 specified row or row index.
 
-#### Parameters
-
-| Name  | Type                        | Description                            |
-| ----- | --------------------------- | -------------------------------------- |
-| `row` | `number \| AsObject \| Row` | A row, row index, or node to collapse. |
-
 #### Returns
 
 Type: `Promise<void>`
@@ -635,12 +629,6 @@ Type: `Promise<void>`
 
 Performs an API call that will deselect the item associated to the given
 row or row index.
-
-#### Parameters
-
-| Name  | Type                        | Description                              |
-| ----- | --------------------------- | ---------------------------------------- |
-| `row` | `number \| AsObject \| Row` | The row, row index, or node to deselect. |
 
 #### Returns
 
@@ -662,12 +650,6 @@ Type: `Promise<void>`
 
 Performs an API call that will expand the node associated to the specified
 row or row index.
-
-#### Parameters
-
-| Name  | Type                        | Description                          |
-| ----- | --------------------------- | ------------------------------------ |
-| `row` | `number \| AsObject \| Row` | A row, row index, or node to expand. |
 
 #### Returns
 
@@ -693,13 +675,6 @@ A promise that resolves with the names of available keys.
 Performs an async request that will filter the displayed items in the tree
 that match the given term and options.
 
-#### Parameters
-
-| Name      | Type                | Description                         |
-| --------- | ------------------- | ----------------------------------- |
-| `term`    | `string`            | The filter term.                    |
-| `options` | `FilterTreeOptions` | The options to apply to the filter. |
-
 #### Returns
 
 Type: `Promise<void>`
@@ -712,12 +687,6 @@ the result of this filter when the promise completes.
 
 Returns the row data from the given vertical client position.
 
-#### Parameters
-
-| Name      | Type     | Description                   |
-| --------- | -------- | ----------------------------- |
-| `clientY` | `number` | The vertical client position. |
-
 #### Returns
 
 Type: `Promise<Row>`
@@ -728,12 +697,6 @@ A row or `undefined` if the row hasn't been loaded.
 
 Returns a row at the given index. If the row data has not been loaded,
 returns `undefined`.
-
-#### Parameters
-
-| Name    | Type     | Description           |
-| ------- | -------- | --------------------- |
-| `index` | `number` | The index of the row. |
 
 #### Returns
 
@@ -747,12 +710,6 @@ Returns the row data from the given mouse or pointer event. The event must
 originate from a `vertex-scene-tree-table-cell` contained by this element,
 otherwise `undefined` is returned.
 
-#### Parameters
-
-| Name    | Type                         | Description                                                   |
-| ------- | ---------------------------- | ------------------------------------------------------------- |
-| `event` | `MouseEvent \| PointerEvent` | A mouse or pointer event that originated from this component. |
-
 #### Returns
 
 Type: `Promise<Row>`
@@ -764,12 +721,6 @@ A row, or `undefined` if the row hasn't been loaded.
 Returns the row with the given id. If there is not a row
 matching the id, returns `undefined`.
 
-#### Parameters
-
-| Name     | Type     | Description                             |
-| -------- | -------- | --------------------------------------- |
-| `itemId` | `string` | An ID of an item to return the row for. |
-
 #### Returns
 
 Type: `Promise<Row>`
@@ -780,12 +731,6 @@ A row, or `undefined` if a corresponding row doesn't exist
 
 Performs an API call that will hide the item associated to the given row
 or row index.
-
-#### Parameters
-
-| Name  | Type                        | Description                          |
-| ----- | --------------------------- | ------------------------------------ |
-| `row` | `number \| AsObject \| Row` | The row, row index, or node to hide. |
 
 #### Returns
 
@@ -813,12 +758,6 @@ Type: `Promise<void>`
 Performs an API call that will show only the item associated to
 the given row or row index and fit the camera to the item's bounding box.
 
-#### Parameters
-
-| Name  | Type                        | Description                             |
-| ----- | --------------------------- | --------------------------------------- |
-| `row` | `number \| AsObject \| Row` | The row, row index, or node to isolate. |
-
 #### Returns
 
 Type: `Promise<void>`
@@ -828,13 +767,6 @@ Type: `Promise<void>`
 ### `scrollToIndex(index: number, options?: ScrollToOptions) => Promise<void>`
 
 Scrolls the tree to the given row index.
-
-#### Parameters
-
-| Name      | Type              | Description                                           |
-| --------- | ----------------- | ----------------------------------------------------- |
-| `index`   | `number`          | An index of the row to scroll to.                     |
-| `options` | `ScrollToOptions` | A set of options to configure the scrolling behavior. |
 
 #### Returns
 
@@ -847,13 +779,6 @@ Type: `Promise<void>`
 Scrolls the tree to an item with the given ID. If the node for the item is
 not expanded, the tree will expand each of its parent nodes.
 
-#### Parameters
-
-| Name      | Type              | Description                                           |
-| --------- | ----------------- | ----------------------------------------------------- |
-| `itemId`  | `string`          | An ID of an item to scroll to.                        |
-| `options` | `ScrollToOptions` | A set of options to configure the scrolling behavior. |
-
 #### Returns
 
 Type: `Promise<void>`
@@ -864,13 +789,6 @@ A promise that resolves when the operation is finished.
 
 Performs an async request that will select the filtered items in the tree
 that match the given term.
-
-#### Parameters
-
-| Name      | Type                                     | Description      |
-| --------- | ---------------------------------------- | ---------------- |
-| `term`    | `string`                                 | The filter term. |
-| `options` | `SceneTreeOperationOptions \| undefined` |                  |
 
 #### Returns
 
@@ -890,13 +808,6 @@ in `rowArg`. If calling `selectItem` with a row not belonging to the
 ancestry of a previous selection, then this method will perform a standard
 selection.
 
-#### Parameters
-
-| Name  | Type                        | Description                                       |
-| ----- | --------------------------- | ------------------------------------------------- |
-| `row` | `number \| AsObject \| Row` | The row, row index or node to select.             |
-| `__1` | `SelectItemOptions`         | A set of options to configure selection behavior. |
-
 #### Returns
 
 Type: `Promise<void>`
@@ -907,12 +818,6 @@ Type: `Promise<void>`
 
 Performs an API call that will show the item associated to the given row
 or row index.
-
-#### Parameters
-
-| Name  | Type                        | Description                          |
-| ----- | --------------------------- | ------------------------------------ |
-| `row` | `number \| AsObject \| Row` | The row, row index, or node to show. |
 
 #### Returns
 
@@ -925,12 +830,6 @@ Type: `Promise<void>`
 Performs an API call that will either expand or collapse the node
 associated to the given row or row index.
 
-#### Parameters
-
-| Name  | Type                        | Description                                        |
-| ----- | --------------------------- | -------------------------------------------------- |
-| `row` | `number \| AsObject \| Row` | The row, row index, or node to collapse or expand. |
-
 #### Returns
 
 Type: `Promise<void>`
@@ -941,12 +840,6 @@ Type: `Promise<void>`
 
 Performs an API call that will either hide or show the item associated to
 the given row or row index.
-
-#### Parameters
-
-| Name  | Type                        | Description                                       |
-| ----- | --------------------------- | ------------------------------------------------- |
-| `row` | `number \| AsObject \| Row` | The row, row index, or node to toggle visibility. |
 
 #### Returns
 

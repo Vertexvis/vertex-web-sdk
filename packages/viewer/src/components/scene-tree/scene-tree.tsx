@@ -1,5 +1,6 @@
 import 'requestidlecallback-polyfill';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Component,
   Element,

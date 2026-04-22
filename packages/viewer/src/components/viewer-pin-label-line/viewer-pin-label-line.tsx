@@ -1,10 +1,5 @@
-import {
-  Component,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  h,
-  Host,
-  Prop,
-} from '@stencil/core';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Component, h, Host, Prop } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 
 import { getPinColors, Pin } from '../../lib/pins/model';

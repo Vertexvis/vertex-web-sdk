@@ -69,13 +69,6 @@ the set of cursors with the same priority.
 
 To remove a cursor, call `dispose()` on the returned disposable.
 
-#### Parameters
-
-| Name       | Type                     | Description                 |
-| ---------- | ------------------------ | --------------------------- |
-| `cursor`   | `string \| CustomCursor` | The cursor to add.          |
-| `priority` | `number \| undefined`    | The priority of the cursor. |
-
 #### Returns
 
 Type: `Promise<Disposable>`
@@ -130,13 +123,6 @@ provided as a URN in the following format:
 
  * `urn:vertex:scene:<sceneid>`
 
-#### Parameters
-
-| Name      | Type                       | Description                                                                                                                                                            |
-| --------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `urn`     | `string`                   | The URN of the resource to load.                                                                                                                                       |
-| `options` | `LoadOptions \| undefined` | Optional configurations when loading the scene. cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used. |
-
 #### Returns
 
 Type: `Promise<void>`
@@ -151,12 +137,6 @@ Registers and initializes an interaction handler with the viewer. Returns a
 `InteractionHandler`s are used to build custom mouse and touch interactions
 for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable
 the default camera controls provided by the viewer.
-
-#### Parameters
-
-| Name                 | Type                 | Description                          |
-| -------------------- | -------------------- | ------------------------------------ |
-| `interactionHandler` | `InteractionHandler` | The interaction handler to register. |
 
 #### Returns
 
@@ -174,12 +154,6 @@ keys are pressed during a `tap` event.
 viewer using the current state of they keyboard to determine whether
 the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
 to disable the default keyboard shortcuts provided by the viewer.
-
-#### Parameters
-
-| Name             | Type                              | Description                         |
-| ---------------- | --------------------------------- | ----------------------------------- |
-| `keyInteraction` | `KeyInteraction<TapEventDetails>` | - The `KeyInteraction` to register. |
 
 #### Returns
 

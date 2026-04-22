@@ -46,7 +46,7 @@ export const config: Config = {
     },
     {
       type: 'dist-custom-elements',
-      customElementsExportBehavior: 'auto-define-custom-elements',
+      customElementsExportBehavior: 'single-export-module',
       externalRuntime: false,
       minify: true,
     },
@@ -56,6 +56,8 @@ export const config: Config = {
   ],
   testing: { ...jestConfig },
   extras: {
+    __deprecated__dynamicImportShim: true,
+    __deprecated__shadowDomShim: true,
     enableImportInjection: true,
   },
 };

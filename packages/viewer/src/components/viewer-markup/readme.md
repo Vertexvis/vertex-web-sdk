@@ -186,12 +186,6 @@ component will be created from the template specified by
 `arrow-template-id`, `circle-template-id`, or if undefined
 a default element will be created.
 
-#### Parameters
-
-| Name     | Type                                            | Description        |
-| -------- | ----------------------------------------------- | ------------------ |
-| `markup` | `ArrowMarkup \| CircleMarkup \| FreeformMarkup` | The markup to add. |
-
 #### Returns
 
 Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>`
@@ -201,12 +195,6 @@ The markup element that was created.
 ### `getMarkupElement(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 Returns the markup element associated to the given ID.
-
-#### Parameters
-
-| Name | Type     | Description                             |
-| ---- | -------- | --------------------------------------- |
-| `id` | `string` | The ID of the markup element to return. |
 
 #### Returns
 
@@ -229,12 +217,6 @@ A list of all markups.
 Removes a markup with the given ID, and returns the HTML element
 associated to the markup. Returns `undefined` if no markup is
 found.
-
-#### Parameters
-
-| Name | Type     | Description                     |
-| ---- | -------- | ------------------------------- |
-| `id` | `string` | The ID of the markup to remove. |
 
 #### Returns
 

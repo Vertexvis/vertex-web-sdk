@@ -23,16 +23,9 @@
 
 ## Methods
 
-### `scrollToPosition(top: number, options: Pick<DomScrollToOptions, "behavior">) => Promise<void>`
+### `scrollToPosition(top: number, options: Pick<DomScrollToOptions, 'behavior'>) => Promise<void>`
 
 Scrolls the table to the provided top value.
-
-#### Parameters
-
-| Name      | Type                                          | Description                                           |
-| --------- | --------------------------------------------- | ----------------------------------------------------- |
-| `top`     | `number`                                      | The position to scroll to.                            |
-| `options` | `{ behavior?: ScrollBehavior \| undefined; }` | A set of options to configure the scrolling behavior. |
 
 #### Returns
 

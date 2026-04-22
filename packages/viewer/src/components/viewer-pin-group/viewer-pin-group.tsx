@@ -1,12 +1,5 @@
-import {
-  Component,
-  Fragment,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  h,
-  Listen,
-  Prop,
-  State,
-} from '@stencil/core';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Component, Fragment, h, Listen, Prop, State } from '@stencil/core';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { Viewport } from '../..';

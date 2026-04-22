@@ -274,7 +274,6 @@ export namespace Components {
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.
      *
      * Use the `config` property for manually setting hosts.
-     * @default 'platprod'
      */
     configEnv: Environment;
     controller?: SceneTreeController;
@@ -348,27 +347,22 @@ export namespace Components {
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      *
      * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name.
-     * @default []
      */
     metadataKeys: MetadataKey[];
     /**
      * @deprecated Use `searchOptions` Indicates whether the metadata search should use an exact match.
-     * @default false
      */
     metadataSearchExactMatch: boolean;
     /**
      * @deprecated Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.
-     * @default []
      */
     metadataSearchKeys: MetadataKey[];
     /**
      * The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.
-     * @default 500
      */
     operationAnimationDuration: number;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
-     * @default 25
      */
     overScanCount: number;
     /**
@@ -406,7 +400,6 @@ export namespace Components {
     scrollToItem: (itemId: string, options?: ScrollToOptions) => Promise<void>;
     /**
      * A set of options to configure scene tree searching behavior.
-     * @default {}
      */
     searchOptions: FilterOptions;
     /**
@@ -485,12 +478,10 @@ export namespace Components {
     debounce?: number;
     /**
      * If `true`, disables user interaction of the component.
-     * @default false
      */
     disabled: boolean;
     /**
      * Placeholder text if `value` is empty.
-     * @default undefined
      */
     placeholder?: string;
     /**
@@ -499,14 +490,12 @@ export namespace Components {
     setFocus: () => Promise<void>;
     /**
      * The current text value of the component. Value is updated on user interaction.
-     * @default ''
      */
     value: string;
   }
   interface VertexSceneTreeTableCell {
     /**
      * Whether to always show the requested icons in the cell. If false, the icons will only appear when hovering over the cell.
-     * @default false
      */
     alwaysShowIcons: boolean;
     /**
@@ -522,9 +511,6 @@ export namespace Components {
      */
     expansionHandler?: SceneTreeOperationHandler;
     hoverController?: SceneTreeCellHoverController;
-    /**
-     * @default false
-     */
     hovered: boolean;
     isScrolling?: boolean;
     /**
@@ -541,7 +527,6 @@ export namespace Components {
     node?: Node.AsObject;
     /**
      * The value to display in this cell if the `value` specified is undefined. Defaults to "--".
-     * @default '--'
      */
     placeholder: string;
     /**
@@ -588,16 +573,12 @@ export namespace Components {
     attemptComputeCellHeight: () => Promise<void>;
     controller?: SceneTreeController;
     layoutHeight?: number;
-    /**
-     * @default 0
-     */
     layoutOffset: number;
     layoutWidth?: number;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      *
      * This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
-     * @default 25
      */
     overScanCount: number;
     /**
@@ -622,17 +603,8 @@ export namespace Components {
      * ```
      */
     rowData?: RowDataProvider;
-    /**
-     * @default 24
-     */
     rowHeight: number;
-    /**
-     * @default []
-     */
     rows: Row[];
-    /**
-     * @default 0
-     */
     scrollOffset: number;
     /**
      * Scrolls the table to the provided top value.
@@ -643,21 +615,12 @@ export namespace Components {
       top: number,
       options: Pick<DomScrollToOptions, 'behavior'>
     ) => Promise<void>;
-    /**
-     * @default 0
-     */
     totalRows: number;
     /**
      * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
      */
     tree?: HTMLVertexSceneTreeElement;
-    /**
-     * @default 0
-     */
     viewportEndIndex: number;
-    /**
-     * @default 0
-     */
     viewportStartIndex: number;
   }
   interface VertexSceneTreeTableResizeDivider {}
@@ -683,12 +646,10 @@ export namespace Components {
     annotations: AnnotationController | undefined;
     /**
      * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
-     * @default true
      */
     cameraControls: boolean;
     /**
      * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
-     * @default 'perspective'
      */
     cameraType: FrameCameraType;
     /**
@@ -709,12 +670,10 @@ export namespace Components {
      *
      * Use the `config` property for manually setting hosts.
      * @see Viewer.config
-     * @default 'platprod'
      */
     configEnv: Environment;
     /**
      * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
-     * @default {     endCapEnabled: true,     endCapColor: undefined,   }
      */
     crossSectioning?: CrossSectioningOptions;
     /**
@@ -734,19 +693,16 @@ export namespace Components {
     dispatchFrameDrawn: (frame: Frame) => Promise<void>;
     /**
      * Specifies whether to enable temporal refinement of still images.
-     * @default true
      */
     enableTemporalRefinement: boolean;
     /**
      * Specifies experimental rendering options. For Vertex use only.
-     * @default ''
      */
     experimentalRenderingOptions: string;
     /**
      * Experimental flag indicating that connections to Vertex should be established if the viewer is initially hidden through its own style or computed style, or has not been scrolled into view.
      *
      * *Caution:* Setting this flag can result in reduced performance, and should generally not be used in a production setting.
-     * @default false
      */
     experimentalSkipVisibilityCheck: boolean;
     /**
@@ -797,7 +753,6 @@ export namespace Components {
     isSceneReady: () => Promise<boolean>;
     /**
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
-     * @default true
      */
     keyboardControls: boolean;
     /**
@@ -813,12 +768,10 @@ export namespace Components {
     modelViews: ModelViewController | undefined;
     /**
      * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
-     * @default false
      */
     noDefaultLights: boolean;
     /**
      * Specifies how phantom parts should appear. The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
-     * @default { opacity: 0.1 }
      */
     phantom?: PhantomOptions;
     /**
@@ -890,7 +843,6 @@ export namespace Components {
     reload: () => Promise<void>;
     /**
      * An optional value that will debounce frame updates when resizing this viewer element.
-     * @default 100
      */
     resizeDebounce: number;
     resolvedConfig?: Config;
@@ -900,7 +852,6 @@ export namespace Components {
      * When rotateAroundTapPoint is true and the user clicks on geometry, then the model will rotate around the point that was clicked. When rotateAroundTapPoint is true and the user clicks in empty space (not on geometry), then the model will rotate around the center of the viewport.
      *
      * When rotateAroundTapPoint is false, then the model will always rotate around the center of the viewport.
-     * @default true
      */
     rotateAroundTapPoint: boolean;
     /**
@@ -930,9 +881,6 @@ export namespace Components {
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertex:scene:<sceneid>`
      */
     src?: string;
-    /**
-     * @default new StencilBufferManager(     this.hostElement   )
-     */
     stencilBuffer: StencilBufferManager;
     stream?: ViewerStream;
     /**
@@ -945,7 +893,6 @@ export namespace Components {
     unload: () => Promise<void>;
     /**
      * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
-     * @default Viewport.fromDimensions(Dimensions.create(0, 0))
      */
     viewport: Viewport;
   }
@@ -956,7 +903,6 @@ export namespace Components {
     data: CalloutAnnotationData;
     /**
      * The icon size to display.
-     * @default 'sm'
      */
     iconSize: ViewerIconSize;
   }
@@ -989,7 +935,6 @@ export namespace Components {
      * `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.
      *
      * The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
-     * @default 'clearAndSelect'
      */
     operationType: VolumeIntersectionQueryType;
     /**
@@ -1001,22 +946,18 @@ export namespace Components {
   interface VertexViewerDefaultToolbar {
     /**
      * The duration of animations, in milliseconds. Defaults to `1000`.
-     * @default 1000
      */
     animationMs: number;
     /**
      * Indicates whether animations will be used when performing camera operations. Defaults to `true`.
-     * @default false
      */
     animationsDisabled: boolean;
     /**
      * Specifies the direction that UI elements are placed.
-     * @default 'horizontal'
      */
     direction: ViewerToolbarGroupDirection;
     /**
      * Specifies where the toolbar is positioned.
-     * @default 'bottom-center'
      */
     placement: ViewerToolbarPlacement;
     /**
@@ -1033,7 +974,6 @@ export namespace Components {
   interface VertexViewerDomElement {
     /**
      * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
-     * @default false
      */
     billboardOff: boolean;
     /**
@@ -1046,22 +986,18 @@ export namespace Components {
      *   }
      * </style>
      * ```
-     * @default false
      */
     detached: boolean;
     /**
      * **EXPERIMENTAL** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
-     * @default true
      */
     detachedOff: boolean;
     /**
      * Disables interaction events from children.
-     * @default false
      */
     interactionsOff: boolean;
     /**
      * The local matrix of this element.
-     * @default Matrix4.makeIdentity()
      */
     matrix: Matrix4.Matrix4;
     /**
@@ -1074,32 +1010,26 @@ export namespace Components {
      *   }
      * </style>
      * ```
-     * @default false
      */
     occluded: boolean;
     /**
      * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
-     * @default false
      */
     occlusionOff: boolean;
     /**
      * The local 3D position of where this element is located.
-     * @default Vector3.origin()
      */
     position: Vector3.Vector3;
     /**
      * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     positionJson: string;
     /**
      * The local rotation of this element.
-     * @default Quaternion.create()
      */
     quaternion: Quaternion.Quaternion;
     /**
      * The local quaternion rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
-     * @default ''
      */
     quaternionJson: string;
     /**
@@ -1112,39 +1042,32 @@ export namespace Components {
     rotationJson?: string;
     /**
      * The local scale of this element.
-     * @default Vector3.create(1, 1, 1)
      */
     scale: Vector3.Vector3;
     /**
      * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     scaleJson: string;
   }
   interface VertexViewerDomGroup {
     /**
      * The local matrix of this element.
-     * @default Matrix4.makeIdentity()
      */
     matrix: Matrix4.Matrix4;
     /**
      * The local 3D position of where this element is located.
-     * @default Vector3.origin()
      */
     position: Vector3.Vector3;
     /**
      * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     positionJson: string;
     /**
      * The local rotation of this element.
-     * @default Quaternion.create()
      */
     quaternion: Quaternion.Quaternion;
     /**
      * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
-     * @default ''
      */
     quaternionJson: string;
     /**
@@ -1157,12 +1080,10 @@ export namespace Components {
     rotationJson?: string;
     /**
      * The local scale of this element.
-     * @default Vector3.create(1, 1, 1)
      */
     scale: Vector3.Vector3;
     /**
      * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     scaleJson: string;
   }
@@ -1188,7 +1109,6 @@ export namespace Components {
      * Specifies the drawing mode for the renderer.
      *
      * When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
-     * @default '3d'
      */
     drawMode: ViewerDomRendererDrawMode;
     /**
@@ -1197,7 +1117,6 @@ export namespace Components {
      * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer.
      *
      * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target for the viewer.
-     * @default true
      */
     propagateEventsToViewer: boolean;
     /**
@@ -1232,14 +1151,12 @@ export namespace Components {
      * * `lg`: 32px
      *
      * A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
-     * @default 'md'
      */
     size?: ViewerIconSize1;
   }
   interface VertexViewerLayer {
     /**
      * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
-     * @default false
      */
     stretchOff: boolean;
   }
@@ -1268,12 +1185,10 @@ export namespace Components {
     circleTemplateId?: string;
     /**
      * If `true`, disables adding or editing of markup through user interaction.
-     * @default false
      */
     disabled: boolean;
     /**
      * The style of the ending anchor. This defaults to 'arrow-triangle.'
-     * @default 'arrow-triangle'
      */
     endLineAnchorStyle: LineAnchorStyle;
     /**
@@ -1321,7 +1236,6 @@ export namespace Components {
     >;
     /**
      * Indicates if new markup should be automatically selected.
-     * @default false
      */
     selectNew: boolean;
     /**
@@ -1330,12 +1244,10 @@ export namespace Components {
     selectedMarkupId?: string;
     /**
      * The style of the starting anchor. This defaults to none.
-     * @default 'none'
      */
     startLineAnchorStyle: LineAnchorStyle;
     /**
      * The type of markup to perform.
-     * @default 'arrow'
      */
     tool: ViewerMarkupToolType;
     /**
@@ -1359,12 +1271,10 @@ export namespace Components {
     endJson?: string;
     /**
      * The style of the ending anchor. This defaults to 'arrow-triangle.'
-     * @default 'arrow-triangle'
      */
     endLineAnchorStyle: LineAnchorStyle;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
-     * @default ''
      */
     mode: ViewerMarkupArrowMode;
     /**
@@ -1381,7 +1291,6 @@ export namespace Components {
     startJson?: string;
     /**
      * The style of the starting anchor. This defaults to none.
-     * @default 'none'
      */
     startLineAnchorStyle: LineAnchorStyle;
     /**
@@ -1407,7 +1316,6 @@ export namespace Components {
     dispose: () => Promise<void>;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
-     * @default ''
      */
     mode: ViewerMarkupCircleMode;
     /**
@@ -1433,7 +1341,6 @@ export namespace Components {
     dispose: () => Promise<void>;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
-     * @default ''
      */
     mode: ViewerMarkupFreeformMode;
     /**
@@ -1468,12 +1375,10 @@ export namespace Components {
      * Disables markups.
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
-     * @default false
      */
     disabled: boolean;
     /**
      * The style of the ending anchor. This defaults to 'arrow-triangle.'
-     * @default 'arrow-triangle'
      */
     endLineAnchorStyle: LineAnchorStyle;
     /**
@@ -1486,14 +1391,12 @@ export namespace Components {
     reset: () => Promise<void>;
     /**
      * The style of the starting anchor. This defaults to none.
-     * @default 'none'
      */
     startLineAnchorStyle: LineAnchorStyle;
     /**
      * The type of markup.
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
-     * @default 'arrow'
      */
     tool: ViewerMarkupToolType1;
     /**
@@ -1510,7 +1413,6 @@ export namespace Components {
     angleFormatter?: Formatter<number>;
     /**
      * The unit of angle-based measurement.
-     * @default 'degrees'
      */
     angleUnits: AngleUnitType;
     /**
@@ -1523,12 +1425,10 @@ export namespace Components {
     distanceFormatter?: Formatter<number>;
     /**
      * The unit of distance-based measurement.
-     * @default 'millimeters'
      */
     distanceUnits: DistanceUnitType;
     /**
      * The number of fraction digits to display.
-     * @default 2
      */
     fractionalDigits: number;
     /**
@@ -1551,7 +1451,6 @@ export namespace Components {
   interface VertexViewerMeasurementDistance {
     /**
      * The distance from an anchor to its label.
-     * @default 20
      */
     anchorLabelOffset: number;
     /**
@@ -1578,19 +1477,16 @@ export namespace Components {
     endJson?: string;
     /**
      * The number of fraction digits to display.
-     * @default 2
      */
     fractionalDigits: number;
     hitProvider?: PointToPointHitProvider;
     indicatorPt?: Vector3.Vector3;
     /**
      * A property that reflects which anchor is currently being interacted with.
-     * @default 'none'
      */
     interactingAnchor: Anchor | 'none';
     /**
      * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
-     * @default false
      */
     invalid: boolean;
     /**
@@ -1599,12 +1495,10 @@ export namespace Components {
     labelFormatter?: Formatter<number | undefined>;
     /**
      * The length of the caps at each end of the distance measurement.
-     * @default MEASUREMENT_LINE_CAP_LENGTH
      */
     lineCapLength: number;
     /**
      * The measurement model that will be updated when this measurement changes. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
-     * @default new MeasurementModel()
      */
     measurementModel: MeasurementModel;
     /**
@@ -1615,17 +1509,14 @@ export namespace Components {
      * When `edit`, the measurement anchors are interactive and the user is able to reposition them.
      *
      * When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
-     * @default ''
      */
     mode: ViewerMeasurementDistanceMode;
     /**
      * Enables the display of axis reference lines between the start and end point.
-     * @default false
      */
     showAxisReferenceLines: boolean;
     /**
      * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     * @default MEASUREMENT_SNAP_DISTANCE
      */
     snapDistance: number;
     /**
@@ -1638,7 +1529,6 @@ export namespace Components {
     startJson?: string;
     /**
      * The unit of measurement.
-     * @default 'millimeters'
      */
     units: DistanceUnitType;
     /**
@@ -1649,22 +1539,18 @@ export namespace Components {
   interface VertexViewerMeasurementLine {
     /**
      * A length of the line cap. The line cap is a line at each end of a line.
-     * @default 0
      */
     capLength: number;
     /**
      * A point that specifies the ending point of the line.
-     * @default Point.create()
      */
     end: Point.Point;
     /**
      * The type of [SVG pointer events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events) that the line should respond to.
-     * @default 'none'
      */
     pointerEvents: string;
     /**
      * A point that specifies the starting point of the line.
-     * @default Point.create()
      */
     start: Point.Point;
   }
@@ -1672,7 +1558,6 @@ export namespace Components {
     camera?: FrameCameraBase1;
     /**
      * The model that contains the overlays to present.
-     * @default new MeasurementOverlayManager()
      */
     measurementOverlays: MeasurementOverlayManager;
     /**
@@ -1687,12 +1572,8 @@ export namespace Components {
     config?: PartialConfig | string;
     /**
      * The environment that will be used to request measurement results.
-     * @default 'platprod'
      */
     configEnv: Environment;
-    /**
-     * @default [     EntityType.PRECISE_SURFACE,     EntityType.IMPRECISE_SURFACE,   ]
-     */
     measurableEntityTypes: EntityType[];
     /**
      * The controller that is responsible for performing measurements and updating the model.
@@ -1700,12 +1581,10 @@ export namespace Components {
     measurementController?: MeasurementController;
     /**
      * The model that contains the entities and outcomes from performing precise measurements.
-     * @default new MeasurementModel()
      */
     measurementModel: MeasurementModel;
     /**
      * The manager that is responsible for measurement overlays to present by this component.
-     * @default new MeasurementOverlayManager()
      */
     measurementOverlays: MeasurementOverlayManager;
     /**
@@ -1714,9 +1593,6 @@ export namespace Components {
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinGroup {
-    /**
-     * @default false
-     */
     detached: boolean;
     /**
      * The dimensions of the canvas for the pins
@@ -1724,12 +1600,8 @@ export namespace Components {
     elementBounds?: DOMRect;
     /**
      * The local matrix of this element.
-     * @default Matrix4.makeIdentity()
      */
     matrix: Matrix4.Matrix4;
-    /**
-     * @default false
-     */
     occluded: boolean;
     /**
      * The pin to draw for the group
@@ -1741,17 +1613,14 @@ export namespace Components {
     pinController?: PinController;
     /**
      * The model that contains the entities and outcomes from performing pin operations
-     * @default new PinModel()
      */
     pinModel: PinModel;
     /**
      * Projection view matrix used for computing the position of the pin line
-     * @default Matrix4.makeIdentity()
      */
     projectionViewMatrix: Matrix4.Matrix4;
     /**
      * Whether the pin is "selected"
-     * @default false
      */
     selected: boolean;
   }
@@ -1790,7 +1659,6 @@ export namespace Components {
     accentColor: Color.Color | string | undefined;
     /**
      * The mode of the pin tool
-     * @default 'view'
      */
     mode: ViewerPinToolMode;
     /**
@@ -1799,7 +1667,6 @@ export namespace Components {
     pinController?: PinController;
     /**
      * The model that contains the entities and outcomes from performing pin annotations
-     * @default new PinModel()
      */
     pinModel: PinModel;
     /**
@@ -1810,7 +1677,6 @@ export namespace Components {
      * The type of pin.
      *
      * This property will automatically be set.
-     * @default 'pin-icon'
      */
     tool: ViewerPinToolType;
     /**
@@ -1827,7 +1693,6 @@ export namespace Components {
      * * `md`: 32px
      *
      * * `lg`: 64px
-     * @default 'md'
      */
     size?: SpinnerSize;
   }
@@ -1839,12 +1704,10 @@ export namespace Components {
   interface VertexViewerTeleportTool {
     /**
      * The duration of animations, in milliseconds. Defaults to `500`.
-     * @default 500
      */
     animationMs?: number;
     /**
      * Indicates whether animations will be used when performing camera operations. Defaults to `false`.
-     * @default false
      */
     animationsDisabled: boolean;
     controller?: WalkModeController;
@@ -1862,9 +1725,6 @@ export namespace Components {
      * Defaults to `undefined`.
      */
     mode?: ViewerTeleportMode;
-    /**
-     * @default new WalkModeModel()
-     */
     model: WalkModeModel;
     /**
      * The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element.
@@ -1872,20 +1732,13 @@ export namespace Components {
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerToolbar {
-    /**
-     * @default 'horizontal'
-     */
     direction: ViewerToolbarDirection;
     /**
      * Specifies where the toolbar is positioned.
-     * @default 'bottom-center'
      */
     placement: ViewerToolbarPlacement;
   }
   interface VertexViewerToolbarGroup {
-    /**
-     * @default 'horizontal'
-     */
     direction: ViewerToolbarGroupDirection;
   }
   interface VertexViewerTransformWidget {
@@ -1904,13 +1757,11 @@ export namespace Components {
      * @see
      *
      * `EXPERIMENTAL_undo`
-     * @default false
      */
     EXPERIMENTAL_undoKeybindings: boolean;
     /**
      * The unit to show for rotation inputs. Defaults to `degrees`.
      * @see AngleUnitType
-     * @default 'degrees'
      */
     angleUnit: AngleUnitType;
     /**
@@ -1919,13 +1770,11 @@ export namespace Components {
     controller?: TransformController;
     /**
      * The number of decimal places to show in the input. Defaults to `1`.
-     * @default 1
      */
     decimalPlaces: number;
     /**
      * The unit to show for translation inputs. Defaults to `millimeters`.
      * @see DistanceUnitType
-     * @default 'millimeters'
      */
     distanceUnit: DistanceUnitType;
     /**
@@ -1936,7 +1785,6 @@ export namespace Components {
      * Specifies the frequency, in milliseconds, to update the transform while interacting with the widget.
      *
      * This delay is used to group events happening in quick succession and results in smoother widget movement.
-     * @default 75
      */
     interactionThrottle: number;
     /**
@@ -1951,7 +1799,6 @@ export namespace Components {
      * Scalar to increase the size of the rotation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
      *
      * Defaults to `1`.
-     * @default 1
      */
     rotationHandleScalar: number;
     /**
@@ -1960,19 +1807,16 @@ export namespace Components {
     rotationSnapDegrees?: number;
     /**
      * When rotationSnapDegrees is defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined here. Defaults to the shift key.
-     * @default 'shift'
      */
     rotationSnapKey: ModifierKey;
     /**
      * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
-     * @default true
      */
     showInputs: boolean;
     /**
      * Scalar to increase the size of the translation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
      *
      * Defaults to `1`.
-     * @default 1
      */
     translationHandleScalar: number;
     /**
@@ -1981,110 +1825,88 @@ export namespace Components {
     viewer?: HTMLVertexViewerElement;
     /**
      * Determines whether the x-rotation is disabled on the widget
-     * @default false
      */
     xRotationDisabled: boolean;
     /**
      * Determines whether the x-translation is disabled on the widget
-     * @default false
      */
     xTranslationDisabled: boolean;
     /**
      * Determines whether the xy-translation is disabled on the widget
-     * @default false
      */
     xyTranslationDisabled: boolean;
     /**
      * Determines whether the xz-translation is disabled on the widget
-     * @default false
      */
     xzTranslationDisabled: boolean;
     /**
      * Determines whether the y-rotation is disabled on the widget
-     * @default false
      */
     yRotationDisabled: boolean;
     /**
      * Determines whether the y-translation is disabled on the widget
-     * @default false
      */
     yTranslationDisabled: boolean;
     /**
      * Determines whether the yz-translation is disabled on the widget
-     * @default false
      */
     yzTranslationDisabled: boolean;
     /**
      * Determines whether the z-rotation is disabled on the widget
-     * @default false
      */
     zRotationDisabled: boolean;
     /**
      * Determines whether the z-translation is disabled on the widget
-     * @default false
      */
     zTranslationDisabled: boolean;
   }
   interface VertexViewerViewCube {
     /**
      * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
-     * @default 500
      */
     animationDuration: number;
     camera?: FramePerspectiveCamera;
     /**
      * Disables interactions for standard views.
-     * @default false
      */
     standardViewsOff: boolean;
     /**
      * Disables the display of the triad.
-     * @default false
      */
     triadOff: boolean;
     /**
      * Whether to perform a `viewAll` when clicking on the view cube. If this is set to `false`, the current `lookAt` point will be maintained, and the camera's `position` and `up` vectors will be aligned to the standard view. Defaults to `true`.
      *
      * **Note** Setting this value to `false` can result in the camera being placed underneath geometry depending on the current `viewVector` length, resulting in a view that may be unexpected.
-     * @default true
      */
     viewAll: boolean;
     /**
      * The viewer element that is connected to the view cube.
      */
     viewer?: HTMLVertexViewerElement;
-    /**
-     * @default Orientation.DEFAULT
-     */
     worldOrientation: Orientation;
     /**
      * The label for the side of the cube on the negative x-axis.
-     * @default 'Left'
      */
     xNegativeLabel: string;
     /**
      * The label for the side of the cube on the positive x-axis.
-     * @default 'Right'
      */
     xPositiveLabel: string;
     /**
      * The label for the side of the cube on the negative y-axis.
-     * @default 'Bottom'
      */
     yNegativeLabel: string;
     /**
      * The label for the side of the cube on the positive y-axis.
-     * @default 'Top'
      */
     yPositiveLabel: string;
     /**
      * The label for the side of the cube on the negative z-axis.
-     * @default 'Back'
      */
     zNegativeLabel: string;
     /**
      * The label for the side of the cube on the positive z-axis.
-     * @default 'Front'
      */
     zPositiveLabel: string;
   }
@@ -2101,12 +1923,10 @@ export namespace Components {
      * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.
      *
      * Defaults to `true`.
-     * @default true
      */
     enabled: boolean;
     /**
      * The `WalkModeModel` responsible for tracking configuration and emitting events for interaction handlers to respond to.
-     * @default new WalkModeModel()
      */
     model: WalkModeModel;
     /**
@@ -2211,261 +2031,33 @@ export interface VertexViewerWalkModeToolCustomEvent<T> extends CustomEvent<T> {
   target: HTMLVertexViewerWalkModeToolElement;
 }
 declare global {
-  interface HTMLVertexSceneTreeElementEventMap {
-    connectionError: SceneTreeErrorDetails;
-    firstRowRendered: void;
-  }
   interface HTMLVertexSceneTreeElement
     extends Components.VertexSceneTree,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexSceneTreeElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeElement,
-        ev: VertexSceneTreeCustomEvent<HTMLVertexSceneTreeElementEventMap[K]>
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLVertexSceneTreeElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeElement,
-        ev: VertexSceneTreeCustomEvent<HTMLVertexSceneTreeElementEventMap[K]>
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexSceneTreeElement: {
     prototype: HTMLVertexSceneTreeElement;
     new (): HTMLVertexSceneTreeElement;
   };
-  interface HTMLVertexSceneTreeNotificationBannerElementEventMap {
-    action: void;
-  }
   /**
    * A notification banner that displays a message and an action button.
    */
   interface HTMLVertexSceneTreeNotificationBannerElement
     extends Components.VertexSceneTreeNotificationBanner,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeNotificationBannerElement,
-        ev: VertexSceneTreeNotificationBannerCustomEvent<
-          HTMLVertexSceneTreeNotificationBannerElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexSceneTreeNotificationBannerElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeNotificationBannerElement,
-        ev: VertexSceneTreeNotificationBannerCustomEvent<
-          HTMLVertexSceneTreeNotificationBannerElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexSceneTreeNotificationBannerElement: {
     prototype: HTMLVertexSceneTreeNotificationBannerElement;
     new (): HTMLVertexSceneTreeNotificationBannerElement;
   };
-  interface HTMLVertexSceneTreeSearchElementEventMap {
-    search: string;
-    searchCompleted: string;
-  }
   interface HTMLVertexSceneTreeSearchElement
     extends Components.VertexSceneTreeSearch,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexSceneTreeSearchElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeSearchElement,
-        ev: VertexSceneTreeSearchCustomEvent<
-          HTMLVertexSceneTreeSearchElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexSceneTreeSearchElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeSearchElement,
-        ev: VertexSceneTreeSearchCustomEvent<
-          HTMLVertexSceneTreeSearchElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexSceneTreeSearchElement: {
     prototype: HTMLVertexSceneTreeSearchElement;
     new (): HTMLVertexSceneTreeSearchElement;
   };
-  interface HTMLVertexSceneTreeTableCellElementEventMap {
-    expandToggled: SceneTreeTableCellEventDetails;
-    visibilityToggled: SceneTreeTableCellEventDetails;
-    selectionToggled: SceneTreeTableCellEventDetails;
-    isolatePressed: SceneTreeTableCellEventDetails;
-    cellLoaded: void;
-  }
   interface HTMLVertexSceneTreeTableCellElement
     extends Components.VertexSceneTreeTableCell,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeTableCellElement,
-        ev: VertexSceneTreeTableCellCustomEvent<
-          HTMLVertexSceneTreeTableCellElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexSceneTreeTableCellElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeTableCellElement,
-        ev: VertexSceneTreeTableCellCustomEvent<
-          HTMLVertexSceneTreeTableCellElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexSceneTreeTableCellElement: {
     prototype: HTMLVertexSceneTreeTableCellElement;
     new (): HTMLVertexSceneTreeTableCellElement;
@@ -2484,68 +2076,9 @@ declare global {
     prototype: HTMLVertexSceneTreeTableHeaderElement;
     new (): HTMLVertexSceneTreeTableHeaderElement;
   };
-  interface HTMLVertexSceneTreeTableLayoutElementEventMap {
-    layoutRendered: void;
-    columnsResized: number[];
-  }
   interface HTMLVertexSceneTreeTableLayoutElement
     extends Components.VertexSceneTreeTableLayout,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeTableLayoutElement,
-        ev: VertexSceneTreeTableLayoutCustomEvent<
-          HTMLVertexSceneTreeTableLayoutElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexSceneTreeTableLayoutElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexSceneTreeTableLayoutElement,
-        ev: VertexSceneTreeTableLayoutCustomEvent<
-          HTMLVertexSceneTreeTableLayoutElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexSceneTreeTableLayoutElement: {
     prototype: HTMLVertexSceneTreeTableLayoutElement;
     new (): HTMLVertexSceneTreeTableLayoutElement;
@@ -2571,73 +2104,9 @@ declare global {
     prototype: HTMLVertexSceneTreeToolbarGroupElement;
     new (): HTMLVertexSceneTreeToolbarGroupElement;
   };
-  interface HTMLVertexViewerElementEventMap {
-    tap: TapEventDetails;
-    doubletap: TapEventDetails;
-    longpress: TapEventDetails;
-    frameReceived: Frame;
-    frameDrawn: Frame;
-    tokenExpired: void;
-    connectionChange: ConnectionStatus;
-    sceneReady: void;
-    sceneChanged: void;
-    interactionStarted: void;
-    interactionFinished: void;
-    cameraTypeChanged: FrameCameraType;
-    annotationStateChanged: AnnotationState;
-    deviceIdChange: string;
-    dimensionschange: Dimensions.Dimensions;
-  }
   interface HTMLVertexViewerElement
     extends Components.VertexViewer,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexViewerElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerElement,
-        ev: VertexViewerCustomEvent<HTMLVertexViewerElementEventMap[K]>
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLVertexViewerElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerElement,
-        ev: VertexViewerCustomEvent<HTMLVertexViewerElementEventMap[K]>
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerElement: {
     prototype: HTMLVertexViewerElement;
     new (): HTMLVertexViewerElement;
@@ -2649,9 +2118,6 @@ declare global {
     prototype: HTMLVertexViewerAnnotationCalloutElement;
     new (): HTMLVertexViewerAnnotationCalloutElement;
   };
-  interface HTMLVertexViewerBoxQueryToolElementEventMap {
-    controllerChanged: VolumeIntersectionQueryController;
-  }
   /**
    * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
    * a query for items in a specific area of the viewer. This tool then allows for an
@@ -2660,62 +2126,7 @@ declare global {
    */
   interface HTMLVertexViewerBoxQueryToolElement
     extends Components.VertexViewerBoxQueryTool,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerBoxQueryToolElement,
-        ev: VertexViewerBoxQueryToolCustomEvent<
-          HTMLVertexViewerBoxQueryToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerBoxQueryToolElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerBoxQueryToolElement,
-        ev: VertexViewerBoxQueryToolCustomEvent<
-          HTMLVertexViewerBoxQueryToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerBoxQueryToolElement: {
     prototype: HTMLVertexViewerBoxQueryToolElement;
     new (): HTMLVertexViewerBoxQueryToolElement;
@@ -2734,11 +2145,6 @@ declare global {
     prototype: HTMLVertexViewerDefaultToolbarElement;
     new (): HTMLVertexViewerDefaultToolbarElement;
   };
-  interface HTMLVertexViewerDomElementElementEventMap {
-    occlusionStateChanged: boolean;
-    detachedStateChanged: boolean;
-    propertyChange: void;
-  }
   /**
    * The `ViewerDomElement` is responsible for managing a
    * `<vertex-viewer-dom-element>` element. These elements are intended to be
@@ -2747,123 +2153,14 @@ declare global {
    */
   interface HTMLVertexViewerDomElementElement
     extends Components.VertexViewerDomElement,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexViewerDomElementElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerDomElementElement,
-        ev: VertexViewerDomElementCustomEvent<
-          HTMLVertexViewerDomElementElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerDomElementElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerDomElementElement,
-        ev: VertexViewerDomElementCustomEvent<
-          HTMLVertexViewerDomElementElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerDomElementElement: {
     prototype: HTMLVertexViewerDomElementElement;
     new (): HTMLVertexViewerDomElementElement;
   };
-  interface HTMLVertexViewerDomGroupElementEventMap {
-    propertyChange: void;
-  }
   interface HTMLVertexViewerDomGroupElement
     extends Components.VertexViewerDomGroup,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexViewerDomGroupElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerDomGroupElement,
-        ev: VertexViewerDomGroupCustomEvent<
-          HTMLVertexViewerDomGroupElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerDomGroupElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerDomGroupElement,
-        ev: VertexViewerDomGroupCustomEvent<
-          HTMLVertexViewerDomGroupElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerDomGroupElement: {
     prototype: HTMLVertexViewerDomGroupElement;
     new (): HTMLVertexViewerDomGroupElement;
@@ -2901,344 +2198,37 @@ declare global {
     prototype: HTMLVertexViewerLayerElement;
     new (): HTMLVertexViewerLayerElement;
   };
-  interface HTMLVertexViewerMarkupElementEventMap {
-    markupAdded:
-      | HTMLVertexViewerMarkupArrowElement
-      | HTMLVertexViewerMarkupCircleElement
-      | HTMLVertexViewerMarkupFreeformElement;
-    markupChanged:
-      | HTMLVertexViewerMarkupArrowElement
-      | HTMLVertexViewerMarkupCircleElement
-      | HTMLVertexViewerMarkupFreeformElement;
-    markupRemoved:
-      | HTMLVertexViewerMarkupArrowElement
-      | HTMLVertexViewerMarkupCircleElement
-      | HTMLVertexViewerMarkupFreeformElement;
-    markupSelectionChanged:
-      | HTMLVertexViewerMarkupArrowElement
-      | HTMLVertexViewerMarkupCircleElement
-      | HTMLVertexViewerMarkupFreeformElement
-      | undefined;
-  }
   interface HTMLVertexViewerMarkupElement
     extends Components.VertexViewerMarkup,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexViewerMarkupElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupElement,
-        ev: VertexViewerMarkupCustomEvent<
-          HTMLVertexViewerMarkupElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLVertexViewerMarkupElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupElement,
-        ev: VertexViewerMarkupCustomEvent<
-          HTMLVertexViewerMarkupElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerMarkupElement: {
     prototype: HTMLVertexViewerMarkupElement;
     new (): HTMLVertexViewerMarkupElement;
   };
-  interface HTMLVertexViewerMarkupArrowElementEventMap {
-    interactionBegin: void;
-    interactionEnd: MarkupInteraction;
-    viewRendered: void;
-  }
   interface HTMLVertexViewerMarkupArrowElement
     extends Components.VertexViewerMarkupArrow,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupArrowElement,
-        ev: VertexViewerMarkupArrowCustomEvent<
-          HTMLVertexViewerMarkupArrowElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupArrowElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupArrowElement,
-        ev: VertexViewerMarkupArrowCustomEvent<
-          HTMLVertexViewerMarkupArrowElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerMarkupArrowElement: {
     prototype: HTMLVertexViewerMarkupArrowElement;
     new (): HTMLVertexViewerMarkupArrowElement;
   };
-  interface HTMLVertexViewerMarkupCircleElementEventMap {
-    interactionBegin: void;
-    interactionEnd: MarkupInteraction;
-    viewRendered: void;
-  }
   interface HTMLVertexViewerMarkupCircleElement
     extends Components.VertexViewerMarkupCircle,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupCircleElement,
-        ev: VertexViewerMarkupCircleCustomEvent<
-          HTMLVertexViewerMarkupCircleElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupCircleElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupCircleElement,
-        ev: VertexViewerMarkupCircleCustomEvent<
-          HTMLVertexViewerMarkupCircleElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerMarkupCircleElement: {
     prototype: HTMLVertexViewerMarkupCircleElement;
     new (): HTMLVertexViewerMarkupCircleElement;
   };
-  interface HTMLVertexViewerMarkupFreeformElementEventMap {
-    interactionBegin: void;
-    interactionEnd: MarkupInteraction;
-    viewRendered: void;
-  }
   interface HTMLVertexViewerMarkupFreeformElement
     extends Components.VertexViewerMarkupFreeform,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupFreeformElement,
-        ev: VertexViewerMarkupFreeformCustomEvent<
-          HTMLVertexViewerMarkupFreeformElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupFreeformElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupFreeformElement,
-        ev: VertexViewerMarkupFreeformCustomEvent<
-          HTMLVertexViewerMarkupFreeformElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerMarkupFreeformElement: {
     prototype: HTMLVertexViewerMarkupFreeformElement;
     new (): HTMLVertexViewerMarkupFreeformElement;
   };
-  interface HTMLVertexViewerMarkupToolElementEventMap {
-    markupBegin: void;
-    markupEnd: Markup;
-  }
   interface HTMLVertexViewerMarkupToolElement
     extends Components.VertexViewerMarkupTool,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexViewerMarkupToolElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupToolElement,
-        ev: VertexViewerMarkupToolCustomEvent<
-          HTMLVertexViewerMarkupToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerMarkupToolElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMarkupToolElement,
-        ev: VertexViewerMarkupToolCustomEvent<
-          HTMLVertexViewerMarkupToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerMarkupToolElement: {
     prototype: HTMLVertexViewerMarkupToolElement;
     new (): HTMLVertexViewerMarkupToolElement;
@@ -3250,68 +2240,9 @@ declare global {
     prototype: HTMLVertexViewerMeasurementDetailsElement;
     new (): HTMLVertexViewerMeasurementDetailsElement;
   };
-  interface HTMLVertexViewerMeasurementDistanceElementEventMap {
-    editBegin: EditBeginEventDetails;
-    editEnd: EditEndEventDetails;
-  }
   interface HTMLVertexViewerMeasurementDistanceElement
     extends Components.VertexViewerMeasurementDistance,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMeasurementDistanceElement,
-        ev: VertexViewerMeasurementDistanceCustomEvent<
-          HTMLVertexViewerMeasurementDistanceElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerMeasurementDistanceElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerMeasurementDistanceElement,
-        ev: VertexViewerMeasurementDistanceCustomEvent<
-          HTMLVertexViewerMeasurementDistanceElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerMeasurementDistanceElement: {
     prototype: HTMLVertexViewerMeasurementDistanceElement;
     new (): HTMLVertexViewerMeasurementDistanceElement;
@@ -3344,67 +2275,9 @@ declare global {
     prototype: HTMLVertexViewerPinGroupElement;
     new (): HTMLVertexViewerPinGroupElement;
   };
-  interface HTMLVertexViewerPinLabelElementEventMap {
-    labelChanged: void;
-    labelFocused: string | undefined;
-    labelBlurred: string | undefined;
-  }
   interface HTMLVertexViewerPinLabelElement
     extends Components.VertexViewerPinLabel,
-      HTMLStencilElement {
-    addEventListener<K extends keyof HTMLVertexViewerPinLabelElementEventMap>(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerPinLabelElement,
-        ev: VertexViewerPinLabelCustomEvent<
-          HTMLVertexViewerPinLabelElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerPinLabelElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerPinLabelElement,
-        ev: VertexViewerPinLabelCustomEvent<
-          HTMLVertexViewerPinLabelElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerPinLabelElement: {
     prototype: HTMLVertexViewerPinLabelElement;
     new (): HTMLVertexViewerPinLabelElement;
@@ -3430,9 +2303,6 @@ declare global {
     prototype: HTMLVertexViewerSpinnerElement;
     new (): HTMLVertexViewerSpinnerElement;
   };
-  interface HTMLVertexViewerTeleportToolElementEventMap {
-    controllerChanged: WalkModeController;
-  }
   /**
    * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
    * around a model, which is particularly useful for walking through a model.
@@ -3440,62 +2310,7 @@ declare global {
    */
   interface HTMLVertexViewerTeleportToolElement
     extends Components.VertexViewerTeleportTool,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerTeleportToolElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerTeleportToolElement,
-        ev: VertexViewerTeleportToolCustomEvent<
-          HTMLVertexViewerTeleportToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerTeleportToolElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerTeleportToolElement,
-        ev: VertexViewerTeleportToolCustomEvent<
-          HTMLVertexViewerTeleportToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerTeleportToolElement: {
     prototype: HTMLVertexViewerTeleportToolElement;
     new (): HTMLVertexViewerTeleportToolElement;
@@ -3514,70 +2329,9 @@ declare global {
     prototype: HTMLVertexViewerToolbarGroupElement;
     new (): HTMLVertexViewerToolbarGroupElement;
   };
-  interface HTMLVertexViewerTransformWidgetElementEventMap {
-    positionChanged: Vector3.Vector3 | undefined;
-    rotationChanged: Euler.Euler | undefined;
-    interactionEnded: Matrix4.Matrix4 | undefined;
-    interactionStarted: void;
-  }
   interface HTMLVertexViewerTransformWidgetElement
     extends Components.VertexViewerTransformWidget,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerTransformWidgetElement,
-        ev: VertexViewerTransformWidgetCustomEvent<
-          HTMLVertexViewerTransformWidgetElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerTransformWidgetElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerTransformWidgetElement,
-        ev: VertexViewerTransformWidgetCustomEvent<
-          HTMLVertexViewerTransformWidgetElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerTransformWidgetElement: {
     prototype: HTMLVertexViewerTransformWidgetElement;
     new (): HTMLVertexViewerTransformWidgetElement;
@@ -3589,71 +2343,13 @@ declare global {
     prototype: HTMLVertexViewerViewCubeElement;
     new (): HTMLVertexViewerViewCubeElement;
   };
-  interface HTMLVertexViewerWalkModeToolElementEventMap {
-    controllerChanged: WalkModeController;
-  }
   /**
    * The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
    * intended for walking through a model instead of orbiting a model.
    */
   interface HTMLVertexViewerWalkModeToolElement
     extends Components.VertexViewerWalkModeTool,
-      HTMLStencilElement {
-    addEventListener<
-      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerWalkModeToolElement,
-        ev: VertexViewerWalkModeToolCustomEvent<
-          HTMLVertexViewerWalkModeToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions
-    ): void;
-    removeEventListener<
-      K extends keyof HTMLVertexViewerWalkModeToolElementEventMap
-    >(
-      type: K,
-      listener: (
-        this: HTMLVertexViewerWalkModeToolElement,
-        ev: VertexViewerWalkModeToolCustomEvent<
-          HTMLVertexViewerWalkModeToolElementEventMap[K]
-        >
-      ) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof DocumentEventMap>(
-      type: K,
-      listener: (this: Document, ev: DocumentEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener<K extends keyof HTMLElementEventMap>(
-      type: K,
-      listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-      options?: boolean | EventListenerOptions
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions
-    ): void;
-  }
+      HTMLStencilElement {}
   var HTMLVertexViewerWalkModeToolElement: {
     prototype: HTMLVertexViewerWalkModeToolElement;
     new (): HTMLVertexViewerWalkModeToolElement;
@@ -3713,7 +2409,6 @@ declare namespace LocalJSX {
      * Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.
      *
      * Use the `config` property for manually setting hosts.
-     * @default 'platprod'
      */
     configEnv?: Environment;
     controller?: SceneTreeController;
@@ -3721,17 +2416,14 @@ declare namespace LocalJSX {
      * A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.
      *
      * **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name.
-     * @default []
      */
     metadataKeys?: MetadataKey[];
     /**
      * @deprecated Use `searchOptions` Indicates whether the metadata search should use an exact match.
-     * @default false
      */
     metadataSearchExactMatch?: boolean;
     /**
      * @deprecated Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.
-     * @default []
      */
     metadataSearchKeys?: MetadataKey[];
     /**
@@ -3746,12 +2438,10 @@ declare namespace LocalJSX {
     onFirstRowRendered?: (event: VertexSceneTreeCustomEvent<void>) => void;
     /**
      * The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.
-     * @default 500
      */
     operationAnimationDuration?: number;
     /**
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
-     * @default 25
      */
     overScanCount?: number;
     /**
@@ -3776,7 +2466,6 @@ declare namespace LocalJSX {
     rowData?: RowDataProvider;
     /**
      * A set of options to configure scene tree searching behavior.
-     * @default {}
      */
     searchOptions?: FilterOptions;
     /**
@@ -3822,7 +2511,6 @@ declare namespace LocalJSX {
     debounce?: number;
     /**
      * If `true`, disables user interaction of the component.
-     * @default false
      */
     disabled?: boolean;
     /**
@@ -3837,19 +2525,16 @@ declare namespace LocalJSX {
     ) => void;
     /**
      * Placeholder text if `value` is empty.
-     * @default undefined
      */
     placeholder?: string;
     /**
      * The current text value of the component. Value is updated on user interaction.
-     * @default ''
      */
     value?: string;
   }
   interface VertexSceneTreeTableCell {
     /**
      * Whether to always show the requested icons in the cell. If false, the icons will only appear when hovering over the cell.
-     * @default false
      */
     alwaysShowIcons?: boolean;
     /**
@@ -3865,9 +2550,6 @@ declare namespace LocalJSX {
      */
     expansionHandler?: SceneTreeOperationHandler;
     hoverController?: SceneTreeCellHoverController;
-    /**
-     * @default false
-     */
     hovered?: boolean;
     isScrolling?: boolean;
     /**
@@ -3913,7 +2595,6 @@ declare namespace LocalJSX {
     ) => void;
     /**
      * The value to display in this cell if the `value` specified is undefined. Defaults to "--".
-     * @default '--'
      */
     placeholder?: string;
     /**
@@ -3955,9 +2636,6 @@ declare namespace LocalJSX {
   interface VertexSceneTreeTableLayout {
     controller?: SceneTreeController;
     layoutHeight?: number;
-    /**
-     * @default 0
-     */
     layoutOffset?: number;
     layoutWidth?: number;
     /**
@@ -3973,7 +2651,6 @@ declare namespace LocalJSX {
      * The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.
      *
      * This prop will be automatically populated based on the `overScanCount` prop specified in the parent `<vertex-scene-tree />` element.
-     * @default 25
      */
     overScanCount?: number;
     /**
@@ -3998,33 +2675,15 @@ declare namespace LocalJSX {
      * ```
      */
     rowData?: RowDataProvider;
-    /**
-     * @default 24
-     */
     rowHeight?: number;
-    /**
-     * @default []
-     */
     rows?: Row[];
-    /**
-     * @default 0
-     */
     scrollOffset?: number;
-    /**
-     * @default 0
-     */
     totalRows?: number;
     /**
      * A reference to the scene tree to perform operations for interactions. Such as expansion, visibility and selection.
      */
     tree?: HTMLVertexSceneTreeElement;
-    /**
-     * @default 0
-     */
     viewportEndIndex?: number;
-    /**
-     * @default 0
-     */
     viewportStartIndex?: number;
   }
   interface VertexSceneTreeTableResizeDivider {}
@@ -4038,12 +2697,10 @@ declare namespace LocalJSX {
     annotations?: AnnotationController | undefined;
     /**
      * Enables or disables the default mouse and touch interactions provided by the viewer. Enabled by default.
-     * @default true
      */
     cameraControls?: boolean;
     /**
      * The type of camera model to represent the scene with. Can be either `perspective` or `orthographic`, and defaults to `perspective`.
-     * @default 'perspective'
      */
     cameraType?: FrameCameraType;
     /**
@@ -4064,12 +2721,10 @@ declare namespace LocalJSX {
      *
      * Use the `config` property for manually setting hosts.
      * @see Viewer.config
-     * @default 'platprod'
      */
     configEnv?: Environment;
     /**
      * Specifies options related to presentation of cross-sections. Defaults to showing the cross-section with an end cap that matches the part color.
-     * @default {     endCapEnabled: true,     endCapColor: undefined,   }
      */
     crossSectioning?: CrossSectioningOptions;
     /**
@@ -4088,19 +2743,16 @@ declare namespace LocalJSX {
     deviceId?: string;
     /**
      * Specifies whether to enable temporal refinement of still images.
-     * @default true
      */
     enableTemporalRefinement?: boolean;
     /**
      * Specifies experimental rendering options. For Vertex use only.
-     * @default ''
      */
     experimentalRenderingOptions?: string;
     /**
      * Experimental flag indicating that connections to Vertex should be established if the viewer is initially hidden through its own style or computed style, or has not been scrolled into view.
      *
      * *Caution:* Setting this flag can result in reduced performance, and should generally not be used in a production setting.
-     * @default false
      */
     experimentalSkipVisibilityCheck?: boolean;
     /**
@@ -4130,7 +2782,6 @@ declare namespace LocalJSX {
     frame?: Frame | undefined;
     /**
      * Enables or disables the default keyboard shortcut interactions provided by the viewer. Enabled by default, requires `cameraControls` being enabled.
-     * @default true
      */
     keyboardControls?: boolean;
     /**
@@ -4140,7 +2791,6 @@ declare namespace LocalJSX {
     modelViews?: ModelViewController | undefined;
     /**
      * Specifies whether to use the default lights for the scene. When false, default lights are used. When true, no default lights are used, and the lights must be specified separately.
-     * @default false
      */
     noDefaultLights?: boolean;
     /**
@@ -4213,7 +2863,6 @@ declare namespace LocalJSX {
     onTokenExpired?: (event: VertexViewerCustomEvent<void>) => void;
     /**
      * Specifies how phantom parts should appear. The opacity must be between 0 and 1, where 0 is completely hidden and 1 is completely visible.
-     * @default { opacity: 0.1 }
      */
     phantom?: PhantomOptions;
     /**
@@ -4223,7 +2872,6 @@ declare namespace LocalJSX {
     pmi?: PmiController | undefined;
     /**
      * An optional value that will debounce frame updates when resizing this viewer element.
-     * @default 100
      */
     resizeDebounce?: number;
     resolvedConfig?: Config;
@@ -4233,7 +2881,6 @@ declare namespace LocalJSX {
      * When rotateAroundTapPoint is true and the user clicks on geometry, then the model will rotate around the point that was clicked. When rotateAroundTapPoint is true and the user clicks in empty space (not on geometry), then the model will rotate around the center of the viewport.
      *
      * When rotateAroundTapPoint is false, then the model will always rotate around the center of the viewport.
-     * @default true
      */
     rotateAroundTapPoint?: boolean;
     /**
@@ -4259,9 +2906,6 @@ declare namespace LocalJSX {
      * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertex:scene:<sceneid>`
      */
     src?: string;
-    /**
-     * @default new StencilBufferManager(     this.hostElement   )
-     */
     stencilBuffer?: StencilBufferManager;
     stream?: ViewerStream;
     /**
@@ -4270,7 +2914,6 @@ declare namespace LocalJSX {
     token?: string;
     /**
      * Represents the current viewport of the viewer. The viewport represents the dimensions of the canvas where a frame is rendered. It contains methods for translating between viewport coordinates, frame coordinates and world coordinates.
-     * @default Viewport.fromDimensions(Dimensions.create(0, 0))
      */
     viewport?: Viewport;
   }
@@ -4281,7 +2924,6 @@ declare namespace LocalJSX {
     data: CalloutAnnotationData;
     /**
      * The icon size to display.
-     * @default 'sm'
      */
     iconSize?: ViewerIconSize;
   }
@@ -4320,7 +2962,6 @@ declare namespace LocalJSX {
      * `clearAndSelect` will clear all existing selection, and select the results of the query. `select` will maintain existing selection, and select the results of the query. `deselect` will maintain existing selection, and deselect the results of the query.
      *
      * The operation behavior for this intersection query tool can also be changed by providing a custom implementation of the `VolumeIntersectionQueryController`, or by using the `setOperationTransform` method of the default controller.
-     * @default 'clearAndSelect'
      */
     operationType?: VolumeIntersectionQueryType;
     /**
@@ -4332,22 +2973,18 @@ declare namespace LocalJSX {
   interface VertexViewerDefaultToolbar {
     /**
      * The duration of animations, in milliseconds. Defaults to `1000`.
-     * @default 1000
      */
     animationMs?: number;
     /**
      * Indicates whether animations will be used when performing camera operations. Defaults to `true`.
-     * @default false
      */
     animationsDisabled?: boolean;
     /**
      * Specifies the direction that UI elements are placed.
-     * @default 'horizontal'
      */
     direction?: ViewerToolbarGroupDirection;
     /**
      * Specifies where the toolbar is positioned.
-     * @default 'bottom-center'
      */
     placement?: ViewerToolbarPlacement;
     /**
@@ -4364,7 +3001,6 @@ declare namespace LocalJSX {
   interface VertexViewerDomElement {
     /**
      * Disables the billboarding behavior of the element. When billboarding is enabled, the element will always be oriented towards the screen.
-     * @default false
      */
     billboardOff?: boolean;
     /**
@@ -4377,22 +3013,18 @@ declare namespace LocalJSX {
      *   }
      * </style>
      * ```
-     * @default false
      */
     detached?: boolean;
     /**
      * **EXPERIMENTAL** Disables detached testing for this element. Defaults to disabled. When enabled, the elements position will be tested against the current depth buffer. If the position is detached, then the `detached` attribute will be set.
-     * @default true
      */
     detachedOff?: boolean;
     /**
      * Disables interaction events from children.
-     * @default false
      */
     interactionsOff?: boolean;
     /**
      * The local matrix of this element.
-     * @default Matrix4.makeIdentity()
      */
     matrix?: Matrix4.Matrix4;
     /**
@@ -4405,12 +3037,10 @@ declare namespace LocalJSX {
      *   }
      * </style>
      * ```
-     * @default false
      */
     occluded?: boolean;
     /**
      * Disables occlusion testing for this element. Defaults to enabled. When enabled, the elements position will be tested against the current depth buffer. If the position is occluded, then the `occluded` attribute will be set.
-     * @default false
      */
     occlusionOff?: boolean;
     /**
@@ -4431,22 +3061,18 @@ declare namespace LocalJSX {
     onPropertyChange?: (event: VertexViewerDomElementCustomEvent<void>) => void;
     /**
      * The local 3D position of where this element is located.
-     * @default Vector3.origin()
      */
     position?: Vector3.Vector3;
     /**
      * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     positionJson?: string;
     /**
      * The local rotation of this element.
-     * @default Quaternion.create()
      */
     quaternion?: Quaternion.Quaternion;
     /**
      * The local quaternion rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
-     * @default ''
      */
     quaternionJson?: string;
     /**
@@ -4459,19 +3085,16 @@ declare namespace LocalJSX {
     rotationJson?: string;
     /**
      * The local scale of this element.
-     * @default Vector3.create(1, 1, 1)
      */
     scale?: Vector3.Vector3;
     /**
      * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     scaleJson?: string;
   }
   interface VertexViewerDomGroup {
     /**
      * The local matrix of this element.
-     * @default Matrix4.makeIdentity()
      */
     matrix?: Matrix4.Matrix4;
     /**
@@ -4480,22 +3103,18 @@ declare namespace LocalJSX {
     onPropertyChange?: (event: VertexViewerDomGroupCustomEvent<void>) => void;
     /**
      * The local 3D position of where this element is located.
-     * @default Vector3.origin()
      */
     position?: Vector3.Vector3;
     /**
      * The local 3D position of where this element is located, as a JSON string. JSON representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     positionJson?: string;
     /**
      * The local rotation of this element.
-     * @default Quaternion.create()
      */
     quaternion?: Quaternion.Quaternion;
     /**
      * The local rotation of this element, as a JSON string. JSON representation can either be `[x, y, z, w]` or `{"x": 0, "y": 0, "z": 0, "w": 1}`.
-     * @default ''
      */
     quaternionJson?: string;
     /**
@@ -4508,12 +3127,10 @@ declare namespace LocalJSX {
     rotationJson?: string;
     /**
      * The local scale of this element.
-     * @default Vector3.create(1, 1, 1)
      */
     scale?: Vector3.Vector3;
     /**
      * The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.
-     * @default ''
      */
     scaleJson?: string;
   }
@@ -4539,7 +3156,6 @@ declare namespace LocalJSX {
      * Specifies the drawing mode for the renderer.
      *
      * When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.
-     * @default '3d'
      */
     drawMode?: ViewerDomRendererDrawMode;
     /**
@@ -4548,7 +3164,6 @@ declare namespace LocalJSX {
      * When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer.
      *
      * When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target for the viewer.
-     * @default true
      */
     propagateEventsToViewer?: boolean;
     /**
@@ -4583,14 +3198,12 @@ declare namespace LocalJSX {
      * * `lg`: 32px
      *
      * A custom size can be supplied by setting this field to `undefined` and setting `font-size` through CSS. Defaults to `md`.
-     * @default 'md'
      */
     size?: ViewerIconSize1;
   }
   interface VertexViewerLayer {
     /**
      * Indicates if the layer should stretch to fill the size of its container's nearest positioned parent.
-     * @default false
      */
     stretchOff?: boolean;
   }
@@ -4605,12 +3218,10 @@ declare namespace LocalJSX {
     circleTemplateId?: string;
     /**
      * If `true`, disables adding or editing of markup through user interaction.
-     * @default false
      */
     disabled?: boolean;
     /**
      * The style of the ending anchor. This defaults to 'arrow-triangle.'
-     * @default 'arrow-triangle'
      */
     endLineAnchorStyle?: LineAnchorStyle;
     /**
@@ -4660,7 +3271,6 @@ declare namespace LocalJSX {
     ) => void;
     /**
      * Indicates if new markup should be automatically selected.
-     * @default false
      */
     selectNew?: boolean;
     /**
@@ -4669,12 +3279,10 @@ declare namespace LocalJSX {
     selectedMarkupId?: string;
     /**
      * The style of the starting anchor. This defaults to none.
-     * @default 'none'
      */
     startLineAnchorStyle?: LineAnchorStyle;
     /**
      * The type of markup to perform.
-     * @default 'arrow'
      */
     tool?: ViewerMarkupToolType;
     /**
@@ -4697,12 +3305,10 @@ declare namespace LocalJSX {
     endJson?: string;
     /**
      * The style of the ending anchor. This defaults to 'arrow-triangle.'
-     * @default 'arrow-triangle'
      */
     endLineAnchorStyle?: LineAnchorStyle;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
-     * @default ''
      */
     mode?: ViewerMarkupArrowMode;
     /**
@@ -4735,7 +3341,6 @@ declare namespace LocalJSX {
     startJson?: string;
     /**
      * The style of the starting anchor. This defaults to none.
-     * @default 'none'
      */
     startLineAnchorStyle?: LineAnchorStyle;
     /**
@@ -4760,7 +3365,6 @@ declare namespace LocalJSX {
     boundsJson?: string;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
-     * @default ''
      */
     mode?: ViewerMarkupCircleMode;
     /**
@@ -4801,7 +3405,6 @@ declare namespace LocalJSX {
     boundsJson?: string;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
-     * @default ''
      */
     mode?: ViewerMarkupFreeformMode;
     /**
@@ -4854,12 +3457,10 @@ declare namespace LocalJSX {
      * Disables markups.
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
-     * @default false
      */
     disabled?: boolean;
     /**
      * The style of the ending anchor. This defaults to 'arrow-triangle.'
-     * @default 'arrow-triangle'
      */
     endLineAnchorStyle?: LineAnchorStyle;
     /**
@@ -4876,14 +3477,12 @@ declare namespace LocalJSX {
     onMarkupEnd?: (event: VertexViewerMarkupToolCustomEvent<Markup>) => void;
     /**
      * The style of the starting anchor. This defaults to none.
-     * @default 'none'
      */
     startLineAnchorStyle?: LineAnchorStyle;
     /**
      * The type of markup.
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` element.
-     * @default 'arrow'
      */
     tool?: ViewerMarkupToolType1;
     /**
@@ -4900,7 +3499,6 @@ declare namespace LocalJSX {
     angleFormatter?: Formatter<number>;
     /**
      * The unit of angle-based measurement.
-     * @default 'degrees'
      */
     angleUnits?: AngleUnitType;
     /**
@@ -4913,12 +3511,10 @@ declare namespace LocalJSX {
     distanceFormatter?: Formatter<number>;
     /**
      * The unit of distance-based measurement.
-     * @default 'millimeters'
      */
     distanceUnits?: DistanceUnitType;
     /**
      * The number of fraction digits to display.
-     * @default 2
      */
     fractionalDigits?: number;
     /**
@@ -4941,7 +3537,6 @@ declare namespace LocalJSX {
   interface VertexViewerMeasurementDistance {
     /**
      * The distance from an anchor to its label.
-     * @default 20
      */
     anchorLabelOffset?: number;
     /**
@@ -4962,19 +3557,16 @@ declare namespace LocalJSX {
     endJson?: string;
     /**
      * The number of fraction digits to display.
-     * @default 2
      */
     fractionalDigits?: number;
     hitProvider?: PointToPointHitProvider;
     indicatorPt?: Vector3.Vector3;
     /**
      * A property that reflects which anchor is currently being interacted with.
-     * @default 'none'
      */
     interactingAnchor?: Anchor | 'none';
     /**
      * Indicates if the measurement is invalid. A measurement is invalid if either the start or end position are not on the surface of the model.
-     * @default false
      */
     invalid?: boolean;
     /**
@@ -4983,12 +3575,10 @@ declare namespace LocalJSX {
     labelFormatter?: Formatter<number | undefined>;
     /**
      * The length of the caps at each end of the distance measurement.
-     * @default MEASUREMENT_LINE_CAP_LENGTH
      */
     lineCapLength?: number;
     /**
      * The measurement model that will be updated when this measurement changes. You can pass this to a <vertex-viewer-measurement-details> component to display measurement outcomes.
-     * @default new MeasurementModel()
      */
     measurementModel?: MeasurementModel;
     /**
@@ -4999,7 +3589,6 @@ declare namespace LocalJSX {
      * When `edit`, the measurement anchors are interactive and the user is able to reposition them.
      *
      * When `replace`, anytime the user clicks on the canvas, a new measurement will be created and replace any existing measurement. After a measurement is created, the measurement will be editable.
-     * @default ''
      */
     mode?: ViewerMeasurementDistanceMode;
     /**
@@ -5016,12 +3605,10 @@ declare namespace LocalJSX {
     ) => void;
     /**
      * Enables the display of axis reference lines between the start and end point.
-     * @default false
      */
     showAxisReferenceLines?: boolean;
     /**
      * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-     * @default MEASUREMENT_SNAP_DISTANCE
      */
     snapDistance?: number;
     /**
@@ -5034,7 +3621,6 @@ declare namespace LocalJSX {
     startJson?: string;
     /**
      * The unit of measurement.
-     * @default 'millimeters'
      */
     units?: DistanceUnitType;
     /**
@@ -5045,22 +3631,18 @@ declare namespace LocalJSX {
   interface VertexViewerMeasurementLine {
     /**
      * A length of the line cap. The line cap is a line at each end of a line.
-     * @default 0
      */
     capLength?: number;
     /**
      * A point that specifies the ending point of the line.
-     * @default Point.create()
      */
     end?: Point.Point;
     /**
      * The type of [SVG pointer events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events) that the line should respond to.
-     * @default 'none'
      */
     pointerEvents?: string;
     /**
      * A point that specifies the starting point of the line.
-     * @default Point.create()
      */
     start?: Point.Point;
   }
@@ -5068,7 +3650,6 @@ declare namespace LocalJSX {
     camera?: FrameCameraBase1;
     /**
      * The model that contains the overlays to present.
-     * @default new MeasurementOverlayManager()
      */
     measurementOverlays?: MeasurementOverlayManager;
     /**
@@ -5083,12 +3664,8 @@ declare namespace LocalJSX {
     config?: PartialConfig | string;
     /**
      * The environment that will be used to request measurement results.
-     * @default 'platprod'
      */
     configEnv?: Environment;
-    /**
-     * @default [     EntityType.PRECISE_SURFACE,     EntityType.IMPRECISE_SURFACE,   ]
-     */
     measurableEntityTypes?: EntityType[];
     /**
      * The controller that is responsible for performing measurements and updating the model.
@@ -5096,12 +3673,10 @@ declare namespace LocalJSX {
     measurementController?: MeasurementController;
     /**
      * The model that contains the entities and outcomes from performing precise measurements.
-     * @default new MeasurementModel()
      */
     measurementModel?: MeasurementModel;
     /**
      * The manager that is responsible for measurement overlays to present by this component.
-     * @default new MeasurementOverlayManager()
      */
     measurementOverlays?: MeasurementOverlayManager;
     /**
@@ -5110,9 +3685,6 @@ declare namespace LocalJSX {
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerPinGroup {
-    /**
-     * @default false
-     */
     detached?: boolean;
     /**
      * The dimensions of the canvas for the pins
@@ -5120,12 +3692,8 @@ declare namespace LocalJSX {
     elementBounds?: DOMRect;
     /**
      * The local matrix of this element.
-     * @default Matrix4.makeIdentity()
      */
     matrix?: Matrix4.Matrix4;
-    /**
-     * @default false
-     */
     occluded?: boolean;
     /**
      * The pin to draw for the group
@@ -5137,17 +3705,14 @@ declare namespace LocalJSX {
     pinController?: PinController;
     /**
      * The model that contains the entities and outcomes from performing pin operations
-     * @default new PinModel()
      */
     pinModel?: PinModel;
     /**
      * Projection view matrix used for computing the position of the pin line
-     * @default Matrix4.makeIdentity()
      */
     projectionViewMatrix?: Matrix4.Matrix4;
     /**
      * Whether the pin is "selected"
-     * @default false
      */
     selected?: boolean;
   }
@@ -5194,7 +3759,6 @@ declare namespace LocalJSX {
     accentColor?: Color.Color | string | undefined;
     /**
      * The mode of the pin tool
-     * @default 'view'
      */
     mode?: ViewerPinToolMode;
     /**
@@ -5203,7 +3767,6 @@ declare namespace LocalJSX {
     pinController?: PinController;
     /**
      * The model that contains the entities and outcomes from performing pin annotations
-     * @default new PinModel()
      */
     pinModel?: PinModel;
     /**
@@ -5214,7 +3777,6 @@ declare namespace LocalJSX {
      * The type of pin.
      *
      * This property will automatically be set.
-     * @default 'pin-icon'
      */
     tool?: ViewerPinToolType;
     /**
@@ -5231,7 +3793,6 @@ declare namespace LocalJSX {
      * * `md`: 32px
      *
      * * `lg`: 64px
-     * @default 'md'
      */
     size?: SpinnerSize;
   }
@@ -5243,12 +3804,10 @@ declare namespace LocalJSX {
   interface VertexViewerTeleportTool {
     /**
      * The duration of animations, in milliseconds. Defaults to `500`.
-     * @default 500
      */
     animationMs?: number;
     /**
      * Indicates whether animations will be used when performing camera operations. Defaults to `false`.
-     * @default false
      */
     animationsDisabled?: boolean;
     controller?: WalkModeController;
@@ -5266,9 +3825,6 @@ declare namespace LocalJSX {
      * Defaults to `undefined`.
      */
     mode?: ViewerTeleportMode;
-    /**
-     * @default new WalkModeModel()
-     */
     model?: WalkModeModel;
     /**
      * Event emitted when the `WalkModeController` associated with this tool changes.
@@ -5282,20 +3838,13 @@ declare namespace LocalJSX {
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerToolbar {
-    /**
-     * @default 'horizontal'
-     */
     direction?: ViewerToolbarDirection;
     /**
      * Specifies where the toolbar is positioned.
-     * @default 'bottom-center'
      */
     placement?: ViewerToolbarPlacement;
   }
   interface VertexViewerToolbarGroup {
-    /**
-     * @default 'horizontal'
-     */
     direction?: ViewerToolbarGroupDirection;
   }
   interface VertexViewerTransformWidget {
@@ -5306,13 +3855,11 @@ declare namespace LocalJSX {
      * @see
      *
      * `EXPERIMENTAL_undo`
-     * @default false
      */
     EXPERIMENTAL_undoKeybindings?: boolean;
     /**
      * The unit to show for rotation inputs. Defaults to `degrees`.
      * @see AngleUnitType
-     * @default 'degrees'
      */
     angleUnit?: AngleUnitType;
     /**
@@ -5321,13 +3868,11 @@ declare namespace LocalJSX {
     controller?: TransformController;
     /**
      * The number of decimal places to show in the input. Defaults to `1`.
-     * @default 1
      */
     decimalPlaces?: number;
     /**
      * The unit to show for translation inputs. Defaults to `millimeters`.
      * @see DistanceUnitType
-     * @default 'millimeters'
      */
     distanceUnit?: DistanceUnitType;
     /**
@@ -5338,7 +3883,6 @@ declare namespace LocalJSX {
      * Specifies the frequency, in milliseconds, to update the transform while interacting with the widget.
      *
      * This delay is used to group events happening in quick succession and results in smoother widget movement.
-     * @default 75
      */
     interactionThrottle?: number;
     /**
@@ -5377,7 +3921,6 @@ declare namespace LocalJSX {
      * Scalar to increase the size of the rotation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
      *
      * Defaults to `1`.
-     * @default 1
      */
     rotationHandleScalar?: number;
     /**
@@ -5386,19 +3929,16 @@ declare namespace LocalJSX {
     rotationSnapDegrees?: number;
     /**
      * When rotationSnapDegrees is defined, the widget will snap to the degree of the nearest multiple of the given number when the user is rotating with the widget and holding the key defined here. Defaults to the shift key.
-     * @default 'shift'
      */
     rotationSnapKey?: ModifierKey;
     /**
      * Whether to show inputs beside the widget handles when they are interacted with. Defaults to `true`.
-     * @default true
      */
     showInputs?: boolean;
     /**
      * Scalar to increase the size of the translation handles of this widget. Values above zero and below three will result in the best visual representation of the handles, and values above three may produce unexpected results.
      *
      * Defaults to `1`.
-     * @default 1
      */
     translationHandleScalar?: number;
     /**
@@ -5407,110 +3947,88 @@ declare namespace LocalJSX {
     viewer?: HTMLVertexViewerElement;
     /**
      * Determines whether the x-rotation is disabled on the widget
-     * @default false
      */
     xRotationDisabled?: boolean;
     /**
      * Determines whether the x-translation is disabled on the widget
-     * @default false
      */
     xTranslationDisabled?: boolean;
     /**
      * Determines whether the xy-translation is disabled on the widget
-     * @default false
      */
     xyTranslationDisabled?: boolean;
     /**
      * Determines whether the xz-translation is disabled on the widget
-     * @default false
      */
     xzTranslationDisabled?: boolean;
     /**
      * Determines whether the y-rotation is disabled on the widget
-     * @default false
      */
     yRotationDisabled?: boolean;
     /**
      * Determines whether the y-translation is disabled on the widget
-     * @default false
      */
     yTranslationDisabled?: boolean;
     /**
      * Determines whether the yz-translation is disabled on the widget
-     * @default false
      */
     yzTranslationDisabled?: boolean;
     /**
      * Determines whether the z-rotation is disabled on the widget
-     * @default false
      */
     zRotationDisabled?: boolean;
     /**
      * Determines whether the z-translation is disabled on the widget
-     * @default false
      */
     zTranslationDisabled?: boolean;
   }
   interface VertexViewerViewCube {
     /**
      * The duration of the animation, in milliseconds, when a user performs a standard view interaction. Set to 0 to disable animations.
-     * @default 500
      */
     animationDuration?: number;
     camera?: FramePerspectiveCamera;
     /**
      * Disables interactions for standard views.
-     * @default false
      */
     standardViewsOff?: boolean;
     /**
      * Disables the display of the triad.
-     * @default false
      */
     triadOff?: boolean;
     /**
      * Whether to perform a `viewAll` when clicking on the view cube. If this is set to `false`, the current `lookAt` point will be maintained, and the camera's `position` and `up` vectors will be aligned to the standard view. Defaults to `true`.
      *
      * **Note** Setting this value to `false` can result in the camera being placed underneath geometry depending on the current `viewVector` length, resulting in a view that may be unexpected.
-     * @default true
      */
     viewAll?: boolean;
     /**
      * The viewer element that is connected to the view cube.
      */
     viewer?: HTMLVertexViewerElement;
-    /**
-     * @default Orientation.DEFAULT
-     */
     worldOrientation?: Orientation;
     /**
      * The label for the side of the cube on the negative x-axis.
-     * @default 'Left'
      */
     xNegativeLabel?: string;
     /**
      * The label for the side of the cube on the positive x-axis.
-     * @default 'Right'
      */
     xPositiveLabel?: string;
     /**
      * The label for the side of the cube on the negative y-axis.
-     * @default 'Bottom'
      */
     yNegativeLabel?: string;
     /**
      * The label for the side of the cube on the positive y-axis.
-     * @default 'Top'
      */
     yPositiveLabel?: string;
     /**
      * The label for the side of the cube on the negative z-axis.
-     * @default 'Back'
      */
     zNegativeLabel?: string;
     /**
      * The label for the side of the cube on the positive z-axis.
-     * @default 'Front'
      */
     zPositiveLabel?: string;
   }
@@ -5527,12 +4045,10 @@ declare namespace LocalJSX {
      * Determines whether the interaction handlers for this tool should respond to events. When set to `true`, the default viewer interaction mode will be overridden to use the `pivot` camera interaction type, keyboard controls for movement will be added, and setting the `teleportMode` will enable the tool.
      *
      * Defaults to `true`.
-     * @default true
      */
     enabled?: boolean;
     /**
      * The `WalkModeModel` responsible for tracking configuration and emitting events for interaction handlers to respond to.
-     * @default new WalkModeModel()
      */
     model?: WalkModeModel;
     /**
@@ -5560,723 +4076,81 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
-
-  interface VertexSceneTreeAttributes {
-    overScanCount: number;
-    viewerSelector: string;
-    config: PartialConfig | string;
-    configEnv: Environment;
-    metadataSearchExactMatch: boolean;
-    operationAnimationDuration: number;
-  }
-  interface VertexSceneTreeNotificationBannerAttributes {
-    message: string;
-    actionLabel: string;
-  }
-  interface VertexSceneTreeSearchAttributes {
-    debounce: number;
-    disabled: boolean;
-    placeholder: string;
-    value: string;
-  }
-  interface VertexSceneTreeTableCellAttributes {
-    value: string;
-    placeholder: string;
-    alwaysShowIcons: boolean;
-    hovered: boolean;
-    isScrolling: boolean;
-    expandToggle: boolean;
-    endItemIndicator: boolean;
-    visibilityToggle: boolean;
-    isolateButton: boolean;
-  }
-  interface VertexSceneTreeTableColumnAttributes {
-    initialWidth: number;
-    minWidth: number;
-    maxWidth: number;
-  }
-  interface VertexSceneTreeTableLayoutAttributes {
-    totalRows: number;
-    rowHeight: number;
-    overScanCount: number;
-    layoutOffset: number;
-    scrollOffset: number;
-    layoutHeight: number;
-    layoutWidth: number;
-    viewportStartIndex: number;
-    viewportEndIndex: number;
-  }
-  interface VertexViewerAttributes {
-    src: string;
-    clientId: string;
-    deviceId: string;
-    config: PartialConfig | string;
-    configEnv: Environment;
-    cameraControls: boolean;
-    cameraType: FrameCameraType;
-    keyboardControls: boolean;
-    rotateAroundTapPoint: boolean;
-    token: string;
-    depthBuffers: FrameType;
-    noDefaultLights: boolean;
-    enableTemporalRefinement: boolean;
-    experimentalRenderingOptions: string;
-    featureMaps: FrameType;
-    resizeDebounce: number;
-    experimentalSkipVisibilityCheck: boolean;
-  }
-  interface VertexViewerAnnotationCalloutAttributes {
-    iconSize: ViewerIconSize;
-  }
-  interface VertexViewerBoxQueryToolAttributes {
-    operationType: VolumeIntersectionQueryType;
-    mode: VolumeIntersectionQueryMode;
-  }
-  interface VertexViewerDefaultToolbarAttributes {
-    placement: ViewerToolbarPlacement;
-    direction: ViewerToolbarGroupDirection;
-    animationsDisabled: boolean;
-    animationMs: number;
-  }
-  interface VertexViewerDomElementAttributes {
-    positionJson: string;
-    rotationJson: string;
-    quaternionJson: string;
-    scaleJson: string;
-    occlusionOff: boolean;
-    occluded: boolean;
-    detachedOff: boolean;
-    detached: boolean;
-    billboardOff: boolean;
-    interactionsOff: boolean;
-  }
-  interface VertexViewerDomGroupAttributes {
-    positionJson: string;
-    rotationJson: string;
-    quaternionJson: string;
-    scaleJson: string;
-  }
-  interface VertexViewerDomRendererAttributes {
-    drawMode: ViewerDomRendererDrawMode;
-    propagateEventsToViewer: boolean;
-  }
-  interface VertexViewerIconAttributes {
-    name: ViewerIconName;
-    size: ViewerIconSize;
-  }
-  interface VertexViewerLayerAttributes {
-    stretchOff: boolean;
-  }
-  interface VertexViewerMarkupAttributes {
-    arrowTemplateId: string;
-    circleTemplateId: string;
-    freeformTemplateId: string;
-    tool: ViewerMarkupToolType;
-    disabled: boolean;
-    selectedMarkupId: string;
-    selectNew: boolean;
-    startLineAnchorStyle: LineAnchorStyle;
-    endLineAnchorStyle: LineAnchorStyle;
-  }
-  interface VertexViewerMarkupArrowAttributes {
-    startJson: string;
-    endJson: string;
-    startLineAnchorStyle: LineAnchorStyle;
-    endLineAnchorStyle: LineAnchorStyle;
-    mode: ViewerMarkupArrowMode;
-  }
-  interface VertexViewerMarkupCircleAttributes {
-    boundsJson: string;
-    mode: ViewerMarkupCircleMode;
-  }
-  interface VertexViewerMarkupFreeformAttributes {
-    pointsJson: string;
-    boundsJson: string;
-    mode: ViewerMarkupFreeformMode;
-  }
-  interface VertexViewerMarkupToolAttributes {
-    arrowTemplateId: string;
-    circleTemplateId: string;
-    freeformTemplateId: string;
-    tool: ViewerMarkupToolType;
-    disabled: boolean;
-    startLineAnchorStyle: LineAnchorStyle;
-    endLineAnchorStyle: LineAnchorStyle;
-  }
-  interface VertexViewerMeasurementDetailsAttributes {
-    distanceUnits: DistanceUnitType;
-    angleUnits: AngleUnitType;
-    fractionalDigits: number;
-  }
-  interface VertexViewerMeasurementDistanceAttributes {
-    startJson: string;
-    endJson: string;
-    distance: number;
-    showAxisReferenceLines: boolean;
-    snapDistance: number;
-    units: DistanceUnitType;
-    fractionalDigits: number;
-    anchorLabelOffset: number;
-    lineCapLength: number;
-    mode: ViewerMeasurementDistanceMode;
-    interactingAnchor: Anchor | 'none';
-    invalid: boolean;
-  }
-  interface VertexViewerMeasurementLineAttributes {
-    capLength: number;
-    pointerEvents: string;
-  }
-  interface VertexViewerMeasurementPreciseAttributes {
-    configEnv: Environment;
-    config: PartialConfig | string;
-  }
-  interface VertexViewerPinGroupAttributes {
-    selected: boolean;
-    occluded: boolean;
-    detached: boolean;
-  }
-  interface VertexViewerPinLabelAttributes {
-    value: string;
-  }
-  interface VertexViewerPinToolAttributes {
-    tool: ViewerPinToolType;
-    mode: ViewerPinToolMode;
-    primaryColor: Color.Color | string | undefined;
-    accentColor: Color.Color | string | undefined;
-  }
-  interface VertexViewerSpinnerAttributes {
-    size: SpinnerSize;
-  }
-  interface VertexViewerTeleportToolAttributes {
-    mode: ViewerTeleportMode;
-    animationsDisabled: boolean;
-    animationMs: number;
-  }
-  interface VertexViewerToolbarAttributes {
-    placement: ViewerToolbarPlacement;
-    direction: ViewerToolbarDirection;
-  }
-  interface VertexViewerToolbarGroupAttributes {
-    direction: ViewerToolbarGroupDirection;
-  }
-  interface VertexViewerTransformWidgetAttributes {
-    xRotationDisabled: boolean;
-    yRotationDisabled: boolean;
-    zRotationDisabled: boolean;
-    xTranslationDisabled: boolean;
-    yTranslationDisabled: boolean;
-    zTranslationDisabled: boolean;
-    xyTranslationDisabled: boolean;
-    xzTranslationDisabled: boolean;
-    yzTranslationDisabled: boolean;
-    showInputs: boolean;
-    distanceUnit: DistanceUnitType;
-    angleUnit: AngleUnitType;
-    decimalPlaces: number;
-    rotationSnapDegrees: number;
-    rotationSnapKey: ModifierKey;
-    translationHandleScalar: number;
-    rotationHandleScalar: number;
-    interactionThrottle: number;
-    EXPERIMENTAL_undoKeybindings: boolean;
-  }
-  interface VertexViewerViewCubeAttributes {
-    xPositiveLabel: string;
-    xNegativeLabel: string;
-    yPositiveLabel: string;
-    yNegativeLabel: string;
-    zPositiveLabel: string;
-    zNegativeLabel: string;
-    standardViewsOff: boolean;
-    viewAll: boolean;
-    animationDuration: number;
-    triadOff: boolean;
-  }
-  interface VertexViewerWalkModeToolAttributes {
-    teleportMode: ViewerTeleportMode;
-    enabled: boolean;
-  }
-
   interface IntrinsicElements {
-    'vertex-scene-tree': Omit<
-      VertexSceneTree,
-      keyof VertexSceneTreeAttributes
-    > & {
-      [K in keyof VertexSceneTree &
-        keyof VertexSceneTreeAttributes]?: VertexSceneTree[K];
-    } & {
-      [K in keyof VertexSceneTree &
-        keyof VertexSceneTreeAttributes as `attr:${K}`]?: VertexSceneTreeAttributes[K];
-    } & {
-      [K in keyof VertexSceneTree &
-        keyof VertexSceneTreeAttributes as `prop:${K}`]?: VertexSceneTree[K];
-    };
-    'vertex-scene-tree-notification-banner': Omit<
-      VertexSceneTreeNotificationBanner,
-      keyof VertexSceneTreeNotificationBannerAttributes
-    > & {
-      [K in keyof VertexSceneTreeNotificationBanner &
-        keyof VertexSceneTreeNotificationBannerAttributes]?: VertexSceneTreeNotificationBanner[K];
-    } & {
-      [K in keyof VertexSceneTreeNotificationBanner &
-        keyof VertexSceneTreeNotificationBannerAttributes as `attr:${K}`]?: VertexSceneTreeNotificationBannerAttributes[K];
-    } & {
-      [K in keyof VertexSceneTreeNotificationBanner &
-        keyof VertexSceneTreeNotificationBannerAttributes as `prop:${K}`]?: VertexSceneTreeNotificationBanner[K];
-    };
-    'vertex-scene-tree-search': Omit<
-      VertexSceneTreeSearch,
-      keyof VertexSceneTreeSearchAttributes
-    > & {
-      [K in keyof VertexSceneTreeSearch &
-        keyof VertexSceneTreeSearchAttributes]?: VertexSceneTreeSearch[K];
-    } & {
-      [K in keyof VertexSceneTreeSearch &
-        keyof VertexSceneTreeSearchAttributes as `attr:${K}`]?: VertexSceneTreeSearchAttributes[K];
-    } & {
-      [K in keyof VertexSceneTreeSearch &
-        keyof VertexSceneTreeSearchAttributes as `prop:${K}`]?: VertexSceneTreeSearch[K];
-    };
-    'vertex-scene-tree-table-cell': Omit<
-      VertexSceneTreeTableCell,
-      keyof VertexSceneTreeTableCellAttributes
-    > & {
-      [K in keyof VertexSceneTreeTableCell &
-        keyof VertexSceneTreeTableCellAttributes]?: VertexSceneTreeTableCell[K];
-    } & {
-      [K in keyof VertexSceneTreeTableCell &
-        keyof VertexSceneTreeTableCellAttributes as `attr:${K}`]?: VertexSceneTreeTableCellAttributes[K];
-    } & {
-      [K in keyof VertexSceneTreeTableCell &
-        keyof VertexSceneTreeTableCellAttributes as `prop:${K}`]?: VertexSceneTreeTableCell[K];
-    };
-    'vertex-scene-tree-table-column': Omit<
-      VertexSceneTreeTableColumn,
-      keyof VertexSceneTreeTableColumnAttributes
-    > & {
-      [K in keyof VertexSceneTreeTableColumn &
-        keyof VertexSceneTreeTableColumnAttributes]?: VertexSceneTreeTableColumn[K];
-    } & {
-      [K in keyof VertexSceneTreeTableColumn &
-        keyof VertexSceneTreeTableColumnAttributes as `attr:${K}`]?: VertexSceneTreeTableColumnAttributes[K];
-    } & {
-      [K in keyof VertexSceneTreeTableColumn &
-        keyof VertexSceneTreeTableColumnAttributes as `prop:${K}`]?: VertexSceneTreeTableColumn[K];
-    };
+    'vertex-scene-tree': VertexSceneTree;
+    'vertex-scene-tree-notification-banner': VertexSceneTreeNotificationBanner;
+    'vertex-scene-tree-search': VertexSceneTreeSearch;
+    'vertex-scene-tree-table-cell': VertexSceneTreeTableCell;
+    'vertex-scene-tree-table-column': VertexSceneTreeTableColumn;
     'vertex-scene-tree-table-header': VertexSceneTreeTableHeader;
-    'vertex-scene-tree-table-layout': Omit<
-      VertexSceneTreeTableLayout,
-      keyof VertexSceneTreeTableLayoutAttributes
-    > & {
-      [K in keyof VertexSceneTreeTableLayout &
-        keyof VertexSceneTreeTableLayoutAttributes]?: VertexSceneTreeTableLayout[K];
-    } & {
-      [K in keyof VertexSceneTreeTableLayout &
-        keyof VertexSceneTreeTableLayoutAttributes as `attr:${K}`]?: VertexSceneTreeTableLayoutAttributes[K];
-    } & {
-      [K in keyof VertexSceneTreeTableLayout &
-        keyof VertexSceneTreeTableLayoutAttributes as `prop:${K}`]?: VertexSceneTreeTableLayout[K];
-    };
+    'vertex-scene-tree-table-layout': VertexSceneTreeTableLayout;
     'vertex-scene-tree-table-resize-divider': VertexSceneTreeTableResizeDivider;
     'vertex-scene-tree-toolbar': VertexSceneTreeToolbar;
     'vertex-scene-tree-toolbar-group': VertexSceneTreeToolbarGroup;
-    'vertex-viewer': Omit<VertexViewer, keyof VertexViewerAttributes> & {
-      [K in keyof VertexViewer &
-        keyof VertexViewerAttributes]?: VertexViewer[K];
-    } & {
-      [K in keyof VertexViewer &
-        keyof VertexViewerAttributes as `attr:${K}`]?: VertexViewerAttributes[K];
-    } & {
-      [K in keyof VertexViewer &
-        keyof VertexViewerAttributes as `prop:${K}`]?: VertexViewer[K];
-    };
-    'vertex-viewer-annotation-callout': Omit<
-      VertexViewerAnnotationCallout,
-      keyof VertexViewerAnnotationCalloutAttributes
-    > & {
-      [K in keyof VertexViewerAnnotationCallout &
-        keyof VertexViewerAnnotationCalloutAttributes]?: VertexViewerAnnotationCallout[K];
-    } & {
-      [K in keyof VertexViewerAnnotationCallout &
-        keyof VertexViewerAnnotationCalloutAttributes as `attr:${K}`]?: VertexViewerAnnotationCalloutAttributes[K];
-    } & {
-      [K in keyof VertexViewerAnnotationCallout &
-        keyof VertexViewerAnnotationCalloutAttributes as `prop:${K}`]?: VertexViewerAnnotationCallout[K];
-    };
-    'vertex-viewer-box-query-tool': Omit<
-      VertexViewerBoxQueryTool,
-      keyof VertexViewerBoxQueryToolAttributes
-    > & {
-      [K in keyof VertexViewerBoxQueryTool &
-        keyof VertexViewerBoxQueryToolAttributes]?: VertexViewerBoxQueryTool[K];
-    } & {
-      [K in keyof VertexViewerBoxQueryTool &
-        keyof VertexViewerBoxQueryToolAttributes as `attr:${K}`]?: VertexViewerBoxQueryToolAttributes[K];
-    } & {
-      [K in keyof VertexViewerBoxQueryTool &
-        keyof VertexViewerBoxQueryToolAttributes as `prop:${K}`]?: VertexViewerBoxQueryTool[K];
-    };
+    'vertex-viewer': VertexViewer;
+    'vertex-viewer-annotation-callout': VertexViewerAnnotationCallout;
+    'vertex-viewer-box-query-tool': VertexViewerBoxQueryTool;
     'vertex-viewer-button': VertexViewerButton;
-    'vertex-viewer-default-toolbar': Omit<
-      VertexViewerDefaultToolbar,
-      keyof VertexViewerDefaultToolbarAttributes
-    > & {
-      [K in keyof VertexViewerDefaultToolbar &
-        keyof VertexViewerDefaultToolbarAttributes]?: VertexViewerDefaultToolbar[K];
-    } & {
-      [K in keyof VertexViewerDefaultToolbar &
-        keyof VertexViewerDefaultToolbarAttributes as `attr:${K}`]?: VertexViewerDefaultToolbarAttributes[K];
-    } & {
-      [K in keyof VertexViewerDefaultToolbar &
-        keyof VertexViewerDefaultToolbarAttributes as `prop:${K}`]?: VertexViewerDefaultToolbar[K];
-    };
-    'vertex-viewer-dom-element': Omit<
-      VertexViewerDomElement,
-      keyof VertexViewerDomElementAttributes
-    > & {
-      [K in keyof VertexViewerDomElement &
-        keyof VertexViewerDomElementAttributes]?: VertexViewerDomElement[K];
-    } & {
-      [K in keyof VertexViewerDomElement &
-        keyof VertexViewerDomElementAttributes as `attr:${K}`]?: VertexViewerDomElementAttributes[K];
-    } & {
-      [K in keyof VertexViewerDomElement &
-        keyof VertexViewerDomElementAttributes as `prop:${K}`]?: VertexViewerDomElement[K];
-    };
-    'vertex-viewer-dom-group': Omit<
-      VertexViewerDomGroup,
-      keyof VertexViewerDomGroupAttributes
-    > & {
-      [K in keyof VertexViewerDomGroup &
-        keyof VertexViewerDomGroupAttributes]?: VertexViewerDomGroup[K];
-    } & {
-      [K in keyof VertexViewerDomGroup &
-        keyof VertexViewerDomGroupAttributes as `attr:${K}`]?: VertexViewerDomGroupAttributes[K];
-    } & {
-      [K in keyof VertexViewerDomGroup &
-        keyof VertexViewerDomGroupAttributes as `prop:${K}`]?: VertexViewerDomGroup[K];
-    };
-    'vertex-viewer-dom-renderer': Omit<
-      VertexViewerDomRenderer,
-      keyof VertexViewerDomRendererAttributes
-    > & {
-      [K in keyof VertexViewerDomRenderer &
-        keyof VertexViewerDomRendererAttributes]?: VertexViewerDomRenderer[K];
-    } & {
-      [K in keyof VertexViewerDomRenderer &
-        keyof VertexViewerDomRendererAttributes as `attr:${K}`]?: VertexViewerDomRendererAttributes[K];
-    } & {
-      [K in keyof VertexViewerDomRenderer &
-        keyof VertexViewerDomRendererAttributes as `prop:${K}`]?: VertexViewerDomRenderer[K];
-    };
+    'vertex-viewer-default-toolbar': VertexViewerDefaultToolbar;
+    'vertex-viewer-dom-element': VertexViewerDomElement;
+    'vertex-viewer-dom-group': VertexViewerDomGroup;
+    'vertex-viewer-dom-renderer': VertexViewerDomRenderer;
     'vertex-viewer-hit-result-indicator': VertexViewerHitResultIndicator;
-    'vertex-viewer-icon': Omit<
-      VertexViewerIcon,
-      keyof VertexViewerIconAttributes
-    > & {
-      [K in keyof VertexViewerIcon &
-        keyof VertexViewerIconAttributes]?: VertexViewerIcon[K];
-    } & {
-      [K in keyof VertexViewerIcon &
-        keyof VertexViewerIconAttributes as `attr:${K}`]?: VertexViewerIconAttributes[K];
-    } & {
-      [K in keyof VertexViewerIcon &
-        keyof VertexViewerIconAttributes as `prop:${K}`]?: VertexViewerIcon[K];
-    };
-    'vertex-viewer-layer': Omit<
-      VertexViewerLayer,
-      keyof VertexViewerLayerAttributes
-    > & {
-      [K in keyof VertexViewerLayer &
-        keyof VertexViewerLayerAttributes]?: VertexViewerLayer[K];
-    } & {
-      [K in keyof VertexViewerLayer &
-        keyof VertexViewerLayerAttributes as `attr:${K}`]?: VertexViewerLayerAttributes[K];
-    } & {
-      [K in keyof VertexViewerLayer &
-        keyof VertexViewerLayerAttributes as `prop:${K}`]?: VertexViewerLayer[K];
-    };
-    'vertex-viewer-markup': Omit<
-      VertexViewerMarkup,
-      keyof VertexViewerMarkupAttributes
-    > & {
-      [K in keyof VertexViewerMarkup &
-        keyof VertexViewerMarkupAttributes]?: VertexViewerMarkup[K];
-    } & {
-      [K in keyof VertexViewerMarkup &
-        keyof VertexViewerMarkupAttributes as `attr:${K}`]?: VertexViewerMarkupAttributes[K];
-    } & {
-      [K in keyof VertexViewerMarkup &
-        keyof VertexViewerMarkupAttributes as `prop:${K}`]?: VertexViewerMarkup[K];
-    };
-    'vertex-viewer-markup-arrow': Omit<
-      VertexViewerMarkupArrow,
-      keyof VertexViewerMarkupArrowAttributes
-    > & {
-      [K in keyof VertexViewerMarkupArrow &
-        keyof VertexViewerMarkupArrowAttributes]?: VertexViewerMarkupArrow[K];
-    } & {
-      [K in keyof VertexViewerMarkupArrow &
-        keyof VertexViewerMarkupArrowAttributes as `attr:${K}`]?: VertexViewerMarkupArrowAttributes[K];
-    } & {
-      [K in keyof VertexViewerMarkupArrow &
-        keyof VertexViewerMarkupArrowAttributes as `prop:${K}`]?: VertexViewerMarkupArrow[K];
-    };
-    'vertex-viewer-markup-circle': Omit<
-      VertexViewerMarkupCircle,
-      keyof VertexViewerMarkupCircleAttributes
-    > & {
-      [K in keyof VertexViewerMarkupCircle &
-        keyof VertexViewerMarkupCircleAttributes]?: VertexViewerMarkupCircle[K];
-    } & {
-      [K in keyof VertexViewerMarkupCircle &
-        keyof VertexViewerMarkupCircleAttributes as `attr:${K}`]?: VertexViewerMarkupCircleAttributes[K];
-    } & {
-      [K in keyof VertexViewerMarkupCircle &
-        keyof VertexViewerMarkupCircleAttributes as `prop:${K}`]?: VertexViewerMarkupCircle[K];
-    };
-    'vertex-viewer-markup-freeform': Omit<
-      VertexViewerMarkupFreeform,
-      keyof VertexViewerMarkupFreeformAttributes
-    > & {
-      [K in keyof VertexViewerMarkupFreeform &
-        keyof VertexViewerMarkupFreeformAttributes]?: VertexViewerMarkupFreeform[K];
-    } & {
-      [K in keyof VertexViewerMarkupFreeform &
-        keyof VertexViewerMarkupFreeformAttributes as `attr:${K}`]?: VertexViewerMarkupFreeformAttributes[K];
-    } & {
-      [K in keyof VertexViewerMarkupFreeform &
-        keyof VertexViewerMarkupFreeformAttributes as `prop:${K}`]?: VertexViewerMarkupFreeform[K];
-    };
-    'vertex-viewer-markup-tool': Omit<
-      VertexViewerMarkupTool,
-      keyof VertexViewerMarkupToolAttributes
-    > & {
-      [K in keyof VertexViewerMarkupTool &
-        keyof VertexViewerMarkupToolAttributes]?: VertexViewerMarkupTool[K];
-    } & {
-      [K in keyof VertexViewerMarkupTool &
-        keyof VertexViewerMarkupToolAttributes as `attr:${K}`]?: VertexViewerMarkupToolAttributes[K];
-    } & {
-      [K in keyof VertexViewerMarkupTool &
-        keyof VertexViewerMarkupToolAttributes as `prop:${K}`]?: VertexViewerMarkupTool[K];
-    };
-    'vertex-viewer-measurement-details': Omit<
-      VertexViewerMeasurementDetails,
-      keyof VertexViewerMeasurementDetailsAttributes
-    > & {
-      [K in keyof VertexViewerMeasurementDetails &
-        keyof VertexViewerMeasurementDetailsAttributes]?: VertexViewerMeasurementDetails[K];
-    } & {
-      [K in keyof VertexViewerMeasurementDetails &
-        keyof VertexViewerMeasurementDetailsAttributes as `attr:${K}`]?: VertexViewerMeasurementDetailsAttributes[K];
-    } & {
-      [K in keyof VertexViewerMeasurementDetails &
-        keyof VertexViewerMeasurementDetailsAttributes as `prop:${K}`]?: VertexViewerMeasurementDetails[K];
-    };
-    'vertex-viewer-measurement-distance': Omit<
-      VertexViewerMeasurementDistance,
-      keyof VertexViewerMeasurementDistanceAttributes
-    > & {
-      [K in keyof VertexViewerMeasurementDistance &
-        keyof VertexViewerMeasurementDistanceAttributes]?: VertexViewerMeasurementDistance[K];
-    } & {
-      [K in keyof VertexViewerMeasurementDistance &
-        keyof VertexViewerMeasurementDistanceAttributes as `attr:${K}`]?: VertexViewerMeasurementDistanceAttributes[K];
-    } & {
-      [K in keyof VertexViewerMeasurementDistance &
-        keyof VertexViewerMeasurementDistanceAttributes as `prop:${K}`]?: VertexViewerMeasurementDistance[K];
-    };
-    'vertex-viewer-measurement-line': Omit<
-      VertexViewerMeasurementLine,
-      keyof VertexViewerMeasurementLineAttributes
-    > & {
-      [K in keyof VertexViewerMeasurementLine &
-        keyof VertexViewerMeasurementLineAttributes]?: VertexViewerMeasurementLine[K];
-    } & {
-      [K in keyof VertexViewerMeasurementLine &
-        keyof VertexViewerMeasurementLineAttributes as `attr:${K}`]?: VertexViewerMeasurementLineAttributes[K];
-    } & {
-      [K in keyof VertexViewerMeasurementLine &
-        keyof VertexViewerMeasurementLineAttributes as `prop:${K}`]?: VertexViewerMeasurementLine[K];
-    };
+    'vertex-viewer-icon': VertexViewerIcon;
+    'vertex-viewer-layer': VertexViewerLayer;
+    'vertex-viewer-markup': VertexViewerMarkup;
+    'vertex-viewer-markup-arrow': VertexViewerMarkupArrow;
+    'vertex-viewer-markup-circle': VertexViewerMarkupCircle;
+    'vertex-viewer-markup-freeform': VertexViewerMarkupFreeform;
+    'vertex-viewer-markup-tool': VertexViewerMarkupTool;
+    'vertex-viewer-measurement-details': VertexViewerMeasurementDetails;
+    'vertex-viewer-measurement-distance': VertexViewerMeasurementDistance;
+    'vertex-viewer-measurement-line': VertexViewerMeasurementLine;
     'vertex-viewer-measurement-overlays': VertexViewerMeasurementOverlays;
-    'vertex-viewer-measurement-precise': Omit<
-      VertexViewerMeasurementPrecise,
-      keyof VertexViewerMeasurementPreciseAttributes
-    > & {
-      [K in keyof VertexViewerMeasurementPrecise &
-        keyof VertexViewerMeasurementPreciseAttributes]?: VertexViewerMeasurementPrecise[K];
-    } & {
-      [K in keyof VertexViewerMeasurementPrecise &
-        keyof VertexViewerMeasurementPreciseAttributes as `attr:${K}`]?: VertexViewerMeasurementPreciseAttributes[K];
-    } & {
-      [K in keyof VertexViewerMeasurementPrecise &
-        keyof VertexViewerMeasurementPreciseAttributes as `prop:${K}`]?: VertexViewerMeasurementPrecise[K];
-    };
-    'vertex-viewer-pin-group': Omit<
-      VertexViewerPinGroup,
-      keyof VertexViewerPinGroupAttributes
-    > & {
-      [K in keyof VertexViewerPinGroup &
-        keyof VertexViewerPinGroupAttributes]?: VertexViewerPinGroup[K];
-    } & {
-      [K in keyof VertexViewerPinGroup &
-        keyof VertexViewerPinGroupAttributes as `attr:${K}`]?: VertexViewerPinGroupAttributes[K];
-    } & {
-      [K in keyof VertexViewerPinGroup &
-        keyof VertexViewerPinGroupAttributes as `prop:${K}`]?: VertexViewerPinGroup[K];
-    };
-    'vertex-viewer-pin-label': Omit<
-      VertexViewerPinLabel,
-      keyof VertexViewerPinLabelAttributes
-    > & {
-      [K in keyof VertexViewerPinLabel &
-        keyof VertexViewerPinLabelAttributes]?: VertexViewerPinLabel[K];
-    } & {
-      [K in keyof VertexViewerPinLabel &
-        keyof VertexViewerPinLabelAttributes as `attr:${K}`]?: VertexViewerPinLabelAttributes[K];
-    } & {
-      [K in keyof VertexViewerPinLabel &
-        keyof VertexViewerPinLabelAttributes as `prop:${K}`]?: VertexViewerPinLabel[K];
-    };
+    'vertex-viewer-measurement-precise': VertexViewerMeasurementPrecise;
+    'vertex-viewer-pin-group': VertexViewerPinGroup;
+    'vertex-viewer-pin-label': VertexViewerPinLabel;
     'vertex-viewer-pin-label-line': VertexViewerPinLabelLine;
-    'vertex-viewer-pin-tool': Omit<
-      VertexViewerPinTool,
-      keyof VertexViewerPinToolAttributes
-    > & {
-      [K in keyof VertexViewerPinTool &
-        keyof VertexViewerPinToolAttributes]?: VertexViewerPinTool[K];
-    } & {
-      [K in keyof VertexViewerPinTool &
-        keyof VertexViewerPinToolAttributes as `attr:${K}`]?: VertexViewerPinToolAttributes[K];
-    } & {
-      [K in keyof VertexViewerPinTool &
-        keyof VertexViewerPinToolAttributes as `prop:${K}`]?: VertexViewerPinTool[K];
-    };
-    'vertex-viewer-spinner': Omit<
-      VertexViewerSpinner,
-      keyof VertexViewerSpinnerAttributes
-    > & {
-      [K in keyof VertexViewerSpinner &
-        keyof VertexViewerSpinnerAttributes]?: VertexViewerSpinner[K];
-    } & {
-      [K in keyof VertexViewerSpinner &
-        keyof VertexViewerSpinnerAttributes as `attr:${K}`]?: VertexViewerSpinnerAttributes[K];
-    } & {
-      [K in keyof VertexViewerSpinner &
-        keyof VertexViewerSpinnerAttributes as `prop:${K}`]?: VertexViewerSpinner[K];
-    };
-    'vertex-viewer-teleport-tool': Omit<
-      VertexViewerTeleportTool,
-      keyof VertexViewerTeleportToolAttributes
-    > & {
-      [K in keyof VertexViewerTeleportTool &
-        keyof VertexViewerTeleportToolAttributes]?: VertexViewerTeleportTool[K];
-    } & {
-      [K in keyof VertexViewerTeleportTool &
-        keyof VertexViewerTeleportToolAttributes as `attr:${K}`]?: VertexViewerTeleportToolAttributes[K];
-    } & {
-      [K in keyof VertexViewerTeleportTool &
-        keyof VertexViewerTeleportToolAttributes as `prop:${K}`]?: VertexViewerTeleportTool[K];
-    };
-    'vertex-viewer-toolbar': Omit<
-      VertexViewerToolbar,
-      keyof VertexViewerToolbarAttributes
-    > & {
-      [K in keyof VertexViewerToolbar &
-        keyof VertexViewerToolbarAttributes]?: VertexViewerToolbar[K];
-    } & {
-      [K in keyof VertexViewerToolbar &
-        keyof VertexViewerToolbarAttributes as `attr:${K}`]?: VertexViewerToolbarAttributes[K];
-    } & {
-      [K in keyof VertexViewerToolbar &
-        keyof VertexViewerToolbarAttributes as `prop:${K}`]?: VertexViewerToolbar[K];
-    };
-    'vertex-viewer-toolbar-group': Omit<
-      VertexViewerToolbarGroup,
-      keyof VertexViewerToolbarGroupAttributes
-    > & {
-      [K in keyof VertexViewerToolbarGroup &
-        keyof VertexViewerToolbarGroupAttributes]?: VertexViewerToolbarGroup[K];
-    } & {
-      [K in keyof VertexViewerToolbarGroup &
-        keyof VertexViewerToolbarGroupAttributes as `attr:${K}`]?: VertexViewerToolbarGroupAttributes[K];
-    } & {
-      [K in keyof VertexViewerToolbarGroup &
-        keyof VertexViewerToolbarGroupAttributes as `prop:${K}`]?: VertexViewerToolbarGroup[K];
-    };
-    'vertex-viewer-transform-widget': Omit<
-      VertexViewerTransformWidget,
-      keyof VertexViewerTransformWidgetAttributes
-    > & {
-      [K in keyof VertexViewerTransformWidget &
-        keyof VertexViewerTransformWidgetAttributes]?: VertexViewerTransformWidget[K];
-    } & {
-      [K in keyof VertexViewerTransformWidget &
-        keyof VertexViewerTransformWidgetAttributes as `attr:${K}`]?: VertexViewerTransformWidgetAttributes[K];
-    } & {
-      [K in keyof VertexViewerTransformWidget &
-        keyof VertexViewerTransformWidgetAttributes as `prop:${K}`]?: VertexViewerTransformWidget[K];
-    };
-    'vertex-viewer-view-cube': Omit<
-      VertexViewerViewCube,
-      keyof VertexViewerViewCubeAttributes
-    > & {
-      [K in keyof VertexViewerViewCube &
-        keyof VertexViewerViewCubeAttributes]?: VertexViewerViewCube[K];
-    } & {
-      [K in keyof VertexViewerViewCube &
-        keyof VertexViewerViewCubeAttributes as `attr:${K}`]?: VertexViewerViewCubeAttributes[K];
-    } & {
-      [K in keyof VertexViewerViewCube &
-        keyof VertexViewerViewCubeAttributes as `prop:${K}`]?: VertexViewerViewCube[K];
-    };
-    'vertex-viewer-walk-mode-tool': Omit<
-      VertexViewerWalkModeTool,
-      keyof VertexViewerWalkModeToolAttributes
-    > & {
-      [K in keyof VertexViewerWalkModeTool &
-        keyof VertexViewerWalkModeToolAttributes]?: VertexViewerWalkModeTool[K];
-    } & {
-      [K in keyof VertexViewerWalkModeTool &
-        keyof VertexViewerWalkModeToolAttributes as `attr:${K}`]?: VertexViewerWalkModeToolAttributes[K];
-    } & {
-      [K in keyof VertexViewerWalkModeTool &
-        keyof VertexViewerWalkModeToolAttributes as `prop:${K}`]?: VertexViewerWalkModeTool[K];
-    };
+    'vertex-viewer-pin-tool': VertexViewerPinTool;
+    'vertex-viewer-spinner': VertexViewerSpinner;
+    'vertex-viewer-teleport-tool': VertexViewerTeleportTool;
+    'vertex-viewer-toolbar': VertexViewerToolbar;
+    'vertex-viewer-toolbar-group': VertexViewerToolbarGroup;
+    'vertex-viewer-transform-widget': VertexViewerTransformWidget;
+    'vertex-viewer-view-cube': VertexViewerViewCube;
+    'vertex-viewer-walk-mode-tool': VertexViewerWalkModeTool;
   }
 }
 export { LocalJSX as JSX };
 declare module '@stencil/core' {
   export namespace JSX {
     interface IntrinsicElements {
-      'vertex-scene-tree': LocalJSX.IntrinsicElements['vertex-scene-tree'] &
+      'vertex-scene-tree': LocalJSX.VertexSceneTree &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeElement>;
       /**
        * A notification banner that displays a message and an action button.
        */
-      'vertex-scene-tree-notification-banner': LocalJSX.IntrinsicElements['vertex-scene-tree-notification-banner'] &
+      'vertex-scene-tree-notification-banner': LocalJSX.VertexSceneTreeNotificationBanner &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeNotificationBannerElement>;
-      'vertex-scene-tree-search': LocalJSX.IntrinsicElements['vertex-scene-tree-search'] &
+      'vertex-scene-tree-search': LocalJSX.VertexSceneTreeSearch &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeSearchElement>;
-      'vertex-scene-tree-table-cell': LocalJSX.IntrinsicElements['vertex-scene-tree-table-cell'] &
+      'vertex-scene-tree-table-cell': LocalJSX.VertexSceneTreeTableCell &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableCellElement>;
-      'vertex-scene-tree-table-column': LocalJSX.IntrinsicElements['vertex-scene-tree-table-column'] &
+      'vertex-scene-tree-table-column': LocalJSX.VertexSceneTreeTableColumn &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableColumnElement>;
-      'vertex-scene-tree-table-header': LocalJSX.IntrinsicElements['vertex-scene-tree-table-header'] &
+      'vertex-scene-tree-table-header': LocalJSX.VertexSceneTreeTableHeader &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableHeaderElement>;
-      'vertex-scene-tree-table-layout': LocalJSX.IntrinsicElements['vertex-scene-tree-table-layout'] &
+      'vertex-scene-tree-table-layout': LocalJSX.VertexSceneTreeTableLayout &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableLayoutElement>;
-      'vertex-scene-tree-table-resize-divider': LocalJSX.IntrinsicElements['vertex-scene-tree-table-resize-divider'] &
+      'vertex-scene-tree-table-resize-divider': LocalJSX.VertexSceneTreeTableResizeDivider &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableResizeDividerElement>;
-      'vertex-scene-tree-toolbar': LocalJSX.IntrinsicElements['vertex-scene-tree-toolbar'] &
+      'vertex-scene-tree-toolbar': LocalJSX.VertexSceneTreeToolbar &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarElement>;
-      'vertex-scene-tree-toolbar-group': LocalJSX.IntrinsicElements['vertex-scene-tree-toolbar-group'] &
+      'vertex-scene-tree-toolbar-group': LocalJSX.VertexSceneTreeToolbarGroup &
         JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarGroupElement>;
-      'vertex-viewer': LocalJSX.IntrinsicElements['vertex-viewer'] &
+      'vertex-viewer': LocalJSX.VertexViewer &
         JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
-      'vertex-viewer-annotation-callout': LocalJSX.IntrinsicElements['vertex-viewer-annotation-callout'] &
+      'vertex-viewer-annotation-callout': LocalJSX.VertexViewerAnnotationCallout &
         JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationCalloutElement>;
       /**
        * The `ViewerBoxQueryTool` allows for the drawing of a "box" on screen to represent
@@ -6284,11 +4158,11 @@ declare module '@stencil/core' {
        * operation to be performed on the items contained (exclusive) by the box or both
        * contained by and intersecting with (inclusive) the box.
        */
-      'vertex-viewer-box-query-tool': LocalJSX.IntrinsicElements['vertex-viewer-box-query-tool'] &
+      'vertex-viewer-box-query-tool': LocalJSX.VertexViewerBoxQueryTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerBoxQueryToolElement>;
-      'vertex-viewer-button': LocalJSX.IntrinsicElements['vertex-viewer-button'] &
+      'vertex-viewer-button': LocalJSX.VertexViewerButton &
         JSXBase.HTMLAttributes<HTMLVertexViewerButtonElement>;
-      'vertex-viewer-default-toolbar': LocalJSX.IntrinsicElements['vertex-viewer-default-toolbar'] &
+      'vertex-viewer-default-toolbar': LocalJSX.VertexViewerDefaultToolbar &
         JSXBase.HTMLAttributes<HTMLVertexViewerDefaultToolbarElement>;
       /**
        * The `ViewerDomElement` is responsible for managing a
@@ -6296,73 +4170,73 @@ declare module '@stencil/core' {
        * added as children to a `<vertex-viewer-dom-renderer>` and represent an
        * individual DOM element within a local 3D scene.
        */
-      'vertex-viewer-dom-element': LocalJSX.IntrinsicElements['vertex-viewer-dom-element'] &
+      'vertex-viewer-dom-element': LocalJSX.VertexViewerDomElement &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomElementElement>;
-      'vertex-viewer-dom-group': LocalJSX.IntrinsicElements['vertex-viewer-dom-group'] &
+      'vertex-viewer-dom-group': LocalJSX.VertexViewerDomGroup &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomGroupElement>;
       /**
        * The `ViewerDomRenderer` is responsible for managing a
        * `<vertex-viewer-dom-renderer>` element. This element supports drawing DOM
        * objects in a local 3D scene that is synced with a remote rendered scene.
        */
-      'vertex-viewer-dom-renderer': LocalJSX.IntrinsicElements['vertex-viewer-dom-renderer'] &
+      'vertex-viewer-dom-renderer': LocalJSX.VertexViewerDomRenderer &
         JSXBase.HTMLAttributes<HTMLVertexViewerDomRendererElement>;
-      'vertex-viewer-hit-result-indicator': LocalJSX.IntrinsicElements['vertex-viewer-hit-result-indicator'] &
+      'vertex-viewer-hit-result-indicator': LocalJSX.VertexViewerHitResultIndicator &
         JSXBase.HTMLAttributes<HTMLVertexViewerHitResultIndicatorElement>;
-      'vertex-viewer-icon': LocalJSX.IntrinsicElements['vertex-viewer-icon'] &
+      'vertex-viewer-icon': LocalJSX.VertexViewerIcon &
         JSXBase.HTMLAttributes<HTMLVertexViewerIconElement>;
-      'vertex-viewer-layer': LocalJSX.IntrinsicElements['vertex-viewer-layer'] &
+      'vertex-viewer-layer': LocalJSX.VertexViewerLayer &
         JSXBase.HTMLAttributes<HTMLVertexViewerLayerElement>;
-      'vertex-viewer-markup': LocalJSX.IntrinsicElements['vertex-viewer-markup'] &
+      'vertex-viewer-markup': LocalJSX.VertexViewerMarkup &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupElement>;
-      'vertex-viewer-markup-arrow': LocalJSX.IntrinsicElements['vertex-viewer-markup-arrow'] &
+      'vertex-viewer-markup-arrow': LocalJSX.VertexViewerMarkupArrow &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupArrowElement>;
-      'vertex-viewer-markup-circle': LocalJSX.IntrinsicElements['vertex-viewer-markup-circle'] &
+      'vertex-viewer-markup-circle': LocalJSX.VertexViewerMarkupCircle &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupCircleElement>;
-      'vertex-viewer-markup-freeform': LocalJSX.IntrinsicElements['vertex-viewer-markup-freeform'] &
+      'vertex-viewer-markup-freeform': LocalJSX.VertexViewerMarkupFreeform &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupFreeformElement>;
-      'vertex-viewer-markup-tool': LocalJSX.IntrinsicElements['vertex-viewer-markup-tool'] &
+      'vertex-viewer-markup-tool': LocalJSX.VertexViewerMarkupTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerMarkupToolElement>;
-      'vertex-viewer-measurement-details': LocalJSX.IntrinsicElements['vertex-viewer-measurement-details'] &
+      'vertex-viewer-measurement-details': LocalJSX.VertexViewerMeasurementDetails &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDetailsElement>;
-      'vertex-viewer-measurement-distance': LocalJSX.IntrinsicElements['vertex-viewer-measurement-distance'] &
+      'vertex-viewer-measurement-distance': LocalJSX.VertexViewerMeasurementDistance &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementDistanceElement>;
-      'vertex-viewer-measurement-line': LocalJSX.IntrinsicElements['vertex-viewer-measurement-line'] &
+      'vertex-viewer-measurement-line': LocalJSX.VertexViewerMeasurementLine &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementLineElement>;
-      'vertex-viewer-measurement-overlays': LocalJSX.IntrinsicElements['vertex-viewer-measurement-overlays'] &
+      'vertex-viewer-measurement-overlays': LocalJSX.VertexViewerMeasurementOverlays &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementOverlaysElement>;
-      'vertex-viewer-measurement-precise': LocalJSX.IntrinsicElements['vertex-viewer-measurement-precise'] &
+      'vertex-viewer-measurement-precise': LocalJSX.VertexViewerMeasurementPrecise &
         JSXBase.HTMLAttributes<HTMLVertexViewerMeasurementPreciseElement>;
-      'vertex-viewer-pin-group': LocalJSX.IntrinsicElements['vertex-viewer-pin-group'] &
+      'vertex-viewer-pin-group': LocalJSX.VertexViewerPinGroup &
         JSXBase.HTMLAttributes<HTMLVertexViewerPinGroupElement>;
-      'vertex-viewer-pin-label': LocalJSX.IntrinsicElements['vertex-viewer-pin-label'] &
+      'vertex-viewer-pin-label': LocalJSX.VertexViewerPinLabel &
         JSXBase.HTMLAttributes<HTMLVertexViewerPinLabelElement>;
-      'vertex-viewer-pin-label-line': LocalJSX.IntrinsicElements['vertex-viewer-pin-label-line'] &
+      'vertex-viewer-pin-label-line': LocalJSX.VertexViewerPinLabelLine &
         JSXBase.HTMLAttributes<HTMLVertexViewerPinLabelLineElement>;
-      'vertex-viewer-pin-tool': LocalJSX.IntrinsicElements['vertex-viewer-pin-tool'] &
+      'vertex-viewer-pin-tool': LocalJSX.VertexViewerPinTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerPinToolElement>;
-      'vertex-viewer-spinner': LocalJSX.IntrinsicElements['vertex-viewer-spinner'] &
+      'vertex-viewer-spinner': LocalJSX.VertexViewerSpinner &
         JSXBase.HTMLAttributes<HTMLVertexViewerSpinnerElement>;
       /**
        * The `<vertex-viewer-teleport-tool>` allows for click-based "teleportation"
        * around a model, which is particularly useful for walking through a model.
        * This tool is automatically included as part of the <vertex-viewer-walk-mode-tool>.
        */
-      'vertex-viewer-teleport-tool': LocalJSX.IntrinsicElements['vertex-viewer-teleport-tool'] &
+      'vertex-viewer-teleport-tool': LocalJSX.VertexViewerTeleportTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerTeleportToolElement>;
-      'vertex-viewer-toolbar': LocalJSX.IntrinsicElements['vertex-viewer-toolbar'] &
+      'vertex-viewer-toolbar': LocalJSX.VertexViewerToolbar &
         JSXBase.HTMLAttributes<HTMLVertexViewerToolbarElement>;
-      'vertex-viewer-toolbar-group': LocalJSX.IntrinsicElements['vertex-viewer-toolbar-group'] &
+      'vertex-viewer-toolbar-group': LocalJSX.VertexViewerToolbarGroup &
         JSXBase.HTMLAttributes<HTMLVertexViewerToolbarGroupElement>;
-      'vertex-viewer-transform-widget': LocalJSX.IntrinsicElements['vertex-viewer-transform-widget'] &
+      'vertex-viewer-transform-widget': LocalJSX.VertexViewerTransformWidget &
         JSXBase.HTMLAttributes<HTMLVertexViewerTransformWidgetElement>;
-      'vertex-viewer-view-cube': LocalJSX.IntrinsicElements['vertex-viewer-view-cube'] &
+      'vertex-viewer-view-cube': LocalJSX.VertexViewerViewCube &
         JSXBase.HTMLAttributes<HTMLVertexViewerViewCubeElement>;
       /**
        * The `<vertex-viewer-walk-mode-tool>` allows for additional interactions
        * intended for walking through a model instead of orbiting a model.
        */
-      'vertex-viewer-walk-mode-tool': LocalJSX.IntrinsicElements['vertex-viewer-walk-mode-tool'] &
+      'vertex-viewer-walk-mode-tool': LocalJSX.VertexViewerWalkModeTool &
         JSXBase.HTMLAttributes<HTMLVertexViewerWalkModeToolElement>;
     }
   }

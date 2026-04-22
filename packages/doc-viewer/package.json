@@ -85,7 +85,6 @@
   "dependencies": {
     "@vertexvis/geometry": "^0.24.3",
     "@vertexvis/utils": "^0.24.3",
-    "@vertexvis/viewer": "^0.24.3",
     "classnames": "^2.5.1",
     "pdfjs-dist": "^5.5.207",
     "resize-observer": "^1.0.4"

@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Component,
   Element,
   Event,
   EventEmitter,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
   Prop,
   Watch,
 } from '@stencil/core';
+/* eslint-enable @typescript-eslint/no-unused-vars */
 import { Disposable } from '@vertexvis/utils';
 
 import { InteractionType } from '../../lib/interactions/baseInteractionHandler';

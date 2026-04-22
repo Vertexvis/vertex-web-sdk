@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, Element, h, Host, Prop, Watch } from '@stencil/core';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';

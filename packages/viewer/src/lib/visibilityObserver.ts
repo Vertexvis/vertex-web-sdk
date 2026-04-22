@@ -14,6 +14,7 @@ export class VisibilityObserver {
 
   public isVisible(element: HTMLElement): boolean {
     if ('checkVisibility' in element) {
+      // @ts-ignore
       return element.checkVisibility({
         visibilityProperty: true,
         opacityProperty: true,

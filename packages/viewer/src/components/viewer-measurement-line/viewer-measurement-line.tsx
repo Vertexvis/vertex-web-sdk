@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, h, Prop } from '@stencil/core';
 import { Angle, Point } from '@vertexvis/geometry';
 

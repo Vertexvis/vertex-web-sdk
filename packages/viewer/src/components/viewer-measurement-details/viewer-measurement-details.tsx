@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 

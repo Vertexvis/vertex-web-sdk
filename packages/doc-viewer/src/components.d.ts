@@ -10,16 +10,12 @@ import { InteractionMode } from "./components/document-viewer/document-viewer";
 import { DocumentApiState } from "./lib/document/api";
 import { DocumentLayersController } from "./lib/document/layers/controller";
 import { PartialConfig } from "./lib/config";
-import { Disposable } from "@vertexvis/utils";
-import { InteractionHandler } from "@vertexvis/viewer/src";
 import { Point } from "@vertexvis/geometry";
 export { DocumentProvider } from "./lib/document/provider";
 export { InteractionMode } from "./components/document-viewer/document-viewer";
 export { DocumentApiState } from "./lib/document/api";
 export { DocumentLayersController } from "./lib/document/layers/controller";
 export { PartialConfig } from "./lib/config";
-export { Disposable } from "@vertexvis/utils";
-export { InteractionHandler } from "@vertexvis/viewer/src";
 export { Point } from "@vertexvis/geometry";
 export namespace Components {
     interface VertexDocumentViewer {
@@ -59,12 +55,6 @@ export namespace Components {
           * @default new PdfJsProvider()
          */
         "provider": DocumentProvider;
-        /**
-          * Registers and initializes an interaction handler with the document viewer. Returns a `Disposable` that should be used to deregister the interaction handler.  `InteractionHandler`s are used to build custom mouse and touch interactions.
-          * @param interactionHandler The interaction handler to register.
-          * @returns A promise containing the disposable to use to deregister the handler.
-         */
-        "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
         /**
           * An optional value that will debounce image updates when resizing this viewer element.
           * @default 100

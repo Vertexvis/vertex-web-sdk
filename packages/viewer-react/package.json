@@ -33,17 +33,17 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
-    "@stencil/react-output-target": "^1.5.0",
+    "@stencil/react-output-target": "1.4.2",
     "@vertexvis/viewer": "0.24.3"
   },
   "devDependencies": {
-    "@types/react": "^18.2.48",
-    "@types/react-dom": "^18.2.18",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.7",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "eslint": "^8.57.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tslib": "^2.1.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tslib": "^2.8.1"
   },
   "peerDependencies": {
     "react": ">=16.3.0 <19.0.0",
