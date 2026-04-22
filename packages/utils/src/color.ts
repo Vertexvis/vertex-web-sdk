@@ -98,12 +98,12 @@ export const isOpaque = (color: Color): boolean => color.a === 255;
  * Converts a `Color` to a hex string - prefixed with `#`. ignores alpha value.
  */
 export const toHexString = (color: Omit<Color, 'a'>): string =>
-  `#${componentToHex(color.r)}${componentToHex(color.g)}${componentToHex(color.b)}`;
+  `#${hexify(color.r)}${hexify(color.g)}${hexify(color.b)}`;
 
 /**
  * Takes rgb(a) component numeric value (0-255) and converts it to hexidecimal
  */
-const componentToHex = (num: number): string => {
+const hexify = (num: number): string => {
   const hex = num.toString(16);
   return hex.length === 1 ? '0' + hex : hex;
 };
