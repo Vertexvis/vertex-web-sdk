@@ -38,22 +38,22 @@
 
 ## Events
 
-| Event                    | Description                                                                                                                                                                                                                                                        | Type                                                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `annotationStateChanged` | Emits an event when the state for annotation changes.                                                                                                                                                                                                              | `CustomEvent<AnnotationState>`                                                                     |
-| `cameraTypeChanged`      | Emits an event when the camera type changes.                                                                                                                                                                                                                       | `CustomEvent<"orthographic" \| "perspective">`                                                     |
-| `connectionChange`       | Emits an event when the connection status changes for the viewer                                                                                                                                                                                                   | `CustomEvent<ConnectedStatus \| ConnectingStatus \| ConnectionFailedStatus \| DisconnectedStatus>` |
-| `dimensionschange`       |                                                                                                                                                                                                                                                                    | `CustomEvent<Dimensions>`                                                                          |
-| `doubletap`              | Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.                                                                                                                        | `CustomEvent<TapEventDetails>`                                                                     |
-| `frameDrawn`             | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                                                                     | `CustomEvent<Frame>`                                                                               |
-| `frameReceived`          | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                                                                           | `CustomEvent<Frame>`                                                                               |
-| `interactionFinished`    | Emits an event when the user hs finished an interaction.                                                                                                                                                                                                           | `CustomEvent<void>`                                                                                |
-| `interactionStarted`     | Emits an event when the user has started an interaction.                                                                                                                                                                                                           | `CustomEvent<void>`                                                                                |
-| `longpress`              | Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.                                                    | `CustomEvent<TapEventDetails>`                                                                     |
-| `sceneChanged`           | Emits an event when a frame is received with a different scene attribute.                                                                                                                                                                                          | `CustomEvent<void>`                                                                                |
-| `sceneReady`             | Emits an event when the scene is ready to be interacted with.                                                                                                                                                                                                      | `CustomEvent<void>`                                                                                |
-| `tap`                    | Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.  This event can be used in combination with the {@link VertexViewer.scene scene} method to query for items at the point of the tap. | `CustomEvent<TapEventDetails>`                                                                     |
-| `tokenExpired`           | Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.                                                                                           | `CustomEvent<void>`                                                                                |
+| Event                    | Description                                                                                                                                                                                                                                     | Type                                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `annotationStateChanged` | Emits an event when the state for annotation changes.                                                                                                                                                                                           | `CustomEvent<AnnotationState>`                                                                     |
+| `cameraTypeChanged`      | Emits an event when the camera type changes.                                                                                                                                                                                                    | `CustomEvent<"orthographic" \| "perspective">`                                                     |
+| `connectionChange`       | Emits an event when the connection status changes for the viewer                                                                                                                                                                                | `CustomEvent<ConnectedStatus \| ConnectingStatus \| ConnectionFailedStatus \| DisconnectedStatus>` |
+| `dimensionschange`       |                                                                                                                                                                                                                                                 | `CustomEvent<Dimensions>`                                                                          |
+| `doubletap`              | Emits an event whenever the user double taps or clicks a location in the viewer. The event includes the location of the first tap or click.                                                                                                     | `CustomEvent<TapEventDetails>`                                                                     |
+| `frameDrawn`             | Emits an event when a frame has been drawn to the viewer's canvas. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                                                  | `CustomEvent<Frame>`                                                                               |
+| `frameReceived`          | Emits an event when a frame has been received by the viewer. The event will include details about the drawn frame, such as the `Scene` information related to the scene.                                                                        | `CustomEvent<Frame>`                                                                               |
+| `interactionFinished`    | Emits an event when the user hs finished an interaction.                                                                                                                                                                                        | `CustomEvent<void>`                                                                                |
+| `interactionStarted`     | Emits an event when the user has started an interaction.                                                                                                                                                                                        | `CustomEvent<void>`                                                                                |
+| `longpress`              | Emits an event whenever the user taps or clicks a location in the viewer and the configured amount of time passes without receiving a mouseup or touchend. The event includes the location of the tap or click.                                 | `CustomEvent<TapEventDetails>`                                                                     |
+| `sceneChanged`           | Emits an event when a frame is received with a different scene attribute.                                                                                                                                                                       | `CustomEvent<void>`                                                                                |
+| `sceneReady`             | Emits an event when the scene is ready to be interacted with.                                                                                                                                                                                   | `CustomEvent<void>`                                                                                |
+| `tap`                    | Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.  This event can be used in combination with the {@link scene} method to query for items at the point of the tap. | `CustomEvent<TapEventDetails>`                                                                     |
+| `tokenExpired`           | Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.                                                                        | `CustomEvent<void>`                                                                                |
 
 
 ## Methods
@@ -68,6 +68,13 @@ the highest priority or if the cursor is the most recently added cursor in
 the set of cursors with the same priority.
 
 To remove a cursor, call `dispose()` on the returned disposable.
+
+#### Parameters
+
+| Name       | Type                     | Description                 |
+| ---------- | ------------------------ | --------------------------- |
+| `cursor`   | `string \| CustomCursor` | The cursor to add.          |
+| `priority` | `number \| undefined`    | The priority of the cursor. |
 
 #### Returns
 
@@ -123,6 +130,13 @@ provided as a URN in the following format:
 
  * `urn:vertex:scene:<sceneid>`
 
+#### Parameters
+
+| Name      | Type                       | Description                                                                                                                                                            |
+| --------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `urn`     | `string`                   | The URN of the resource to load.                                                                                                                                       |
+| `options` | `LoadOptions \| undefined` | Optional configurations when loading the scene. cameraType (Optional) The camera type to load. If not included, the default camera type for the resource will be used. |
+
 #### Returns
 
 Type: `Promise<void>`
@@ -137,6 +151,12 @@ Registers and initializes an interaction handler with the viewer. Returns a
 `InteractionHandler`s are used to build custom mouse and touch interactions
 for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable
 the default camera controls provided by the viewer.
+
+#### Parameters
+
+| Name                 | Type                 | Description                          |
+| -------------------- | -------------------- | ------------------------------------ |
+| `interactionHandler` | `InteractionHandler` | The interaction handler to register. |
 
 #### Returns
 
@@ -154,6 +174,12 @@ keys are pressed during a `tap` event.
 viewer using the current state of they keyboard to determine whether
 the `fn` should be invoked. Use `<vertex-viewer keyboard-controls="false" />`
 to disable the default keyboard shortcuts provided by the viewer.
+
+#### Parameters
+
+| Name             | Type                              | Description                         |
+| ---------------- | --------------------------------- | ----------------------------------- |
+| `keyInteraction` | `KeyInteraction<TapEventDetails>` | - The `KeyInteraction` to register. |
 
 #### Returns
 

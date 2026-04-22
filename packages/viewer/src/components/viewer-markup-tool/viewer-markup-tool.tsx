@@ -10,6 +10,8 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as DocViewer from '@vertexvis/doc-viewer';
 
 import { stampTemplateWithId } from '../../lib/templates';
 import {
