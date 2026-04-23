@@ -46,7 +46,7 @@ import { ViewerDomRendererDrawMode } from "./components/viewer-dom-renderer/view
 import { ViewerIconName, ViewerIconSize as ViewerIconSize1 } from "./components/viewer-icon/viewer-icon";
 import { ViewerMarkupToolType } from "./components/viewer-markup-tool/viewer-markup-tool";
 import { LineAnchorStyle } from "./components/viewer-markup-arrow/utils";
-import { Markup, MarkupInteraction } from "./lib/types/markup";
+import { Markup, MarkupCenteringBehavior, MarkupInteraction } from "./lib/types/markup";
 import { ViewerMarkupArrowMode } from "./components/viewer-markup-arrow/viewer-markup-arrow";
 import { ViewerMarkupCircleMode } from "./components/viewer-markup-circle/viewer-markup-circle";
 import { ViewerMarkupFreeformMode } from "./components/viewer-markup-freeform/viewer-markup-freeform";
@@ -796,6 +796,10 @@ export namespace Components {
          */
         "arrowTemplateId"?: string;
         /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior": MarkupCenteringBehavior;
+        /**
           * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
          */
         "circleTemplateId"?: string;
@@ -864,6 +868,10 @@ export namespace Components {
         "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMarkupArrow {
+        /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior": MarkupCenteringBehavior;
         "dispose": () => Promise<void>;
         /**
           * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
@@ -919,6 +927,10 @@ export namespace Components {
           * The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
          */
         "boundsJson"?: string;
+        /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior": MarkupCenteringBehavior;
         "dispose": () => Promise<void>;
         /**
           * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
@@ -950,6 +962,10 @@ export namespace Components {
           * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
          */
         "boundsJson"?: string;
+        /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior": MarkupCenteringBehavior;
         "dispose": () => Promise<void>;
         /**
           * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
@@ -985,6 +1001,10 @@ export namespace Components {
           * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
          */
         "arrowTemplateId"?: string;
+        /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior": MarkupCenteringBehavior;
         /**
           * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
          */
@@ -2537,6 +2557,10 @@ declare namespace LocalJSX {
          */
         "arrowTemplateId"?: string;
         /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior"?: MarkupCenteringBehavior;
+        /**
           * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
          */
         "circleTemplateId"?: string;
@@ -2612,6 +2636,10 @@ declare namespace LocalJSX {
     }
     interface VertexViewerMarkupArrow {
         /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior"?: MarkupCenteringBehavior;
+        /**
           * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.  Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
          */
         "end"?: Point.Point;
@@ -2678,6 +2706,10 @@ declare namespace LocalJSX {
          */
         "boundsJson"?: string;
         /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior"?: MarkupCenteringBehavior;
+        /**
           * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
         "mode"?: ViewerMarkupCircleMode;
@@ -2719,6 +2751,10 @@ declare namespace LocalJSX {
           * The bounds of the freeform. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
          */
         "boundsJson"?: string;
+        /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior"?: MarkupCenteringBehavior;
         /**
           * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
          */
@@ -2765,6 +2801,10 @@ declare namespace LocalJSX {
           * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
          */
         "arrowTemplateId"?: string;
+        /**
+          * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+         */
+        "centeringBehavior"?: MarkupCenteringBehavior;
         /**
           * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
          */

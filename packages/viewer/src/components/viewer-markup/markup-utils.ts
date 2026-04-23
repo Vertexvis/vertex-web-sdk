@@ -1,5 +1,6 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 
+import { MarkupCenteringBehavior } from '../../lib/types';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
@@ -41,42 +42,39 @@ export function getBoundingBox2dAnchorPosition(
   }
 }
 
-export function getShadowDimensions(
-  originatingViewport?: Dimensions.Dimensions,
-  scale = 1
-): Dimensions.Dimensions | undefined {
-  if (originatingViewport != null) {
-    return Dimensions.scale(scale, scale, originatingViewport);
-  }
-  return undefined;
-}
-
 export function translatePointToScreen(
   pt: Point.Point,
   canvasDimensions: Dimensions.Dimensions,
   contentDimensions: Dimensions.Dimensions = canvasDimensions,
+  centeringBehavior: MarkupCenteringBehavior = 'none',
   scale = 1
 ): Point.Point {
-  const scaleX = canvasDimensions.width / contentDimensions.width;
-  const scaleY = canvasDimensions.height / contentDimensions.height;
-  const dimensionsScale = Math.min(scaleX, scaleY);
-  const effectiveScale = dimensionsScale * scale;
-
-  const scaleFactor = contentDimensions.height;
-  const scaledPoint = Point.add(
-    Point.scale(pt, scaleFactor, scaleFactor),
+  const canvasToContentScaleFactor = Math.min(
+    canvasDimensions.width / contentDimensions.width,
+    canvasDimensions.height / contentDimensions.height
+  );
+  const effectiveScalar = canvasToContentScaleFactor * scale;
+  const contentRelativePoint = Point.add(
+    Point.scale(pt, contentDimensions.height, contentDimensions.height),
     Dimensions.center(contentDimensions)
   );
 
-  const scaledContentWidth = contentDimensions.width * effectiveScale;
-  const centerOffsetX = Math.max(
-    0,
-    (canvasDimensions.width - scaledContentWidth) / 2
-  );
+  // Include an offset for width and height to account for cases where the
+  // content dimensions are smaller than the canvas dimensions.
+  const scaledContentWidth = contentDimensions.width * effectiveScalar;
+  const scaledContentHeight = contentDimensions.height * effectiveScalar;
+  const centerOffsetX =
+    centeringBehavior === 'both' || centeringBehavior === 'x-only'
+      ? Math.max(0, (canvasDimensions.width - scaledContentWidth) / 2)
+      : 0;
+  const centerOffsetY =
+    centeringBehavior === 'both' || centeringBehavior === 'y-only'
+      ? Math.max(0, (canvasDimensions.height - scaledContentHeight) / 2)
+      : 0;
 
   return Point.create(
-    scaledPoint.x * effectiveScale + centerOffsetX,
-    scaledPoint.y * effectiveScale
+    contentRelativePoint.x * effectiveScalar + centerOffsetX,
+    contentRelativePoint.y * effectiveScalar + centerOffsetY
   );
 }
 
@@ -95,14 +93,22 @@ export function translateDimensionsToScreen(
   contentDimensions: Dimensions.Dimensions = canvasDimensions,
   scale = 1
 ): Dimensions.Dimensions {
-  const scaleX = canvasDimensions.width / contentDimensions.width;
-  const scaleY = canvasDimensions.height / contentDimensions.height;
-  const dimensionsScale = Math.min(scaleX, scaleY);
-  const effectiveScale = dimensionsScale * scale;
+  const canvasToContentScaleFactor = Math.min(
+    canvasDimensions.width / contentDimensions.width,
+    canvasDimensions.height / contentDimensions.height
+  );
+  const effectiveScalar = canvasToContentScaleFactor * scale;
+  const contentRelativeDimensions = Dimensions.scale(
+    contentDimensions.height,
+    contentDimensions.height,
+    dimensions
+  );
 
-  const scaleFactor = contentDimensions.height * effectiveScale;
-
-  return Dimensions.scale(scaleFactor, scaleFactor, dimensions);
+  return Dimensions.scale(
+    effectiveScalar,
+    effectiveScalar,
+    contentRelativeDimensions
+  );
 }
 
 /**
@@ -115,12 +121,14 @@ export function translateRectToScreen(
   rect: Rectangle.Rectangle,
   canvasDimensions: Dimensions.Dimensions,
   contentDimensions?: Dimensions.Dimensions,
-  scale?: number
+  centeringBehavior: MarkupCenteringBehavior = 'none',
+  scale = 1
 ): Rectangle.Rectangle {
   const position = translatePointToScreen(
     rect,
     canvasDimensions,
     contentDimensions,
+    centeringBehavior,
     scale
   );
   const dimensions = translateDimensionsToScreen(

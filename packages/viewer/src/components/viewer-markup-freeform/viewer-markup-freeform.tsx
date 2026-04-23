@@ -13,7 +13,10 @@ import {
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { MarkupInteraction } from '../../lib/types/markup';
+import {
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidStartEvent,
@@ -113,6 +116,20 @@ export class ViewerMarkupFreeform {
    */
   @Prop()
   public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * Defines the behavior of the provided markup when the originating viewport is smaller
+   * than the current viewport, or is scaled to a size smaller than the current viewport
+   * using the `scale` property.
+   *
+   * Options:
+   * - `x-only`: Markup will be centered horizontally, but not vertically.
+   * - `y-only`: Markup will be centered vertically, but not horizontally.
+   * - `both`: Markup will be centered both horizontally and vertically.
+   * - `none`: Markup will not be centered (default).
+   */
+  @Prop()
+  public centeringBehavior: MarkupCenteringBehavior = 'none';
 
   /**
    * The current offset of the visible viewport. This value is used to determine where
@@ -346,6 +363,7 @@ export class ViewerMarkupFreeform {
           pt,
           elementBounds,
           this.originatingViewport,
+          this.centeringBehavior,
           this.scale ?? 1
         )
       );

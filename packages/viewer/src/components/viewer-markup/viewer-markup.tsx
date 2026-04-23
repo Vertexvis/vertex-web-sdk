@@ -19,6 +19,7 @@ import {
   CircleMarkup,
   FreeformMarkup,
   Markup,
+  MarkupCenteringBehavior,
   MarkupInteraction,
 } from '../../lib/types/markup';
 import {
@@ -112,6 +113,20 @@ export class ViewerMarkup {
    */
   @Prop()
   public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * Defines the behavior of the provided markup when the originating viewport is smaller
+   * than the current viewport, or is scaled to a size smaller than the current viewport
+   * using the `scale` property.
+   *
+   * Options:
+   * - `x-only`: Markup will be centered horizontally, but not vertically.
+   * - `y-only`: Markup will be centered vertically, but not horizontally.
+   * - `both`: Markup will be centered both horizontally and vertically.
+   * - `none`: Markup will not be centered (default).
+   */
+  @Prop()
+  public centeringBehavior: MarkupCenteringBehavior = 'none';
 
   /**
    * The current offset of the visible viewport. This value is used to determine where
@@ -373,6 +388,7 @@ export class ViewerMarkup {
    */
   @Watch('viewer')
   @Watch('originatingViewport')
+  @Watch('centeringBehavior')
   @Watch('offset')
   @Watch('scale')
   protected async handleViewerChanged(
@@ -638,6 +654,7 @@ export class ViewerMarkup {
   ): void {
     element.viewer = this.viewer;
     element.originatingViewport = this.originatingViewport;
+    element.centeringBehavior = this.centeringBehavior;
     element.offset = this.offset;
     element.scale = this.scale;
     element.classList.add('viewer-markup__markup');
@@ -655,6 +672,7 @@ export class ViewerMarkup {
       tool.startLineAnchorStyle = this.startLineAnchorStyle;
       tool.endLineAnchorStyle = this.endLineAnchorStyle;
       tool.originatingViewport = this.originatingViewport;
+      tool.centeringBehavior = this.centeringBehavior;
       tool.offset = this.offset;
       tool.scale = this.scale;
     }
