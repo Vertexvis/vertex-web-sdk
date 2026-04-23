@@ -4,9 +4,9 @@ import Long from 'long';
 
 import { drawFramePayloadPerspective } from '../../../testing/fixtures';
 import { Orientation } from '../../types';
-import { fromPbFrame, fromPbFrameOrThrow } from '../frameStreaming';
+import { fromPbFrameOrThrow } from '../frameStreaming';
 
-describe(fromPbFrame, () => {
+describe('fromPbFrameOrThrow', () => {
   it('should decode model view id', () => {
     const id = UUID.create();
     const msbLsb = UUID.toMsbLsb(id);

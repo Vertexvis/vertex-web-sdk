@@ -2,7 +2,7 @@ import { Color } from '@vertexvis/utils';
 
 import { toPbRGBi } from '../material';
 
-describe(toPbRGBi, () => {
+describe('toPbRGBi', () => {
   it('returns rgbi for hex string', () => {
     const res = toPbRGBi('#ff0000');
     expect(res).toEqual({ r: 255, g: 0, b: 0 });

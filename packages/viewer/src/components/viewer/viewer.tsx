@@ -528,6 +528,7 @@ export class Viewer {
   private isVisible = false;
 
   private resizeTimer?: NodeJS.Timeout;
+  private frameRenderVersion = 0;
 
   private interactionHandlers: InteractionHandler[] = [];
   private defaultInteractionHandlerDisposables: Array<Disposable> = [];
@@ -1018,6 +1019,7 @@ export class Viewer {
   @Method()
   public async unload(): Promise<void> {
     if (this.stream != null) {
+      this.frameRenderVersion += 1;
       this.annotations?.disconnect();
       this.stream.disconnect();
 
@@ -1083,6 +1085,11 @@ export class Viewer {
         throw new MissingJWTError('JWT is empty');
       }
     }
+
+    if (!this.hostElement.isConnected) {
+      return;
+    }
+
     this.connectionChange.emit(status);
   }
 
@@ -1308,6 +1315,7 @@ export class Viewer {
 
   private async updateFrame(frame: Frame): Promise<void> {
     const canvasDimensions = this.getCanvasDimensions();
+    const frameRenderVersion = this.frameRenderVersion;
 
     if (
       this.canvasElement != null &&
@@ -1356,7 +1364,10 @@ export class Viewer {
 
         const drawnFrame = await this.canvasRenderer(data);
 
-        if (drawnFrame != null) {
+        if (
+          drawnFrame != null &&
+          frameRenderVersion === this.frameRenderVersion
+        ) {
           this.updateViewerBackground();
 
           this.dispatchFrameDrawn(drawnFrame);

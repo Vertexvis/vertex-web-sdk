@@ -41,13 +41,13 @@
     "typescript": "^5.2.0"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.1",
+    "@types/jest": "^29.5.14",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/jest-config-vertexvis": "^0.5.4",
     "eslint": "^8.57.1",
-    "jest": "^27.5.1",
+    "jest": "^29.5.14",
     "rollup": "^2.80.0",
-    "ts-jest": "^27.1.4"
+    "ts-jest": "^29.4.9"
   },
   "peerDependencies": {
     "rollup": "^2"

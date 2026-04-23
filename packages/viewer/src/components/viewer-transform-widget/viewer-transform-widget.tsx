@@ -262,7 +262,6 @@ export class ViewerTransformWidget {
   @State()
   protected isEndingTransform = false;
 
-  @State()
   protected inputShouldFocus = false;
 
   @Element()
