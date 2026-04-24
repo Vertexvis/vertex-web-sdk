@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, State, Watch } from '@stencil/core';
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, Watch } from '@stencil/core';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
@@ -88,8 +88,6 @@ export class VertexDocumentViewer {
   @Event() public pageDrawn!: EventEmitter<DocumentApiState>;
 
   @Element() private hostEl!: HTMLElement;
-
-  @State() public renderedViewport?: Rectangle.Rectangle = Rectangle.create(0, 0, 0, 0);
 
   private viewerContainerElement?: HTMLDivElement;
   private canvasContainerElement?: HTMLDivElement;

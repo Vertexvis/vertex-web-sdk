@@ -13,6 +13,7 @@ import {
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
+import { getWindowDevicePixelRatio } from '../../lib/dom';
 import {
   MarkupCenteringBehavior,
   MarkupInteraction,
@@ -329,11 +330,13 @@ export class ViewerMarkupArrow {
   }
 
   public render(): h.JSX.IntrinsicElements {
+    console.log('render', this.start, this.end, this.elementBounds);
+
     if (this.start != null && this.end != null && this.elementBounds != null) {
       const elementBounds = this.elementBounds;
       const effectiveScale = this.scale ?? 1;
-      const offsetX = (this.offset?.x ?? 0) / window.devicePixelRatio;
-      const offsetY = (this.offset?.y ?? 0) / window.devicePixelRatio;
+      const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
+      const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
       const screenStart = translatePointToScreen(
         this.start,
         elementBounds,

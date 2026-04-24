@@ -13,6 +13,7 @@ import {
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
+import { getWindowDevicePixelRatio } from '../../lib/dom';
 import {
   MarkupCenteringBehavior,
   MarkupInteraction,
@@ -270,8 +271,8 @@ export class ViewerMarkupFreeform {
 
   public render(): h.JSX.IntrinsicElements {
     if (this.screenPoints.length > 0 && this.elementBounds != null) {
-      const offsetX = (this.offset?.x ?? 0) / window.devicePixelRatio;
-      const offsetY = (this.offset?.y ?? 0) / window.devicePixelRatio;
+      const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
+      const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
 
       return (
         <Host>
