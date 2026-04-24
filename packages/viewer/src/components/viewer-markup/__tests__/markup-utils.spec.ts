@@ -1,11 +1,9 @@
-import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 
 import {
   translateDimensionsToScreen,
-  translatePointToBounds,
   translatePointToRelative,
   translatePointToScreen,
-  translateRectToScreen,
 } from '../markup-utils';
 
 describe('markup utils', () => {
