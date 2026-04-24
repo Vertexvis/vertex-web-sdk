@@ -528,24 +528,32 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
       const stream = new ResponseStreamMock<SubscribeResponse>();
+      const error = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-      (client.subscribe as jest.Mock).mockReturnValue(stream);
+      try {
+        (client.subscribe as jest.Mock).mockReturnValue(stream);
 
-      await controller.connect(jwtProvider);
+        await controller.connect(jwtProvider);
 
-      stream.invokeOnStatus({
-        code: 1,
-        details: 'Testing',
-      } as unknown as Status);
+        stream.invokeOnStatus({
+          code: 1,
+          details: 'Testing',
+        } as unknown as Status);
 
-      const req = new SubscribeRequest();
-      expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+        const req = new SubscribeRequest();
+        expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+        expect(error).toHaveBeenCalledWith(
+          'Failed to subscribe to scene tree with code=1, details=Testing'
+        );
 
-      const pages = Array.from({ length: 10 })
-        .map((_, page) => page)
-        .filter((page) => controller.isPageLoaded(page));
+        const pages = Array.from({ length: 10 })
+          .map((_, page) => page)
+          .filter((page) => controller.isPageLoaded(page));
 
-      expect(pages).toEqual([]);
+        expect(pages).toEqual([]);
+      } finally {
+        error.mockRestore();
+      }
     });
 
     it('should invalidate the tree when the subscription call ends', async () => {
