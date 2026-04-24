@@ -528,7 +528,7 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
       const stream = new ResponseStreamMock<SubscribeResponse>();
-      const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const error = jest.spyOn(console, 'error').mockImplementation(jest.fn());
 
       try {
         (client.subscribe as jest.Mock).mockReturnValue(stream);
