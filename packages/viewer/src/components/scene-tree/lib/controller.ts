@@ -74,6 +74,7 @@ interface Page {
   index: number;
   metadataKeys: MetadataKey[];
   res: Promise<GetTreeResponse>;
+  done?: Promise<void>;
 }
 
 export interface DisconnectedState {
@@ -631,10 +632,15 @@ export class SceneTreeController {
         const id = this.nextPageId++;
         const page = { id, res, index, metadataKeys: this.metadataKeys };
         this.pages.set(index, page);
-        this.handlePageResult(page);
+        page.done = this.handlePageResult(page);
       }
 
-      await this.pages.get(index)?.res;
+      const page = this.pages.get(index);
+      const [resResult] = await Promise.allSettled([page?.res, page?.done]);
+
+      if (resResult?.status === 'rejected') {
+        throw resResult.reason;
+      }
     });
   }
 

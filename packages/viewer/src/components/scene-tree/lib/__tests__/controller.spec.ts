@@ -1061,6 +1061,27 @@ describe(SceneTreeController, () => {
       );
     });
 
+    it('awaits page result handling before resolving', async () => {
+      const { controller, client } = createController(100);
+      (client.getTree as jest.Mock)
+        .mockImplementationOnce(mockGrpcUnaryResult(createGetTreeResponse(100, 200)))
+        .mockImplementationOnce(mockGrpcUnaryResult(createGetTreeResponse(100, 200)));
+
+      await controller.connect(jwtProvider);
+
+      let finishedHandling = false;
+      jest
+        .spyOn(controller as never, 'handlePageResult' as never)
+        .mockImplementation(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          finishedHandling = true;
+        });
+
+      await controller.fetchPage(1);
+
+      expect(finishedHandling).toBe(true);
+    });
+
     it('marks page as not loaded if request fails', async () => {
       const error: ServiceError = {
         code: grpc.Code.FailedPrecondition,
