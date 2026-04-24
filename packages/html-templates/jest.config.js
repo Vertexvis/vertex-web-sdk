@@ -6,6 +6,10 @@ module.exports = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
   },
+  setupFilesAfterEnv: [
+    ...(jestConfig.setupFilesAfterEnv || []),
+    '<rootDir>/../../jest.setup.console.js',
+  ],
   moduleNameMapper: {
     ...jestConfig.moduleNameMapper,
     '^@vertexvis/utils$': '<rootDir>/../utils/src/index.ts',

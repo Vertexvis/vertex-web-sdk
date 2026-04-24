@@ -15,5 +15,9 @@ module.exports = {
   moduleNameMapper: {
     '^pdfjs-dist/legacy/build/pdf\\.mjs$': '<rootDir>/src/__mocks__/pdfjs-mock.ts',
   },
-  setupFilesAfterEnv: ['<rootDir>/src/__setup__/polyfills.ts', '<rootDir>/src/__setup__/resize-observer.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/../../jest.setup.console.js',
+    '<rootDir>/src/__setup__/polyfills.ts',
+    '<rootDir>/src/__setup__/resize-observer.ts',
+  ],
 };

@@ -14,5 +14,8 @@ module.exports = {
   moduleNameMapper: {
     '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
   },
-  setupFilesAfterEnv: ['<rootDir>/src/__setup__/polyfills.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/../../jest.setup.console.js',
+    '<rootDir>/src/__setup__/polyfills.ts',
+  ],
 };
