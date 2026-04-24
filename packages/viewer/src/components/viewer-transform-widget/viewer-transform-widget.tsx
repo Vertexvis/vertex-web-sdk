@@ -54,6 +54,9 @@ import { TransformWidget } from './widget';
   shadow: true,
 })
 export class ViewerTransformWidget {
+  @Element()
+  private hostEl!: HTMLElement;
+
   /**
    * An event that is emitted when the position of the widget changes.
    */
@@ -263,9 +266,6 @@ export class ViewerTransformWidget {
   protected isEndingTransform = false;
 
   protected inputShouldFocus = false;
-
-  @Element()
-  private hostEl!: HTMLElement;
 
   private startingTransform?: Matrix4.Matrix4;
   private currentTransform?: Matrix4.Matrix4;
