@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Examples</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #f5f7fb;
+        color: #132238;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 48px 24px 64px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 2.8rem);
+      }
+
+      p {
+        margin: 0 0 24px;
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      a {
+        display: block;
+        padding: 16px 18px;
+        border: 1px solid #d8e1ec;
+        border-radius: 12px;
+        background: #ffffff;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:hover {
+        border-color: #9ab3cf;
+        background: #f8fbff;
+      }
+
+      strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .back {
+        margin-bottom: 24px;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="back"><a href="/">Back to root</a></div>
+      <h1>Examples</h1>
+      <p>Browse the available SDK examples served by Vite.</p>
+      <div class="grid">
+        <a href="/examples/align-two-surfaces/">
+          <strong>Align Two Surfaces</strong>
+          Surface alignment tools and interactions.
+        </a>
+        <a href="/examples/camera-manipulations/">
+          <strong>Camera Manipulations</strong>
+          Programmatic viewer camera control.
+        </a>
+        <a href="/examples/custom-interactions/">
+          <strong>Custom Interactions</strong>
+          Custom viewer interaction handling.
+        </a>
+        <a href="/examples/end-items/">
+          <strong>End Items</strong>
+          Work with end item visibility and selection.
+        </a>
+        <a href="/examples/loading-models/">
+          <strong>Loading Models</strong>
+          Load models into the viewer from a stream key.
+        </a>
+        <a href="/examples/metadata-operations/">
+          <strong>Metadata Operations</strong>
+          Read and update metadata-driven state.
+        </a>
+        <a href="/examples/phantom-parts/">
+          <strong>Phantom Parts</strong>
+          Visualize phantom parts in the scene.
+        </a>
+        <a href="/examples/picking/">
+          <strong>Picking</strong>
+          Hit-test and inspect viewer selections.
+        </a>
+        <a href="/examples/pmi/">
+          <strong>PMI</strong>
+          Explore model views and PMI annotations.
+        </a>
+        <a href="/examples/scene-tree-columns/">
+          <strong>Scene Tree Columns</strong>
+          Extend scene tree table columns.
+        </a>
+        <a href="/examples/transform-widget/">
+          <strong>Transform Widget</strong>
+          Interact with transform controls in the viewer.
+        </a>
+        <a href="/examples/walk-mode/">
+          <strong>Walk Mode</strong>
+          Navigate a scene with walk mode tools.
+        </a>
+        <a href="/examples/work-instructions/">
+          <strong>Work Instructions</strong>
+          Step through guided work instructions.
+        </a>
+      </div>
+    </main>
+  </body>
+</html>
