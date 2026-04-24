@@ -175,7 +175,7 @@ import {
   resetAwaiter,
   sceneMock,
   viewer,
-} from '../viewer/__mocks__/mocks';
+} from '../viewer/__mocks__/viewer-test-mocks';
 
 describe('vertex-viewer-view-cube interactions', () => {
   beforeEach(() => {
