@@ -8,7 +8,7 @@
     "semver": "^7.5.2",
     "typedoc": "^0.28.14",
     "typescript": "^5.2.0",
-    "vite": "^8.0.9"
+    "vite": "^8.0.10"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc",
