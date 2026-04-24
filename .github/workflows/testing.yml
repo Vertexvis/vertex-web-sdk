@@ -5,26 +5,21 @@ on:
     branches:
       - publish-testing
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v4
-      - name: Set Node Version
-        id: nvm
-        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: yarn.lock
       - name: "Install"
         run: "yarn install --frozen-lockfile"
       - name: "Build"
@@ -39,6 +34,8 @@ jobs:
   publish-testing:
     runs-on: ubuntu-latest
     needs: [build]
+    permissions:
+      contents: write
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v4
@@ -47,22 +44,14 @@ jobs:
         with:
           name: build-artifact
           path: packages
-      - name: Set Node Version
-        id: nvm
-        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
       - name: "Install"
         run: "yarn install"
       - name: "Publish Testing build to NPM"
