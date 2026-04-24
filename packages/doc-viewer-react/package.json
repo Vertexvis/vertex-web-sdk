@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/doc-viewer-react",
-  "version": "0.24.3",
+  "version": "0.24.4",
   "description": "React bindings for the Vertex Document Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@stencil/react-output-target": "^1.4.2",
-    "@vertexvis/doc-viewer": "0.24.3"
+    "@vertexvis/doc-viewer": "0.24.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",
