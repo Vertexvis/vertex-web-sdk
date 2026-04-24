@@ -630,7 +630,7 @@ export class SceneTreeController {
         this.log('Scene tree fetching page', index, offset);
         const res = this.fetchTree(offset, this.rowLimit, jwt);
         const id = this.nextPageId++;
-        const page = { id, res, index, metadataKeys: this.metadataKeys };
+        const page: Page = { id, res, index, metadataKeys: this.metadataKeys };
         this.pages.set(index, page);
         page.done = this.handlePageResult(page);
       }

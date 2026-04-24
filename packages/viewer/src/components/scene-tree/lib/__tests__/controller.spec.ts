@@ -1064,8 +1064,12 @@ describe(SceneTreeController, () => {
     it('awaits page result handling before resolving', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock)
-        .mockImplementationOnce(mockGrpcUnaryResult(createGetTreeResponse(100, 200)))
-        .mockImplementationOnce(mockGrpcUnaryResult(createGetTreeResponse(100, 200)));
+        .mockImplementationOnce(
+          mockGrpcUnaryResult(createGetTreeResponse(100, 200))
+        )
+        .mockImplementationOnce(
+          mockGrpcUnaryResult(createGetTreeResponse(100, 200))
+        );
 
       await controller.connect(jwtProvider);
 
