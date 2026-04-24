@@ -374,6 +374,7 @@ describe(SceneTreeController, () => {
         10,
         subscriptionHandshakeTimeout
       );
+      const error = jest.spyOn(console, 'error').mockImplementation(jest.fn());
       const getTree = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false)
       );
@@ -436,6 +437,7 @@ describe(SceneTreeController, () => {
           })
         );
       } finally {
+        error.mockRestore();
         (window as any).__setTimeout = originalWindowSetTimeout;
         (window as any).__clearTimeout = originalWindowClearTimeout;
         jest.useRealTimers();
