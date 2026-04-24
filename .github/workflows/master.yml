@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout changes"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup NodeJS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: yarn
@@ -40,7 +40,7 @@ jobs:
       publish: ${{ steps.detect-publish.outputs.publish }}
     steps:
       - name: "Checkout changes"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Detect publish"
         id: "detect-publish"
         run: |
@@ -55,14 +55,14 @@ jobs:
       contents: write
     steps:
       - name: "Checkout changes"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Download build artifacts"
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: packages
       - name: Setup NodeJS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: yarn
@@ -89,14 +89,14 @@ jobs:
       contents: write
     steps:
       - name: "Checkout changes"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Download build artifacts"
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: packages
       - name: Setup NodeJS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: yarn
@@ -119,14 +119,14 @@ jobs:
       contents: write
     steps:
       - name: "Checkout changes"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Download build artifacts"
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
           path: packages
       - name: Setup NodeJS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: yarn
