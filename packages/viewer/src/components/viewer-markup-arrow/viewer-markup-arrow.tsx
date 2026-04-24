@@ -330,8 +330,6 @@ export class ViewerMarkupArrow {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    console.log('render', this.start, this.end, this.elementBounds);
-
     if (this.start != null && this.end != null && this.elementBounds != null) {
       const elementBounds = this.elementBounds;
       const effectiveScale = this.scale ?? 1;
