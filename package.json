@@ -1,15 +1,14 @@
 {
   "name": "root",
   "private": true,
-  "nextVersionBump": "patch",
+  "nextVersionBump": "major",
   "devDependencies": {
     "eslint": "^8.57.1",
-    "http-server": "^14.1.1",
     "lerna": "^6.6.2",
-    "livereload": "^0.9.1",
     "semver": "^7.5.2",
-    "typedoc": "^0.22.17",
-    "typescript": "^4.5.4"
+    "typedoc": "^0.28.14",
+    "typescript": "^5.2.0",
+    "vite": "^8.0.10"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc",
@@ -27,8 +26,7 @@
     "clean": "lerna clean",
     "validate": "yarn build && yarn test && yarn lint",
     "version:bump": "./scripts/version_bump.sh",
-    "examples:start": "http-server -c-1 examples/ & livereload ./examples/ --wait 1000",
-    "examples:scaffold": "./bin/run scaffold"
+    "examples:start": "vite --host 0.0.0.0 --port 8080 --strictPort"
   },
   "workspaces": {
     "packages": [
@@ -43,9 +41,12 @@
     ]
   },
   "resolutions": {
-    "@types/minimatch": "^6.0.0",
-    "@types/react": "18.3.4",
+    "@types/react": "^19",
     "minimatch": "^6.2.3",
     "semver": "^7.5.2"
-  }
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

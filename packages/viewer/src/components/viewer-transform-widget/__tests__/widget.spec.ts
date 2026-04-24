@@ -188,6 +188,16 @@ describe(TransformWidget, () => {
     expect(regl().frame).toHaveBeenCalled();
   });
 
+  it('destroys regl resources on dispose', () => {
+    const widget = new TransformWidget(canvas);
+
+    widget.updateFrame(makePerspectiveFrame());
+    widget.updateTransform(Matrix4.makeTranslation(Vector3.create(1, 1, 1)));
+    widget.dispose();
+
+    expect(regl().destroy).toHaveBeenCalled();
+  });
+
   it('creates axis and arrow meshes', async () => {
     const widget = new TransformWidget(canvas);
     const frame = makePerspectiveFrame();

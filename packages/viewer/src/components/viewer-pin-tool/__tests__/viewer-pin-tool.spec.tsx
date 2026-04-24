@@ -4,7 +4,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
 import { TextPin } from '../../../lib/pins/model';
-import { viewer } from '../../viewer/__mocks__/mocks';
+import { viewer } from '../../viewer/__mocks__/viewer-test-mocks';
 import { ViewerPinGroup } from '../../viewer-pin-group/viewer-pin-group';
 import { ViewerPinTool } from '../viewer-pin-tool';
 

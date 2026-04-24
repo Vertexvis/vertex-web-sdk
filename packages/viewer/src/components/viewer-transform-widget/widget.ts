@@ -158,7 +158,7 @@ export class TransformWidget extends ReglComponent {
   }
 
   public dispose(): void {
-    this.reglFrameDisposable?.cancel();
+    super.dispose();
   }
 
   /**

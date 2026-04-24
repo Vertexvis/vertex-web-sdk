@@ -21,8 +21,7 @@ const typeDefFormattedExamples = [...docExampleMatches].reduce(function (
     exampleMatch[0],
     `\n${formattedMatch}`
   );
-},
-stdin);
+}, stdin);
 const typeDefFormattedMultiline = [...docMatches].reduce(function (
   typeDefFormattedMultiline,
   mutilineMatch
@@ -38,8 +37,7 @@ const typeDefFormattedMultiline = [...docMatches].reduce(function (
     mutilineMatch[0],
     `${formattedMatch}`
   );
-},
-typeDefFormattedExamples);
+}, typeDefFormattedExamples);
 
 process.stdout.write(typeDefFormattedMultiline);
 

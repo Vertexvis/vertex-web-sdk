@@ -32,7 +32,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected element?: HTMLElement;
   protected downPosition?: Point.Point;
   private downPositionCanvas?: Point.Point;
-  private primaryInteraction: MouseInteraction = this.rotateInteraction;
+  private primaryInteraction: MouseInteraction;
   private currentInteraction?: MouseInteraction;
   private draggingInteraction: MouseInteraction | undefined;
   private lastPrimaryRotateInteraction?: MouseInteraction;
@@ -59,6 +59,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     private pivotInteraction: PivotInteraction,
     private getConfig: ConfigProvider
   ) {
+    this.primaryInteraction = rotateInteraction;
     this.handleDownEvent = this.handleDownEvent.bind(this);
     this.handleMouseWheel = this.handleMouseWheel.bind(this);
     this.handleWindowMove = this.handleWindowMove.bind(this);

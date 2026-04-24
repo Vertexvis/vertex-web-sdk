@@ -1,10 +1,14 @@
 import * as Async from '../async';
 import { EventDispatcher } from '../eventDispatcher';
 
-describe(EventDispatcher, () => {
-  const dispatcher = new EventDispatcher<string>();
+describe('EventDispatcher', () => {
+  let dispatcher: EventDispatcher<string>;
 
-  describe(EventDispatcher.prototype.on, () => {
+  beforeEach(() => {
+    dispatcher = new EventDispatcher<string>();
+  });
+
+  describe('EventDispatcher.prototype.on', () => {
     it('invokes event listener when event emitted', () => {
       const listener = jest.fn();
       dispatcher.on(listener);
@@ -30,7 +34,7 @@ describe(EventDispatcher, () => {
     });
   });
 
-  describe(EventDispatcher.prototype.once, () => {
+  describe('EventDispatcher.prototype.once', () => {
     it('resolves when event emitted', async () => {
       const pending = dispatcher.once();
       dispatcher.emit('event');
@@ -46,7 +50,7 @@ describe(EventDispatcher, () => {
     });
   });
 
-  describe(EventDispatcher.prototype.onceWhen, () => {
+  describe('EventDispatcher.prototype.onceWhen', () => {
     it('resolves when event matches predicate', async () => {
       const pending = dispatcher.onceWhen((e) => e === 'event');
       dispatcher.emit('nope');
@@ -65,7 +69,7 @@ describe(EventDispatcher, () => {
     });
   });
 
-  describe(EventDispatcher.prototype.onceWhen, () => {
+  describe('EventDispatcher.prototype.when', () => {
     it('invokes listener when event matches predicate', async () => {
       const listener = jest.fn();
       dispatcher.when((e) => e === 'event', listener);
@@ -95,7 +99,7 @@ describe(EventDispatcher, () => {
     });
   });
 
-  describe(EventDispatcher.prototype.off, () => {
+  describe('EventDispatcher.prototype.off', () => {
     it('should remove event listener', () => {
       const listener = jest.fn();
       dispatcher.on(listener);

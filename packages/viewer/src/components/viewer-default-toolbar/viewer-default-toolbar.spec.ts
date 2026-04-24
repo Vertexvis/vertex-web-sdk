@@ -8,7 +8,7 @@ import {
   resetAwaiter,
   sceneMock,
   viewer,
-} from '../viewer/__mocks__/mocks';
+} from '../viewer/__mocks__/viewer-test-mocks';
 import { ViewerDefaultToolbar } from './viewer-default-toolbar';
 
 describe('<vertex-viewer-default-toolbar>', () => {

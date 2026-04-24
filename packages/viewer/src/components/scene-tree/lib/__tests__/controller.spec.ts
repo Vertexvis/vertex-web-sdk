@@ -374,6 +374,7 @@ describe(SceneTreeController, () => {
         10,
         subscriptionHandshakeTimeout
       );
+      const error = jest.spyOn(console, 'error').mockImplementation(jest.fn());
       const getTree = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false)
       );
@@ -384,23 +385,63 @@ describe(SceneTreeController, () => {
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
 
-      await controller.connect(jwtProvider);
+      // Stencil's mock-doc captures globalThis.setTimeout at module load time
+      // (var nativeSetTimeout = globalThis.setTimeout) and stores it as
+      // window.__setTimeout. Since jest.useFakeTimers() runs after module
+      // initialization it only replaces global.setTimeout — not the already-
+      // captured reference held by window.__setTimeout. We redirect both
+      // window.__setTimeout and window.__clearTimeout to the Jest fake
+      // implementations so that every window.setTimeout/clearTimeout call
+      // inside the controller is intercepted by fake timers.
+      const originalWindowSetTimeout = (window as any).__setTimeout;
+      const originalWindowClearTimeout = (window as any).__clearTimeout;
+      jest.useFakeTimers();
+      (window as any).__setTimeout = setTimeout;
+      (window as any).__clearTimeout = clearTimeout;
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, subscriptionHandshakeTimeout * 3 + 50);
-      });
+      try {
+        // Start connecting without awaiting — connect() internally awaits
+        // subscribe() then fetchPage(), where the latter triggers a gRPC mock
+        // using setTimeout(10ms). We must flush the microtask queue first so
+        // that subscribe() completes and fetchPage registers the getTree timer
+        // before we advance fake time.
+        const connectPromise = controller.connect(jwtProvider);
+        await Promise.resolve(); // subscribe's jwtProvider tick
+        await Promise.resolve(); // connect resumes, starts fetchPage
+        await Promise.resolve(); // fetchPage's jwtProvider tick → getTree setTimeout registered
 
-      expect(onStateChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          connection: expect.objectContaining({
-            type: 'failure',
-            details: new SceneTreeErrorDetails(
-              'SUBSCRIPTION_FAILURE',
-              SceneTreeErrorCode.SUBSCRIPTION_FAILURE
-            ),
-          }),
-        })
-      );
+        // Advance past the getTree mock's 10ms response delay to let fetchPage
+        // complete, then await the connect Promise to ensure the handshake
+        // timer is registered.
+        jest.advanceTimersByTime(11);
+        await connectPromise;
+
+        // Advance through all timeout cycles: 2 retries + 1 failure (3 total).
+        // After each advance, flush microtasks so the async retry logic
+        // (re-subscribing) completes and registers the next timer.
+        for (let i = 0; i < 3; i++) {
+          jest.advanceTimersByTime(subscriptionHandshakeTimeout + 1);
+          await Promise.resolve(); // subscribe's jwtProvider tick → retry handler resumes
+          await Promise.resolve(); // fire-and-forget page refetch registers getTree timer
+        }
+
+        expect(onStateChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            connection: expect.objectContaining({
+              type: 'failure',
+              details: new SceneTreeErrorDetails(
+                'SUBSCRIPTION_FAILURE',
+                SceneTreeErrorCode.SUBSCRIPTION_FAILURE
+              ),
+            }),
+          })
+        );
+      } finally {
+        error.mockRestore();
+        (window as any).__setTimeout = originalWindowSetTimeout;
+        (window as any).__clearTimeout = originalWindowClearTimeout;
+        jest.useRealTimers();
+      }
     });
 
     it('does not retry the subscription if a handshake was received before before the first page', async () => {
@@ -489,24 +530,32 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(createGetTreeResponse(10, 100))
       );
       const stream = new ResponseStreamMock<SubscribeResponse>();
+      const error = jest.spyOn(console, 'error').mockImplementation(jest.fn());
 
-      (client.subscribe as jest.Mock).mockReturnValue(stream);
+      try {
+        (client.subscribe as jest.Mock).mockReturnValue(stream);
 
-      await controller.connect(jwtProvider);
+        await controller.connect(jwtProvider);
 
-      stream.invokeOnStatus({
-        code: 1,
-        details: 'Testing',
-      } as unknown as Status);
+        stream.invokeOnStatus({
+          code: 1,
+          details: 'Testing',
+        } as unknown as Status);
 
-      const req = new SubscribeRequest();
-      expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+        const req = new SubscribeRequest();
+        expect(client.subscribe).toHaveBeenCalledWith(req, metadata);
+        expect(error).toHaveBeenCalledWith(
+          'Failed to subscribe to scene tree with code=1, details=Testing'
+        );
 
-      const pages = Array.from({ length: 10 })
-        .map((_, page) => page)
-        .filter((page) => controller.isPageLoaded(page));
+        const pages = Array.from({ length: 10 })
+          .map((_, page) => page)
+          .filter((page) => controller.isPageLoaded(page));
 
-      expect(pages).toEqual([]);
+        expect(pages).toEqual([]);
+      } finally {
+        error.mockRestore();
+      }
     });
 
     it('should invalidate the tree when the subscription call ends', async () => {
@@ -1020,6 +1069,31 @@ describe(SceneTreeController, () => {
           totalRows: 100,
         })
       );
+    });
+
+    it('awaits page result handling before resolving', async () => {
+      const { controller, client } = createController(100);
+      (client.getTree as jest.Mock)
+        .mockImplementationOnce(
+          mockGrpcUnaryResult(createGetTreeResponse(100, 200))
+        )
+        .mockImplementationOnce(
+          mockGrpcUnaryResult(createGetTreeResponse(100, 200))
+        );
+
+      await controller.connect(jwtProvider);
+
+      let finishedHandling = false;
+      jest
+        .spyOn(controller as never, 'handlePageResult' as never)
+        .mockImplementation(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          finishedHandling = true;
+        });
+
+      await controller.fetchPage(1);
+
+      expect(finishedHandling).toBe(true);
     });
 
     it('marks page as not loaded if request fails', async () => {

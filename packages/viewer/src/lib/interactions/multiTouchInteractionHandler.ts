@@ -4,9 +4,7 @@ import { requestAnimationFrame } from '../window';
 import { InteractionApi } from './interactionApi';
 import { InteractionHandler } from './interactionHandler';
 
-export abstract class MultiTouchInteractionHandler
-  implements InteractionHandler
-{
+export abstract class MultiTouchInteractionHandler implements InteractionHandler {
   protected element?: HTMLElement;
   protected interactionApi?: InteractionApi;
 

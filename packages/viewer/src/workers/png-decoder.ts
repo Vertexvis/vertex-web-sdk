@@ -1,10 +1,5 @@
-import { defineWorker } from '@vertexvis/web-workers';
-import { decode, DecodedPng } from 'fast-png';
+import type { DecodedPng } from 'fast-png';
 
-export type DecodePngFn = (bytes: ArrayBufferLike) => Promise<DecodedPng>;
+export type DecodePngBytes = ArrayBufferLike | Uint8Array<ArrayBufferLike>;
 
-const decodePng: DecodePngFn = async (bytes) => {
-  return decode(bytes);
-};
-
-defineWorker(decodePng);
+export type DecodePngFn = (bytes: DecodePngBytes) => Promise<DecodedPng>;
