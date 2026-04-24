@@ -26,7 +26,6 @@
         height: 100%;
         padding: 0;
         margin: 0;
-        overflow: hidden;
       }
 
       .app {
@@ -69,14 +68,6 @@
 
         const viewer = document.getElementById('viewer');
         const tree = document.getElementById('scene-tree');
-        const markup = document.getElementById('markup');
-
-        await markup.componentOnReady();
-
-        const arrow = markup.firstElementChild;
-
-        // arrow.originatingViewport = {width: 5000, height: 5000};
-        // arrow.currentViewportOffset = {x: 100, y: 100};
       }
     </script>
   </head>
@@ -86,7 +77,6 @@
       <div class="tree">
         <vertex-scene-tree
           id="scene-tree"
-          config-env="platdev"
           viewer-selector="#viewer"
         >
         </vertex-scene-tree>
@@ -94,8 +84,7 @@
       <div class="workarea">
         <vertex-viewer
           id="viewer"
-          config-env="platdev"
-          src="urn:vertex:stream-key:IPxrmz8mbf7PdkP3-qeSLmqfr4bbtWafMa0o"
+          src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
         >
           <vertex-viewer-default-toolbar
             placement="bottom-left"
@@ -106,18 +95,6 @@
               class="view-cube"
             ></vertex-viewer-view-cube>
           </vertex-viewer-toolbar>
-
-          <vertex-viewer-markup id="markup" mode="edit">
-            <vertex-viewer-markup-tool tool="arrow">
-              
-            </vertex-viewer-markup-tool>
-            <vertex-viewer-markup-arrow
-              start="[-0.5, -0.5]"
-              end="[0.25, 0.25]"
-              start-line-anchor-style="arrow-triangle"
-              end-line-anchor-style="arrow-triangle"
-            ></vertex-viewer-markup-arrow>
-          </vertex-viewer-markup>
         </vertex-viewer>
       </div>
     </div>
