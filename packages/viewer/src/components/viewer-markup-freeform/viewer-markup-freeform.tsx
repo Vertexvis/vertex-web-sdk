@@ -296,7 +296,14 @@ export class ViewerMarkupFreeform {
           </svg>
           {this.mode === 'edit' && this.bounds != null && (
             <BoundingBox2d
-              bounds={translateRectToScreen(this.bounds, this.elementBounds)}
+              bounds={translateRectToScreen(
+                this.bounds,
+                this.elementBounds,
+                this.originatingViewport,
+                this.centeringBehavior,
+                this.scale ?? 1
+              )}
+              offset={{ x: offsetX, y: offsetY }}
               onTopLeftAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('top-left', e)
               }

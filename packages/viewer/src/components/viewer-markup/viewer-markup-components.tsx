@@ -4,6 +4,7 @@ import { Point } from '@vertexvis/geometry';
 
 export interface RelativeAnchorProps {
   id?: string;
+  transform?: string;
   rotation?: number;
   name: string;
   point: Point.Point;
@@ -11,7 +12,7 @@ export interface RelativeAnchorProps {
 }
 
 export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
-  { id, rotation, name, point, onPointerDown },
+  { id, transform, rotation, name, point, onPointerDown },
   children
 ) => {
   return (
@@ -25,13 +26,15 @@ export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
       onTouchStart={(event) => event.preventDefault()}
       onPointerDown={onPointerDown}
     >
-      <div
-        class="bounds-anchor"
-        style={{
-          transform: `rotateZ(${rotation ?? 0}deg)`,
-        }}
-      >
-        <slot name={name}>{children}</slot>
+      <div style={{ transform }}>
+        <div
+          class="bounds-anchor"
+          style={{
+            transform: `rotateZ(${rotation ?? 0}deg)`,
+          }}
+        >
+          <slot name={name}>{children}</slot>
+        </div>
       </div>
     </div>
   );

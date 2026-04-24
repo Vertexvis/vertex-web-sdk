@@ -406,6 +406,7 @@ export class ViewerMarkupArrow {
               <BoundingBox1d
                 start={screenStart}
                 end={screenEnd}
+                offset={{ x: offsetX, y: offsetY }}
                 onStartAnchorPointerDown={(event) =>
                   this.interactionHandler.editAnchor('start', event)
                 }

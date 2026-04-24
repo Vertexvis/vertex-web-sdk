@@ -276,6 +276,7 @@ export class ViewerMarkupCircle {
           {this.mode === 'edit' && (
             <BoundingBox2d
               bounds={relativeBounds}
+              offset={{ x: offsetX, y: offsetY }}
               onTopLeftAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('top-left', e)
               }
