@@ -186,6 +186,19 @@ describe(HitIndicator, () => {
     expect(regl().frame).toHaveBeenCalled();
   });
 
+  it('destroys regl resources on dispose', () => {
+    const indicator = new HitIndicator(canvas);
+
+    indicator.updateFrame(makePerspectiveFrame());
+    indicator.updateTransformAndNormal(
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1)),
+      Vector3.up()
+    );
+    indicator.dispose();
+
+    expect(regl().destroy).toHaveBeenCalled();
+  });
+
   it('creates meshes for the hit position, normal, and plane', async () => {
     const indicator = new HitIndicator(canvas);
     const frame = makePerspectiveFrame();

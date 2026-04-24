@@ -53,6 +53,9 @@ export abstract class ReglComponent implements Disposable {
 
   public dispose(): void {
     this.reglFrameDisposable?.cancel();
+    this.reglFrameDisposable = undefined;
+    this.reglCommand?.destroy();
+    this.reglCommand = undefined;
   }
 
   public updateFrame(frame: Frame, redraw = true): void {
