@@ -81,6 +81,22 @@ export class VertexDocumentViewer {
    */
   @Event() public documentReady!: EventEmitter<void>;
 
+  /**
+   * Emits an event when the document state changes.
+   */
+  @Event() public documentStateChanged!: EventEmitter<DocumentApiState>;
+
+  /**
+   * Emits an event when a page has been loaded or reloaded prior to being
+   * drawn to the canvas.
+   */
+  @Event() public pageLoaded!: EventEmitter<DocumentApiState>;
+
+  /**
+   * Emits an event when a page has been drawn to the canvas.
+   */
+  @Event() public pageDrawn!: EventEmitter<DocumentApiState>;
+
   @Element() private hostEl!: HTMLElement;
 
   private viewerContainerElement?: HTMLDivElement;
@@ -95,10 +111,14 @@ export class VertexDocumentViewer {
   private documentApi?: DocumentApi;
   private panInteractionHandler?: PanInteractionHandler;
   private documentApiStateChangedDisposable?: Disposable;
+  private pageLoadedDisposable?: Disposable;
+  private pageDrawnDisposable?: Disposable;
 
   protected componentWillLoad(): void {
     this.handleElementResize = this.handleElementResize.bind(this);
     this.handleDocumentApiStateChanged = this.handleDocumentApiStateChanged.bind(this);
+    this.handlePageLoaded = this.handlePageLoaded.bind(this);
+    this.handlePageDrawn = this.handlePageDrawn.bind(this);
 
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
   }
@@ -227,15 +247,28 @@ export class VertexDocumentViewer {
     this.documentApi?.dispose();
     this.panInteractionHandler?.dispose();
     this.documentApiStateChangedDisposable?.dispose();
+    this.pageLoadedDisposable?.dispose();
+    this.pageDrawnDisposable?.dispose();
     this.layers = undefined;
   }
 
   private handleDocumentApiStateChanged(state: DocumentApiState): void {
     this.documentState = state;
+    this.documentStateChanged.emit(state);
+  }
+
+  private handlePageLoaded(state: DocumentApiState): void {
+    this.pageLoaded.emit(state);
+  }
+
+  private handlePageDrawn(state: DocumentApiState): void {
+    this.pageDrawn.emit(state);
   }
 
   private updateDocumentApiListeners(): void {
     this.documentApiStateChangedDisposable = this.documentApi?.onStateChanged(this.handleDocumentApiStateChanged);
+    this.pageLoadedDisposable = this.documentRenderer?.onPageLoaded(this.handlePageLoaded);
+    this.pageDrawnDisposable = this.documentRenderer?.onPageDrawn(this.handlePageDrawn);
   }
 
   private updateInteractionHandler(): void {
