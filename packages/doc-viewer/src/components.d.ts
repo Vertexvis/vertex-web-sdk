@@ -24,6 +24,10 @@ export namespace Components {
          */
         "config"?: PartialConfig;
         /**
+          * The ID of the loaded `Document`. This ID is required to enable persistence of annotations.  Note that this is different than a `File` ID within the Vertex Platform, and must be created separately using the `/documents` endpoints. See https://docs.vertex3d.com/ for more details.
+         */
+        "documentId"?: string;
+        /**
           * Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.
          */
         "documentState"?: DocumentApiState;
@@ -100,6 +104,10 @@ declare namespace LocalJSX {
          */
         "config"?: PartialConfig;
         /**
+          * The ID of the loaded `Document`. This ID is required to enable persistence of annotations.  Note that this is different than a `File` ID within the Vertex Platform, and must be created separately using the `/documents` endpoints. See https://docs.vertex3d.com/ for more details.
+         */
+        "documentId"?: string;
+        /**
           * Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.
          */
         "documentState"?: DocumentApiState;
@@ -134,6 +142,7 @@ declare namespace LocalJSX {
 
     interface VertexDocumentViewerAttributes {
         "src": string;
+        "documentId": string;
         "interactionMode": InteractionMode;
         "resizeDebounce": number;
     }
