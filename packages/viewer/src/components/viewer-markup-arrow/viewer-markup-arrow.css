@@ -13,8 +13,11 @@
   /**
    * @prop --viewer-markup-arrow-line-stroke-width: A CSS length that
    * specifies the width of the arrow line's outline.
+   *
+   * Note that this is scaled by the component's scale factor, so providing a scale
+   * other than 1 will result in a different stroke width.
    */
-  --viewer-markup-arrow-line-stroke-width: 4;
+  --viewer-markup-arrow-line-stroke-width: 4px;
   /**
    * @prop --viewer-markup-arrow-head-stroke-color: A CSS color that
    * specifies the color of the arrow head's outline.
@@ -23,8 +26,11 @@
   /**
    * @prop --viewer-markup-arrow-head-stroke-width: A CSS length that
    * specifies the width of the arrow head's outline.
+   *
+   * Note that this is scaled by the component's scale factor, so providing a scale
+   * other than 1 will result in a different stroke width.
    */
-  --viewer-markup-arrow-head-stroke-width: 4;
+  --viewer-markup-arrow-head-stroke-width: 4px;
   /**
    * @prop --viewer-markup-arrow-head-fill-color: A CSS color that
    * specifies the color of the arrow head's fill.
@@ -85,7 +91,12 @@
     * specifies the height of the resize and reposition anchors.
     */
    --viewer-markup-arrow-bounds-anchor-height: 9px;
-  ;
+   /**
+    * @prop --viewer-markup-arrow-scale: A number that specifies the scale of the arrow.
+    * This is used to scale the arrow's stroke width. Defaults to 1, and is managed internally
+    * by the component.
+    */
+   --viewer-markup-arrow-scale: 1;
 }
 
 .svg {
@@ -107,14 +118,14 @@
 .line {
   pointer-events: auto;
   stroke: var(--viewer-markup-arrow-line-stroke-color);
-  stroke-width: var(--viewer-markup-arrow-line-stroke-width);
+  stroke-width: calc(var(--viewer-markup-arrow-line-stroke-width) * var(--viewer-markup-arrow-scale));
   cursor: default;
 }
 
 .head {
   pointer-events: auto;
   stroke: var(--viewer-markup-arrow-head-stroke-color);
-  stroke-width: var(--viewer-markup-arrow-head-stroke-width);
+  stroke-width: calc(var(--viewer-markup-arrow-head-stroke-width) * var(--viewer-markup-arrow-scale));
   fill: var(--viewer-markup-arrow-head-fill-color);
   fill-opacity: var(--viewer-markup-arrow-head-fill-opacity);
   cursor: default;

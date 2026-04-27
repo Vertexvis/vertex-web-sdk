@@ -14,6 +14,7 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
+import { writeDOM } from '../../lib/stencil';
 import {
   MarkupCenteringBehavior,
   MarkupInteraction,
@@ -226,6 +227,16 @@ export class ViewerMarkupCircle {
     if (this.mode !== 'create') {
       window.removeEventListener('pointerdown', this.handleWindowPointerDown);
     }
+  }
+
+  @Watch('scale')
+  protected handleScaleChange(): void {
+    writeDOM(() => {
+      this.hostEl.style.setProperty(
+        '--viewer-markup-circle-scale',
+        this.scale?.toString() ?? '1'
+      );
+    });
   }
 
   private updateViewport(): void {

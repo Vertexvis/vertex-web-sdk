@@ -14,6 +14,7 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
+import { writeDOM } from '../../lib/stencil';
 import {
   MarkupCenteringBehavior,
   MarkupInteraction,
@@ -248,6 +249,16 @@ export class ViewerMarkupFreeform {
   @Watch('points')
   protected recomputePointsFromProps(): void {
     this.updatePointsFromProps();
+  }
+
+  @Watch('scale')
+  protected handleScaleChange(): void {
+    writeDOM(() => {
+      this.hostEl.style.setProperty(
+        '--viewer-markup-freeform-scale',
+        this.scale?.toString() ?? '1'
+      );
+    });
   }
 
   @Watch('mode')

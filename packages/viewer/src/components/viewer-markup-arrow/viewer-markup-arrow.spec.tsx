@@ -143,6 +143,39 @@ describe('vertex-viewer-markup-arrow', () => {
     expect(groupEl.querySelector('line')?.getAttribute('y2')).toBe('0');
   });
 
+  it('defines and updates the scale property as scale changes', async () => {
+    const page = await newSpecPage({
+      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
+      template: () => (
+        <vertex-viewer>
+          <vertex-viewer-markup scale={0.5}>
+            <vertex-viewer-markup-arrow mode="create" />
+          </vertex-viewer-markup>
+        </vertex-viewer>
+      ),
+    });
+
+    const el = page.root?.querySelector(
+      'vertex-viewer-markup-arrow'
+    ) as HTMLVertexViewerMarkupArrowElement;
+
+    expect(el.getAttribute('style')).toContain(
+      '--viewer-markup-arrow-scale: 0.5'
+    );
+
+    el.scale = 2;
+    await page.waitForChanges();
+    expect(el.getAttribute('style')).toContain(
+      '--viewer-markup-arrow-scale: 2'
+    );
+
+    el.scale = undefined;
+    await page.waitForChanges();
+    expect(el.getAttribute('style')).toContain(
+      '--viewer-markup-arrow-scale: 1'
+    );
+  });
+
   it('removes event listeners when the viewer changes', async () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
