@@ -3,7 +3,7 @@ import { Color } from '@vertexvis/utils';
 
 import { toPbStreamAttributes } from '../streamAttributes';
 
-describe(toPbStreamAttributes, () => {
+describe('toPbStreamAttributes', () => {
   describe('depth buffer', () => {
     it('enables depth buffer if type is all', () => {
       const res = toPbStreamAttributes({ depthBuffers: 'all' });

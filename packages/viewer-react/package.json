@@ -33,6 +33,7 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
+    "@stencil/react-output-target": "1.4.2",
     "@vertexvis/viewer": "0.24.4"
   },
   "devDependencies": {

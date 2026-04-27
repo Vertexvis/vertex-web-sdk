@@ -5,6 +5,7 @@ import { UUID } from '@vertexvis/utils';
 import Long from 'long';
 
 import { random } from '../../../testing/random';
+import { SceneViewStateFeature } from '..';
 import {
   buildSceneElementOperationOnAnnotation,
   buildSceneElementOperationOnItem,
@@ -203,7 +204,9 @@ describe(toPbSceneViewStateFeatures, () => {
   });
 
   it('maps to invalid when unknown feature given', () => {
-    expect(toPbSceneViewStateFeatures(['Not a feature'])).toMatchObject([
+    expect(
+      toPbSceneViewStateFeatures(['Not a feature' as SceneViewStateFeature])
+    ).toMatchObject([
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_INVALID,
     ]);

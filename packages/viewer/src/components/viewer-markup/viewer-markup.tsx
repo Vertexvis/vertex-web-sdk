@@ -171,8 +171,8 @@ export class ViewerMarkup {
    *
    * @param markup The markup to add.
    * @returns The markup element that was created.
-   * @see {@link ViewerMarkups.arrowTemplateId}
-   * @see {@link ViewerMarkups.circleTemplateId}
+   * @see {@link arrowTemplateId}
+   * @see {@link circleTemplateId}
    */
   @Method()
   public async addMarkup(
@@ -246,7 +246,7 @@ export class ViewerMarkup {
    * Returns a list of markup elements that are children of this component.
    *
    * @returns A list of all markups.
-   * @see {@link ViewerMarkup.getMarkupElement}
+   * @see {@link getMarkupElement}
    */
   @Method()
   public async getMarkupElements(): Promise<
@@ -273,7 +273,7 @@ export class ViewerMarkup {
    *
    * @param id The ID of the markup element to return.
    * @returns A markup element, or `undefined`.
-   * @see {@link ViewerMarkup.getMarkupElements}
+   * @see {@link getMarkupElements}
    */
   @Method()
   public async getMarkupElement(

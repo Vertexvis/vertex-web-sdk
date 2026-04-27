@@ -16,7 +16,7 @@ describe('volume intersection controller', () => {
     materialOverride: jest.fn(),
   };
   const mockItemBuilder = {
-    where: (fn) => {
+    where: (fn: any) => {
       fn(mockQuery);
       return mockOperations;
     },
@@ -28,7 +28,7 @@ describe('volume intersection controller', () => {
   const model = new VolumeIntersectionQueryModel();
   const mockViewer = {
     scene: () => ({
-      elements: (fn) => {
+      elements: (fn: any) => {
         fn(mockBuilder);
         return {
           execute: mockExecute,
