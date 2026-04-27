@@ -11,9 +11,7 @@ This project contains Vertex's 3D Viewer SDK. Vertex is a cloud platform for
 rendering large 3D models. See [Vertex's website][vertex] for more information.
 
 Our 3D viewer is distributed as a set of standards-based [web components] that
-can run in any browser supporting the Custom Elements v1 specification. For
-browsers that do not support the Custom Elements v1 spec, a polyfill will
-automatically be used.
+can run in modern browsers matching this project's Browserslist targets.
 
 ## Installation
 
@@ -161,25 +159,6 @@ function main() {
   sceneTree.controller.stateChanged(state => {
     console.log(`Scene Tree Row Count: ${state.totalRows}`);
   });
-}
-```
-
-## Polyfills
-
-If you plan on targeting IE11 or Edge <= 18, you'll also need to supply
-polyfills for the Web Component APIs (Custom Elements, Shadow DOM, CSS
-Variables, etc).
-
-To include the polyfills, import `applyPolyfills` from the loader.
-
-```js
-import { applyPolyfills, defineCustomElements } from '@vertexvis/viewer/loader';
-
-function main() {
-  await applyPolyfills();
-  await defineCustomElements();
-
-  console.log("Loaded!");
 }
 ```
 

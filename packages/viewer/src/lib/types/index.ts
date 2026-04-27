@@ -24,7 +24,6 @@ export * from './pagination';
 export * from './standardView';
 export * from './stencilBuffer';
 export * from './synchronizedClock';
-export * from './typeGuards';
 export * from './viewport';
 
 export {
