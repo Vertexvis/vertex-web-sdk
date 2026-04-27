@@ -54,8 +54,9 @@ export function translatePointToScreen(
     canvasDimensions.height / contentDimensions.height
   );
   const effectiveScalar = canvasToContentScaleFactor * scale;
+  const contentScaleFactor = getScaleFactor(contentDimensions);
   const contentRelativePoint = Point.add(
-    Point.scale(pt, contentDimensions.height, contentDimensions.height),
+    Point.scale(pt, contentScaleFactor, contentScaleFactor),
     Dimensions.center(contentDimensions)
   );
 
@@ -98,9 +99,10 @@ export function translateDimensionsToScreen(
     canvasDimensions.height / contentDimensions.height
   );
   const effectiveScalar = canvasToContentScaleFactor * scale;
+  const contentScaleFactor = getScaleFactor(contentDimensions);
   const contentRelativeDimensions = Dimensions.scale(
-    contentDimensions.height,
-    contentDimensions.height,
+    contentScaleFactor,
+    contentScaleFactor,
     dimensions
   );
 
@@ -147,7 +149,7 @@ export function translatePointToRelative(
   pt: Point.Point,
   canvasDimensions: Dimensions.Dimensions
 ): Point.Point {
-  const scaleFactor = 1 / canvasDimensions.height;
+  const scaleFactor = 1 / getScaleFactor(canvasDimensions);
   const point = Point.scale(
     Point.subtract(pt, Dimensions.center(canvasDimensions)),
     scaleFactor,
@@ -289,4 +291,12 @@ export function isValidStartEvent(event: PointerEvent): boolean {
   const el = event.target as HTMLElement;
 
   return isVertexViewerMarkupElement(el) && el.mode !== 'edit';
+}
+
+function getScaleFactor(dimensions: Dimensions.Dimensions): number {
+  // We intentionally use the content's height when scaling to maintain a consistent coordinate
+  // space for markup. This is to ensure the markup will be displayed in the same position
+  // on the canvas regardless of the aspect ratio at the time the markup was created.
+  // See https://github.com/Vertexvis/vertex-web-sdk/pull/429 for more details.
+  return dimensions.height;
 }
