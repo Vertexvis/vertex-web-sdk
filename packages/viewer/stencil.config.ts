@@ -5,7 +5,6 @@ import workers from '@vertexvis/rollup-plugin-web-workers';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import typescript2 from 'rollup-plugin-typescript2';
 
 import jestConfig from './jest-shared.config';
 
@@ -16,20 +15,14 @@ export const config: Config = {
   preamble: copyright(),
   plugins: [
     workers({
-      plugins: [
-        commonjs(),
-        resolve({ browser: true }),
-        typescript2(),
-        terser(),
-      ],
+      plugins: [commonjs(), resolve({ browser: true }), terser()],
     }),
   ],
   globalScript: 'src/polyfill/resize-observer.ts',
   globalStyle: 'src/css/global.css',
   outputTargets: [
     reactOutputTarget({
-      componentCorePackage: '@vertexvis/viewer',
-      proxiesFile: '../viewer-react/src/generated/components.ts',
+      outDir: '../viewer-react/src/generated/',
       excludeComponents: [
         // Omitted because the React scene tree component doesn't support
         // rendering a row as a React element.
@@ -46,7 +39,8 @@ export const config: Config = {
     },
     {
       type: 'dist-custom-elements',
-      autoDefineCustomElements: true,
+      customElementsExportBehavior: 'auto-define-custom-elements',
+      externalRuntime: false,
       minify: true,
     },
     {
@@ -55,8 +49,6 @@ export const config: Config = {
   ],
   testing: { ...jestConfig },
   extras: {
-    dynamicImportShim: true,
-    shadowDomShim: true,
     experimentalImportInjection: true,
   },
 };

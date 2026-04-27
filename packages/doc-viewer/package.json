@@ -51,7 +51,6 @@
     "loader/",
     "LICENSE"
   ],
-  "private": "true",
   "scripts": {
     "prebuild": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "build": "stencil build",
@@ -79,7 +78,7 @@
     "eslint": "^8.57.1",
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
-    "tslib": "^2.1.0",
+    "tslib": "^2.4.0",
     "typescript": "~5.8.3"
   },
   "dependencies": {
