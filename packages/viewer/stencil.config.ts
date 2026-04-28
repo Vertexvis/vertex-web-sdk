@@ -2,9 +2,11 @@ import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
 import { vueOutputTarget } from '@stencil/vue-output-target';
 import workers from '@vertexvis/rollup-plugin-web-workers';
+import type { Plugin } from 'rollup';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
+import * as ts from 'typescript';
 
 import jestConfig from './jest-shared.config';
 
@@ -15,7 +17,12 @@ export const config: Config = {
   preamble: copyright(),
   plugins: [
     workers({
-      plugins: [commonjs(), resolve({ browser: true }), terser()],
+      plugins: [
+        commonjs(),
+        resolve({ browser: true }),
+        workerTypescript(),
+        terser(),
+      ],
     }),
   ],
   globalScript: 'src/polyfill/resize-observer.ts',
@@ -56,4 +63,25 @@ export const config: Config = {
 function copyright(): string {
   const year = new Date(Date.now()).getFullYear();
   return `Copyright (c) ${year} Vertex Software LLC. All rights reserved.`;
+}
+
+function workerTypescript(): Plugin {
+  return {
+    name: 'worker-typescript',
+    transform(code: string, id: string) {
+      if (!id.endsWith('.ts')) {
+        return null;
+      }
+
+      const output = ts.transpileModule(code, {
+        compilerOptions: {
+          module: ts.ModuleKind.ESNext,
+          target: ts.ScriptTarget.ES2019,
+        },
+        fileName: id,
+      });
+
+      return { code: output.outputText, map: null };
+    },
+  };
 }
