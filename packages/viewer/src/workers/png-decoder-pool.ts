@@ -1,4 +1,4 @@
-import { loadWorker, Pool, WorkerModule } from 'worker:./png-decoder.worker.js';
+import { loadWorker, Pool, WorkerModule } from 'worker:./png-decoder.js';
 
 import type { DecodePngFn } from './png-decoder';
 
