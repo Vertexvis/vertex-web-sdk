@@ -126,7 +126,7 @@ export class SceneTreeSearch {
    * Clears the current search term and clears any debounced filters.
    */
   @Method()
-  public clear(): void {
+  public async clear(): Promise<void> {
     this.value = '';
     this.searchDisposable?.dispose();
     this.emitCurrentValue();

@@ -10,6 +10,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+import { Dimensions, Point } from '@vertexvis/geometry';
 
 import { stampTemplateWithId } from '../../lib/templates';
 import {
@@ -17,6 +18,7 @@ import {
   CircleMarkup,
   FreeformMarkup,
   Markup,
+  MarkupCenteringBehavior,
 } from '../../lib/types/markup';
 import {
   isVertexViewerArrowMarkup,
@@ -105,6 +107,48 @@ export class ViewerMarkupTool {
    */
   @Prop({ mutable: true })
   public endLineAnchorStyle: LineAnchorStyle = 'arrow-triangle';
+
+  /**
+   * The original viewport dimensions where this markup was created. This value is used
+   * to determine where the markup should be rendered relative to the current viewport,
+   * enabling some markup to appear "off-screen".
+   *
+   * When provided, all NDC values will be considered relative to this viewport.
+   */
+  @Prop()
+  public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * Defines the behavior of the provided markup when the originating viewport is smaller
+   * than the current viewport, or is scaled to a size smaller than the current viewport
+   * using the `scale` property.
+   *
+   * Options:
+   * - `x-only`: Markup will be centered horizontally, but not vertically.
+   * - `y-only`: Markup will be centered vertically, but not horizontally.
+   * - `both`: Markup will be centered both horizontally and vertically.
+   * - `none`: Markup will not be centered (default).
+   */
+  @Prop()
+  public centeringBehavior: MarkupCenteringBehavior = 'none';
+
+  /**
+   * The current offset of the visible viewport. This value is used to determine where
+   * markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+   *
+   * When provided, all computed coordinates will be offset by this amount.
+   */
+  @Prop()
+  public offset?: Point.Point;
+
+  /**
+   * The scale to render this markup at. This value is used to scale the element's bounds
+   * along with any `offset` to determine the final computed coordinates.
+   *
+   * When provided, all computed coordinates will be scaled by this amount.
+   */
+  @Prop()
+  public scale?: number;
 
   /**
    * An event that is dispatched when a user begins a new markup.
@@ -360,6 +404,10 @@ export class ViewerMarkupTool {
 
       newMarkupElement.mode = 'create';
       newMarkupElement.viewer = this.viewer;
+      newMarkupElement.originatingViewport = this.originatingViewport;
+      newMarkupElement.centeringBehavior = this.centeringBehavior;
+      newMarkupElement.offset = this.offset;
+      newMarkupElement.scale = this.scale;
       newMarkupElement.addEventListener(
         'interactionBegin',
         this.handleMarkupInteractionBegin

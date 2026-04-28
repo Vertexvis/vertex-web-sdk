@@ -2598,9 +2598,9 @@
     "@vertexvis/typescript-config-vertexvis" "1.1.0"
 
 "@vertexvis/rollup-plugin-vertexvis-copyright@0.4.3":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-vertexvis-copyright/-/rollup-plugin-vertexvis-copyright-0.4.2.tgz#588998b12e8504bf5897b2ae9720bfa7c27e104a"
-  integrity sha512-xcFbtMgSCAgrJQPsZqXhnTWyCkcHTac8kYMQCh0U4NiQZa2eRqgBB/XV3GXTetfKy2SwzPVArTOCej3GQdj4cQ==
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-vertexvis-copyright/-/rollup-plugin-vertexvis-copyright-0.4.3.tgz#631d6ef0d1f09477fbe76ed7a3feee44eff9fbfc"
+  integrity sha512-gGswHX3CzbeyM36EjG03aczc78PVAfFbH2SBSxUgjfy8Ks82z2WOOXFYe1DeOeK5b89jGPyvE6zg9X/LeKRGpw==
   dependencies:
     rollup "^2.63.0"
 
@@ -7079,6 +7079,11 @@ jsonc-parser@3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/jsonc-parser/-/jsonc-parser-3.2.0.tgz#31ff3f4c2b9793f89c67212627c51c6394f88e76"
   integrity sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==
+
+jsonc-parser@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/jsonc-parser/-/jsonc-parser-3.0.0.tgz#abdd785701c7e7eaca8a9ec8cf070ca51a745a22"
+  integrity sha512-fQzRfAbIBnR0IQvftw9FJveWiHp72Fg20giDrHz6TdfB12UH/uue0D3hm57UB5KgAVuniLMCaS8P1IMj9NR7cA==
 
 jsonfile@^6.0.1:
   version "6.1.0"

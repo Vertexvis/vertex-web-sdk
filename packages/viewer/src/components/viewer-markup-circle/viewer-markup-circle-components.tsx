@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FunctionalComponent, h } from '@stencil/core';
-import { Rectangle } from '@vertexvis/geometry';
+import { Point, Rectangle } from '@vertexvis/geometry';
 import classNames from 'classnames';
 
 import { getBoundingBox2dAnchorPosition } from '../viewer-markup/markup-utils';
@@ -8,6 +8,7 @@ import { RelativeAnchor } from '../viewer-markup/viewer-markup-components';
 
 export interface BoundingBox2dProps {
   bounds: Rectangle.Rectangle;
+  offset?: Point.Point;
   onTopLeftAnchorPointerDown?: (event: PointerEvent) => void;
   onLeftAnchorPointerDown?: (event: PointerEvent) => void;
   onTopRightAnchorPointerDown?: (event: PointerEvent) => void;
@@ -21,6 +22,7 @@ export interface BoundingBox2dProps {
 
 export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
   bounds,
+  offset,
   onTopLeftAnchorPointerDown,
   onLeftAnchorPointerDown,
   onTopRightAnchorPointerDown,
@@ -33,6 +35,8 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
 }) => {
   const padded = Rectangle.pad(bounds, 6);
   const center = Rectangle.center(padded);
+  const transform =
+    offset != null ? `translate(${offset.x}px, ${offset.y}px)` : undefined;
 
   return (
     <div class="bounds-container">
@@ -43,9 +47,11 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
           left: `${padded.x}px`,
           width: `${padded.width}px`,
           height: `${padded.height}px`,
+          transform,
         }}
       ></div>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-top-left-anchor"
         name="top-left-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'top-left')}
@@ -56,6 +62,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-left-anchor"
         name="left-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'left')}
@@ -66,6 +73,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-top-right-anchor"
         name="top-right-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'top-right')}
@@ -76,6 +84,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-right-anchor"
         name="right-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'right')}
@@ -86,6 +95,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-bottom-left-anchor"
         name="bottom-left-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'bottom-left')}
@@ -96,6 +106,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-bottom-anchor"
         name="bottom-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'bottom')}
@@ -106,6 +117,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-bottom-right-anchor"
         name="bottom-right-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'bottom-right')}
@@ -116,6 +128,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-top-anchor"
         name="top-anchor"
         point={getBoundingBox2dAnchorPosition(padded, 'top')}
@@ -126,6 +139,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-2d-center-anchor"
         name="center-anchor"
         point={center}

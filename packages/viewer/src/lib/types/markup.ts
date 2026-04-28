@@ -69,3 +69,5 @@ export class FreeformMarkup {
 }
 
 export type Markup = ArrowMarkup | CircleMarkup | FreeformMarkup;
+
+export type MarkupCenteringBehavior = 'x-only' | 'y-only' | 'both' | 'none';
