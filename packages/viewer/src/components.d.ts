@@ -95,7 +95,11 @@ import {
 } from './components/viewer-icon/viewer-icon';
 import { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
 import { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
-import { Markup, MarkupInteraction } from './lib/types/markup';
+import {
+  Markup,
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from './lib/types/markup';
 import { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
 import { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform/viewer-markup-freeform';
@@ -220,7 +224,11 @@ export {
 } from './components/viewer-icon/viewer-icon';
 export { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
 export { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
-export { Markup, MarkupInteraction } from './lib/types/markup';
+export {
+  Markup,
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from './lib/types/markup';
 export { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 export { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
 export { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform/viewer-markup-freeform';
@@ -1258,6 +1266,13 @@ export namespace Components {
      */
     arrowTemplateId?: string;
     /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior: MarkupCenteringBehavior;
+    /**
      * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
      */
     circleTemplateId?: string;
@@ -1300,6 +1315,18 @@ export namespace Components {
       >
     >;
     /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
      * Removes a markup with the given ID, and returns the HTML element associated to the markup. Returns `undefined` if no markup is found.
      * @param id The ID of the markup to remove.
      * @returns The markup element, or undefined.
@@ -1312,6 +1339,12 @@ export namespace Components {
       | HTMLVertexViewerMarkupFreeformElement
       | undefined
     >;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
     /**
      * Indicates if new markup should be automatically selected.
      * @default false
@@ -1337,6 +1370,13 @@ export namespace Components {
     viewer?: HTMLVertexViewerElement;
   }
   interface VertexViewerMarkupArrow {
+    /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior: MarkupCenteringBehavior;
     dispose: () => Promise<void>;
     /**
      * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
@@ -1360,6 +1400,24 @@ export namespace Components {
      * @default ''
      */
     mode: ViewerMarkupArrowMode;
+    /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
     /**
      * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
      *
@@ -1397,12 +1455,37 @@ export namespace Components {
      * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     boundsJson?: string;
+    /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior: MarkupCenteringBehavior;
     dispose: () => Promise<void>;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      * @default ''
      */
     mode: ViewerMarkupCircleMode;
+    /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
     /**
      * The viewer to connect to markups.
      *
@@ -1423,12 +1506,31 @@ export namespace Components {
      * Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a freeform with a diameter of one fourth the viewport's smallest size in the center of the viewport.
      */
     boundsJson?: string;
+    /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior: MarkupCenteringBehavior;
     dispose: () => Promise<void>;
     /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      * @default ''
      */
     mode: ViewerMarkupFreeformMode;
+    /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
     /**
      * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
      *
@@ -1442,6 +1544,12 @@ export namespace Components {
      */
     pointsJson?: string;
     /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
+    /**
      * The viewer to connect to markups.
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
@@ -1453,6 +1561,13 @@ export namespace Components {
      * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
      */
     arrowTemplateId?: string;
+    /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior: MarkupCenteringBehavior;
     /**
      * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
      */
@@ -1474,9 +1589,27 @@ export namespace Components {
      */
     freeformTemplateId?: string;
     /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
      * Resets the state of the internally managed markup element to allow for creating a new markup. This state is automatically managed when this element is placed as a child of a `<vertex-viewer-markup>` element.
      */
     reset: () => Promise<void>;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
     /**
      * The style of the starting anchor. This defaults to none.
      * @default 'none'
@@ -4553,6 +4686,13 @@ declare namespace LocalJSX {
      */
     arrowTemplateId?: string;
     /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior?: MarkupCenteringBehavior;
+    /**
      * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
      */
     circleTemplateId?: string;
@@ -4570,6 +4710,12 @@ declare namespace LocalJSX {
      * An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.
      */
     freeformTemplateId?: string;
+    /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
     /**
      * Dispatched when a new markup is added, either through user interaction or programmatically.
      */
@@ -4612,6 +4758,18 @@ declare namespace LocalJSX {
       >
     ) => void;
     /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
+    /**
      * Indicates if new markup should be automatically selected.
      * @default false
      */
@@ -4637,6 +4795,13 @@ declare namespace LocalJSX {
   }
   interface VertexViewerMarkupArrow {
     /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior?: MarkupCenteringBehavior;
+    /**
      * The position of the ending anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
      *
      * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
@@ -4659,6 +4824,12 @@ declare namespace LocalJSX {
      */
     mode?: ViewerMarkupArrowMode;
     /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
+    /**
      * An event that is dispatched anytime the user begins interacting with the markup.
      */
     onInteractionBegin?: (
@@ -4674,6 +4845,18 @@ declare namespace LocalJSX {
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */
     onViewRendered?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
     /**
      * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
      *
@@ -4712,10 +4895,23 @@ declare namespace LocalJSX {
      */
     boundsJson?: string;
     /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior?: MarkupCenteringBehavior;
+    /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      * @default ''
      */
     mode?: ViewerMarkupCircleMode;
+    /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
     /**
      * An event that is dispatched anytime the user begins interacting with the markup.
      */
@@ -4732,6 +4928,18 @@ declare namespace LocalJSX {
      * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
      */
     onViewRendered?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
     /**
      * The viewer to connect to markups.
      *
@@ -4753,10 +4961,23 @@ declare namespace LocalJSX {
      */
     boundsJson?: string;
     /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior?: MarkupCenteringBehavior;
+    /**
      * A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.
      * @default ''
      */
     mode?: ViewerMarkupFreeformMode;
+    /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
     /**
      * An event that is dispatched anytime the user begins interacting with the markup.
      */
@@ -4776,6 +4997,12 @@ declare namespace LocalJSX {
       event: VertexViewerMarkupFreeformCustomEvent<void>
     ) => void;
     /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
      * The positions of the various points of this freeform markup. Can either be an array of `Point`s or a JSON string representation in the format of `[[x1, y1], [x2, y2]]` or `[{"x": 0, "y": 0}, {"x": 0, "y": 0}]`.
      *
      * Points are expected to be relative coordinates from `[-0.5, 0.5]`, e.g. `[0, 0]` corresponds to a point in the center of the viewport.
@@ -4788,6 +5015,12 @@ declare namespace LocalJSX {
      */
     pointsJson?: string;
     /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
+    /**
      * The viewer to connect to markups.
      *
      * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
@@ -4799,6 +5032,13 @@ declare namespace LocalJSX {
      * An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.
      */
     arrowTemplateId?: string;
+    /**
+     * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
+     *
+     * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
+     */
+    centeringBehavior?: MarkupCenteringBehavior;
     /**
      * An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.
      */
@@ -4820,6 +5060,12 @@ declare namespace LocalJSX {
      */
     freeformTemplateId?: string;
     /**
+     * The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all computed coordinates will be offset by this amount.
+     */
+    offset?: Point.Point;
+    /**
      * An event that is dispatched when a user begins a new markup.
      */
     onMarkupBegin?: (event: VertexViewerMarkupToolCustomEvent<void>) => void;
@@ -4827,6 +5073,18 @@ declare namespace LocalJSX {
      * An event that is dispatched when a user has finished their markup.
      */
     onMarkupEnd?: (event: VertexViewerMarkupToolCustomEvent<Markup>) => void;
+    /**
+     * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+     *
+     * When provided, all NDC values will be considered relative to this viewport.
+     */
+    originatingViewport?: Dimensions.Dimensions;
+    /**
+     * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
+     *
+     * When provided, all computed coordinates will be scaled by this amount.
+     */
+    scale?: number;
     /**
      * The style of the starting anchor. This defaults to none.
      * @default 'none'
@@ -5630,10 +5888,14 @@ declare namespace LocalJSX {
     selectNew: boolean;
     startLineAnchorStyle: LineAnchorStyle;
     endLineAnchorStyle: LineAnchorStyle;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMarkupArrowAttributes {
     startJson: string;
     endJson: string;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
     startLineAnchorStyle: LineAnchorStyle;
     endLineAnchorStyle: LineAnchorStyle;
     mode: ViewerMarkupArrowMode;
@@ -5641,11 +5903,15 @@ declare namespace LocalJSX {
   interface VertexViewerMarkupCircleAttributes {
     boundsJson: string;
     mode: ViewerMarkupCircleMode;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMarkupFreeformAttributes {
     pointsJson: string;
     boundsJson: string;
     mode: ViewerMarkupFreeformMode;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMarkupToolAttributes {
     arrowTemplateId: string;
@@ -5655,6 +5921,8 @@ declare namespace LocalJSX {
     disabled: boolean;
     startLineAnchorStyle: LineAnchorStyle;
     endLineAnchorStyle: LineAnchorStyle;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMeasurementDetailsAttributes {
     distanceUnits: DistanceUnitType;

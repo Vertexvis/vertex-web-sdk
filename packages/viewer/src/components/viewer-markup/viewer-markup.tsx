@@ -11,7 +11,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Point } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 
 import { stampTemplateWithId } from '../../lib/templates';
 import {
@@ -19,6 +19,7 @@ import {
   CircleMarkup,
   FreeformMarkup,
   Markup,
+  MarkupCenteringBehavior,
   MarkupInteraction,
 } from '../../lib/types/markup';
 import {
@@ -102,6 +103,48 @@ export class ViewerMarkup {
    */
   @Prop({ mutable: true })
   public endLineAnchorStyle: LineAnchorStyle = 'arrow-triangle';
+
+  /**
+   * The original viewport dimensions where this markup was created. This value is used
+   * to determine where the markup should be rendered relative to the current viewport,
+   * enabling some markup to appear "off-screen".
+   *
+   * When provided, all NDC values will be considered relative to this viewport.
+   */
+  @Prop()
+  public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * Defines the behavior of the provided markup when the originating viewport is smaller
+   * than the current viewport, or is scaled to a size smaller than the current viewport
+   * using the `scale` property.
+   *
+   * Options:
+   * - `x-only`: Markup will be centered horizontally, but not vertically.
+   * - `y-only`: Markup will be centered vertically, but not horizontally.
+   * - `both`: Markup will be centered both horizontally and vertically.
+   * - `none`: Markup will not be centered (default).
+   */
+  @Prop()
+  public centeringBehavior: MarkupCenteringBehavior = 'none';
+
+  /**
+   * The current offset of the visible viewport. This value is used to determine where
+   * markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+   *
+   * When provided, all computed coordinates will be offset by this amount.
+   */
+  @Prop()
+  public offset?: Point.Point;
+
+  /**
+   * The scale to render this markup at. This value is used to scale the element's bounds
+   * along with any `offset` to determine the final computed coordinates.
+   *
+   * When provided, all computed coordinates will be scaled by this amount.
+   */
+  @Prop()
+  public scale?: number;
 
   /**
    * Dispatched when a new markup is added, either through user interaction
@@ -340,6 +383,10 @@ export class ViewerMarkup {
    * @ignore
    */
   @Watch('viewer')
+  @Watch('originatingViewport')
+  @Watch('centeringBehavior')
+  @Watch('offset')
+  @Watch('scale')
   protected async handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined
   ): Promise<void> {
@@ -602,6 +649,10 @@ export class ViewerMarkup {
       | HTMLVertexViewerMarkupFreeformElement
   ): void {
     element.viewer = this.viewer;
+    element.originatingViewport = this.originatingViewport;
+    element.centeringBehavior = this.centeringBehavior;
+    element.offset = this.offset;
+    element.scale = this.scale;
     element.classList.add('viewer-markup__markup');
   }
 
@@ -616,6 +667,10 @@ export class ViewerMarkup {
       tool.viewer = this.viewer;
       tool.startLineAnchorStyle = this.startLineAnchorStyle;
       tool.endLineAnchorStyle = this.endLineAnchorStyle;
+      tool.originatingViewport = this.originatingViewport;
+      tool.centeringBehavior = this.centeringBehavior;
+      tool.offset = this.offset;
+      tool.scale = this.scale;
     }
   }
 

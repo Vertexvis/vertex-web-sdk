@@ -2,6 +2,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import fs from 'fs';
 import { builtinModules } from 'module';
+// import { config, input, output, typescript } from '@vertexvis/build-tools';
 import path from 'path';
 import ts from 'typescript';
 
@@ -99,3 +100,8 @@ export default {
     createTypeScriptPlugin(),
   ],
 };
+// export default config(
+//   input('src/index.ts'),
+//   typescript(),
+//   output({ enableInlineDynamicImports: true })
+// );

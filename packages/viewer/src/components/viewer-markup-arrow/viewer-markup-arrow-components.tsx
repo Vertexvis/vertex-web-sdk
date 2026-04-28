@@ -8,6 +8,7 @@ import { RelativeAnchor } from '../viewer-markup/viewer-markup-components';
 export interface BoundingBox1dProps {
   start: Point.Point;
   end: Point.Point;
+  offset?: Point.Point;
   onStartAnchorPointerDown?: (event: PointerEvent) => void;
   onCenterAnchorPointerDown?: (event: PointerEvent) => void;
   onEndAnchorPointerDown?: (event: PointerEvent) => void;
@@ -16,6 +17,7 @@ export interface BoundingBox1dProps {
 export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
   start,
   end,
+  offset,
   onStartAnchorPointerDown,
   onCenterAnchorPointerDown,
   onEndAnchorPointerDown,
@@ -24,10 +26,13 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
     Angle.toDegrees(Angle.fromPoints(start, end)) - 270
   );
   const center = Point.create((start.x + end.x) / 2, (start.y + end.y) / 2);
+  const transform =
+    offset != null ? `translate(${offset.x}px, ${offset.y}px)` : undefined;
 
   return (
     <div class="bounds-container">
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-1d-start-anchor"
         name="start-anchor"
         rotation={angle}
@@ -37,6 +42,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
         <div class={classNames('bounds-default-anchor', 'bounds-cap-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-1d-end-anchor"
         name="end-anchor"
         rotation={angle}
@@ -46,6 +52,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
         <div class={classNames('bounds-default-anchor', 'bounds-cap-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
+        transform={transform}
         id="bounding-box-1d-center-anchor"
         name="center-anchor"
         point={center}

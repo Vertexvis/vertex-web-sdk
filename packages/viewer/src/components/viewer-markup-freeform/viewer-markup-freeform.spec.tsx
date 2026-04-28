@@ -4,7 +4,7 @@ jest.mock('../viewer-markup/dom');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { Point, Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 
 import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
@@ -260,6 +260,43 @@ describe('vertex-viewer-markup-freeform', () => {
     expect(topEl?.getAttribute('style')).toContain('top: 19px');
     expect(bottomEl?.getAttribute('style')).toContain('left: 50px');
     expect(bottomEl?.getAttribute('style')).toContain('top: 81px');
+  });
+
+  it('applies a transform for the provided offset and maps points to the originating viewport', async () => {
+    const originatingViewport = Dimensions.create(200, 200);
+    const offset = Point.create(25, 25);
+    const scale = 0.5;
+    const points = [
+      Point.create(0, 0),
+      Point.create(0, -0.5),
+      Point.create(-0.5, 0),
+    ];
+
+    const page = await newSpecPage({
+      components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
+      template: () => (
+        <vertex-viewer>
+          <vertex-viewer-markup
+            originatingViewport={originatingViewport}
+            offset={offset}
+            scale={scale}
+          >
+            <vertex-viewer-markup-freeform points={points} />
+          </vertex-viewer-markup>
+        </vertex-viewer>
+      ),
+    });
+
+    const el = page.root?.querySelector(
+      'vertex-viewer-markup-freeform'
+    ) as HTMLVertexViewerMarkupFreeformElement;
+    const svg = el.shadowRoot?.querySelector('.svg') as SVGElement;
+    const groupEl = svg.querySelector('g') as SVGElement;
+
+    expect(groupEl.getAttribute('transform')).toContain(`translate(25 25)`);
+    expect(groupEl.querySelector('path')?.getAttribute('d')).toBe(
+      'M25,25L25,25L25,0L0,25'
+    );
   });
 
   it('removes event listeners when the viewer changes', async () => {

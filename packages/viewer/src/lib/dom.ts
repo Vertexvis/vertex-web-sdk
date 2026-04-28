@@ -38,3 +38,10 @@ export function cssCursor(cursor: Cursor): string {
     return parts.join(' ');
   }
 }
+
+export function getWindowDevicePixelRatio(): number {
+  if (typeof window !== 'undefined') {
+    return window.devicePixelRatio;
+  }
+  return 1;
+}

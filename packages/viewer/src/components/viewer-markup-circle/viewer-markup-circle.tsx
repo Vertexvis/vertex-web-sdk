@@ -10,10 +10,14 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Rectangle } from '@vertexvis/geometry';
+import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { MarkupInteraction } from '../../lib/types/markup';
+import { getWindowDevicePixelRatio } from '../../lib/dom';
+import {
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidStartEvent,
@@ -79,6 +83,48 @@ export class ViewerMarkupCircle {
    */
   @Prop()
   public viewer?: HTMLVertexViewerElement;
+
+  /**
+   * The original viewport dimensions where this markup was created. This value is used
+   * to determine where the markup should be rendered relative to the current viewport,
+   * enabling some markup to appear "off-screen".
+   *
+   * When provided, all NDC values will be considered relative to this viewport.
+   */
+  @Prop()
+  public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * Defines the behavior of the provided markup when the originating viewport is smaller
+   * than the current viewport, or is scaled to a size smaller than the current viewport
+   * using the `scale` property.
+   *
+   * Options:
+   * - `x-only`: Markup will be centered horizontally, but not vertically.
+   * - `y-only`: Markup will be centered vertically, but not horizontally.
+   * - `both`: Markup will be centered both horizontally and vertically.
+   * - `none`: Markup will not be centered (default).
+   */
+  @Prop()
+  public centeringBehavior: MarkupCenteringBehavior = 'none';
+
+  /**
+   * The current offset of the visible viewport. This value is used to determine where
+   * markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+   *
+   * When provided, all computed coordinates will be offset by this amount.
+   */
+  @Prop()
+  public offset?: Point.Point;
+
+  /**
+   * The scale to render this markup at. This value is used to scale the element's bounds
+   * along with any `offset` to determine the final computed coordinates.
+   *
+   * When provided, all computed coordinates will be scaled by this amount.
+   */
+  @Prop()
+  public scale?: number;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -193,11 +239,17 @@ export class ViewerMarkupCircle {
 
   public render(): h.JSX.IntrinsicElements {
     if (this.bounds != null && this.elementBounds != null) {
+      const effectiveScale = this.scale ?? 1;
       const relativeBounds = translateRectToScreen(
         this.bounds,
-        this.elementBounds
+        this.elementBounds,
+        this.originatingViewport,
+        this.centeringBehavior,
+        effectiveScale
       );
       const center = Rectangle.center(relativeBounds);
+      const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
+      const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
 
       return (
         <Host>
@@ -205,7 +257,10 @@ export class ViewerMarkupCircle {
             <defs>
               <SvgShadow id="circle-shadow" />
             </defs>
-            <g filter="url(#circle-shadow)">
+            <g
+              transform={`translate(${offsetX} ${offsetY})`}
+              filter="url(#circle-shadow)"
+            >
               <ellipse
                 class="ellipse"
                 cx={center.x}
@@ -221,6 +276,7 @@ export class ViewerMarkupCircle {
           {this.mode === 'edit' && (
             <BoundingBox2d
               bounds={relativeBounds}
+              offset={{ x: offsetX, y: offsetY }}
               onTopLeftAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('top-left', e)
               }
