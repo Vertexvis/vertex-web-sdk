@@ -10,7 +10,10 @@ export class PanInteractionHandler implements Disposable {
   private isDragging = false;
   private downPosition?: Point.Point;
 
-  public constructor(private element: HTMLElement, private api: DocumentApi) {
+  public constructor(
+    private element: HTMLElement,
+    private api: DocumentApi,
+  ) {
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerMove = this.handlePointerMove.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);

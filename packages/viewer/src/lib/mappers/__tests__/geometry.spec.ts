@@ -2,7 +2,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 import { fromPbMatrix4f, fromPbVector4f } from '../geometry';
 
-describe(fromPbVector4f, () => {
+describe('fromPbVector4f', () => {
   it('returns mapped vector4', () => {
     const pbVector4 = new vertexvis.protobuf.core.Vector4f({
       x: 10,
@@ -22,7 +22,7 @@ describe(fromPbVector4f, () => {
   });
 });
 
-describe(fromPbMatrix4f, () => {
+describe('fromPbMatrix4f', () => {
   it('returns mapped Matrix4x4', () => {
     const pbMatrix4x4 = new vertexvis.protobuf.core.Matrix4x4f({
       r0: { x: 10, y: 20, z: 30, w: 40 },

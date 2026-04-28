@@ -22,7 +22,10 @@ instance.
 <html>
   <body>
     <vertex-scene-tree viewer-selector="#viewer"></vertex-scene-tree>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
   </body>
 </html>
 ```
@@ -42,7 +45,7 @@ pass custom data and handlers to your row.
 **Example:** Customizing a `<vertex-scene-tree-table-layout>`.
 
 Refer to the [`<vertex-scene-tree-table-layout>`](../scene-tree-table-layout/readme.md),
-[`<vertex-scene-tree-table-column>`](../scene-tree-table-column/readme.md), and 
+[`<vertex-scene-tree-table-column>`](../scene-tree-table-column/readme.md), and
 [`<vertex-scene-tree-table-cell>`](../scene-tree-table-cell/readme.md) docs for more
 information about these components.
 
@@ -60,8 +63,16 @@ information about these components.
       <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle visibility-toggle>
-              <button class="my-btn" slot="right-gutter" event:click="{{row.data.handleClick}}">
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+              visibility-toggle
+            >
+              <button
+                class="my-btn"
+                slot="right-gutter"
+                event:click="{{row.data.handleClick}}"
+              >
                 {{row.data.buttonLabel}}
               </button>
             </vertex-scene-tree-table-cell>
@@ -70,7 +81,10 @@ information about these components.
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
 
     <script type="module">
       function main() {
@@ -78,9 +92,9 @@ information about these components.
         tree.rowData = (row) => {
           return {
             handleClick: () => console.log('clicked row button', row),
-            buttonLabel: `Click ${row.index}`
-          }
-        }
+            buttonLabel: `Click ${row.index}`,
+          };
+        };
       }
 
       main();
@@ -108,20 +122,20 @@ information about these components.
         color: green;
       }
 
-      .my-expand-btn[data-can-expand="false"] {
+      .my-expand-btn[data-can-expand='false'] {
         pointer-events: none;
         display: none;
       }
 
-      .my-expand-label[data-expanded="true"] {
+      .my-expand-label[data-expanded='true'] {
         display: none;
       }
 
-      .my-collapse-label[data-expanded="false"] {
+      .my-collapse-label[data-expanded='false'] {
         display: none;
       }
 
-      span[data-can-expand="false"] {
+      span[data-can-expand='false'] {
         margin-left: 0.25rem;
       }
     </style>
@@ -132,11 +146,25 @@ information about these components.
         <vertex-scene-tree-table-column>
           <template>
             <div class="my-row">
-              <button class="my-expand-btn" event:click="{{row.data.handleExpansion}}" attr:data-can-expand="{{row.data.canExpand}}">
-                <span class="my-expand-label" attr:data-expanded="{{row.data.expanded}}">></span>
-                <span class="my-collapse-label" attr:data-expanded="{{row.data.expanded}}">v</span>
+              <button
+                class="my-expand-btn"
+                event:click="{{row.data.handleExpansion}}"
+                attr:data-can-expand="{{row.data.canExpand}}"
+              >
+                <span
+                  class="my-expand-label"
+                  attr:data-expanded="{{row.data.expanded}}"
+                  >></span
+                >
+                <span
+                  class="my-collapse-label"
+                  attr:data-expanded="{{row.data.expanded}}"
+                  >v</span
+                >
               </button>
-              <span attr:data-can-expand="{{row.data.canExpand}}">{{row.node.name}}</span>
+              <span attr:data-can-expand="{{row.data.canExpand}}"
+                >{{row.node.name}}</span
+              >
               <button class="my-btn">Click Me</button>
             </div>
           </template>
@@ -144,7 +172,10 @@ information about these components.
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
 
     <script type="module">
       function main() {
@@ -153,9 +184,9 @@ information about these components.
           return {
             handleExpansion: () => tree.toggleExpandItem(row),
             canExpand: !row.node.isLeaf,
-            expanded: row.node.expanded
-          }
-        }
+            expanded: row.node.expanded,
+          };
+        };
       }
 
       main();
@@ -173,18 +204,27 @@ information about these components.
       <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.depth}}" visibility-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.depth}}"
+              visibility-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
   </body>
 </html>
 ```
@@ -205,26 +245,32 @@ made available when binding to the `row.metadata` object.
       <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.metadata.InstanceID}}"
+              visibility-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
 
     <script type="module">
       function main() {
         const tree = document.querySelector('vertex-scene-tree');
-        tree.metadataKeys = [
-          "VERTEX_SCENE_ITEM_NAME",
-          "InstanceID"
-        ];
+        tree.metadataKeys = ['VERTEX_SCENE_ITEM_NAME', 'InstanceID'];
       }
 
       main();
@@ -249,31 +295,35 @@ metadata keys to search against using the `metadataSearchKeys` property.
       <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.metadata.InstanceID}}"
+              visibility-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
 
     <script type="module">
       function main() {
         const tree = document.querySelector('vertex-scene-tree');
-        
-        tree.metadataKeys = [
-          "VERTEX_SCENE_ITEM_NAME",
-          "InstanceID"
-        ];
 
-        tree.metadataSearchKeys = [
-          "InstanceID"
-        ];
+        tree.metadataKeys = ['VERTEX_SCENE_ITEM_NAME', 'InstanceID'];
+
+        tree.metadataSearchKeys = ['InstanceID'];
       }
 
       main();
@@ -296,18 +346,27 @@ can also be done programmatically using the `filterItems` method.
       <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.metadata.InstanceID}}"
+              visibility-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
 
     <button id="product-filter-one">Filter to product 1</button>
     <button id="product-filter-two">Filter to product 2</button>
@@ -315,25 +374,22 @@ can also be done programmatically using the `filterItems` method.
     <script type="module">
       function main() {
         const tree = document.querySelector('vertex-scene-tree');
-        
-        tree.metadataKeys = [
-          "VERTEX_SCENE_ITEM_NAME",
-          "InstanceID"
-        ];
+
+        tree.metadataKeys = ['VERTEX_SCENE_ITEM_NAME', 'InstanceID'];
 
         const button1 = document.querySelector('#product-filter-one');
         const button2 = document.querySelector('#product-filter-two');
 
         button1.addEventListener('click', () => {
-          tree.filterItems("113950", {
-            columns: ["InstanceID"],
-            exactMatch: true
+          tree.filterItems('113950', {
+            columns: ['InstanceID'],
+            exactMatch: true,
           });
         });
         button2.addEventListener('click', () => {
-          tree.filterItems("111800", {
-            columns: ["InstanceID"],
-            exactMatch: true
+          tree.filterItems('111800', {
+            columns: ['InstanceID'],
+            exactMatch: true,
           });
         });
       }
@@ -347,7 +403,7 @@ can also be done programmatically using the `filterItems` method.
 ## Retrieving Metadata Keys
 
 The tree also provides support for retrieving the set of available metadata keys for the
-scene. This can be done by performing a lookup using the `controller` property of the 
+scene. This can be done by performing a lookup using the `controller` property of the
 `<vertex-scene-tree>` element. Once retrieved, these keys can then be used to filter
 the tree. See the `SceneTreeController` class for more information.
 
@@ -360,23 +416,32 @@ the tree. See the `SceneTreeController` class for more information.
       <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.metadata.InstanceID}}" visibility-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.metadata.InstanceID}}"
+              visibility-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
 
     <script type="module">
       function main() {
         const tree = document.querySelector('vertex-scene-tree');
-        
+
         // Ensure the component has initialized so the `controller` is defined.
         await tree.componentOnReady();
 
@@ -475,7 +540,10 @@ replace the header and want search behavior, your header slot should include a
         <button slot="after">A</button>
       </vertex-scene-tree-toolbar>
     </vertex-scene-tree>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
   </body>
 </html>
 ```
@@ -511,7 +579,10 @@ stack toolbars.
         <button slot="after">A</button>
       </vertex-scene-tree-toolbar>
     </vertex-scene-tree>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    ></vertex-viewer>
   </body>
 </html>
 ```
@@ -522,8 +593,9 @@ stack toolbars.
 
 #### Expected results not appearing
 
-By default, filtering occurs against the `VERTEX_SCENE_ITEM_NAME` metadata. This can be 
+By default, filtering occurs against the `VERTEX_SCENE_ITEM_NAME` metadata. This can be
 configured through a couple different options:
+
 - Providing values via the `metadataSearchKeys` property will cause all filters to be checked
   against the provided metadata keys. This can be used to customize the filter behavior to either
   include additional metadata properties, or to exclude the default `VERTEX_SCENE_ITEM_NAME` metadata.
@@ -545,25 +617,34 @@ When binding data for metadata keys that include spaces, we expect that the spac
       <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.node.name}}" expand-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
         <vertex-scene-tree-table-column>
           <template>
-            <vertex-scene-tree-table-cell prop:value="{{row.metadata.Metadata property with spaces}}" visibility-toggle></vertex-scene-tree-table-cell>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.metadata.Metadata property with spaces}}"
+              visibility-toggle
+            ></vertex-scene-tree-table-cell>
           </template>
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
     </vertex-scene-tree>
 
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       function main() {
         const tree = document.querySelector('vertex-scene-tree');
         tree.metadataKeys = [
-          "VERTEX_SCENE_ITEM_NAME",
-          "Metadata property with spaces"
+          'VERTEX_SCENE_ITEM_NAME',
+          'Metadata property with spaces',
         ];
       }
 
@@ -575,24 +656,22 @@ When binding data for metadata keys that include spaces, we expect that the spac
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
-| Property                     | Attribute                      | Description                                                                                                                                                                                                                                                                                                                                                                             | Type                                                   | Default      |
-| ---------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
-| `config`                     | `config`                       | An object to configure the scene tree.                                                                                                                                                                                                                                                                                                                                                  | `Config \| string \| undefined`                        | `undefined`  |
-| `configEnv`                  | `config-env`                   | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                                                                                                                                                                                                                            | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
-| `controller`                 | --                             |                                                                                                                                                                                                                                                                                                                                                                                         | `SceneTreeController \| undefined`                     | `undefined`  |
-| `metadataKeys`               | --                             | A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.  **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name. | `string[]`                                             | `[]`         |
-| `metadataSearchExactMatch`   | `metadata-search-exact-match`  | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` Indicates whether the metadata search should use an exact match.<br/><br/>                                                                                                                                                                                                                                          | `boolean`                                              | `false`      |
-| `metadataSearchKeys`         | --                             | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.<br/><br/>                                                                                                                                                                                                                              | `string[]`                                             | `[]`         |
-| `operationAnimationDuration` | `operation-animation-duration` | The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.                                                                                                                                                                                                                            | `number`                                               | `500`        |
-| `overScanCount`              | `over-scan-count`              | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.                                                                                                                                                                                                                     | `number`                                               | `25`         |
-| `rowData`                    | --                             | A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.                                                                                                                                                                                                                               | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
-| `searchOptions`              | --                             | A set of options to configure scene tree searching behavior.                                                                                                                                                                                                                                                                                                                            | `FilterOptions`                                        | `{}`         |
-| `viewer`                     | --                             | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                                                                                                                                                                                                                                       | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
-| `viewerSelector`             | `viewer-selector`              | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                                                                                                                                                                                                                                                | `string \| undefined`                                  | `undefined`  |
-
+| Property                     | Attribute                      | Description                                                                                                                                                                                                                                                                                                                                                                            | Type                                                   | Default      |
+| ---------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
+| `config`                     | `config`                       | An object to configure the scene tree.                                                                                                                                                                                                                                                                                                                                                 | `Config \| string \| undefined`                        | `undefined`  |
+| `configEnv`                  | `config-env`                   | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts. Use the `config` property for manually setting hosts.                                                                                                                                                                                                                            | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
+| `controller`                 | --                             |                                                                                                                                                                                                                                                                                                                                                                                        | `SceneTreeController \| undefined`                     | `undefined`  |
+| `metadataKeys`               | --                             | A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template. **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name. | `string[]`                                             | `[]`         |
+| `metadataSearchExactMatch`   | `metadata-search-exact-match`  | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` Indicates whether the metadata search should use an exact match.<br/><br/>                                                                                                                                                                                                                                         | `boolean`                                              | `false`      |
+| `metadataSearchKeys`         | --                             | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.<br/><br/>                                                                                                                                                                                                                             | `string[]`                                             | `[]`         |
+| `operationAnimationDuration` | `operation-animation-duration` | The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.                                                                                                                                                                                                                           | `number`                                               | `500`        |
+| `overScanCount`              | `over-scan-count`              | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.                                                                                                                                                                                                                    | `number`                                               | `25`         |
+| `rowData`                    | --                             | A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.                                                                                                                                                                                                                              | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
+| `searchOptions`              | --                             | A set of options to configure scene tree searching behavior.                                                                                                                                                                                                                                                                                                                           | `FilterOptions`                                        | `{}`         |
+| `viewer`                     | --                             | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                                                                                                                                                                                                                                      | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
+| `viewerSelector`             | `viewer-selector`              | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                                                                                                                                                                                                                                               | `string \| undefined`                                  | `undefined`  |
 
 ## Events
 
@@ -600,7 +679,6 @@ When binding data for metadata keys that include spaces, we expect that the spac
 | ------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------ |
 | `connectionError`  | An event that is emitted when this <vertex-scene-tree> encounters a connection error.      | `CustomEvent<SceneTreeErrorDetails>` |
 | `firstRowRendered` | An event that is emitted when the first row of this <vertex-scene-tree> has been rendered. | `CustomEvent<void>`                  |
-
 
 ## Methods
 
@@ -612,29 +690,35 @@ Performs an API call to collapse all nodes in the tree.
 
 Type: `Promise<void>`
 
-
-
 ### `collapseItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will collapse the node associated to the
 specified row or row index.
 
+#### Parameters
+
+| Name  | Type                        | Description                            |
+| ----- | --------------------------- | -------------------------------------- |
+| `row` | `number \| AsObject \| Row` | A row, row index, or node to collapse. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `deselectItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will deselect the item associated to the given
 row or row index.
 
+#### Parameters
+
+| Name  | Type                        | Description                              |
+| ----- | --------------------------- | ---------------------------------------- |
+| `row` | `number \| AsObject \| Row` | The row, row index, or node to deselect. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `expandAll() => Promise<void>`
 
@@ -644,18 +728,20 @@ Performs an API call to expand all nodes in the tree.
 
 Type: `Promise<void>`
 
-
-
 ### `expandItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will expand the node associated to the specified
 row or row index.
 
+#### Parameters
+
+| Name  | Type                        | Description                          |
+| ----- | --------------------------- | ------------------------------------ |
+| `row` | `number \| AsObject \| Row` | A row, row index, or node to expand. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `fetchMetadataKeys() => Promise<MetadataKey[]>`
 
@@ -675,6 +761,13 @@ A promise that resolves with the names of available keys.
 Performs an async request that will filter the displayed items in the tree
 that match the given term and options.
 
+#### Parameters
+
+| Name      | Type                | Description                         |
+| --------- | ------------------- | ----------------------------------- |
+| `term`    | `string`            | The filter term.                    |
+| `options` | `FilterTreeOptions` | The options to apply to the filter. |
+
 #### Returns
 
 Type: `Promise<void>`
@@ -687,6 +780,12 @@ the result of this filter when the promise completes.
 
 Returns the row data from the given vertical client position.
 
+#### Parameters
+
+| Name      | Type     | Description                   |
+| --------- | -------- | ----------------------------- |
+| `clientY` | `number` | The vertical client position. |
+
 #### Returns
 
 Type: `Promise<Row>`
@@ -697,6 +796,12 @@ A row or `undefined` if the row hasn't been loaded.
 
 Returns a row at the given index. If the row data has not been loaded,
 returns `undefined`.
+
+#### Parameters
+
+| Name    | Type     | Description           |
+| ------- | -------- | --------------------- |
+| `index` | `number` | The index of the row. |
 
 #### Returns
 
@@ -710,6 +815,12 @@ Returns the row data from the given mouse or pointer event. The event must
 originate from a `vertex-scene-tree-table-cell` contained by this element,
 otherwise `undefined` is returned.
 
+#### Parameters
+
+| Name    | Type                         | Description                                                   |
+| ------- | ---------------------------- | ------------------------------------------------------------- |
+| `event` | `MouseEvent \| PointerEvent` | A mouse or pointer event that originated from this component. |
+
 #### Returns
 
 Type: `Promise<Row>`
@@ -720,6 +831,12 @@ A row, or `undefined` if the row hasn't been loaded.
 
 Returns the row with the given id. If there is not a row
 matching the id, returns `undefined`.
+
+#### Parameters
+
+| Name     | Type     | Description                             |
+| -------- | -------- | --------------------------------------- |
+| `itemId` | `string` | An ID of an item to return the row for. |
 
 #### Returns
 
@@ -732,11 +849,15 @@ A row, or `undefined` if a corresponding row doesn't exist
 Performs an API call that will hide the item associated to the given row
 or row index.
 
+#### Parameters
+
+| Name  | Type                        | Description                          |
+| ----- | --------------------------- | ------------------------------------ |
+| `row` | `number \| AsObject \| Row` | The row, row index, or node to hide. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `invalidateRows() => Promise<void>`
 
@@ -751,33 +872,47 @@ next frame.
 
 Type: `Promise<void>`
 
-
-
 ### `isolateItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will show only the item associated to
 the given row or row index and fit the camera to the item's bounding box.
 
+#### Parameters
+
+| Name  | Type                        | Description                             |
+| ----- | --------------------------- | --------------------------------------- |
+| `row` | `number \| AsObject \| Row` | The row, row index, or node to isolate. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `scrollToIndex(index: number, options?: ScrollToOptions) => Promise<void>`
 
 Scrolls the tree to the given row index.
 
+#### Parameters
+
+| Name      | Type              | Description                                           |
+| --------- | ----------------- | ----------------------------------------------------- |
+| `index`   | `number`          | An index of the row to scroll to.                     |
+| `options` | `ScrollToOptions` | A set of options to configure the scrolling behavior. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `scrollToItem(itemId: string, options?: ScrollToOptions) => Promise<void>`
 
 Scrolls the tree to an item with the given ID. If the node for the item is
 not expanded, the tree will expand each of its parent nodes.
+
+#### Parameters
+
+| Name      | Type              | Description                                           |
+| --------- | ----------------- | ----------------------------------------------------- |
+| `itemId`  | `string`          | An ID of an item to scroll to.                        |
+| `options` | `ScrollToOptions` | A set of options to configure the scrolling behavior. |
 
 #### Returns
 
@@ -785,10 +920,17 @@ Type: `Promise<void>`
 
 A promise that resolves when the operation is finished.
 
-### `selectFilteredItems(term: string, options?: SceneTreeOperationOptions | undefined) => Promise<void>`
+### `selectFilteredItems(term: string, options?: SceneTreeOperationOptions) => Promise<void>`
 
 Performs an async request that will select the filtered items in the tree
 that match the given term.
+
+#### Parameters
+
+| Name      | Type                                     | Description      |
+| --------- | ---------------------------------------- | ---------------- |
+| `term`    | `string`                                 | The filter term. |
+| `options` | `SceneTreeOperationOptions \| undefined` |                  |
 
 #### Returns
 
@@ -808,45 +950,61 @@ in `rowArg`. If calling `selectItem` with a row not belonging to the
 ancestry of a previous selection, then this method will perform a standard
 selection.
 
+#### Parameters
+
+| Name  | Type                        | Description                                       |
+| ----- | --------------------------- | ------------------------------------------------- |
+| `row` | `number \| AsObject \| Row` | The row, row index or node to select.             |
+| `__1` | `SelectItemOptions`         | A set of options to configure selection behavior. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `showItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will show the item associated to the given row
 or row index.
 
+#### Parameters
+
+| Name  | Type                        | Description                          |
+| ----- | --------------------------- | ------------------------------------ |
+| `row` | `number \| AsObject \| Row` | The row, row index, or node to show. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `toggleExpandItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will either expand or collapse the node
 associated to the given row or row index.
 
+#### Parameters
+
+| Name  | Type                        | Description                                        |
+| ----- | --------------------------- | -------------------------------------------------- |
+| `row` | `number \| AsObject \| Row` | The row, row index, or node to collapse or expand. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
 
 ### `toggleItemVisibility(row: RowArg) => Promise<void>`
 
 Performs an API call that will either hide or show the item associated to
 the given row or row index.
 
+#### Parameters
+
+| Name  | Type                        | Description                                       |
+| ----- | --------------------------- | ------------------------------------------------- |
+| `row` | `number \| AsObject \| Row` | The row, row index, or node to toggle visibility. |
+
 #### Returns
 
 Type: `Promise<void>`
-
-
-
 
 ## Slots
 
@@ -854,7 +1012,6 @@ Type: `Promise<void>`
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `"footer"` | A slot that places content below the rows in the tree. Elements can be stacked by assigning multiple elements to this slot.                                                           |
 | `"header"` | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. Elements can be stacked by assigning multiple elements to this slot. |
-
 
 ## CSS Custom Properties
 
@@ -871,7 +1028,6 @@ Type: `Promise<void>`
 | `--scene-tree-selected-row-background-color` | The background color to use when displaying selected rows. This value always takes precedence if the row is selected. Defaults to `unset`.                                                                                                                                                                                                        |
 | `--scene-tree-toolbar-separator`             | A CSS border value that specifies the border between scene tree toolbars.                                                                                                                                                                                                                                                                         |
 
-
 ## Dependencies
 
 ### Depends on
@@ -883,6 +1039,7 @@ Type: `Promise<void>`
 - [vertex-scene-tree-table-layout](../scene-tree-table-layout)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
@@ -896,6 +1053,6 @@ graph TD;
   style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_
