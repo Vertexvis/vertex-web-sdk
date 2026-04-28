@@ -125,7 +125,7 @@ export class ViewerMarkupCircle {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -234,7 +234,7 @@ export class ViewerMarkupCircle {
     writeDOM(() => {
       this.hostEl.style.setProperty(
         '--viewer-markup-circle-scale',
-        this.scale?.toString() ?? '1'
+        this.scale.toString()
       );
     });
   }
@@ -250,13 +250,12 @@ export class ViewerMarkupCircle {
 
   public render(): h.JSX.IntrinsicElements {
     if (this.bounds != null && this.elementBounds != null) {
-      const effectiveScale = this.scale ?? 1;
       const relativeBounds = translateRectToScreen(
         this.bounds,
         this.elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        effectiveScale
+        this.scale
       );
       const center = Rectangle.center(relativeBounds);
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();

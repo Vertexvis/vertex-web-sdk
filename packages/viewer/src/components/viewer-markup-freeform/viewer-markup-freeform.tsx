@@ -149,7 +149,7 @@ export class ViewerMarkupFreeform {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -256,7 +256,7 @@ export class ViewerMarkupFreeform {
     writeDOM(() => {
       this.hostEl.style.setProperty(
         '--viewer-markup-freeform-scale',
-        this.scale?.toString() ?? '1'
+        this.scale.toString()
       );
     });
   }
@@ -312,7 +312,7 @@ export class ViewerMarkupFreeform {
                 this.elementBounds,
                 this.originatingViewport,
                 this.centeringBehavior,
-                this.scale ?? 1
+                this.scale
               )}
               offset={{ x: offsetX, y: offsetY }}
               onTopLeftAnchorPointerDown={(e) =>
@@ -383,7 +383,7 @@ export class ViewerMarkupFreeform {
           elementBounds,
           this.originatingViewport,
           this.centeringBehavior,
-          this.scale ?? 1
+          this.scale
         )
       );
     }

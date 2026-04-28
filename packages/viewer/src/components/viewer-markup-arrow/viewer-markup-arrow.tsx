@@ -136,7 +136,7 @@ export class ViewerMarkupArrow {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * The style of the starting anchor. This defaults to none.
@@ -305,10 +305,7 @@ export class ViewerMarkupArrow {
         <polygon
           id="line-anchor-arrow-triangle"
           class="head"
-          points={arrowheadPointsToPolygonPoints(
-            arrowheadPoints,
-            this.scale ?? 1
-          )}
+          points={arrowheadPointsToPolygonPoints(arrowheadPoints, this.scale)}
         />
       );
     } else if (anchorStyle === 'arrow-line') {
@@ -316,20 +313,20 @@ export class ViewerMarkupArrow {
         <path
           id="line-anchor-arrow-line"
           class="head"
-          d={arrowheadPointsToPathPoints(arrowheadPoints, this.scale ?? 1)}
+          d={arrowheadPointsToPathPoints(arrowheadPoints, this.scale)}
         />
       );
     } else if (anchorStyle === 'hash') {
       const hashPoints = arrowheadPointsToHashPoints(
         arrowheadPoints,
-        this.scale ?? 1
+        this.scale
       );
 
       return <line id="line-anchor-hash" class="head" {...hashPoints} />;
     } else if (anchorStyle === 'dot') {
       const circlePoints = arrowheadPointsToCirclePoints(
         arrowheadPoints,
-        this.scale ?? 1
+        this.scale
       );
 
       return <circle id="line-anchor-circle" class="head" {...circlePoints} />;
@@ -341,7 +338,6 @@ export class ViewerMarkupArrow {
   public render(): h.JSX.IntrinsicElements {
     if (this.start != null && this.end != null && this.elementBounds != null) {
       const elementBounds = this.elementBounds;
-      const effectiveScale = this.scale ?? 1;
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
       const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
       const screenStart = translatePointToScreen(
@@ -349,14 +345,14 @@ export class ViewerMarkupArrow {
         elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        effectiveScale
+        this.scale
       );
       const screenEnd = translatePointToScreen(
         this.end,
         elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        effectiveScale
+        this.scale
       );
 
       if (isValidPointData(screenStart, screenEnd)) {
