@@ -439,6 +439,7 @@ export class SceneTreeController {
 
     this.clearHandshakeTimer();
     this.clearReconnectTimer();
+    this.clearLoadingTimer();
 
     if (reset) {
       this.pages.clear();
@@ -474,6 +475,7 @@ export class SceneTreeController {
 
     this.clearHandshakeTimer();
     this.clearReconnectTimer();
+    this.clearLoadingTimer();
 
     this.pages.clear();
     this.activeRowRange = [];

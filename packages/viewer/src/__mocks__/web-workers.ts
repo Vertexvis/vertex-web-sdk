@@ -13,5 +13,5 @@ function spawnWorker(): Promise<any> {
 }
 
 function makeController(): any {
-  return {};
+  return { terminate: () => Promise.resolve() };
 }
