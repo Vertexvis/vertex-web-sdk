@@ -10,10 +10,14 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Point } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
-import { MarkupInteraction } from '../../lib/types/markup';
+import { getWindowDevicePixelRatio } from '../../lib/dom';
+import {
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidPointData,
@@ -88,6 +92,48 @@ export class ViewerMarkupArrow {
    */
   @Prop({ attribute: 'end' })
   public endJson?: string;
+
+  /**
+   * The original viewport dimensions where this markup was created. This value is used
+   * to determine where the markup should be rendered relative to the current viewport,
+   * enabling some markup to appear "off-screen".
+   *
+   * When provided, all NDC values will be considered relative to this viewport.
+   */
+  @Prop()
+  public originatingViewport?: Dimensions.Dimensions;
+
+  /**
+   * Defines the behavior of the provided markup when the originating viewport is smaller
+   * than the current viewport, or is scaled to a size smaller than the current viewport
+   * using the `scale` property.
+   *
+   * Options:
+   * - `x-only`: Markup will be centered horizontally, but not vertically.
+   * - `y-only`: Markup will be centered vertically, but not horizontally.
+   * - `both`: Markup will be centered both horizontally and vertically.
+   * - `none`: Markup will not be centered (default).
+   */
+  @Prop()
+  public centeringBehavior: MarkupCenteringBehavior = 'none';
+
+  /**
+   * The current offset of the visible viewport. This value is used to determine where
+   * markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
+   *
+   * When provided, all computed coordinates will be offset by this amount.
+   */
+  @Prop()
+  public offset?: Point.Point;
+
+  /**
+   * The scale to render this markup at. This value is used to scale the element's bounds
+   * along with any `offset` to determine the final computed coordinates.
+   *
+   * When provided, all computed coordinates will be scaled by this amount.
+   */
+  @Prop()
+  public scale?: number;
 
   /**
    * The style of the starting anchor. This defaults to none.
@@ -285,11 +331,24 @@ export class ViewerMarkupArrow {
 
   public render(): h.JSX.IntrinsicElements {
     if (this.start != null && this.end != null && this.elementBounds != null) {
+      const elementBounds = this.elementBounds;
+      const effectiveScale = this.scale ?? 1;
+      const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
+      const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
       const screenStart = translatePointToScreen(
         this.start,
-        this.elementBounds
+        elementBounds,
+        this.originatingViewport,
+        this.centeringBehavior,
+        effectiveScale
       );
-      const screenEnd = translatePointToScreen(this.end, this.elementBounds);
+      const screenEnd = translatePointToScreen(
+        this.end,
+        elementBounds,
+        this.originatingViewport,
+        this.centeringBehavior,
+        effectiveScale
+      );
 
       if (isValidPointData(screenStart, screenEnd)) {
         const arrowheadStartPoints = createLineAnchorStylePoints(
@@ -307,7 +366,10 @@ export class ViewerMarkupArrow {
               <defs>
                 <SvgShadow id="arrow-shadow" />
               </defs>
-              <g filter="url(#arrow-shadow)">
+              <g
+                transform={`translate(${offsetX} ${offsetY})`}
+                filter="url(#arrow-shadow)"
+              >
                 {this.renderLineAnchorStyle(
                   this.startLineAnchorStyle,
                   arrowheadStartPoints
@@ -326,7 +388,7 @@ export class ViewerMarkupArrow {
                 )}
               </g>
               {this.mode === 'edit' && (
-                <g>
+                <g transform={`translate(${offsetX} ${offsetY})`}>
                   <line
                     id="bounding-box-1d-line"
                     class="bounds-line"
@@ -342,6 +404,7 @@ export class ViewerMarkupArrow {
               <BoundingBox1d
                 start={screenStart}
                 end={screenEnd}
+                offset={{ x: offsetX, y: offsetY }}
                 onStartAnchorPointerDown={(event) =>
                   this.interactionHandler.editAnchor('start', event)
                 }

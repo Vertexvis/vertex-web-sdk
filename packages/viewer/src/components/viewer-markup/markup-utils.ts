@@ -1,5 +1,6 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 
+import { MarkupCenteringBehavior } from '../../lib/types';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
@@ -43,12 +44,38 @@ export function getBoundingBox2dAnchorPosition(
 
 export function translatePointToScreen(
   pt: Point.Point,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  contentDimensions: Dimensions.Dimensions = canvasDimensions,
+  centeringBehavior: MarkupCenteringBehavior = 'none',
+  scale = 1
 ): Point.Point {
-  const scaleFactor = canvasDimensions.height;
-  return Point.add(
-    Point.scale(pt, scaleFactor, scaleFactor),
-    Dimensions.center(canvasDimensions)
+  const canvasToContentScaleFactor = Math.min(
+    canvasDimensions.width / contentDimensions.width,
+    canvasDimensions.height / contentDimensions.height
+  );
+  const effectiveScalar = canvasToContentScaleFactor * scale;
+  const contentScaleFactor = getScaleFactor(contentDimensions);
+  const contentRelativePoint = Point.add(
+    Point.scale(pt, contentScaleFactor, contentScaleFactor),
+    Dimensions.center(contentDimensions)
+  );
+
+  // Include an offset for width and height to account for cases where the
+  // content dimensions are smaller than the canvas dimensions.
+  const scaledContentWidth = contentDimensions.width * effectiveScalar;
+  const scaledContentHeight = contentDimensions.height * effectiveScalar;
+  const centerOffsetX =
+    centeringBehavior === 'both' || centeringBehavior === 'x-only'
+      ? Math.max(0, (canvasDimensions.width - scaledContentWidth) / 2)
+      : 0;
+  const centerOffsetY =
+    centeringBehavior === 'both' || centeringBehavior === 'y-only'
+      ? Math.max(0, (canvasDimensions.height - scaledContentHeight) / 2)
+      : 0;
+
+  return Point.create(
+    contentRelativePoint.x * effectiveScalar + centerOffsetX,
+    contentRelativePoint.y * effectiveScalar + centerOffsetY
   );
 }
 
@@ -63,10 +90,27 @@ export function translatePointToBounds(
 
 export function translateDimensionsToScreen(
   dimensions: Dimensions.Dimensions,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  contentDimensions: Dimensions.Dimensions = canvasDimensions,
+  scale = 1
 ): Dimensions.Dimensions {
-  const scaleFactor = canvasDimensions.height;
-  return Dimensions.scale(scaleFactor, scaleFactor, dimensions);
+  const canvasToContentScaleFactor = Math.min(
+    canvasDimensions.width / contentDimensions.width,
+    canvasDimensions.height / contentDimensions.height
+  );
+  const effectiveScalar = canvasToContentScaleFactor * scale;
+  const contentScaleFactor = getScaleFactor(contentDimensions);
+  const contentRelativeDimensions = Dimensions.scale(
+    contentScaleFactor,
+    contentScaleFactor,
+    dimensions
+  );
+
+  return Dimensions.scale(
+    effectiveScalar,
+    effectiveScalar,
+    contentRelativeDimensions
+  );
 }
 
 /**
@@ -77,10 +121,24 @@ export function translateDimensionsToScreen(
  */
 export function translateRectToScreen(
   rect: Rectangle.Rectangle,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  contentDimensions?: Dimensions.Dimensions,
+  centeringBehavior: MarkupCenteringBehavior = 'none',
+  scale = 1
 ): Rectangle.Rectangle {
-  const position = translatePointToScreen(rect, canvasDimensions);
-  const dimensions = translateDimensionsToScreen(rect, canvasDimensions);
+  const position = translatePointToScreen(
+    rect,
+    canvasDimensions,
+    contentDimensions,
+    centeringBehavior,
+    scale
+  );
+  const dimensions = translateDimensionsToScreen(
+    rect,
+    canvasDimensions,
+    contentDimensions,
+    scale
+  );
   return Rectangle.fromPointAndDimensions(position, dimensions);
 }
 
@@ -91,7 +149,7 @@ export function translatePointToRelative(
   pt: Point.Point,
   canvasDimensions: Dimensions.Dimensions
 ): Point.Point {
-  const scaleFactor = 1 / canvasDimensions.height;
+  const scaleFactor = 1 / getScaleFactor(canvasDimensions);
   const point = Point.scale(
     Point.subtract(pt, Dimensions.center(canvasDimensions)),
     scaleFactor,
@@ -233,4 +291,12 @@ export function isValidStartEvent(event: PointerEvent): boolean {
   const el = event.target as HTMLElement;
 
   return isVertexViewerMarkupElement(el) && el.mode !== 'edit';
+}
+
+function getScaleFactor(dimensions: Dimensions.Dimensions): number {
+  // We intentionally use the content's height when scaling to maintain a consistent coordinate
+  // space for markup. This is to ensure the markup will be displayed in the same position
+  // on the canvas regardless of the aspect ratio at the time the markup was created.
+  // See https://github.com/Vertexvis/vertex-web-sdk/pull/429 for more details.
+  return dimensions.height;
 }

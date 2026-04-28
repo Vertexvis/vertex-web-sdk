@@ -83,11 +83,23 @@ export class PdfJsRenderer extends DocumentRenderer {
         optionalContentConfigPromise: optionalContentConfig != null ? Promise.resolve(optionalContentConfig) : undefined,
       }).promise;
 
-      const ctx = this.canvas.getContext('2d');
-      if (ctx != null) {
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.drawImage(this.offscreenCanvas, 0, 0);
-      }
+      // Emit an event before the page is drawn, then draw the page to the canvas on the next
+      // animation frame. This allows for more accurate synchronization of external content with the canvas.
+      this.pageLoaded.emit(state);
+
+      await new Promise<void>(resolve => {
+        window.requestAnimationFrame(() => {
+          const ctx = this.canvas.getContext('2d');
+          if (ctx != null) {
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            ctx.drawImage(this.offscreenCanvas, 0, 0);
+          }
+
+          resolve();
+        });
+      });
+
+      this.pageDrawn.emit(state);
 
       this.state.rendering = false;
     }

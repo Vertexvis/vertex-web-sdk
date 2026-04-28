@@ -4,7 +4,7 @@ jest.mock('../viewer-markup/dom');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { Point } from '@vertexvis/geometry';
+import { Dimensions, Point } from '@vertexvis/geometry';
 
 import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
@@ -106,6 +106,41 @@ describe('vertex-viewer-markup-arrow', () => {
     expect(endEl?.getAttribute('style')).toContain('top: 75px');
     expect(centerEl?.getAttribute('style')).toContain('left: 50px');
     expect(centerEl?.getAttribute('style')).toContain('top: 50px');
+  });
+
+  it('applies a transform for the provided offset and maps points to the originating viewport', async () => {
+    const originatingViewport = Dimensions.create(200, 200);
+    const offset = Point.create(25, 25);
+    const scale = 0.5;
+    const bottomCenter = Point.create(0, -0.5);
+    const topCenter = Point.create(0, 0.5);
+
+    const page = await newSpecPage({
+      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
+      template: () => (
+        <vertex-viewer>
+          <vertex-viewer-markup
+            originatingViewport={originatingViewport}
+            offset={offset}
+            scale={scale}
+          >
+            <vertex-viewer-markup-arrow start={bottomCenter} end={topCenter} />
+          </vertex-viewer-markup>
+        </vertex-viewer>
+      ),
+    });
+
+    const el = page.root?.querySelector(
+      'vertex-viewer-markup-arrow'
+    ) as HTMLVertexViewerMarkupArrowElement;
+    const svg = el.shadowRoot?.querySelector('.svg') as SVGElement;
+    const groupEl = svg.querySelector('g') as SVGElement;
+
+    expect(groupEl.getAttribute('transform')).toContain(`translate(25 25)`);
+    expect(groupEl.querySelector('line')?.getAttribute('x1')).toBe('25');
+    expect(groupEl.querySelector('line')?.getAttribute('y1')).toBe('50');
+    expect(groupEl.querySelector('line')?.getAttribute('x2')).toBe('25');
+    expect(groupEl.querySelector('line')?.getAttribute('y2')).toBe('0');
   });
 
   it('removes event listeners when the viewer changes', async () => {
