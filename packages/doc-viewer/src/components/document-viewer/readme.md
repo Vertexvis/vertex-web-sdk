@@ -21,9 +21,12 @@
 
 ## Events
 
-| Event           | Description                                                      | Type                |
-| --------------- | ---------------------------------------------------------------- | ------------------- |
-| `documentReady` | Emits an event when the document is ready to be interacted with. | `CustomEvent<void>` |
+| Event                  | Description                                                                                | Type                            |
+| ---------------------- | ------------------------------------------------------------------------------------------ | ------------------------------- |
+| `documentReady`        | Emits an event when the document is ready to be interacted with.                           | `CustomEvent<void>`             |
+| `documentStateChanged` | Emits an event when the document state changes.                                            | `CustomEvent<DocumentApiState>` |
+| `pageDrawn`            | Emits an event when a page has been drawn to the canvas.                                   | `CustomEvent<DocumentApiState>` |
+| `pageLoaded`           | Emits an event when a page has been loaded or reloaded prior to being drawn to the canvas. | `CustomEvent<DocumentApiState>` |
 
 
 ## Methods

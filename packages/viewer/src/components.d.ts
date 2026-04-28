@@ -224,7 +224,11 @@ export {
 } from './components/viewer-icon/viewer-icon';
 export { ViewerMarkupToolType } from './components/viewer-markup-tool/viewer-markup-tool';
 export { LineAnchorStyle } from './components/viewer-markup-arrow/utils';
-export { Markup, MarkupInteraction } from './lib/types/markup';
+export {
+  Markup,
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from './lib/types/markup';
 export { ViewerMarkupArrowMode } from './components/viewer-markup-arrow/viewer-markup-arrow';
 export { ViewerMarkupCircleMode } from './components/viewer-markup-circle/viewer-markup-circle';
 export { ViewerMarkupFreeformMode } from './components/viewer-markup-freeform/viewer-markup-freeform';
@@ -1270,6 +1274,7 @@ export namespace Components {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior: MarkupCenteringBehavior;
     /**
@@ -1376,6 +1381,7 @@ export namespace Components {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior: MarkupCenteringBehavior;
     dispose: () => Promise<void>;
@@ -1460,6 +1466,7 @@ export namespace Components {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior: MarkupCenteringBehavior;
     dispose: () => Promise<void>;
@@ -1510,6 +1517,7 @@ export namespace Components {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior: MarkupCenteringBehavior;
     dispose: () => Promise<void>;
@@ -1564,6 +1572,7 @@ export namespace Components {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior: MarkupCenteringBehavior;
     /**
@@ -4727,6 +4736,7 @@ declare namespace LocalJSX {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior?: MarkupCenteringBehavior;
     /**
@@ -4835,6 +4845,7 @@ declare namespace LocalJSX {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior?: MarkupCenteringBehavior;
     /**
@@ -4934,6 +4945,7 @@ declare namespace LocalJSX {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior?: MarkupCenteringBehavior;
     /**
@@ -4999,6 +5011,7 @@ declare namespace LocalJSX {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior?: MarkupCenteringBehavior;
     /**
@@ -5070,6 +5083,7 @@ declare namespace LocalJSX {
      * Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.
      *
      * Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default).
+     * @default 'none'
      */
     centeringBehavior?: MarkupCenteringBehavior;
     /**
@@ -5921,10 +5935,14 @@ declare namespace LocalJSX {
     selectNew: boolean;
     startLineAnchorStyle: LineAnchorStyle;
     endLineAnchorStyle: LineAnchorStyle;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMarkupArrowAttributes {
     startJson: string;
     endJson: string;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
     startLineAnchorStyle: LineAnchorStyle;
     endLineAnchorStyle: LineAnchorStyle;
     mode: ViewerMarkupArrowMode;
@@ -5932,11 +5950,15 @@ declare namespace LocalJSX {
   interface VertexViewerMarkupCircleAttributes {
     boundsJson: string;
     mode: ViewerMarkupCircleMode;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMarkupFreeformAttributes {
     pointsJson: string;
     boundsJson: string;
     mode: ViewerMarkupFreeformMode;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMarkupToolAttributes {
     arrowTemplateId: string;
@@ -5946,6 +5968,8 @@ declare namespace LocalJSX {
     disabled: boolean;
     startLineAnchorStyle: LineAnchorStyle;
     endLineAnchorStyle: LineAnchorStyle;
+    centeringBehavior: MarkupCenteringBehavior;
+    scale: number;
   }
   interface VertexViewerMeasurementDetailsAttributes {
     distanceUnits: DistanceUnitType;
