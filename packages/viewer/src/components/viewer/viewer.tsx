@@ -351,9 +351,7 @@ export class Viewer {
    * @internal
    */
   @Prop({ mutable: true })
-  public stencilBuffer: StencilBufferManager = new StencilBufferManager(
-    this.hostElement
-  );
+  public stencilBuffer!: StencilBufferManager;
 
   /**
    * Represents the current viewport of the viewer. The viewport represents the
@@ -415,7 +413,7 @@ export class Viewer {
    * Emits an event whenever the user taps or clicks a location in the viewer.
    * The event includes the location of the tap or click.
    *
-   * This event can be used in combination with the {@link VertexViewer.scene scene} method
+   * This event can be used in combination with the `scene` method
    * to query for items at the point of the tap.
    *
    * @see {@link Scene.raycaster Scene.raycaster} for more information.
@@ -530,6 +528,7 @@ export class Viewer {
   private isVisible = false;
 
   private resizeTimer?: NodeJS.Timeout;
+  private frameRenderVersion = 0;
 
   private interactionHandlers: InteractionHandler[] = [];
   private defaultInteractionHandlerDisposables: Array<Disposable> = [];
@@ -550,6 +549,8 @@ export class Viewer {
    * @ignore
    */
   protected connectedCallback(): void {
+    this.stencilBuffer ??= new StencilBufferManager(this.hostElement);
+
     this.visibilityObserver = new VisibilityObserver(
       this.handleVisibilityChange
     );
@@ -1018,6 +1019,7 @@ export class Viewer {
   @Method()
   public async unload(): Promise<void> {
     if (this.stream != null) {
+      this.frameRenderVersion += 1;
       this.annotations?.disconnect();
       this.stream.disconnect();
 
@@ -1083,6 +1085,11 @@ export class Viewer {
         throw new MissingJWTError('JWT is empty');
       }
     }
+
+    if (!this.hostElement.isConnected) {
+      return;
+    }
+
     this.connectionChange.emit(status);
   }
 
@@ -1308,6 +1315,7 @@ export class Viewer {
 
   private async updateFrame(frame: Frame): Promise<void> {
     const canvasDimensions = this.getCanvasDimensions();
+    const frameRenderVersion = this.frameRenderVersion;
 
     if (
       this.canvasElement != null &&
@@ -1356,7 +1364,10 @@ export class Viewer {
 
         const drawnFrame = await this.canvasRenderer(data);
 
-        if (drawnFrame != null) {
+        if (
+          drawnFrame != null &&
+          frameRenderVersion === this.frameRenderVersion
+        ) {
           this.updateViewerBackground();
 
           this.dispatchFrameDrawn(drawnFrame);
