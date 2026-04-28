@@ -29,7 +29,7 @@
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {

@@ -60,10 +60,10 @@
     "dev": "yarn start",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",
-    "test": "stencil test --spec --maxWorkers=50%",
+    "test": "stencil test --spec --runInBand",
     "test:watch": "stencil test --spec --watchAll --maxWorkers=50%",
-    "test:ci": "stencil test --spec --coverage",
-    "test:coverage": "stencil test --spec --coverage --maxWorkers=50%",
+    "test:ci": "stencil test --spec --coverage --runInBand",
+    "test:coverage": "stencil test --spec --coverage --runInBand",
     "generate": "stencil generate",
     "release:stage": "yarn generate:docs"
   },
