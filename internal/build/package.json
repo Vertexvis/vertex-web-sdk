@@ -35,7 +35,6 @@
   "dependencies": {
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "@vertexvis/build-tools": "^0.10.2",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",
     "rollup-plugin-terser": "^7.0.2",
     "tslib": "^2.4.0",

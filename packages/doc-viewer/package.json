@@ -51,6 +51,7 @@
     "loader/",
     "LICENSE"
   ],
+  "private": "true",
   "scripts": {
     "prebuild": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "build": "stencil build",

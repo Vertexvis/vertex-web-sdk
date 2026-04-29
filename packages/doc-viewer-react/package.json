@@ -18,6 +18,7 @@
   "files": [
     "dist/*"
   ],
+  "private": "true",
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
