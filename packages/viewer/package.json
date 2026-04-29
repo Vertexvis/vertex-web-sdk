@@ -14,7 +14,6 @@
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
-  "es2015": "dist/esm/index.mjs",
   "es2017": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
@@ -69,7 +68,6 @@
     "protobufjs": "^7.5.4",
     "regl": "^2.1.0",
     "regl-shape": "^1.1.0",
-    "requestidlecallback-polyfill": "^1.0.2",
     "resize-observer": "^1.0.4",
     "threads": "^1.7.0",
     "tslib": "^2.4.0"
