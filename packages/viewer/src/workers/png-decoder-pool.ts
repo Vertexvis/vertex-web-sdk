@@ -43,5 +43,7 @@ export const decodePng: DecodePngFn = async (bytes) => {
   return pool.queue((decode: DecodePngFn) => decode(bytes));
 };
 
-// Prefetch the worker and initialize the pool.
-getPool();
+// Prefetch the worker and initialize the pool in browsers only.
+if (typeof window !== 'undefined') {
+  void getPool();
+}

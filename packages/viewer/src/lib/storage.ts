@@ -2,10 +2,18 @@ export enum StorageKeys {
   DEVICE_ID = 'vertexvis:device-id',
 }
 
+function getLocalStorage(): Storage {
+  if (typeof window === 'undefined') {
+    throw new Error('Local storage is not available.');
+  }
+
+  return window.localStorage;
+}
+
 export function upsertStorageEntry<T>(
   key: string,
   values: Record<string, T>,
-  storage: Storage = window.localStorage
+  storage: Storage = getLocalStorage()
 ): void {
   const existing = storage.getItem(key);
 
@@ -20,7 +28,7 @@ export function upsertStorageEntry<T>(
 export function getStorageEntry<T>(
   key: string,
   f: (value: Record<string, T>) => T | undefined,
-  storage: Storage = window.localStorage
+  storage: Storage = getLocalStorage()
 ): T | undefined {
   const item = storage.getItem(key);
 
