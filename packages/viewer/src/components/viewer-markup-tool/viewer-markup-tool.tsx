@@ -148,7 +148,7 @@ export class ViewerMarkupTool {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * An event that is dispatched when a user begins a new markup.

@@ -14,6 +14,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
+import { writeDOM } from '../../lib/stencil';
 import {
   MarkupCenteringBehavior,
   MarkupInteraction,
@@ -27,6 +28,8 @@ import {
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { ArrowMarkupInteractionHandler } from './interactions';
 import {
+  arrowheadPointsToCirclePoints,
+  arrowheadPointsToHashPoints,
   arrowheadPointsToPathPoints,
   arrowheadPointsToPolygonPoints,
   createLineAnchorStylePoints,
@@ -133,7 +136,7 @@ export class ViewerMarkupArrow {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * The style of the starting anchor. This defaults to none.
@@ -273,6 +276,16 @@ export class ViewerMarkupArrow {
     }
   }
 
+  @Watch('scale')
+  protected handleScaleChange(): void {
+    writeDOM(() => {
+      this.hostEl.style.setProperty(
+        '--viewer-markup-arrow-scale',
+        this.scale?.toString() ?? '1'
+      );
+    });
+  }
+
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
@@ -292,7 +305,7 @@ export class ViewerMarkupArrow {
         <polygon
           id="line-anchor-arrow-triangle"
           class="head"
-          points={arrowheadPointsToPolygonPoints(arrowheadPoints)}
+          points={arrowheadPointsToPolygonPoints(arrowheadPoints, this.scale)}
         />
       );
     } else if (anchorStyle === 'arrow-line') {
@@ -300,30 +313,23 @@ export class ViewerMarkupArrow {
         <path
           id="line-anchor-arrow-line"
           class="head"
-          d={arrowheadPointsToPathPoints(arrowheadPoints)}
+          d={arrowheadPointsToPathPoints(arrowheadPoints, this.scale)}
         />
       );
     } else if (anchorStyle === 'hash') {
-      return (
-        <line
-          id="line-anchor-hash"
-          class="head"
-          x1={arrowheadPoints.hash.leftPoint.x}
-          y1={arrowheadPoints.hash.leftPoint.y}
-          x2={arrowheadPoints.hash.rightPoint.x}
-          y2={arrowheadPoints.hash.rightPoint.y}
-        />
+      const hashPoints = arrowheadPointsToHashPoints(
+        arrowheadPoints,
+        this.scale
       );
+
+      return <line id="line-anchor-hash" class="head" {...hashPoints} />;
     } else if (anchorStyle === 'dot') {
-      return (
-        <circle
-          id="line-anchor-circle"
-          class="head"
-          cx={arrowheadPoints.tip.x}
-          cy={arrowheadPoints.tip.y}
-          r={arrowheadPoints.radius}
-        />
+      const circlePoints = arrowheadPointsToCirclePoints(
+        arrowheadPoints,
+        this.scale
       );
+
+      return <circle id="line-anchor-circle" class="head" {...circlePoints} />;
     } else {
       return <div />;
     }
@@ -332,7 +338,6 @@ export class ViewerMarkupArrow {
   public render(): h.JSX.IntrinsicElements {
     if (this.start != null && this.end != null && this.elementBounds != null) {
       const elementBounds = this.elementBounds;
-      const effectiveScale = this.scale ?? 1;
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
       const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
       const screenStart = translatePointToScreen(
@@ -340,14 +345,14 @@ export class ViewerMarkupArrow {
         elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        effectiveScale
+        this.scale
       );
       const screenEnd = translatePointToScreen(
         this.end,
         elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        effectiveScale
+        this.scale
       );
 
       if (isValidPointData(screenStart, screenEnd)) {

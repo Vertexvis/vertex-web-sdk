@@ -13,8 +13,11 @@
   /**
    * @prop --viewer-markup-circle-ellipse-stroke-width: A CSS length that
    * specifies the width of the circle's outline.
+   *
+   * Note that this is scaled by the component's scale factor, so providing a scale
+   * other than 1 will result in a different stroke width.
    */
-  --viewer-markup-circle-ellipse-stroke-width: 4;
+  --viewer-markup-circle-ellipse-stroke-width: 4px;
   /**
    * @prop --viewer-markup-circle-ellipse-fill-color: A CSS color that
    * specifies the color of the circle's fill.
@@ -75,6 +78,12 @@
    * specifies the height of the resize and reposition anchors.
    */
   --viewer-markup-circle-bounds-anchor-height: 9px;
+  /**
+   * @prop --viewer-markup-circle-scale: A number that specifies the scale of the circle.
+   * This is used to scale the circle's stroke width. Defaults to 1, and is managed internally
+   * by the component.
+   */
+  --viewer-markup-circle-scale: 1;
 }
 
 .svg {
@@ -96,7 +105,7 @@
 .ellipse {
   pointer-events: auto;
   stroke: var(--viewer-markup-circle-ellipse-stroke-color);
-  stroke-width: var(--viewer-markup-circle-ellipse-stroke-width);
+  stroke-width: calc(var(--viewer-markup-circle-ellipse-stroke-width) * var(--viewer-markup-circle-scale));
   fill: var(--viewer-markup-circle-ellipse-fill-color);
   fill-opacity: var(--viewer-markup-circle-ellipse-fill-opacity);
   cursor: default;

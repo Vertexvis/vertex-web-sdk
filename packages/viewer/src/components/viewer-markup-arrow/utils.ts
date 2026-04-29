@@ -23,6 +23,19 @@ export interface ArrowheadPoints {
   rightPoint: Point.Point;
 }
 
+export interface LinePoints {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
+export interface CirclePoints {
+  cx: number;
+  cy: number;
+  r: number;
+}
+
 export function createArrowheadPoints(
   start: Point.Point,
   end: Point.Point,
@@ -120,22 +133,76 @@ export function createLineAnchorStylePoints(
 }
 
 export function arrowheadPointsToPolygonPoints(
-  points: LineAnchorStylePoints
+  points: LineAnchorStylePoints,
+  scale = 1
 ): string {
-  return [
+  const scaledRight = scalePointProportional(
     points.tip,
     points.arrowTriangle.rightPoint,
-    points.base,
+    scale
+  );
+  const scaledLeft = scalePointProportional(
+    points.tip,
     points.arrowTriangle.leftPoint,
-  ]
+    scale
+  );
+  const scaledBase = scalePointProportional(points.tip, points.base, scale);
+
+  return [points.tip, scaledRight, scaledBase, scaledLeft]
     .map((pt) => `${pt.x},${pt.y}`)
     .join(' ');
 }
 
 export function arrowheadPointsToPathPoints(
-  points: LineAnchorStylePoints
+  points: LineAnchorStylePoints,
+  scale = 1
 ): string {
-  return `M${points.arrowLine.rightPoint.x} ${points.arrowLine.rightPoint.y} L${points.tip.x} ${points.tip.y} L${points.arrowLine.leftPoint.x} ${points.arrowLine.leftPoint.y} L${points.tip.x} ${points.tip.y} Z`;
+  const scaledRight = scalePointProportional(
+    points.tip,
+    points.arrowLine.rightPoint,
+    scale
+  );
+  const scaledLeft = scalePointProportional(
+    points.tip,
+    points.arrowLine.leftPoint,
+    scale
+  );
+
+  return `M${scaledRight.x} ${scaledRight.y} L${points.tip.x} ${points.tip.y} L${scaledLeft.x} ${scaledLeft.y} L${points.tip.x} ${points.tip.y} Z`;
+}
+
+export function arrowheadPointsToHashPoints(
+  points: LineAnchorStylePoints,
+  scale = 1
+): LinePoints {
+  const scaledRight = scalePointProportional(
+    points.tip,
+    points.hash.rightPoint,
+    scale
+  );
+  const scaledLeft = scalePointProportional(
+    points.tip,
+    points.hash.leftPoint,
+    scale
+  );
+
+  return {
+    x1: scaledRight.x,
+    y1: scaledRight.y,
+    x2: scaledLeft.x,
+    y2: scaledLeft.y,
+  };
+}
+
+export function arrowheadPointsToCirclePoints(
+  points: LineAnchorStylePoints,
+  scale = 1
+): CirclePoints {
+  return {
+    cx: points.tip.x,
+    cy: points.tip.y,
+    r: points.radius * scale,
+  };
 }
 
 export function isVertexViewerArrowMarkup(
@@ -150,4 +217,15 @@ export function parsePoint(
   value: string | Point.Point | undefined
 ): Point.Point | undefined {
   return typeof value === 'string' ? Point.fromJson(value) : value;
+}
+
+export function scalePointProportional(
+  basePoint: Point.Point,
+  scaledPoint: Point.Point,
+  scale: number
+): Point.Point {
+  return Point.add(
+    basePoint,
+    Point.scaleProportional(Point.subtract(scaledPoint, basePoint), scale)
+  );
 }

@@ -14,6 +14,7 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
+import { writeDOM } from '../../lib/stencil';
 import {
   MarkupCenteringBehavior,
   MarkupInteraction,
@@ -148,7 +149,7 @@ export class ViewerMarkupFreeform {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -250,6 +251,16 @@ export class ViewerMarkupFreeform {
     this.updatePointsFromProps();
   }
 
+  @Watch('scale')
+  protected handleScaleChange(): void {
+    writeDOM(() => {
+      this.hostEl.style.setProperty(
+        '--viewer-markup-freeform-scale',
+        this.scale.toString()
+      );
+    });
+  }
+
   @Watch('mode')
   protected handleModeChange(): void {
     if (this.mode !== 'create') {
@@ -301,7 +312,7 @@ export class ViewerMarkupFreeform {
                 this.elementBounds,
                 this.originatingViewport,
                 this.centeringBehavior,
-                this.scale ?? 1
+                this.scale
               )}
               offset={{ x: offsetX, y: offsetY }}
               onTopLeftAnchorPointerDown={(e) =>
@@ -372,7 +383,7 @@ export class ViewerMarkupFreeform {
           elementBounds,
           this.originatingViewport,
           this.centeringBehavior,
-          this.scale ?? 1
+          this.scale
         )
       );
     }
