@@ -15,6 +15,25 @@
   "main": "./dist/bundle.cjs.js",
   "module": "./dist/bundle.esm.js",
   "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-server": {
+        "types": "./dist/index.server.d.ts",
+        "import": "./dist/bundle.server.esm.js",
+        "require": "./dist/bundle.server.cjs.js"
+      },
+      "import": "./dist/bundle.esm.js",
+      "require": "./dist/bundle.cjs.js",
+      "default": "./dist/bundle.esm.js"
+    },
+    "./client": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/bundle.esm.js",
+      "require": "./dist/bundle.cjs.js",
+      "default": "./dist/bundle.esm.js"
+    }
+  },
   "files": [
     "dist/*"
   ],

@@ -3,7 +3,8 @@
   "extends": "@vertexwebsdk/build/tsconfig-web",
   "compilerOptions": {
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "rootDir": "src",
   },
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules"],
 }
