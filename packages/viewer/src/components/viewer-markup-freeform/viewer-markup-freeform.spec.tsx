@@ -304,7 +304,7 @@ describe('vertex-viewer-markup-freeform', () => {
       components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
       template: () => (
         <vertex-viewer>
-          <vertex-viewer-markup scale={0.5}>
+          <vertex-viewer-markup>
             <vertex-viewer-markup-freeform mode="create" />
           </vertex-viewer-markup>
         </vertex-viewer>
@@ -315,9 +315,7 @@ describe('vertex-viewer-markup-freeform', () => {
       'vertex-viewer-markup-freeform'
     ) as HTMLVertexViewerMarkupFreeformElement;
 
-    expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-freeform-scale: 0.5'
-    );
+    expect(el.getAttribute('style')).toBeNull();
 
     el.scale = 2;
     await page.waitForChanges();
@@ -325,10 +323,10 @@ describe('vertex-viewer-markup-freeform', () => {
       '--viewer-markup-freeform-scale: 2'
     );
 
-    el.scale = undefined;
+    el.scale = 0.5;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-freeform-scale: 1'
+      '--viewer-markup-freeform-scale: 0.5'
     );
   });
 

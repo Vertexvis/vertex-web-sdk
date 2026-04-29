@@ -320,7 +320,7 @@ describe('vertex-viewer-markup-circle', () => {
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>
-          <vertex-viewer-markup scale={0.5}>
+          <vertex-viewer-markup>
             <vertex-viewer-markup-circle mode="create" />
           </vertex-viewer-markup>
         </vertex-viewer>
@@ -331,9 +331,7 @@ describe('vertex-viewer-markup-circle', () => {
       'vertex-viewer-markup-circle'
     ) as HTMLVertexViewerMarkupCircleElement;
 
-    expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-circle-scale: 0.5'
-    );
+    expect(el.getAttribute('style')).toBeNull();
 
     el.scale = 2;
     await page.waitForChanges();
@@ -341,10 +339,10 @@ describe('vertex-viewer-markup-circle', () => {
       '--viewer-markup-circle-scale: 2'
     );
 
-    el.scale = undefined;
+    el.scale = 0.5;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-circle-scale: 1'
+      '--viewer-markup-circle-scale: 0.5'
     );
   });
 

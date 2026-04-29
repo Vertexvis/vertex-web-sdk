@@ -148,7 +148,7 @@ describe('vertex-viewer-markup-arrow', () => {
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer>
-          <vertex-viewer-markup scale={0.5}>
+          <vertex-viewer-markup>
             <vertex-viewer-markup-arrow mode="create" />
           </vertex-viewer-markup>
         </vertex-viewer>
@@ -159,9 +159,7 @@ describe('vertex-viewer-markup-arrow', () => {
       'vertex-viewer-markup-arrow'
     ) as HTMLVertexViewerMarkupArrowElement;
 
-    expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-arrow-scale: 0.5'
-    );
+    expect(el.getAttribute('style')).toBeNull();
 
     el.scale = 2;
     await page.waitForChanges();
@@ -169,10 +167,10 @@ describe('vertex-viewer-markup-arrow', () => {
       '--viewer-markup-arrow-scale: 2'
     );
 
-    el.scale = undefined;
+    el.scale = 0.5;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-arrow-scale: 1'
+      '--viewer-markup-arrow-scale: 0.5'
     );
   });
 
