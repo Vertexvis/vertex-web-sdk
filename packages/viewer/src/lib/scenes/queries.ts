@@ -363,10 +363,10 @@ export class RootQuery implements ItemQuery<SingleSceneItemQuery> {
   }
 
   /**
-   * Specifies that the operation should be performed on items within the specified `rectangle` boundary 
-   * within the Viewer. The `exclusive` flag here determines whether items that intersect with the `rectangle`, 
+   * Specifies that the operation should be performed on items within the specified `rectangle` boundary
+   * within the Viewer. The `exclusive` flag here determines whether items that intersect with the `rectangle`,
    * but are not contained should be included in the result.
-   * 
+   *
    * @example
    * ```typescript
    * const viewer = document.querySelector('vertex-viewer');
@@ -506,7 +506,7 @@ export class AllQuery extends TerminalQuery {
 
 export class SceneTreeRangeQuery extends TerminalQuery {
   public constructor(
-    private range: SceneTreeRange,
+    private readonly range: SceneTreeRange,
     inverted: boolean
   ) {
     super(inverted);

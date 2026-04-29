@@ -44,7 +44,7 @@ export class AttributeBinding extends NodeBinding<Element> {
   public constructor(
     node: Element,
     expr: string,
-    private attr: string
+    private readonly attr: string
   ) {
     super(node, expr);
   }

@@ -15,7 +15,7 @@ function loadWorkerModule(): Promise<DecodePngModule> {
     console.debug(`Loading PNG worker module`);
     workerLoader = loadWorker();
   }
-  return workerLoader!;
+  return workerLoader;
 }
 
 function getPoolSize(): number {

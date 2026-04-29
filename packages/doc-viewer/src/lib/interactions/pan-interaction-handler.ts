@@ -11,8 +11,8 @@ export class PanInteractionHandler implements Disposable {
   private downPosition?: Point.Point;
 
   public constructor(
-    private element: HTMLElement,
-    private api: DocumentApi,
+    private readonly element: HTMLElement,
+    private readonly api: DocumentApi,
   ) {
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerMove = this.handlePointerMove.bind(this);
