@@ -30,6 +30,7 @@ export const config: Config = {
   outputTargets: [
     reactOutputTarget({
       outDir: '../viewer-react/src/generated/',
+      stencilPackageName: '@vertexvis/viewer',
       excludeComponents: [
         // Omitted because the React scene tree component doesn't support
         // rendering a row as a React element.
@@ -65,6 +66,7 @@ function copyright(): string {
   return `Copyright (c) ${year} Vertex Software LLC. All rights reserved.`;
 }
 
+// TODO: return to typescript2() from build-tools once that is updated in a way that can be used here.
 function workerTypescript(): Plugin {
   return {
     name: 'worker-typescript',
