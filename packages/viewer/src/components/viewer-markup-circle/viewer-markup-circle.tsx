@@ -14,6 +14,7 @@ import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
+import { writeDOM } from '../../lib/stencil';
 import {
   MarkupCenteringBehavior,
   MarkupInteraction,
@@ -124,7 +125,7 @@ export class ViewerMarkupCircle {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -228,6 +229,16 @@ export class ViewerMarkupCircle {
     }
   }
 
+  @Watch('scale')
+  protected handleScaleChange(): void {
+    writeDOM(() => {
+      this.hostEl.style.setProperty(
+        '--viewer-markup-circle-scale',
+        this.scale.toString()
+      );
+    });
+  }
+
   private updateViewport(): void {
     const rect = getMarkupBoundingClientRect(this.hostEl);
     this.elementBounds = rect;
@@ -239,13 +250,12 @@ export class ViewerMarkupCircle {
 
   public render(): h.JSX.IntrinsicElements {
     if (this.bounds != null && this.elementBounds != null) {
-      const effectiveScale = this.scale ?? 1;
       const relativeBounds = translateRectToScreen(
         this.bounds,
         this.elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        effectiveScale
+        this.scale
       );
       const center = Rectangle.center(relativeBounds);
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();

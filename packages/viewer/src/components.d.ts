@@ -1343,8 +1343,9 @@ export namespace Components {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
-    scale?: number;
+    scale: number;
     /**
      * Indicates if new markup should be automatically selected.
      * @default false
@@ -1416,8 +1417,9 @@ export namespace Components {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
-    scale?: number;
+    scale: number;
     /**
      * The position of the starting anchor. Can either be an instance of a `Point` or a JSON string representation in the format of `[x, y]` or `{"x": 0, "y": 0}`.
      *
@@ -1484,8 +1486,9 @@ export namespace Components {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
-    scale?: number;
+    scale: number;
     /**
      * The viewer to connect to markups.
      *
@@ -1547,8 +1550,9 @@ export namespace Components {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
-    scale?: number;
+    scale: number;
     /**
      * The viewer to connect to markups.
      *
@@ -1608,8 +1612,9 @@ export namespace Components {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
-    scale?: number;
+    scale: number;
     /**
      * The style of the starting anchor. This defaults to none.
      * @default 'none'
@@ -4767,6 +4772,7 @@ declare namespace LocalJSX {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
     scale?: number;
     /**
@@ -4855,6 +4861,7 @@ declare namespace LocalJSX {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
     scale?: number;
     /**
@@ -4938,6 +4945,7 @@ declare namespace LocalJSX {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
     scale?: number;
     /**
@@ -5018,6 +5026,7 @@ declare namespace LocalJSX {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
     scale?: number;
     /**
@@ -5083,6 +5092,7 @@ declare namespace LocalJSX {
      * The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.
      *
      * When provided, all computed coordinates will be scaled by this amount.
+     * @default 1
      */
     scale?: number;
     /**

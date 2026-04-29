@@ -144,7 +144,7 @@ export class ViewerMarkup {
    * When provided, all computed coordinates will be scaled by this amount.
    */
   @Prop()
-  public scale?: number;
+  public scale = 1;
 
   /**
    * Dispatched when a new markup is added, either through user interaction

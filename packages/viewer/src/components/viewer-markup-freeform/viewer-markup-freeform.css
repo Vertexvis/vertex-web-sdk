@@ -13,8 +13,11 @@
   /**
     * @prop --viewer-markup-freeform-stroke-width: A CSS length that
     * specifies the width of the freeform line.
+    *
+    * Note that this is scaled by the component's scale factor, so providing a scale
+    * other than 1 will result in a different stroke width.
     */
-  --viewer-markup-freeform-stroke-width: 4;
+  --viewer-markup-freeform-stroke-width: 4px;
   /**
     * @prop --viewer-markup-freeform-line-join: The join behavior between
     * the lines making up this freeform markup. Defaults to `round`.
@@ -64,7 +67,9 @@
     * @prop --viewer-markup-freeform-bounds-center-anchor-background-color: A CSS color that
     * specifies the background color of the center reposition anchor.
     */
-  --viewer-markup-freeform-bounds-center-anchor-background-color: var(--blue-400);
+  --viewer-markup-freeform-bounds-center-anchor-background-color: var(
+    --blue-400
+  );
   /**
     * @prop --viewer-markup-freeform-bounds-anchor-width: A CSS length that
     * specifies the width of the resize and reposition anchors.
@@ -75,6 +80,12 @@
     * specifies the height of the resize and reposition anchors.
     */
   --viewer-markup-freeform-bounds-anchor-height: 9px;
+  /**
+   * @prop --viewer-markup-freeform-scale: A number that specifies the scale of the freeform.
+   * This is used to scale the freeform's stroke width. Defaults to 1, and is managed internally
+   * by the component.
+   */
+  --viewer-markup-freeform-scale: 1;
 }
 
 .svg {
@@ -90,7 +101,10 @@
   pointer-events: auto;
   cursor: default;
   stroke: var(--viewer-markup-freeform-stroke-color);
-  stroke-width: var(--viewer-markup-freeform-stroke-width);
+  stroke-width: calc(
+    var(--viewer-markup-freeform-stroke-width) *
+      var(--viewer-markup-freeform-scale)
+  );
   stroke-linejoin: var(--viewer-markup-freeform-line-join);
   stroke-linecap: var(--viewer-markup-freeform-line-cap);
 }
@@ -146,12 +160,16 @@
   border-width: var(--viewer-markup-freeform-bounds-center-anchor-border-width);
   border-color: var(--viewer-markup-freeform-bounds-center-anchor-border-color);
   border-style: solid;
-  background-color: var(--viewer-markup-freeform-bounds-center-anchor-background-color);
+  background-color: var(
+    --viewer-markup-freeform-bounds-center-anchor-background-color
+  );
 }
 
 .bounds-edge-anchor {
   border-width: var(--viewer-markup-freeform-bounds-edge-anchor-border-width);
   border-color: var(--viewer-markup-freeform-bounds-edge-anchor-border-color);
   border-style: solid;
-  background-color: var(--viewer-markup-freeform-bounds-edge-anchor-background-color);
+  background-color: var(
+    --viewer-markup-freeform-bounds-edge-anchor-background-color
+  );
 }
