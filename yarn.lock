@@ -1560,7 +1560,7 @@
     "@rollup/rollup-win32-arm64-msvc" "4.44.0"
     "@rollup/rollup-win32-x64-msvc" "4.44.0"
 
-"@stencil/react-output-target@^1.4.2":
+"@stencil/react-output-target@^1.4.2", "@stencil/react-output-target@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@stencil/react-output-target/-/react-output-target-1.5.2.tgz#c35e979cc9732edf00132e74f960731b8a81bd7e"
   integrity sha512-NnzwjHwoHtD/O7uDA7oi/bUCd4McwvWOPrmD5/QJP3h1QoXTGw0hobpCdl5R04zB1xwrP8d4JUaR16DaTD+aAQ==
