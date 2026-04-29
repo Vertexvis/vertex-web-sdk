@@ -1,52 +1,40 @@
-const rgbRegex = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/;
-const rgbaRegex = /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(.+)\s*\)/;
-const hexRegex = /^(#|0x)?([A-Fa-f0-9]{6})$/;
+const hexRegex = /^(#|0x)?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/;
 
 /**
  * A `Color` represents an object containing values for red, green, blue and
  * alpha channels. Each value represents a number between 0 and 255.
  */
 export interface Color {
-  /**
-   * The color's red channel value, as a number from 0 to 255.
-   */
-  r: number;
-
-  /**
-   * The color's green channel value, as a number from 0 to 255.
-   */
-  g: number;
-
-  /**
-   * The color's blue channel value, as a number from 0 to 255.
-   */
-  b: number;
-
-  /**
-   * The color's alpha channel value, as a number from 0 to 255.
-   */
-  a: number;
+  r: number; // red channel value, from 0 to 255.
+  g: number; // green channel value, from 0 to 255.
+  b: number; // blue channel value, from 0 to 255.
+  a: number; // alpha channel value, from 0 to 255.
 }
 
 /**
  * Constructs a new color with the given red, green, blue and alpha values. If
  * alpha is undefined, defaults to 1.
  */
-export const create = (r: number, g: number, b: number, a = 255): Color => {
-  return { r, g, b, a };
-};
+export const create = (r: number, g: number, b: number, a = 255): Color => ({
+  r,
+  g,
+  b,
+  a,
+});
 
 /**
  * Converts a numeric color value containing red, green and blue values to a
  * `Color`. The alpha channel will default to fully opaque.
  */
-export const fromNumber = (num: number): Color => {
+export const fromNumber = (num: number, hasAlpha = false): Color => {
   // tslint:disable:no-bitwise
-  const normalized = num & 0xffffff;
+  const value = hasAlpha ? num : ((num & 0xffffff) << 8) | 0xff;
+
   return create(
-    (normalized >> 16) & 0xff,
-    (normalized >> 8) & 0xff,
-    normalized & 0xff
+    (value >> 24) & 0xff,
+    (value >> 16) & 0xff,
+    (value >> 8) & 0xff,
+    value & 0xff
   );
   // tslint:enable:no-bitwise
 };
@@ -59,35 +47,30 @@ export const fromNumber = (num: number): Color => {
 export const fromHexString = (str: string): Color | undefined => {
   const match = hexRegex.exec(str);
   if (match != null) {
-    return fromNumber(parseInt(match[2], 16));
+    const hex = match[2];
+    return fromNumber(parseInt(hex, 16), hex.length === 8);
   }
 };
 
 /**
  * Creates a `Color` from a CSS color value. This function currently only
  * supports `rgb(255, 255, 255)`, `rgba(255, 255, 255, 0.5)` or `"#FFFFFF"`.
- * Returns `undefined` if the color cannot be parsed.
+ * expects valid css color strings.
+ * @returns Color or `undefined` if the color cannot be parsed.
  */
 export const fromCss = (css: string): Color | undefined => {
-  const rgbMatch = rgbRegex.exec(css);
-  if (rgbMatch != null) {
+  if (css.startsWith('rgb')) {
+    const numbers = extractNumbersFromString(css);
+    if (numbers.length <= 3) {
+      return create(numbers[0], numbers[1], numbers[2]);
+    }
     return create(
-      parseInt(rgbMatch[1]),
-      parseInt(rgbMatch[2]),
-      parseInt(rgbMatch[3])
+      numbers[0],
+      numbers[1],
+      numbers[2],
+      Math.floor(Number(`${numbers[3]}.${numbers[4] ?? 0}`) * 255)
     );
   }
-
-  const rgbaMatch = rgbaRegex.exec(css);
-  if (rgbaMatch != null) {
-    return create(
-      parseInt(rgbaMatch[1]),
-      parseInt(rgbaMatch[2]),
-      parseInt(rgbaMatch[3]),
-      Math.floor(parseFloat(rgbaMatch[4]) * 255)
-    );
-  }
-
   if (hexRegex.test(css)) {
     return fromHexString(css);
   }
@@ -104,28 +87,31 @@ export const fromArray = (rgba: number[] | Uint8ClampedArray): Color => {
 /**
  * Returns `true` if the color's alpha channel is 0.
  */
-export const isInvisible = (color: Color): boolean => {
-  return color.a === 0;
-};
+export const isInvisible = (color: Color): boolean => color.a === 0;
 
 /**
  * Returns `true` if the alpha channel of this color is fully opaque (255).
  */
-export const isOpaque = (color: Color): boolean => {
-  return color.a === 255;
-};
+export const isOpaque = (color: Color): boolean => color.a === 255;
 
 /**
- * Converts a `Color` to a hex string. The returned string will be prefixed with
- * `#`.
+ * Converts a `Color` to a hex string - prefixed with `#`. ignores alpha value.
  */
-export const toHexString = (color: Omit<Color, 'a'>): string => {
-  return `#${componentToHex(color.r)}${componentToHex(color.g)}${componentToHex(
-    color.b
-  )}`;
-};
+export const toHexString = (color: Omit<Color, 'a'>): string =>
+  `#${hexify(color.r)}${hexify(color.g)}${hexify(color.b)}`;
 
-const componentToHex = (num: number): string => {
+/**
+ * Takes rgb(a) component numeric value (0-255) and converts it to hexidecimal
+ */
+const hexify = (num: number): string => {
   const hex = num.toString(16);
   return hex.length === 1 ? '0' + hex : hex;
+};
+
+const extractNumbersFromString = (stringWithNumbers: string): number[] => {
+  const matches = stringWithNumbers.match(/\d+/g); // Matches all digits in the string
+  if (matches) {
+    return matches.map(Number); // Converts each match to a number
+  }
+  return []; // Return an empty array if no numbers are found
 };
