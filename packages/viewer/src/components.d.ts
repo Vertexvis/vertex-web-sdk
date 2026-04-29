@@ -1253,6 +1253,8 @@ export namespace Components {
      * Adds a new markup as a child to this component. A new markup component will be created from the template specified by `arrow-template-id`, `circle-template-id`, or if undefined a default element will be created.
      * @param markup The markup to add.
      * @returns The markup element that was created.
+     * @see {@link arrowTemplateId}
+     * @see {@link circleTemplateId}
      */
     addMarkup: (
       markup: Markup
@@ -1294,6 +1296,7 @@ export namespace Components {
      * Returns the markup element associated to the given ID.
      * @param id The ID of the markup element to return.
      * @returns A markup element, or `undefined`.
+     * @see {@link getMarkupElements}
      */
     getMarkupElement: (
       id: string
@@ -1306,6 +1309,7 @@ export namespace Components {
     /**
      * Returns a list of markup elements that are children of this component.
      * @returns A list of all markups.
+     * @see {@link getMarkupElement}
      */
     getMarkupElements: () => Promise<
       Array<
@@ -4297,7 +4301,7 @@ declare namespace LocalJSX {
     /**
      * Emits an event whenever the user taps or clicks a location in the viewer. The event includes the location of the tap or click.
      *
-     * This event can be used in combination with the `scene` method to query for items at the point of the tap.
+     * This event can be used in combination with the {@link scene} method to query for items at the point of the tap.
      * @see {@link Scene.raycaster Scene.raycaster} for more information.
      */
     onTap?: (event: VertexViewerCustomEvent<TapEventDetails>) => void;
