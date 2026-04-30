@@ -38,6 +38,7 @@
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",
     "test": "stencil test --spec --maxWorkers=2 --workerIdleMemoryLimit=768MB",
+    "test:ssr-import": "node ./scripts/test-ssr-import.mjs",
     "test:watch": "stencil test --spec --watchAll --maxWorkers=50%",
     "test:ci": "stencil test --spec --coverage --maxWorkers=2 --workerIdleMemoryLimit=768MB",
     "test:coverage": "stencil test --spec --coverage --maxWorkers=2 --workerIdleMemoryLimit=768MB",
