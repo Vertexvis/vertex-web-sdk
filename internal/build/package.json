@@ -19,9 +19,24 @@
     "tsconfig.json",
     "tsconfig-web.json"
   ],
-  "main": "./dist/bundle.cjs.js",
-  "module": "./dist/bundle.esm.js",
-  "typings": "./dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/bundle.cjs",
+  "module": "./dist/bundle.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/bundle.js",
+      "require": "./dist/bundle.cjs",
+      "default": "./dist/bundle.js"
+    },
+    "./tsconfig": {
+      "default": "./tsconfig.json"
+    },
+    "./tsconfig-web": {
+      "default": "./tsconfig-web.json"
+    }
+  },
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",

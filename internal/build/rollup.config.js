@@ -91,13 +91,13 @@ export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/bundle.cjs.js',
+      file: 'dist/bundle.cjs',
       format: 'cjs',
       sourcemap: true,
       inlineDynamicImports: true,
     },
     {
-      file: 'dist/bundle.esm.js',
+      file: 'dist/bundle.js',
       format: 'esm',
       sourcemap: true,
       inlineDynamicImports: true,

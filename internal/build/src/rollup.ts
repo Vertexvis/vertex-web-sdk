@@ -215,9 +215,14 @@ function createOutputs({
   name,
   globals,
 }: OutputConfig = {}): OutputOptions[] {
+  const extensionForFormat = (
+    format: NonNullable<OutputOptions['format']>
+  ): string => (format === 'cjs' ? 'cjs' : 'js');
+
   return formats.flatMap((format) => {
+    const extension = extensionForFormat(format);
     const output: OutputOptions = {
-      file: `dist/${bundleName}.${format}.js`,
+      file: `dist/${bundleName}.${extension}`,
       format,
       globals,
       name,
@@ -229,7 +234,7 @@ function createOutputs({
           output,
           {
             ...output,
-            file: `dist/${bundleName}.${format}.min.js`,
+            file: `dist/${bundleName}.min.${extension}`,
             plugins: [terser()],
           },
         ]
