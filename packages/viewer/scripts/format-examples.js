@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -53,8 +53,9 @@ process.stdout.write(typeDefFormattedMultiline);
 
 function formatExample(example, parser = 'typescript') {
   return String(
-    execSync(
-      `yarn -s prettier --parser ${parser} --config ${JSON.stringify(prettierConfigPath)}`,
+    execFileSync(
+      'yarn',
+      ['-s', 'prettier', '--parser', parser, '--config', prettierConfigPath],
       {
         input: example,
         cwd: rootDir,
