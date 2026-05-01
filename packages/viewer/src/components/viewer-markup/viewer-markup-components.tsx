@@ -42,11 +42,33 @@ export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
 
 export interface SvgShadowProps {
   id: string;
+  scale?: number;
 }
 
-export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({ id }) => {
+export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({
+  id,
+  scale,
+}) => {
+  // Scale default values for a `<filter>` element by the provided scale.
+  // This prevents the filter area from being too small when scale is greater than 1,
+  // and uses the default values for a scale less than 1 to prevent the same issue.
+  // See https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/filter
+  // for more details on the default values used here.
+  const effectiveScale = scale ?? 1;
+  const xOffset = Math.max(10, 10 * effectiveScale);
+  const yOffset = Math.max(10, 10 * effectiveScale);
+  const width = Math.max(120, 110 * effectiveScale + xOffset);
+  const height = Math.max(120, 110 * effectiveScale + yOffset);
+
   return (
-    <filter id={id}>
+    <filter
+      id={id}
+      filterUnits="userSpaceOnUse"
+      x={`${-xOffset}%`}
+      y={`${-yOffset}%`}
+      width={`${width}%`}
+      height={`${height}%`}
+    >
       <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
       <feOffset dx="0" dy="1" result="offsetblur" />
       <feFlood flood-color="#000000" flood-opacity="0.25" />

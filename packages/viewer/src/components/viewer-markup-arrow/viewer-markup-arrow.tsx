@@ -369,7 +369,7 @@ export class ViewerMarkupArrow {
           <Host>
             <svg class="svg" onTouchStart={this.handleTouchStart}>
               <defs>
-                <SvgShadow id="arrow-shadow" />
+                <SvgShadow id="arrow-shadow" scale={this.scale} />
               </defs>
               <g
                 transform={`translate(${offsetX} ${offsetY})`}

@@ -48,6 +48,9 @@
     "./assets/pdf.worker.min.mjs": {
       "import": "./assets/pdf.worker.min.mjs",
       "default": "./assets/pdf.worker.min.mjs"
+    },
+    "./dist/doc-viewer/doc-viewer.css": {
+      "default": "./dist/doc-viewer/doc-viewer.css"
     }
   },
   "files": [
