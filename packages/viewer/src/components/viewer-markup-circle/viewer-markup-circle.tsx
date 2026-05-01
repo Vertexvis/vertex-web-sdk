@@ -265,7 +265,7 @@ export class ViewerMarkupCircle {
         <Host>
           <svg class="svg" onTouchStart={this.handleTouchStart}>
             <defs>
-              <SvgShadow id="circle-shadow" />
+              <SvgShadow id="circle-shadow" scale={this.scale} />
             </defs>
             <g
               transform={`translate(${offsetX} ${offsetY})`}
