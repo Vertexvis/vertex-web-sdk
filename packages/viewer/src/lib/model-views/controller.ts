@@ -95,15 +95,5 @@ export class ModelViewController {
    */
   public async unload(): Promise<void> {
     await this.stream.updateModelView({}, true);
-
-    // Clear any cross-section added from the model view
-    await this.stream.updateCrossSectioning(
-      {
-        crossSectioning: {
-          sectionPlanes: [],
-        },
-      },
-      true
-    );
   }
 }

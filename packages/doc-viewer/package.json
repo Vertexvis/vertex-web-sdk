@@ -52,7 +52,10 @@
     "loader/",
     "LICENSE"
   ],
-  "private": "true",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
   "scripts": {
     "prebuild": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "build": "stencil build",

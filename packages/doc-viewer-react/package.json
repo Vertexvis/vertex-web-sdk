@@ -18,7 +18,10 @@
   "files": [
     "dist/*"
   ],
-  "private": "true",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
