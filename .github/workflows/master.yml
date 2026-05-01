@@ -33,6 +33,8 @@ jobs:
           path: |
             packages/*/dist
             packages/viewer/loader
+            packages/doc-viewer/loader
+            packages/doc-viewer/assets
 
   detect-publish-release:
     runs-on: ubuntu-latest

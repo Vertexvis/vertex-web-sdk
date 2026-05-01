@@ -32,6 +32,8 @@ jobs:
           path: |
             packages/*/dist
             packages/viewer/loader
+            packages/doc-viewer/loader
+            packages/doc-viewer/assets
   lint:
     runs-on: ubuntu-latest
     steps:
