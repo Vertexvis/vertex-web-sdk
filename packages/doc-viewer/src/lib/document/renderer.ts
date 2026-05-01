@@ -10,7 +10,10 @@ export abstract class DocumentRenderer implements Disposable {
   protected readonly pageLoaded = new EventDispatcher<DocumentApiState>();
   protected readonly pageDrawn = new EventDispatcher<DocumentApiState>();
 
-  public constructor(protected readonly api: DocumentApi, protected readonly canvas: HTMLCanvasElement) {}
+  public constructor(
+    protected readonly api: DocumentApi,
+    protected readonly canvas: HTMLCanvasElement,
+  ) {}
 
   public onPageLoaded(listener: Listener<DocumentApiState>): Disposable {
     return this.pageLoaded.on(listener);

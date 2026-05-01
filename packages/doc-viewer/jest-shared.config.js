@@ -1,6 +1,6 @@
 // Jest configuration that shared between StencilJS and the Jest config that's
 // needed by IDE plugins.
-module.exports = {
+export default {
   collectCoverageFrom: ['./src/**', '!./src/__*__/**', '!./src/testing'],
   coveragePathIgnorePatterns: ['./src/assets/*', './src/polyfill/*'],
   coverageThreshold: {
@@ -15,5 +15,5 @@ module.exports = {
   moduleNameMapper: {
     '^pdfjs-dist/legacy/build/pdf\\.mjs$': '<rootDir>/src/__mocks__/pdfjs-mock.ts',
   },
-  setupFilesAfterEnv: ['<rootDir>/src/__setup__/polyfills.ts', '<rootDir>/src/__setup__/resize-observer.ts'],
+  setupFilesAfterEnv: ['<rootDir>/../../jest.setup.console.js', '<rootDir>/src/__setup__/polyfills.ts', '<rootDir>/src/__setup__/resize-observer.ts'],
 };

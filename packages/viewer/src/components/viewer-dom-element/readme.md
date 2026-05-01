@@ -13,6 +13,12 @@ information.
 
 <!-- Auto Generated Below -->
 
+## Overview
+
+The `ViewerDomElement` is responsible for managing a
+`<vertex-viewer-dom-element>` element. These elements are intended to be
+added as children to a `<vertex-viewer-dom-renderer>` and represent an
+individual DOM element within a local 3D scene.
 
 ## Properties
 
@@ -34,7 +40,6 @@ information.
 | `scale`           | --                 | The local scale of this element.                                                                                                                                                                                                                | `Vector3`                                                                                                                          | `Vector3.create(1, 1, 1)` |
 | `scaleJson`       | `scale`            | The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.                                                                                         | `string`                                                                                                                           | `''`                      |
 
-
 ## Events
 
 | Event                   | Description                                                         | Type                   |
@@ -43,15 +48,15 @@ information.
 | `occlusionStateChanged` | Dispatched when the occlusion state is changed.                     | `CustomEvent<boolean>` |
 | `propertyChange`        | An event that is emitted when any property on the dom group changes | `CustomEvent<void>`    |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-pin-group](../viewer-pin-group)
- - [vertex-viewer-view-cube](../viewer-view-cube)
+- [vertex-viewer-pin-group](../viewer-pin-group)
+- [vertex-viewer-view-cube](../viewer-view-cube)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-pin-group --> vertex-viewer-dom-element
@@ -59,6 +64,6 @@ graph TD;
   style vertex-viewer-dom-element fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

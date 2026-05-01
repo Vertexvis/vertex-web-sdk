@@ -6,6 +6,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
+  JSX,
   Method,
   Prop,
   State,

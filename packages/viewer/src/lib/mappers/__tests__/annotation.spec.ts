@@ -8,7 +8,7 @@ import {
 import { CustomAnnotationData } from '../../annotations/annotation';
 import { fromPbAnnotation, fromPbAnnotationSet } from '../annotation';
 
-describe(fromPbAnnotationSet, () => {
+describe('fromPbAnnotationSet', () => {
   it('returns mapped annotation set', () => {
     const id = UUID.create();
     const createdAt = new Date();
@@ -36,7 +36,7 @@ describe(fromPbAnnotationSet, () => {
   });
 });
 
-describe(fromPbAnnotation, () => {
+describe('fromPbAnnotation', () => {
   it('returns mapped annotation set', () => {
     const id = UUID.create();
     const createdAt = new Date();

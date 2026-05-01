@@ -10,9 +10,7 @@ import { TapEventDetails } from './tapEventDetails';
 
 type SceneProvider = () => Promise<Scene>;
 
-export class FlyToPositionKeyInteraction
-  implements KeyInteraction<TapEventDetails>
-{
+export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetails> {
   public constructor(
     private stream: StreamApi,
     private configProvider: ConfigProvider,

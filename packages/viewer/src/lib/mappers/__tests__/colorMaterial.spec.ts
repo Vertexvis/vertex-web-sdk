@@ -2,7 +2,7 @@ import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 import { fromPbColorMaterial } from '../colorMaterial';
 
-describe(fromPbColorMaterial, () => {
+describe('fromPbColorMaterial', () => {
   it('returns mapped color material', () => {
     const pbColorMaterial = new vertexvis.protobuf.core.ColorMaterial({
       d: 10,

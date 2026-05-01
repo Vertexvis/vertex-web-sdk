@@ -19,32 +19,50 @@
     "tsconfig.json",
     "tsconfig-web.json"
   ],
-  "main": "./dist/bundle.cjs.js",
-  "module": "./dist/bundle.esm.js",
-  "typings": "./dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/bundle.cjs",
+  "module": "./dist/bundle.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/bundle.js",
+      "require": "./dist/bundle.cjs",
+      "default": "./dist/bundle.js"
+    },
+    "./tsconfig": {
+      "default": "./tsconfig.json"
+    },
+    "./tsconfig-web": {
+      "default": "./tsconfig-web.json"
+    }
+  },
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "rollup --config ./rollup.config.js",
+    "build": "rollup --config ./rollup.config.js && tsc --project tsconfig.json --emitDeclarationOnly --declaration --outDir dist",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path ../../.gitignore .",
     "start": "jest --watch",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/build-tools": "^0.10.2",
+    "@rollup/plugin-commonjs": "^21.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@vertexvis/typescript-config-vertexvis": "1.1.0",
-    "tslib": "^2.1.0"
+    "rollup-plugin-terser": "^7.0.2",
+    "tslib": "^2.4.0",
+    "typescript": "^5.2.0"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.1",
+    "@types/jest": "^29.5.14",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "@vertexvis/jest-config-vertexvis": "^0.5.4",
     "eslint": "^8.57.1",
-    "jest": "^27.5.1",
+    "jest": "^29.5.14",
     "rollup": "^2.80.0",
-    "ts-jest": "^27.1.4"
+    "ts-jest": "^29.4.9"
   },
   "peerDependencies": {
     "rollup": "^2"

@@ -2,9 +2,9 @@
   "name": "@vertexvis/doc-viewer",
   "version": "0.24.4",
   "description": "The Vertex SDK for viewing documents.",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.js",
-  "es2015": "dist/esm/index.mjs",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/esm/index.mjs",
   "es2017": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
@@ -24,9 +24,11 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.mjs",
-      "require": "./dist/index.cjs.js",
+      "require": "./dist/index.cjs",
       "default": "./dist/esm/index.mjs"
     },
+    "./doc-viewer.css": "./dist/doc-viewer/doc-viewer.css",
+    "./dist/*": "./dist/*",
     "./dist/components": {
       "import": "./dist/components/index.js",
       "default": "./dist/components/index.js"
@@ -35,11 +37,14 @@
       "import": "./dist/components/*",
       "default": "./dist/components/*"
     },
+    "./loader/*": "./loader/*",
     "./loader": {
       "types": "./loader/index.d.ts",
       "import": "./loader/index.js",
+      "require": "./loader/index.cjs",
       "default": "./loader/index.js"
     },
+    "./assets/*": "./assets/*",
     "./assets/pdf.worker.min.mjs": {
       "import": "./assets/pdf.worker.min.mjs",
       "default": "./assets/pdf.worker.min.mjs"
@@ -61,22 +66,23 @@
   "scripts": {
     "prebuild": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "build": "stencil build",
-    "postbuild": "cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
+    "postbuild": "./scripts/postbuild.sh",
     "prestart": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "start": "stencil build --dev --watch --serve",
     "dev": "yarn start",
     "format": "yarn lint --fix",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx --ignore-path .gitignore .",
-    "test": "stencil test --spec --maxWorkers=50%",
+    "test": "stencil test --spec --runInBand",
+    "test:ssr-import": "node ./scripts/test-ssr-import.mjs",
     "test:watch": "stencil test --spec --watchAll --maxWorkers=50%",
-    "test:ci": "stencil test --spec --coverage",
-    "test:coverage": "stencil test --spec --coverage --maxWorkers=50%",
+    "test:ci": "stencil test --spec --coverage --runInBand",
+    "test:coverage": "stencil test --spec --coverage --runInBand",
     "generate": "stencil generate",
     "release:stage": "yarn generate:docs"
   },
   "devDependencies": {
     "@stencil/core": "^4.27.1",
-    "@stencil/react-output-target": "^1.4.2",
+    "@stencil/react-output-target": "^1.5.2",
     "@stencil/vue-output-target": "^0.13.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.5",
@@ -85,7 +91,7 @@
     "eslint": "^8.57.1",
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
-    "tslib": "^2.1.0",
+    "tslib": "^2.4.0",
     "typescript": "~5.8.3"
   },
   "dependencies": {

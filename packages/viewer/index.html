@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="ltr" lang="en">
   <head>
     <meta charset="utf-8" />
@@ -16,7 +16,6 @@
 
     <link rel="stylesheet" href="/dist/viewer/viewer.css" />
     <script type="module" src="/dist/viewer/viewer.esm.js"></script>
-    <script nomodule src="/dist/viewer.js"></script>
 
     <style>
       html,
@@ -75,10 +74,7 @@
   <body>
     <div class="app">
       <div class="tree">
-        <vertex-scene-tree
-          id="scene-tree"
-          viewer-selector="#viewer"
-        >
+        <vertex-scene-tree id="scene-tree" viewer-selector="#viewer">
         </vertex-scene-tree>
       </div>
       <div class="workarea">

@@ -17,6 +17,12 @@ export const STENCIL_BUFFER_EMPTY_VALUE = 0;
  */
 export const STENCIL_BUFFER_FEATURE_VALUE = 255;
 
+function asBlobPart(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
+
 /**
  * The `StencilBufferManager` manages the stencil buffer state for the viewer.
  * Stencil buffers are represented as images and contain additional information
@@ -277,7 +283,7 @@ export class StencilBuffer implements FrameImageLike {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function debugStencilBuffer(imageBytes: Uint8Array): Promise<void> {
-  const blob = new Blob([imageBytes]);
+  const blob = new Blob([asBlobPart(imageBytes)]);
   const bitmap = await createImageBitmap(blob);
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');

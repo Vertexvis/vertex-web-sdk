@@ -71,12 +71,7 @@ describe('vertex-viewer-pin-tool', () => {
 
   it('should setup the projectionViewMatrix when loading with an initialized viewer', async () => {
     /* eslint-disable prettier/prettier */
-    const matrix = [
-      0, 0.5, 0.5, 0,
-      0, 1, 0, 0,
-      0.5, 0.5, 0, 0,
-      0, 0, 0, 1
-    ];
+    const matrix = [0, 0.5, 0.5, 0, 0, 1, 0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 1];
     /* eslint-enable prettier/prettier */
 
     const page = await newSpecPage({

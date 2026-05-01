@@ -1,23 +1,19 @@
 # vertex-document-viewer
 
-
-
 <!-- Auto Generated Below -->
-
 
 ## Properties
 
-| Property          | Attribute          | Description                                                                                                                                                                                                                                                                            | Type                                    | Default               |
-| ----------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------- |
-| `config`          | --                 | Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.                                                                                                                                                         | `Config \| undefined`                   | `undefined`           |
-| `documentId`      | `document-id`      | The ID of the loaded `Document`. This ID is required to enable persistence of annotations.  Note that this is different than a `File` ID within the Vertex Platform, and must be created separately using the `/documents` endpoints. See https://docs.vertex3d.com/ for more details. | `string \| undefined`                   | `undefined`           |
-| `documentState`   | --                 | Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.                                                                                                        | `DocumentApiState \| undefined`         | `undefined`           |
-| `interactionMode` | `interaction-mode` | The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.                                                                                                                          | `"none" \| "pan"`                       | `'pan'`               |
-| `layers`          | --                 | Controller for interacting with layers in the currently loaded document.  This controller will automatically be created along with the loaded document. Note that the methods available on this controller will only be supported if the underlying document type supports layers.     | `DocumentLayersController \| undefined` | `undefined`           |
-| `provider`        | --                 | The provider used to create the document API and renderer.                                                                                                                                                                                                                             | `DocumentProvider`                      | `new PdfJsProvider()` |
-| `resizeDebounce`  | `resize-debounce`  | An optional value that will debounce image updates when resizing this viewer element.                                                                                                                                                                                                  | `number`                                | `100`                 |
-| `src`             | `src`              | A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.                                                                                                                                                   | `string \| undefined`                   | `undefined`           |
-
+| Property          | Attribute          | Description                                                                                                                                                                                                                                                                           | Type                                    | Default               |
+| ----------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------- |
+| `config`          | --                 | Configuration values for the document viewer. See {@link Config } for more information on the available configuration options.                                                                                                                                                        | `Config \| undefined`                   | `undefined`           |
+| `documentId`      | `document-id`      | The ID of the loaded `Document`. This ID is required to enable persistence of annotations. Note that this is different than a `File` ID within the Vertex Platform, and must be created separately using the `/documents` endpoints. See https://docs.vertex3d.com/ for more details. | `string \| undefined`                   | `undefined`           |
+| `documentState`   | --                 | Common state of the current document. This value includes information common to all types of documents, including state like zoom percentage, viewport definition, and offsets.                                                                                                       | `DocumentApiState \| undefined`         | `undefined`           |
+| `interactionMode` | `interaction-mode` | The interaction mode for the viewer. When set to `'pan'`, click and drag will pan the document. When set to `'none'`, no pointer interactions are registered.                                                                                                                         | `"none" \| "pan"`                       | `'pan'`               |
+| `layers`          | --                 | Controller for interacting with layers in the currently loaded document. This controller will automatically be created along with the loaded document. Note that the methods available on this controller will only be supported if the underlying document type supports layers.     | `DocumentLayersController \| undefined` | `undefined`           |
+| `provider`        | --                 | The provider used to create the document API and renderer.                                                                                                                                                                                                                            | `DocumentProvider`                      | `new PdfJsProvider()` |
+| `resizeDebounce`  | `resize-debounce`  | An optional value that will debounce image updates when resizing this viewer element.                                                                                                                                                                                                 | `number`                                | `100`                 |
+| `src`             | `src`              | A URI of the document to load when the component is mounted in the DOM tree. Currently only supports URLs for client-side rendering.                                                                                                                                                  | `string \| undefined`                   | `undefined`           |
 
 ## Events
 
@@ -27,7 +23,6 @@
 | `documentStateChanged` | Emits an event when the document state changes.                                            | `CustomEvent<DocumentApiState>` |
 | `pageDrawn`            | Emits an event when a page has been drawn to the canvas.                                   | `CustomEvent<DocumentApiState>` |
 | `pageLoaded`           | Emits an event when a page has been loaded or reloaded prior to being drawn to the canvas. | `CustomEvent<DocumentApiState>` |
-
 
 ## Methods
 
@@ -48,8 +43,6 @@ a new page.
 
 Type: `Promise<void>`
 
-
-
 ### `panByDelta(delta: Point.Point) => Promise<void>`
 
 Pans the currently loaded document by the specified delta.
@@ -68,8 +61,6 @@ appear blank.
 
 Type: `Promise<void>`
 
-
-
 ### `zoomTo(percentage: number) => Promise<void>`
 
 Zooms the currently loaded document to the specified zoom percentage.
@@ -87,9 +78,6 @@ same center point of the document where possible.
 
 Type: `Promise<void>`
 
+---
 
-
-
-----------------------------------------------
-
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

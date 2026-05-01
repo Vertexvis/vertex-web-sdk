@@ -24,7 +24,7 @@
    */
   --viewer-markup-circle-ellipse-fill-color: none;
   /**
-   * @prop --viewer-markup-circle-ellipse-fill-opacity: A number between 
+   * @prop --viewer-markup-circle-ellipse-fill-opacity: A number between
    * 0 and 1 that specifies the opacity of the circle's fill.
    */
   --viewer-markup-circle-ellipse-fill-opacity: 0;
@@ -105,7 +105,10 @@
 .ellipse {
   pointer-events: auto;
   stroke: var(--viewer-markup-circle-ellipse-stroke-color);
-  stroke-width: calc(var(--viewer-markup-circle-ellipse-stroke-width) * var(--viewer-markup-circle-scale));
+  stroke-width: calc(
+    var(--viewer-markup-circle-ellipse-stroke-width) *
+      var(--viewer-markup-circle-scale)
+  );
   fill: var(--viewer-markup-circle-ellipse-fill-color);
   fill-opacity: var(--viewer-markup-circle-ellipse-fill-opacity);
   cursor: default;
@@ -152,12 +155,16 @@
   border-width: var(--viewer-markup-circle-bounds-center-anchor-border-width);
   border-color: var(--viewer-markup-circle-bounds-center-anchor-border-color);
   border-style: solid;
-  background-color: var(--viewer-markup-circle-bounds-center-anchor-background-color);
+  background-color: var(
+    --viewer-markup-circle-bounds-center-anchor-background-color
+  );
 }
 
 .bounds-edge-anchor {
   border-width: var(--viewer-markup-circle-bounds-edge-anchor-border-width);
   border-color: var(--viewer-markup-circle-bounds-edge-anchor-border-color);
   border-style: solid;
-  background-color: var(--viewer-markup-circle-bounds-edge-anchor-background-color);
+  background-color: var(
+    --viewer-markup-circle-bounds-edge-anchor-background-color
+  );
 }

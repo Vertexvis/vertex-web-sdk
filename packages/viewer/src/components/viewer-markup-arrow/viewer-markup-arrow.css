@@ -37,7 +37,7 @@
    */
   --viewer-markup-arrow-head-fill-color: var(--red-800);
   /**
-   * @prop --viewer-markup-arrow-head-fill-opacity: A number between 
+   * @prop --viewer-markup-arrow-head-fill-opacity: A number between
    * 0 and 1 that specifies the opacity of the arrow head's fill.
    */
   --viewer-markup-arrow-head-fill-opacity: 1;
@@ -85,18 +85,18 @@
    * @prop --viewer-markup-arrow-bounds-anchor-width: A CSS length that
    * specifies the width of the resize and reposition anchors.
    */
-   --viewer-markup-arrow-bounds-anchor-width: 9px;
-   /**
+  --viewer-markup-arrow-bounds-anchor-width: 9px;
+  /**
     * @prop --viewer-markup-arrow-bounds-anchor-height: A CSS length that
     * specifies the height of the resize and reposition anchors.
     */
-   --viewer-markup-arrow-bounds-anchor-height: 9px;
-   /**
+  --viewer-markup-arrow-bounds-anchor-height: 9px;
+  /**
     * @prop --viewer-markup-arrow-scale: A number that specifies the scale of the arrow.
     * This is used to scale the arrow's stroke width. Defaults to 1, and is managed internally
     * by the component.
     */
-   --viewer-markup-arrow-scale: 1;
+  --viewer-markup-arrow-scale: 1;
 }
 
 .svg {
@@ -118,14 +118,20 @@
 .line {
   pointer-events: auto;
   stroke: var(--viewer-markup-arrow-line-stroke-color);
-  stroke-width: calc(var(--viewer-markup-arrow-line-stroke-width) * var(--viewer-markup-arrow-scale));
+  stroke-width: calc(
+    var(--viewer-markup-arrow-line-stroke-width) *
+      var(--viewer-markup-arrow-scale)
+  );
   cursor: default;
 }
 
 .head {
   pointer-events: auto;
   stroke: var(--viewer-markup-arrow-head-stroke-color);
-  stroke-width: calc(var(--viewer-markup-arrow-head-stroke-width) * var(--viewer-markup-arrow-scale));
+  stroke-width: calc(
+    var(--viewer-markup-arrow-head-stroke-width) *
+      var(--viewer-markup-arrow-scale)
+  );
   fill: var(--viewer-markup-arrow-head-fill-color);
   fill-opacity: var(--viewer-markup-arrow-head-fill-opacity);
   cursor: default;
@@ -170,7 +176,9 @@
   border-width: var(--viewer-markup-arrow-bounds-center-anchor-border-width);
   border-color: var(--viewer-markup-arrow-bounds-center-anchor-border-color);
   border-style: solid;
-  background-color: var(--viewer-markup-arrow-bounds-center-anchor-background-color);
+  background-color: var(
+    --viewer-markup-arrow-bounds-center-anchor-background-color
+  );
 }
 
 .bounds-cap-anchor {
