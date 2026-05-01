@@ -289,7 +289,7 @@ export class ViewerMarkupFreeform {
         <Host>
           <svg class="svg" onTouchStart={this.handleTouchStart}>
             <defs>
-              <SvgShadow id="freeform-markup-shadow" />
+              <SvgShadow id="freeform-markup-shadow" scale={this.scale} />
             </defs>
             <g
               transform={`translate(${offsetX} ${offsetY})`}

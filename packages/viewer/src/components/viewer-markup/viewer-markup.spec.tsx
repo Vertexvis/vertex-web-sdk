@@ -394,6 +394,99 @@ describe('vertex-viewer-markup', () => {
     });
   });
 
+  describe('scaling markup', () => {
+    it('scales markup shadows up in size when scaled up', async () => {
+      const page = await newSpecPage({
+        components: [
+          ViewerMarkup,
+          ViewerMarkupArrow,
+          ViewerMarkupCircle,
+          ViewerMarkupFreeform,
+        ],
+        html: `<vertex-viewer-markup>
+          <vertex-viewer-markup-arrow start="[-0.25, 0]" end="[0, 0]"></vertex-viewer-markup-arrow>
+          <vertex-viewer-markup-circle bounds="[0,0,0.5,0.5]"></vertex-viewer-markup-circle>
+          <vertex-viewer-markup-freeform points="[[0,0],[0.5,0.5]]"></vertex-viewer-markup-freeform>
+        </vertex-viewer-markup>`,
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      const arrow = el.querySelector(
+        'vertex-viewer-markup-arrow'
+      ) as HTMLVertexViewerMarkupArrowElement;
+      const circle = el.querySelector(
+        'vertex-viewer-markup-circle'
+      ) as HTMLVertexViewerMarkupCircleElement;
+      const freeform = el.querySelector(
+        'vertex-viewer-markup-freeform'
+      ) as HTMLVertexViewerMarkupFreeformElement;
+
+      el.scale = 2;
+      await page.waitForChanges();
+
+      [arrow, circle, freeform].forEach((el) => {
+        console.log(el.tagName);
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe(
+          '-20%'
+        );
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe(
+          '-20%'
+        );
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('width')
+        ).toBe('240%');
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('height')
+        ).toBe('240%');
+      });
+    });
+
+    it('keeps markup shadows at the default size when scaled down', async () => {
+      const page = await newSpecPage({
+        components: [
+          ViewerMarkup,
+          ViewerMarkupArrow,
+          ViewerMarkupCircle,
+          ViewerMarkupFreeform,
+        ],
+        html: `<vertex-viewer-markup>
+          <vertex-viewer-markup-arrow start="[-0.25, 0]" end="[0, 0]"></vertex-viewer-markup-arrow>
+          <vertex-viewer-markup-circle bounds="[0,0,0.5,0.5]"></vertex-viewer-markup-circle>
+          <vertex-viewer-markup-freeform points="[[0,0],[0.5,0.5]]"></vertex-viewer-markup-freeform>
+        </vertex-viewer-markup>`,
+      });
+
+      const el = page.root as HTMLVertexViewerMarkupElement;
+      const arrow = el.querySelector(
+        'vertex-viewer-markup-arrow'
+      ) as HTMLVertexViewerMarkupArrowElement;
+      const circle = el.querySelector(
+        'vertex-viewer-markup-circle'
+      ) as HTMLVertexViewerMarkupCircleElement;
+      const freeform = el.querySelector(
+        'vertex-viewer-markup-freeform'
+      ) as HTMLVertexViewerMarkupFreeformElement;
+
+      el.scale = 0.5;
+      await page.waitForChanges();
+
+      [arrow, circle, freeform].forEach((el) => {
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe(
+          '-10%'
+        );
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe(
+          '-10%'
+        );
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('width')
+        ).toBe('120%');
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('height')
+        ).toBe('120%');
+      });
+    });
+  });
+
   describe('query markup', () => {
     it('returns markup with id', async () => {
       const page = await newSpecPage({
