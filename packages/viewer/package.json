@@ -14,19 +14,21 @@
   },
   "type": "module",
   "main": "dist/index.cjs",
-  "module": "dist/esm/index.mjs",
-  "es2017": "dist/esm/index.mjs",
+  "module": "dist/esm/index.js",
+  "es2019": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/viewer/viewer.esm.js",
+  "unpkg": "dist/viewer/viewer.js",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
+      "import": "./dist/esm/index.js",
       "require": "./dist/index.cjs",
-      "default": "./dist/esm/index.mjs"
+      "default": "./dist/esm/index.js"
     },
+    "./viewer.css": "./dist/viewer/viewer.css",
+    "./dist/*": "./dist/*",
     "./dist/components": {
       "import": "./dist/components/index.js",
       "default": "./dist/components/index.js"
@@ -35,6 +37,7 @@
       "import": "./dist/components/*",
       "default": "./dist/components/*"
     },
+    "./loader/*": "./loader/*",
     "./loader": {
       "types": "./loader/index.d.ts",
       "import": "./loader/index.js",
