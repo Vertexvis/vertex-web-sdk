@@ -31,6 +31,8 @@ jobs:
           path: |
             packages/*/dist
             packages/viewer/loader
+            packages/doc-viewer/loader
+            packages/doc-viewer/assets
   publish-testing:
     runs-on: ubuntu-latest
     needs: [build]
