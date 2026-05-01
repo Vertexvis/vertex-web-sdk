@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xml:lang="en">
   <head>
     <title>Camera Manipulations</title>
@@ -18,6 +18,16 @@
       nomodule
       src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer.js"
     ></script>
+    <!--
+        Local development: use the local viewer build output instead of the CDN.
+        Do `yarn workspace @vertexvis/viewer build` and `yarn examples:start`
+        before enabling this block.
+    -->
+
+    <!--
+    <link rel="stylesheet" href="/packages/viewer/dist/viewer/viewer.css" />
+    <script type="module" src="/packages/viewer/dist/viewer/viewer.js"></script>
+    -->
   </head>
   <body>
     <div>

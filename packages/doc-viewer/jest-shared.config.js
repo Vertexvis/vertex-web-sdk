@@ -1,6 +1,6 @@
 // Jest configuration that shared between StencilJS and the Jest config that's
 // needed by IDE plugins.
-module.exports = {
+export default {
   collectCoverageFrom: ['./src/**', '!./src/__*__/**', '!./src/testing'],
   coveragePathIgnorePatterns: ['./src/assets/*', './src/polyfill/*'],
   coverageThreshold: {

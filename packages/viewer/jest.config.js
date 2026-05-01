@@ -1,6 +1,6 @@
-const config = require('./jest-shared.config');
+import config from './jest-shared.config';
 
-module.exports = {
+export default {
   ...config,
   preset: '@stencil/core/testing',
   testRunner: 'jasmine2',

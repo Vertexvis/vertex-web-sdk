@@ -2,8 +2,9 @@
   "name": "@vertexvis/doc-viewer",
   "version": "0.24.4",
   "description": "The Vertex SDK for viewing documents.",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/esm/index.mjs",
   "es2017": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
@@ -23,7 +24,7 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.mjs",
-      "require": "./dist/index.cjs.js",
+      "require": "./dist/index.cjs",
       "default": "./dist/esm/index.mjs"
     },
     "./dist/components": {
@@ -37,6 +38,7 @@
     "./loader": {
       "types": "./loader/index.d.ts",
       "import": "./loader/index.js",
+      "require": "./loader/index.cjs",
       "default": "./loader/index.js"
     },
     "./assets/pdf.worker.min.mjs": {
@@ -54,7 +56,7 @@
   "scripts": {
     "prebuild": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "build": "stencil build",
-    "postbuild": "cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
+    "postbuild": "./scripts/postbuild.sh",
     "prestart": "mkdir -p assets && cp ../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./assets",
     "start": "stencil build --dev --watch --serve",
     "dev": "yarn start",

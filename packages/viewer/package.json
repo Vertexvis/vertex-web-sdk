@@ -12,13 +12,36 @@
   "bugs": {
     "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
   },
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/esm/index.mjs",
   "es2017": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
   "unpkg": "dist/viewer/viewer.esm.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./dist/components": {
+      "import": "./dist/components/index.js",
+      "default": "./dist/components/index.js"
+    },
+    "./dist/components/*": {
+      "import": "./dist/components/*",
+      "default": "./dist/components/*"
+    },
+    "./loader": {
+      "types": "./loader/index.d.ts",
+      "import": "./loader/index.js",
+      "require": "./loader/index.cjs",
+      "default": "./loader/index.js"
+    }
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"

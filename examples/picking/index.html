@@ -1,22 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xml:lang="en">
   <head>
     <title>Picking</title>
 
     <script type="module" src="main.js"></script>
 
+    <!--
+      Default: use the published package from the CDN.
+      To test in-development viewer changes instead, comment this section out and
+      uncomment the local assets section below.
+    -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer/viewer.esm.js"
+      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer/viewer.js"
     ></script>
     <script
       nomodule
-      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer.js"
+      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer.cjs"
     ></script>
+
+    <!--
+      Local development: use the local viewer build output instead of the CDN.
+      Do `yarn workspace @vertexvis/viewer build` and `yarn examples:start`
+      before enabling this block.
+    -->
+
+    <!--
+    <link rel="stylesheet" href="/packages/viewer/dist/viewer/viewer.css" />
+    <script type="module" src="/packages/viewer/dist/viewer/viewer.js"></script>
+    -->
 
     <style>
       html,
