@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xml:lang="en">
   <head>
     <title>Loading Models</title>
@@ -14,15 +14,17 @@
       type="module"
       src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer/viewer.esm.js"
     ></script>
-    <script
-      nomodule
-      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/viewer.js"
-    ></script>
   </head>
   <body>
-  <h1 class="heading">Instructions</h1>
-  This example uses url parameters to define the stream key. Therefore, update your url to http://localhost:8080/loading-models?streamkey=YOUR_STREAM_KEY to load a model.  For more information
-  on generating a stream key, see <a target="_blank" href="https://developer.vertexvis.com/docs/guides/authentication#viewer-component">Vertex's developer documentation</a>.
+    <h1 class="heading">Instructions</h1>
+    This example uses url parameters to define the stream key. Therefore, update
+    your url to http://localhost:8080/loading-models?streamkey=YOUR_STREAM_KEY
+    to load a model. For more information on generating a stream key, see
+    <a
+      target="_blank"
+      href="https://developer.vertexvis.com/docs/guides/authentication#viewer-component"
+      >Vertex's developer documentation</a
+    >.
     <vertex-viewer id="viewer" class="viewer">
       <vertex-viewer-toolbar data-viewer="viewer"></vertex-viewer-toolbar>
     </vertex-viewer>
