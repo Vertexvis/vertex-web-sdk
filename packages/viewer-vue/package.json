@@ -12,9 +12,18 @@
   "bugs": {
     "url": "https://github.com/Vertexvis/vertex-web-sdk/issues"
   },
-  "main": "./dist/bundle.cjs.js",
-  "module": "./dist/bundle.esm.js",
-  "typings": "./dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/bundle.cjs",
+  "module": "./dist/bundle.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/bundle.js",
+      "require": "./dist/bundle.cjs",
+      "default": "./dist/bundle.js"
+    }
+  },
   "files": [
     "dist/*"
   ],
@@ -33,15 +42,16 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
+    "@stencil/vue-output-target": "^0.13.1",
     "@vertexvis/viewer": "0.24.5"
   },
   "devDependencies": {
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.5.0",
     "eslint": "^8.57.1",
-    "tslib": "^2.1.0",
+    "tslib": "^2.4.0",
     "vue": "^3.3.4"
   },
   "peerDependencies": {
-    "tslib": ">=2.1.0"
+    "tslib": ">=2.4.0"
   }
 }

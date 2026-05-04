@@ -34,7 +34,7 @@ export type InteractionConfigProvider = () => Interactions.InteractionConfig;
 
 export type CameraTransform<
   T extends Camera = Camera,
-  R extends Camera = Camera
+  R extends Camera = Camera,
 > = (data: {
   camera: T;
   viewport: Viewport;

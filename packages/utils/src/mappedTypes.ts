@@ -13,9 +13,10 @@
  * type Baz = DeepPartial<Bar>; // { foo?: { a?: number } }
  * ```
  */
-export type DeepPartial<T> = T extends Record<string, unknown>
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : T;
+export type DeepPartial<T> =
+  T extends Record<string, unknown>
+    ? { [K in keyof T]?: DeepPartial<T[K]> }
+    : T;
 
 /**
  * A type that recursively makes each property of `T` required.
@@ -34,13 +35,13 @@ export type DeepPartial<T> = T extends Record<string, unknown>
 export type DeepRequired<T, P extends string[]> = T extends unknown[]
   ? T
   : T extends Record<string, unknown>
-  ? Pick<T, Extract<keyof T, P[0]>> &
-      Required<{
-        [K in Exclude<keyof T, P[0]>]: NonNullable<
-          DeepRequired<T[K], ShiftUnion<K, P>>
-        >;
-      }>
-  : T;
+    ? Pick<T, Extract<keyof T, P[0]>> &
+        Required<{
+          [K in Exclude<keyof T, P[0]>]: NonNullable<
+            DeepRequired<T[K], ShiftUnion<K, P>>
+          >;
+        }>
+    : T;
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 type Shift<T extends unknown[]> = ((...t: T) => unknown) extends (
@@ -53,7 +54,7 @@ type Shift<T extends unknown[]> = ((...t: T) => unknown) extends (
 
 type ShiftUnion<
   P extends PropertyKey,
-  T extends unknown[]
+  T extends unknown[],
 > = T extends unknown[] ? (T[0] extends P ? Shift<T> : never) : never;
 
 /**

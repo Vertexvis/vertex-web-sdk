@@ -19,7 +19,10 @@ export class CollectionBinding implements Binding {
 }
 
 export abstract class NodeBinding<N extends Node> implements Binding {
-  protected constructor(protected node: N, protected expr: string) {}
+  protected constructor(
+    protected node: N,
+    protected expr: string
+  ) {}
 
   public abstract bind<T extends BindingDataMap>(data: T): void;
 }
@@ -38,7 +41,11 @@ export class TextNodeBinding extends NodeBinding<Node> {
 }
 
 export class AttributeBinding extends NodeBinding<Element> {
-  public constructor(node: Element, expr: string, private attr: string) {
+  public constructor(
+    node: Element,
+    expr: string,
+    private readonly attr: string
+  ) {
     super(node, expr);
   }
 
@@ -52,7 +59,11 @@ export class AttributeBinding extends NodeBinding<Element> {
 }
 
 export class PropertyBinding extends NodeBinding<Element> {
-  public constructor(node: Element, expr: string, private prop: string) {
+  public constructor(
+    node: Element,
+    expr: string,
+    private prop: string
+  ) {
     super(node, expr);
   }
 
@@ -70,7 +81,11 @@ export class PropertyBinding extends NodeBinding<Element> {
 export class EventHandlerBinding extends NodeBinding<Element> {
   private disposable?: Disposable;
 
-  public constructor(node: Element, expr: string, private eventName: string) {
+  public constructor(
+    node: Element,
+    expr: string,
+    private eventName: string
+  ) {
     super(node, expr);
   }
 

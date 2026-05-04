@@ -14,22 +14,22 @@ markup is added, it's assigned an ID. This ID can be passed to
 
 ```html
 <html>
-<body>
-  <vertex-viewer src="urn:vertex:stream-key:my-key">
-    <vertex-viewer-markup id="markup">
-      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
-    </vertex-viewer-markup>
-  </vertex-viewer>
+  <body>
+    <vertex-viewer src="urn:vertex:stream-key:my-key">
+      <vertex-viewer-markup id="markup">
+        <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+      </vertex-viewer-markup>
+    </vertex-viewer>
 
-  <script type="module">
-    const markup = document.getElementById('markup');
+    <script type="module">
+      const markup = document.getElementById('markup');
 
-    // An event is dispatched whenever a new markup is added.
-    markup.addEventListener('markupAdded', (event) => {
-      console.log(`markup added`, event.detail.id, event.detail.distance);
-    })
-  </script>
-</body>
+      // An event is dispatched whenever a new markup is added.
+      markup.addEventListener('markupAdded', (event) => {
+        console.log(`markup added`, event.detail.id, event.detail.distance);
+      });
+    </script>
+  </body>
 </html>
 ```
 
@@ -40,13 +40,13 @@ the component.
 
 ```html
 <html>
-<body>
-  <vertex-viewer src="urn:vertex:stream-key:my-key">
-    <vertex-viewer-markup tool="circle">
-      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
-    </vertex-viewer-markup>
-  </vertex-viewer>
-</body>
+  <body>
+    <vertex-viewer src="urn:vertex:stream-key:my-key">
+      <vertex-viewer-markup tool="circle">
+        <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+      </vertex-viewer-markup>
+    </vertex-viewer>
+  </body>
 </html>
 ```
 
@@ -60,38 +60,38 @@ as children, provide a unique ID to the element.
 
 ```html
 <html>
-<body>
-  <button id="add-markup-btn">Add markup</button>
+  <body>
+    <button id="add-markup-btn">Add markup</button>
 
-  <vertex-viewer src="urn:vertex:stream-key:my-key">
-    <vertex-viewer-markup id="markup">
-      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+    <vertex-viewer src="urn:vertex:stream-key:my-key">
+      <vertex-viewer-markup id="markup">
+        <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
 
-      <!-- A markup added as a child component -->
-      <vertex-viewer-markup-arrow
-        id="my-markup-id"
-        start="[-0.25, 0.25]"
-        end="[0, 0]"
-      ></vertex-viewer-markup-arrow>
-    </vertex-viewer-markup>
-  </vertex-viewer>
+        <!-- A markup added as a child component -->
+        <vertex-viewer-markup-arrow
+          id="my-markup-id"
+          start="[-0.25, 0.25]"
+          end="[0, 0]"
+        ></vertex-viewer-markup-arrow>
+      </vertex-viewer-markup>
+    </vertex-viewer>
 
-  <script type="module">
-    import { ArrowMarkup } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@latest/dist/viewer/index.esm.js'
+    <script type="module">
+      import { ArrowMarkup } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@latest/dist/viewer/index.esm.js';
 
-    const markup = document.getElementById('markup');
-    const button = document.getElementById('add-markup-btn');
-    button.addEventListener('click', async () => {
-      const arrow = new ArrowMarkup({
-        start: { x: -0.25, y: 0.5 },
-        end: { x: 0, y: 0 },
+      const markup = document.getElementById('markup');
+      const button = document.getElementById('add-markup-btn');
+      button.addEventListener('click', async () => {
+        const arrow = new ArrowMarkup({
+          start: { x: -0.25, y: 0.5 },
+          end: { x: 0, y: 0 },
+        });
+
+        // Returns the HTML element for the newly added markup.
+        const element = await markup.addMarkup(arrow);
       });
-
-      // Returns the HTML element for the newly added markup.
-      const element = await markup.addMarkup(arrow);
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
 ```
 
@@ -110,66 +110,64 @@ be cloned and added to the component.
 
 ```html
 <html>
-<head>
-  <style>
-    /* Styling for the markup resize and reposition anchors */
-    .arrow-markup {
-      --viewer-arrow-markup-background-color: black;
-      --viewer-arrow-markup-border-color: white;
-    }
+  <head>
+    <style>
+      /* Styling for the markup resize and reposition anchors */
+      .arrow-markup {
+        --viewer-arrow-markup-background-color: black;
+        --viewer-arrow-markup-border-color: white;
+      }
 
-    .arrow-markup .anchor {
-      background-color: var(--viewer-arrow-markup-background-color);
-      border: 1px solid var(--viewer-arrow-markup-border-color);
-      box-sizing: border-box;
-      width: 10px;
-      height: 10px;
-      border-radius: 100%;
-    }
-  </style>
-</head>
+      .arrow-markup .anchor {
+        background-color: var(--viewer-arrow-markup-background-color);
+        border: 1px solid var(--viewer-arrow-markup-border-color);
+        box-sizing: border-box;
+        width: 10px;
+        height: 10px;
+        border-radius: 100%;
+      }
+    </style>
+  </head>
 
-<body>
-  <!-- The template for arrow markup -->
-  <template id="my-arrow-markup">
-    <vertex-viewer-markup-arrow class="arrow-markup">
-      <div slot="start-anchor" class="anchor"></div>
-      <div slot="end-anchor" class="anchor"></div>
-    </vertex-viewer-markup-arrow>
-  </template>
+  <body>
+    <!-- The template for arrow markup -->
+    <template id="my-arrow-markup">
+      <vertex-viewer-markup-arrow class="arrow-markup">
+        <div slot="start-anchor" class="anchor"></div>
+        <div slot="end-anchor" class="anchor"></div>
+      </vertex-viewer-markup-arrow>
+    </template>
 
-  <vertex-viewer src="urn:vertex:stream-key:my-key">
-    <!-- Pass the template ID to use for arrow markup -->
-    <vertex-viewer-markup arrow-template-id="my-arrow-markup">
-      <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
-    </vertex-viewer-markup>
-  </vertex-viewer>
-</body>
+    <vertex-viewer src="urn:vertex:stream-key:my-key">
+      <!-- Pass the template ID to use for arrow markup -->
+      <vertex-viewer-markup arrow-template-id="my-arrow-markup">
+        <vertex-viewer-markup-tool></vertex-viewer-markup-tool>
+      </vertex-viewer-markup>
+    </vertex-viewer>
+  </body>
 </html>
 ```
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
-| Property               | Attribute                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Type                                                            | Default            |
-| ---------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------ |
-| `arrowTemplateId`      | `arrow-template-id`       | An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.                                                                                                                                                                                                                                                                                                                                | `string \| undefined`                                           | `undefined`        |
-| `centeringBehavior`    | `centering-behavior`      | Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default). | `"both" \| "none" \| "x-only" \| "y-only"`                      | `'none'`           |
-| `circleTemplateId`     | `circle-template-id`      | An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.                                                                                                                                                                                                                                                                                                                              | `string \| undefined`                                           | `undefined`        |
-| `disabled`             | `disabled`                | If `true`, disables adding or editing of markup through user interaction.                                                                                                                                                                                                                                                                                                                                                                                                       | `boolean`                                                       | `false`            |
-| `endLineAnchorStyle`   | `end-line-anchor-style`   | The style of the ending anchor. This defaults to 'arrow-triangle.'                                                                                                                                                                                                                                                                                                                                                                                                              | `"arrow-line" \| "arrow-triangle" \| "dot" \| "hash" \| "none"` | `'arrow-triangle'` |
-| `freeformTemplateId`   | `freeform-template-id`    | An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.                                                                                                                                                                                                                                                                                                                          | `string \| undefined`                                           | `undefined`        |
-| `offset`               | --                        | The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".  When provided, all computed coordinates will be offset by this amount.                                                                                                                                                                                                              | `Point \| undefined`                                            | `undefined`        |
-| `originatingViewport`  | --                        | The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".  When provided, all NDC values will be considered relative to this viewport.                                                                                                                                                                                 | `Dimensions \| undefined`                                       | `undefined`        |
-| `scale`                | `scale`                   | The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.  When provided, all computed coordinates will be scaled by this amount.                                                                                                                                                                                                                                               | `number`                                                        | `1`                |
-| `selectNew`            | `select-new`              | Indicates if new markup should be automatically selected.                                                                                                                                                                                                                                                                                                                                                                                                                       | `boolean`                                                       | `false`            |
-| `selectedMarkupId`     | `selected-markup-id`      | The ID of the markup that is selected.                                                                                                                                                                                                                                                                                                                                                                                                                                          | `string \| undefined`                                           | `undefined`        |
-| `startLineAnchorStyle` | `start-line-anchor-style` | The style of the starting anchor. This defaults to none.                                                                                                                                                                                                                                                                                                                                                                                                                        | `"arrow-line" \| "arrow-triangle" \| "dot" \| "hash" \| "none"` | `'none'`           |
-| `tool`                 | `tool`                    | The type of markup to perform.                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `"arrow" \| "circle" \| "freeform"`                             | `'arrow'`          |
-| `viewer`               | --                        | The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.                                                                                                                                                                                                                                                                                                                                                             | `HTMLVertexViewerElement \| undefined`                          | `undefined`        |
-
+| Property               | Attribute                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Type                                                            | Default            |
+| ---------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- | ------------------ |
+| `arrowTemplateId`      | `arrow-template-id`       | An HTML template that describes the HTML to use for new arrow markup. It's expected that the template contains a `<vertex-viewer-markup-arrow>`.                                                                                                                                                                                                                                                                                                                               | `string \| undefined`                                           | `undefined`        |
+| `centeringBehavior`    | `centering-behavior`      | Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property. Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default). | `"both" \| "none" \| "x-only" \| "y-only"`                      | `'none'`           |
+| `circleTemplateId`     | `circle-template-id`      | An HTML template that describes the HTML to use for new circle markup. It's expected that the template contains a `<vertex-viewer-markup-circle>`.                                                                                                                                                                                                                                                                                                                             | `string \| undefined`                                           | `undefined`        |
+| `disabled`             | `disabled`                | If `true`, disables adding or editing of markup through user interaction.                                                                                                                                                                                                                                                                                                                                                                                                      | `boolean`                                                       | `false`            |
+| `endLineAnchorStyle`   | `end-line-anchor-style`   | The style of the ending anchor. This defaults to 'arrow-triangle.'                                                                                                                                                                                                                                                                                                                                                                                                             | `"arrow-line" \| "arrow-triangle" \| "dot" \| "hash" \| "none"` | `'arrow-triangle'` |
+| `freeformTemplateId`   | `freeform-template-id`    | An HTML template that describes the HTML to use for new freeform markup. It's expected that the template contains a `<vertex-viewer-markup-freeform>`.                                                                                                                                                                                                                                                                                                                         | `string \| undefined`                                           | `undefined`        |
+| `offset`               | --                        | The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen". When provided, all computed coordinates will be offset by this amount.                                                                                                                                                                                                              | `Point \| undefined`                                            | `undefined`        |
+| `originatingViewport`  | --                        | The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen". When provided, all NDC values will be considered relative to this viewport.                                                                                                                                                                                 | `Dimensions \| undefined`                                       | `undefined`        |
+| `scale`                | `scale`                   | The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates. When provided, all computed coordinates will be scaled by this amount.                                                                                                                                                                                                                                               | `number`                                                        | `1`                |
+| `selectNew`            | `select-new`              | Indicates if new markup should be automatically selected.                                                                                                                                                                                                                                                                                                                                                                                                                      | `boolean`                                                       | `false`            |
+| `selectedMarkupId`     | `selected-markup-id`      | The ID of the markup that is selected.                                                                                                                                                                                                                                                                                                                                                                                                                                         | `string \| undefined`                                           | `undefined`        |
+| `startLineAnchorStyle` | `start-line-anchor-style` | The style of the starting anchor. This defaults to none.                                                                                                                                                                                                                                                                                                                                                                                                                       | `"arrow-line" \| "arrow-triangle" \| "dot" \| "hash" \| "none"` | `'none'`           |
+| `tool`                 | `tool`                    | The type of markup to perform.                                                                                                                                                                                                                                                                                                                                                                                                                                                 | `"arrow" \| "circle" \| "freeform"`                             | `'arrow'`          |
+| `viewer`               | --                        | The viewer to connect to markup. If nested within a <vertex-viewer>, this property will be populated automatically.                                                                                                                                                                                                                                                                                                                                                            | `HTMLVertexViewerElement \| undefined`                          | `undefined`        |
 
 ## Events
 
@@ -180,7 +178,6 @@ be cloned and added to the component.
 | `markupRemoved`          | Dispatched when a markup is removed, either through user interaction or programmatically.                                           | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement>`              |
 | `markupSelectionChanged` | Dispatched when markup selection changes. Will either be the selected element or `undefined` indicating that selection was cleared. | `CustomEvent<HTMLVertexViewerMarkupArrowElement \| HTMLVertexViewerMarkupCircleElement \| HTMLVertexViewerMarkupFreeformElement \| undefined>` |
 
-
 ## Methods
 
 ### `addMarkup(markup: Markup) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement>`
@@ -189,6 +186,12 @@ Adds a new markup as a child to this component. A new markup
 component will be created from the template specified by
 `arrow-template-id`, `circle-template-id`, or if undefined
 a default element will be created.
+
+#### Parameters
+
+| Name     | Type                                            | Description        |
+| -------- | ----------------------------------------------- | ------------------ |
+| `markup` | `ArrowMarkup \| CircleMarkup \| FreeformMarkup` | The markup to add. |
 
 #### Returns
 
@@ -199,6 +202,12 @@ The markup element that was created.
 ### `getMarkupElement(id: string) => Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 Returns the markup element associated to the given ID.
+
+#### Parameters
+
+| Name | Type     | Description                             |
+| ---- | -------- | --------------------------------------- |
+| `id` | `string` | The ID of the markup element to return. |
 
 #### Returns
 
@@ -222,12 +231,17 @@ Removes a markup with the given ID, and returns the HTML element
 associated to the markup. Returns `undefined` if no markup is
 found.
 
+#### Parameters
+
+| Name | Type     | Description                     |
+| ---- | -------- | ------------------------------- |
+| `id` | `string` | The ID of the markup to remove. |
+
 #### Returns
 
 Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircleElement | HTMLVertexViewerMarkupFreeformElement | undefined>`
 
 The markup element, or undefined.
-
 
 ## Dependencies
 
@@ -238,6 +252,7 @@ The markup element, or undefined.
 - [vertex-viewer-markup-freeform](../viewer-markup-freeform)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-markup --> vertex-viewer-markup-arrow
@@ -246,6 +261,6 @@ graph TD;
   style vertex-viewer-markup fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

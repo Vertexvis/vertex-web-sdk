@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, h, Host, JSX, Prop, State, Watch } from '@stencil/core';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 
@@ -31,7 +31,8 @@ export class ViewerMeasurementPrecise {
    * component.
    */
   @Prop()
-  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
+  public measurementOverlays: MeasurementOverlayManager =
+    new MeasurementOverlayManager();
 
   /**
    * The controller that is responsible for performing measurements and updating

@@ -22,7 +22,10 @@ export class EventDispatcher<T> {
 
   public once(opts: OnOptions = {}): Promise<T> {
     return new Promise((resolve) => {
-      this.on((event) => resolve(event), opts);
+      const subscription = this.on((event) => {
+        subscription.dispose();
+        resolve(event);
+      }, opts);
     });
   }
 

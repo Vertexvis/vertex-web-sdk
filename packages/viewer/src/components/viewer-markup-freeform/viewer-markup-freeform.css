@@ -67,7 +67,9 @@
     * @prop --viewer-markup-freeform-bounds-center-anchor-background-color: A CSS color that
     * specifies the background color of the center reposition anchor.
     */
-  --viewer-markup-freeform-bounds-center-anchor-background-color: var(--blue-400);
+  --viewer-markup-freeform-bounds-center-anchor-background-color: var(
+    --blue-400
+  );
   /**
     * @prop --viewer-markup-freeform-bounds-anchor-width: A CSS length that
     * specifies the width of the resize and reposition anchors.
@@ -99,7 +101,10 @@
   pointer-events: auto;
   cursor: default;
   stroke: var(--viewer-markup-freeform-stroke-color);
-  stroke-width: calc(var(--viewer-markup-freeform-stroke-width) * var(--viewer-markup-freeform-scale));
+  stroke-width: calc(
+    var(--viewer-markup-freeform-stroke-width) *
+      var(--viewer-markup-freeform-scale)
+  );
   stroke-linejoin: var(--viewer-markup-freeform-line-join);
   stroke-linecap: var(--viewer-markup-freeform-line-cap);
 }
@@ -155,12 +160,16 @@
   border-width: var(--viewer-markup-freeform-bounds-center-anchor-border-width);
   border-color: var(--viewer-markup-freeform-bounds-center-anchor-border-color);
   border-style: solid;
-  background-color: var(--viewer-markup-freeform-bounds-center-anchor-background-color);
+  background-color: var(
+    --viewer-markup-freeform-bounds-center-anchor-background-color
+  );
 }
 
 .bounds-edge-anchor {
   border-width: var(--viewer-markup-freeform-bounds-edge-anchor-border-width);
   border-color: var(--viewer-markup-freeform-bounds-edge-anchor-border-color);
   border-style: solid;
-  background-color: var(--viewer-markup-freeform-bounds-edge-anchor-background-color);
+  background-color: var(
+    --viewer-markup-freeform-bounds-edge-anchor-background-color
+  );
 }

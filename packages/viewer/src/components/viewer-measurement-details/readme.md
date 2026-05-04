@@ -17,31 +17,35 @@ components.
 
 ```html
 <html>
-<body>
-  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" feature-maps="final">
-    <vertex-viewer-measurement-precise
-      id="measurement"
-    ></vertex-viewer-measurement-precise>
+  <body>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+      feature-maps="final"
+    >
+      <vertex-viewer-measurement-precise
+        id="measurement"
+      ></vertex-viewer-measurement-precise>
 
-    <vertex-viewer-toolbar placement="bottom-right">
-      <vertex-viewer-measurement-details
-        id="details"
-      ></vertex-viewer-measurement-details>
-    </vertex-viewer-toolbar>
-  </vertex-viewer>
+      <vertex-viewer-toolbar placement="bottom-right">
+        <vertex-viewer-measurement-details
+          id="details"
+        ></vertex-viewer-measurement-details>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
 
-  <script type="module">
-    window.addEventListener('load', () => main());
+    <script type="module">
+      window.addEventListener('load', () => main());
 
-    async function main() {
-      const measurement = document.getElementById('measurement');
-      const details = document.getElementById('details');
+      async function main() {
+        const measurement = document.getElementById('measurement');
+        const details = document.getElementById('details');
 
-      // Set the detail's measurement model to display measurement results.
-      details.measurementModel = measurement.measurementModel;
-    }
-  </script>
-</body>
+        // Set the detail's measurement model to display measurement results.
+        details.measurementModel = measurement.measurementModel;
+      }
+    </script>
+  </body>
 </html>
 ```
 
@@ -56,16 +60,16 @@ Currently supported units include: `millimeters`, `centimeters`, `meters`,
 
 ```html
 <html>
-<body>
-  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
-    <vertex-viewer-toolbar placement="bottom-right">
-      <vertex-viewer-measurement-details
-        distance-units="inches"
-        fractional-digits="1"
-      ></vertex-viewer-measurement-details>
-    </vertex-viewer-toolbar>
-  </vertex-viewer>
-</body>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
+      <vertex-viewer-toolbar placement="bottom-right">
+        <vertex-viewer-measurement-details
+          distance-units="inches"
+          fractional-digits="1"
+        ></vertex-viewer-measurement-details>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
+  </body>
 </html>
 ```
 
@@ -77,20 +81,20 @@ in real space and should return a string.
 
 ```html
 <html>
-<body>
-  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
-    <vertex-viewer-toolbar placement="bottom-right">
-      <vertex-viewer-measurement-details
-        id="measurement-details"
-      ></vertex-viewer-measurement-details>
-    </vertex-viewer-toolbar>
-  </vertex-viewer>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
+      <vertex-viewer-toolbar placement="bottom-right">
+        <vertex-viewer-measurement-details
+          id="measurement-details"
+        ></vertex-viewer-measurement-details>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
 
-  <script type="module">
-    const details = document.getElementById('measurement-details');
-    details.distanceFormatter = (distance) => `${distance}"`;
-  </script>
-</body>
+    <script type="module">
+      const details = document.getElementById('measurement-details');
+      details.distanceFormatter = (distance) => `${distance}"`;
+    </script>
+  </body>
 </html>
 ```
 
@@ -104,16 +108,16 @@ include: `degrees` and `radians`.
 
 ```html
 <html>
-<body>
-  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
-    <vertex-viewer-toolbar placement="bottom-right">
-      <vertex-viewer-measurement-details
-        angle-units="radians"
-        fractional-digits="1"
-      ></vertex-viewer-measurement-details>
-    </vertex-viewer-toolbar>
-  </vertex-viewer>
-</body>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
+      <vertex-viewer-toolbar placement="bottom-right">
+        <vertex-viewer-measurement-details
+          angle-units="radians"
+          fractional-digits="1"
+        ></vertex-viewer-measurement-details>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
+  </body>
 </html>
 ```
 
@@ -125,41 +129,39 @@ in degrees, and should return a string.
 
 ```html
 <html>
-<body>
-  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
-    <vertex-viewer-toolbar placement="bottom-right">
-      <vertex-viewer-measurement-details
-        id="measurement-details"
-      ></vertex-viewer-measurement-details>
-    </vertex-viewer-toolbar>
-  </vertex-viewer>
+  <body>
+    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key">
+      <vertex-viewer-toolbar placement="bottom-right">
+        <vertex-viewer-measurement-details
+          id="measurement-details"
+        ></vertex-viewer-measurement-details>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
 
-  <script type="module">
-    const details = document.getElementById('measurement-details');
-    details.angleFormatter = (angle) => `${angle}"`;
-  </script>
-</body>
+    <script type="module">
+      const details = document.getElementById('measurement-details');
+      details.angleFormatter = (angle) => `${angle}"`;
+    </script>
+  </body>
 </html>
 ```
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
 | Property              | Attribute           | Description                                                                                                                                                                        | Type                                                                                           | Default         |
 | --------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------- |
-| `angleFormatter`      | --                  | An optional formatter that can be used to format the display of an angle. The formatting function is passed a calculated angle in degrees and is expected to return a string.      | `((value: number) => string) \| undefined`                                                     | `undefined`     |
+| `angleFormatter`      | --                  | An optional formatter that can be used to format the display of an angle. The formatting function is passed a calculated angle in degrees and is expected to return a string.      | `number \| undefined`                                                                          | `undefined`     |
 | `angleUnits`          | `angle-units`       | The unit of angle-based measurement.                                                                                                                                               | `"degrees" \| "radians"`                                                                       | `'degrees'`     |
-| `areaFormatter`       | --                  | An optional formatter that can be used to format the display of an area. The formatting function is passed a calculated area and is expected to return a string.                   | `((value: number) => string) \| undefined`                                                     | `undefined`     |
-| `distanceFormatter`   | --                  | An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string. | `((value: number) => string) \| undefined`                                                     | `undefined`     |
+| `areaFormatter`       | --                  | An optional formatter that can be used to format the display of an area. The formatting function is passed a calculated area and is expected to return a string.                   | `number \| undefined`                                                                          | `undefined`     |
+| `distanceFormatter`   | --                  | An optional formatter that can be used to format the display of a distance. The formatting function is passed a calculated real-world distance and is expected to return a string. | `number \| undefined`                                                                          | `undefined`     |
 | `distanceUnits`       | `distance-units`    | The unit of distance-based measurement.                                                                                                                                            | `"centimeters" \| "feet" \| "inches" \| "meters" \| "millimeters" \| "yards"`                  | `'millimeters'` |
 | `fractionalDigits`    | `fractional-digits` | The number of fraction digits to display.                                                                                                                                          | `number`                                                                                       | `2`             |
 | `measurementModel`    | --                  | The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.        | `MeasurementModel \| undefined`                                                                | `undefined`     |
 | `measurementOutcome`  | --                  | The outcome to display. This property is automatically updated if a measurement model is provided.                                                                                 | `MeasurementOutcome \| undefined`                                                              | `undefined`     |
 | `measurementOverlays` | --                  | The manager that the component will use to present measurement overlays.                                                                                                           | `MeasurementOverlayManager \| undefined`                                                       | `undefined`     |
 | `resultTypes`         | --                  | A set of result types to display. If `undefined`, then all results will be displayed.                                                                                              | `("minimum-distance" \| "planar-angle" \| "planar-distance" \| "surface-area")[] \| undefined` | `undefined`     |
-
 
 ## CSS Custom Properties
 
@@ -169,7 +171,6 @@ in degrees, and should return a string.
 | `--viewer-measurement-details-y-color` | The color of the `X` label in measurements. Defaults to var(--green-500). |
 | `--viewer-measurement-details-z-color` | The color of the `X` label in measurements. Defaults to blue.             |
 
+---
 
-----------------------------------------------
-
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

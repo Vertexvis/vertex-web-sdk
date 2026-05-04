@@ -1,6 +1,6 @@
 // Jest configuration that shared between StencilJS and the Jest config that's
 // needed by IDE plugins.
-module.exports = {
+export default {
   collectCoverageFrom: ['./src/**', '!./src/__*__/**', '!./src/testing'],
   coverageThreshold: {
     global: {
@@ -14,5 +14,8 @@ module.exports = {
   moduleNameMapper: {
     '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
   },
-  setupFilesAfterEnv: ['<rootDir>/src/__setup__/polyfills.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/../../jest.setup.console.js',
+    '<rootDir>/src/__setup__/polyfills.ts',
+  ],
 };

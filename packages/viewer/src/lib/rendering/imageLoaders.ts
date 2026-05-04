@@ -6,11 +6,17 @@ export interface HtmlImage extends Disposable {
   image: HTMLImageElement | ImageBitmap;
 }
 
+function asBlobPart(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
+
 function loadImageBytesAsImageElement(
   imageData: Uint8Array
 ): Promise<HtmlImage> {
   return new Promise((resolve, reject) => {
-    const blob = new Blob([imageData]);
+    const blob = new Blob([asBlobPart(imageData)]);
     const blobUrl = URL.createObjectURL(blob);
 
     const image = new Image();
@@ -30,7 +36,7 @@ function loadImageBytesAsImageElement(
 async function loadImageBytesAsImageBitmap(
   imageData: Uint8Array
 ): Promise<HtmlImage> {
-  const blob = new Blob([imageData]);
+  const blob = new Blob([asBlobPart(imageData)]);
   const bitmap = await window.createImageBitmap(blob);
   return { image: bitmap, dispose: () => bitmap.close() };
 }

@@ -1,18 +1,3 @@
-// Manual definition for the Element `checkVisibility` API.
-// https://developer.mozilla.org/en-US/docs/Web/API/Element/checkVisibility#visibilityproperty
-// TODO: Remove this after upgrading StencilJS + TypeScript
-declare global {
-  interface Element {
-    checkVisibility: (options: {
-      checkOpacity?: boolean;
-      checkVisibilityCSS?: boolean;
-      contentVisibilityAuto?: boolean;
-      opacityProperty?: boolean;
-      visibilityProperty?: boolean;
-    }) => boolean;
-  }
-}
-
 export class VisibilityObserver {
   private targetElement?: HTMLElement;
 

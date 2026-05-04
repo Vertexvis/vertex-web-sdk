@@ -3,6 +3,22 @@ export interface Timing {
   duration: number;
 }
 
+const fallbackPerformance = {
+  clearMarks: () => undefined,
+  clearMeasures: () => undefined,
+  getEntriesByName: () => [],
+  mark: () => undefined,
+  measure: () => undefined,
+} as unknown as Performance;
+
+function getPerformance(): Performance {
+  if (typeof window !== 'undefined') {
+    return window.performance;
+  }
+
+  return globalThis.performance ?? fallbackPerformance;
+}
+
 /**
  * A meter for measuring timings. Measurements are stored using the browser's
  * performance APIs, which provide high-resolution timestamps, as well as
@@ -14,7 +30,7 @@ export class TimingMeter {
 
   public constructor(
     public readonly name: string,
-    private readonly perf: Performance = window.performance
+    private readonly perf: Performance = getPerformance()
   ) {}
 
   /**

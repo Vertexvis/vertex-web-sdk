@@ -358,7 +358,7 @@ export const fromPbStencilBufferOrThrow = M.ifInvalidThrow(fromPbStencilBuffer);
 
 function fromPbStreamResponse<
   P extends keyof vertexvis.protobuf.stream.IStreamResponse,
-  R
+  R,
 >(
   prop: P,
   mapper: M.Func<NonNullable<vertexvis.protobuf.stream.IStreamResponse[P]>, R>

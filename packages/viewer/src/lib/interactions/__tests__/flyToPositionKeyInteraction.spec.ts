@@ -42,7 +42,7 @@ describe(FlyToPositionKeyInteraction, () => {
   function createInteraction(frame: Frame): FlyToPositionKeyInteraction {
     return new FlyToPositionKeyInteraction(
       streamApi,
-      () => ({ animation: { durationMs: 500 } } as Config),
+      () => ({ animation: { durationMs: 500 } }) as Config,
       () => Point.create(1, 1),
       () => createScene(frame)
     );

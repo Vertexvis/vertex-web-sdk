@@ -6,9 +6,7 @@ import { InteractionApi } from '../interactions';
 import { InteractionHandler } from '../interactions/interactionHandler';
 import { VolumeIntersectionQueryController } from './controller';
 
-export class VolumeIntersectionQueryInteractionHandler
-  implements InteractionHandler
-{
+export class VolumeIntersectionQueryInteractionHandler implements InteractionHandler {
   private element?: HTMLElement;
   private api?: InteractionApi;
   private isInteracting?: boolean;

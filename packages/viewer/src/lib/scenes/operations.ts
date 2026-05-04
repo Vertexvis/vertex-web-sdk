@@ -128,9 +128,7 @@ export interface SceneItemOperations<T> {
 /**
  * A class to handle the building of operations on scene items for a scene.
  */
-export class ItemOperationBuilder
-  implements SceneItemOperations<ItemOperationBuilder>
-{
+export class ItemOperationBuilder implements SceneItemOperations<ItemOperationBuilder> {
   public constructor(private operations: ItemOperation[] = []) {}
 
   /**
@@ -266,9 +264,7 @@ export interface PmiAnnotationOperations<T> {
 /**
  * A class to handle the building of operations on PMI annotations for a scene.
  */
-export class PmiAnnotationOperationBuilder
-  implements PmiAnnotationOperations<PmiAnnotationOperationBuilder>
-{
+export class PmiAnnotationOperationBuilder implements PmiAnnotationOperations<PmiAnnotationOperationBuilder> {
   public constructor(private operations: PmiAnnotationOperation[] = []) {}
   /**
    * Constructs the scene PMI annotation operations and returns a definition describing each

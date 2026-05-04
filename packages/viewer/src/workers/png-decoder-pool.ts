@@ -1,4 +1,4 @@
-import { loadWorker, Pool, WorkerModule } from 'worker:./png-decoder';
+import { loadWorker, Pool, WorkerModule } from 'worker:./png-decoder.js';
 
 import type { DecodePngFn } from './png-decoder';
 
@@ -40,8 +40,10 @@ async function getPool(): Promise<DecodePngPool> {
 
 export const decodePng: DecodePngFn = async (bytes) => {
   const pool = await getPool();
-  return pool.queue((decode) => decode(bytes));
+  return pool.queue((decode: DecodePngFn) => decode(bytes));
 };
 
-// Prefetch the worker and initialize the pool.
-getPool();
+// Prefetch the worker and initialize the pool in browsers only.
+if (typeof window !== 'undefined') {
+  void getPool();
+}

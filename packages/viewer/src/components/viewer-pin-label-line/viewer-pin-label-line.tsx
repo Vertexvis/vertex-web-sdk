@@ -3,6 +3,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
   Host,
+  JSX,
   Prop,
 } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';

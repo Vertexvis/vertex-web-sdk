@@ -138,7 +138,7 @@ export class DepthBuffer implements FrameImageLike {
 
       const depthOrFallback =
         depth === DepthBuffer.MAX_DEPTH_VALUE
-          ? fallbackNormalizedDepth ?? depth
+          ? (fallbackNormalizedDepth ?? depth)
           : depth;
       return (
         (depthOrFallback ?? DepthBuffer.MAX_DEPTH_VALUE) /

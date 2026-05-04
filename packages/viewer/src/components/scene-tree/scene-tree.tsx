@@ -1,5 +1,3 @@
-import 'requestidlecallback-polyfill';
-
 import {
   Component,
   Element,

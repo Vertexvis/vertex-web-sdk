@@ -104,7 +104,7 @@ is a helper library for common 3D math operations.
           pin.scale = Vector3.create(scale, scale, scale);
 
           animate();
-        })
+        });
       }
       animate();
     </script>
@@ -127,11 +127,17 @@ group of elements.
       <vertex-viewer-dom-renderer>
         <vertex-viewer-dom-group position="[500, 0, 0]" scale="[0.5, 0.5, 0.5]">
           <!-- Pin 1 -->
-          <vertex-viewer-dom-element position="[0, 100, 0]" rotation="[90, 180, 0]">
+          <vertex-viewer-dom-element
+            position="[0, 100, 0]"
+            rotation="[90, 180, 0]"
+          >
             <div class="pin">1</div>
           </vertex-viewer-dom-element>
 
-          <vertex-viewer-dom-group position="[0, 500, 0]" rotation="[90, 180, 0]">
+          <vertex-viewer-dom-group
+            position="[0, 500, 0]"
+            rotation="[90, 180, 0]"
+          >
             <!-- Pin 2 -->
             <vertex-viewer-dom-element position="[0, 100, 0]">
               <div class="pin">2</div>
@@ -171,9 +177,10 @@ property.
 ```
 
 ## Occlusion
+
 The renderer supports occluding its elements based on the element's position and
-depth information returned on a frame. If depth buffers are requested for all 
-frames, the occlusion state will be updated on every frame. Conversely, if depth 
+depth information returned on a frame. If depth buffers are requested for all
+frames, the occlusion state will be updated on every frame. Conversely, if depth
 buffers are only requested on final frames, the occlusion state will only be calculated
 on final frames and will always report occluded on transitional frames.
 
@@ -193,7 +200,11 @@ attribute.
   </head>
   <body>
     <!-- Opt-in to depth buffers for all frames. -->
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" depth-buffers="all">
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+      depth-buffers="all"
+    >
       <vertex-viewer-dom-renderer>
         <!-- This element will be included in occlusion testing. -->
         <vertex-viewer-dom-element position="[0, 0, 100]">
@@ -211,6 +222,7 @@ attribute.
 ```
 
 ## Detachment
+
 The renderer supports determining whether an element is detached from geometry based on the element's position and
 depth information returned on a frame. If depth buffers are requested for all
 frames, the detached state will be updated on every frame. Conversely, if depth
@@ -235,7 +247,11 @@ attribute.
   </head>
   <body>
     <!-- Opt-in to depth buffers for all frames. -->
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" depth-buffers="all">
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+      depth-buffers="all"
+    >
       <vertex-viewer-dom-renderer>
         <!-- This element will be included in detachment testing. -->
         <vertex-viewer-dom-element position="[0, 0, 100]" detached-off="false">
@@ -254,26 +270,31 @@ attribute.
 
 <!-- Auto Generated Below -->
 
+## Overview
+
+The `ViewerDomRenderer` is responsible for managing a
+`<vertex-viewer-dom-renderer>` element. This element supports drawing DOM
+objects in a local 3D scene that is synced with a remote rendered scene.
 
 ## Properties
 
-| Property                  | Attribute                    | Description                                                                                                                                                                                                                                                                                                                                                                    | Type                                   | Default     |
-| ------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------- |
-| `camera`                  | --                           | The current camera of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.                                                                                                                                                                                                             | `FrameCameraBase \| undefined`         | `undefined` |
-| `depthBuffer`             | --                           | The current depth buffer of the frame.  This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.                                                                                                                                                                                                       | `DepthBuffer \| undefined`             | `undefined` |
-| `drawMode`                | `draw-mode`                  | Specifies the drawing mode for the renderer.  When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.                                                                                                           | `"2d" \| "3d"`                         | `'3d'`      |
-| `propagateEventsToViewer` | `propagate-events-to-viewer` | Specifies whether to propagate events to the viewer's interaction handlers  When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer.  When `false` this <vertex-viewer-dom-renderer> will *not* be registered as a target for the viewer. | `boolean`                              | `true`      |
-| `viewer`                  | --                           | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                                                                                                                              | `HTMLVertexViewerElement \| undefined` | `undefined` |
-
+| Property                  | Attribute                    | Description                                                                                                                                                                                                                                                                                                                                                                  | Type                                   | Default     |
+| ------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------- |
+| `camera`                  | --                           | The current camera of the frame. This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.                                                                                                                                                                                                            | `FrameCameraBase \| undefined`         | `undefined` |
+| `depthBuffer`             | --                           | The current depth buffer of the frame. This property will automatically be set when supplying a viewer to the component, or when added as a child to `<vertex-viewer>`.                                                                                                                                                                                                      | `DepthBuffer \| undefined`             | `undefined` |
+| `drawMode`                | `draw-mode`                  | Specifies the drawing mode for the renderer. When in `3d` mode, elements are positioned using CSS 3D transforms and will scale and rotate with the camera. In `2d` mode, a simpler 2D transform is used, and elements will not scale or rotate with camera changes.                                                                                                          | `"2d" \| "3d"`                         | `'3d'`      |
+| `propagateEventsToViewer` | `propagate-events-to-viewer` | Specifies whether to propagate events to the viewer's interaction handlers When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer. When `false` this <vertex-viewer-dom-renderer> will _not_ be registered as a target for the viewer. | `boolean`                              | `true`      |
+| `viewer`                  | --                           | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                                                                                                                            | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-pin-tool](../viewer-pin-tool)
- - [vertex-viewer-view-cube](../viewer-view-cube)
+- [vertex-viewer-pin-tool](../viewer-pin-tool)
+- [vertex-viewer-view-cube](../viewer-view-cube)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-pin-tool --> vertex-viewer-dom-renderer
@@ -281,6 +302,6 @@ graph TD;
   style vertex-viewer-dom-renderer fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_
