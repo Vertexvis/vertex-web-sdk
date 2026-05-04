@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/viewer-react",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "description": "React bindings for the Vertex Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
@@ -42,8 +42,12 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
+<<<<<<< newReact19Stencil4
     "@stencil/react-output-target": "^1.5.2",
     "@vertexvis/viewer": "0.24.4"
+=======
+    "@vertexvis/viewer": "0.24.5"
+>>>>>>> master
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
