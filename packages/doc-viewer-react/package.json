@@ -42,13 +42,8 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
-<<<<<<< newReact19Stencil4
     "@stencil/react-output-target": "^1.5.2",
-    "@vertexvis/doc-viewer": "0.24.4"
-=======
-    "@stencil/react-output-target": "^1.4.2",
     "@vertexvis/doc-viewer": "0.24.5"
->>>>>>> master
   },
   "devDependencies": {
     "@types/react": "^18.2.48",
