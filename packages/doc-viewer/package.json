@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/doc-viewer",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "description": "The Vertex SDK for viewing documents.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -89,8 +89,8 @@
     "typescript": "~5.8.3"
   },
   "dependencies": {
-    "@vertexvis/geometry": "0.24.4",
-    "@vertexvis/utils": "0.24.4",
+    "@vertexvis/geometry": "0.24.5",
+    "@vertexvis/utils": "0.24.5",
     "classnames": "^2.5.1",
     "pdfjs-dist": "^5.5.207",
     "resize-observer": "^1.0.4"
