@@ -95,7 +95,7 @@ export class ViewerMarkupTool {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
 
   /**
    * The style of the starting anchor. This defaults to none.
