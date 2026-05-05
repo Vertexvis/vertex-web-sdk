@@ -1,8 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, Watch } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
-import { GeneralInteractionHandler } from '@vertexvis/utils';
+import { Disposable, GeneralInteractionHandler } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { PartialConfig } from '../../lib/config';
