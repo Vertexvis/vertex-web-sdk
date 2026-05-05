@@ -107,7 +107,7 @@ export class ViewerMarkupFreeform {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
 
   /**
    * The original viewport dimensions where this markup was created. This value is used
@@ -230,7 +230,7 @@ export class ViewerMarkupFreeform {
    */
   @Watch('viewer')
   protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement
+    newViewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement
   ): Promise<void> {
     this.registeredInteraction?.dispose();
     this.registeredInteraction = undefined;

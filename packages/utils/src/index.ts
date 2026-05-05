@@ -15,6 +15,7 @@ import * as UUID from './uuid';
 
 export * from './disposable';
 export * from './eventDispatcher';
+export * from './interactions/generalInteractionHandler';
 export * from './mappedTypes';
 export * from './predicate';
 

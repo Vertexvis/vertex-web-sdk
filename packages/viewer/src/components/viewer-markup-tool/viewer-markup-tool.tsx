@@ -10,6 +10,7 @@ import {
   State,
   Watch,
 } from '@stencil/core';
+import {} from '@vertexvis/doc-viewer';
 import { Dimensions, Point } from '@vertexvis/geometry';
 
 import { stampTemplateWithId } from '../../lib/templates';

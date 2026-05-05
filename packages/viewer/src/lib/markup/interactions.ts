@@ -1,9 +1,8 @@
-import type { InteractionApi, InteractionHandler } from '../interactions';
+import { GeneralInteractionHandler } from '@vertexvis/utils';
 
-export abstract class MarkupInteractionHandler implements InteractionHandler {
+export abstract class MarkupInteractionHandler implements GeneralInteractionHandler {
   protected element?: HTMLElement;
   protected elementBounds?: DOMRect;
-  protected api?: InteractionApi;
 
   private resizeObserver: ResizeObserver;
 
@@ -13,9 +12,8 @@ export abstract class MarkupInteractionHandler implements InteractionHandler {
     });
   }
 
-  public initialize(element: HTMLElement, api: InteractionApi): void {
+  public initialize(element: HTMLElement): void {
     this.element = element;
-    this.api = api;
 
     this.elementBounds = this.computeBoundingRect();
     this.resizeObserver.observe(this.element);
@@ -28,7 +26,6 @@ export abstract class MarkupInteractionHandler implements InteractionHandler {
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
 
     this.element = undefined;
-    this.api = undefined;
   }
 
   protected acceptInteraction(): void {
