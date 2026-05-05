@@ -1,7 +1,5 @@
 import fastDeepEqual from 'fast-deep-equal';
-import isSimpleObject from 'is-plain-object';
 
-/* eslint-disable padding-line-between-statements */
 /**
  * Returns a new object where any enumerable property from `other` are
  * recursively applied to `a`. Once a property is set, it will not be
@@ -42,7 +40,6 @@ export function defaults(
     return other.reduce((result, next) => defaults(result, next), a);
   }
 }
-/* eslint-enable padding-line-between-statements */
 
 /**
  * Returns `true` if this is a plain object, which is defined by a type created
@@ -64,7 +61,11 @@ export function defaults(
  * ```
  */
 export function isPlainObject(obj: unknown): boolean {
-  return isSimpleObject(obj);
+  if (obj == null || typeof obj !== 'object') {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(obj);
+  return prototype != null && prototype.constructor === Object;
 }
 
 /**
