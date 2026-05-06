@@ -3,7 +3,7 @@
   "version": "0.24.5",
   "description": "A websocket client for interacting with Vertex's stream API.",
   "license": "MIT",
-  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
   "repository": {
     "type": "git",

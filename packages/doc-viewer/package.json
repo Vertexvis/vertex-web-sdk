@@ -11,7 +11,7 @@
   "collection:main": "dist/collection/index.js",
   "unpkg": "dist/doc-viewer/doc-viewer.esm.js",
   "license": "MIT",
-  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
   "repository": {
     "type": "git",

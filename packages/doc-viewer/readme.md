@@ -13,5 +13,5 @@ can run in any browser supporting the Custom Elements v1 specification. For
 browsers that do not support the Custom Elements v1 spec, a polyfill will
 automatically be used.
 
-[vertex]: https://www.vertexvis.com
+[vertex]: https://www.vertex3d.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components
