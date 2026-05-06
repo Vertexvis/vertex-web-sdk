@@ -1,5 +1,3 @@
-import { v4 as uuid } from 'uuid';
-
 export type UUID = string;
 
 export interface UUIDMsbLsb {
@@ -8,7 +6,7 @@ export interface UUIDMsbLsb {
 }
 
 export function create(): UUID {
-  return uuid();
+  return globalThis.crypto.randomUUID(); // synonomys with uuid.v4()
 }
 
 export function fromMsbLsb(msb: bigint | string, lsb: bigint | string): UUID {
