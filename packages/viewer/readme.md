@@ -165,7 +165,7 @@ function main() {
 ## Examples
 
 Check out our [examples](../../examples) directory and
-[Examples](https://developer.vertexvis.com/examples) page on our Dev Portal to
+[Examples](https://developer.vertex3d.com/examples) page on our Dev Portal to
 get an idea of what you can do with Vertex's Viewer component.
 
 ## Documentation
@@ -223,5 +223,5 @@ dedicated READMEs corresponding to their functionality:
 - [model-views](./src/lib/model-views/readme.md)
 - [pmi](./src/lib/pmi/readme.md)
 
-[vertex]: https://www.vertexvis.com
+[vertex]: https://www.vertex3d.com
 [web components]: https://developer.mozilla.org/en-US/docs/Web/Web_Components
