@@ -14,6 +14,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
+import { MarkupEnabledElement } from '../../lib/markup/types';
 import { writeDOM } from '../../lib/stencil';
 import {
   MarkupCenteringBehavior,
@@ -167,7 +168,7 @@ export class ViewerMarkupArrow {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: MarkupEnabledElement;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -254,7 +255,7 @@ export class ViewerMarkupArrow {
    */
   @Watch('viewer')
   protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement
+    newViewer?: MarkupEnabledElement
   ): Promise<void> {
     this.registeredInteraction?.dispose();
     this.registeredInteraction = undefined;
