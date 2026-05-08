@@ -158,8 +158,9 @@ describe('vertex-viewer-markup-arrow', () => {
     const el = page.root?.querySelector(
       'vertex-viewer-markup-arrow'
     ) as HTMLVertexViewerMarkupArrowElement;
-
-    expect(el.getAttribute('style')).toBeNull();
+    expect(el.getAttribute('style')).toContain(
+      '--viewer-markup-arrow-scale: 1'
+    );
 
     el.scale = 2;
     await page.waitForChanges();

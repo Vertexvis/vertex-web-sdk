@@ -157,7 +157,13 @@ export class ViewerMarkupCircle {
   private interactionHandler = new CircleMarkupInteractionHandler(
     this.hostEl,
     this.interactionBegin,
-    this.interactionEnd
+    this.interactionEnd,
+    {
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    }
   );
 
   private registeredHandler?: Disposable;
@@ -168,6 +174,7 @@ export class ViewerMarkupCircle {
   protected componentWillLoad(): void {
     this.updateViewport();
     this.handleViewerChanged(this.viewer);
+    this.handleScaleChange();
     this.updateBoundsFromProps();
   }
 
@@ -227,6 +234,19 @@ export class ViewerMarkupCircle {
     if (this.mode !== 'create') {
       window.removeEventListener('pointerdown', this.handleWindowPointerDown);
     }
+  }
+
+  @Watch('offset')
+  @Watch('originatingViewport')
+  @Watch('centeringBehavior')
+  @Watch('scale')
+  protected handleScalingConfigurationChange(): void {
+    this.interactionHandler.updateScalingOptions({
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    });
   }
 
   @Watch('scale')

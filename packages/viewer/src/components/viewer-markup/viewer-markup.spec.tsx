@@ -425,7 +425,6 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
 
       [arrow, circle, freeform].forEach((el) => {
-        console.log(el.tagName);
         expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe(
           '-20%'
         );
