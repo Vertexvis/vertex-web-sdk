@@ -1,7 +1,7 @@
 import { Disposable } from '../disposable';
 
 /**
- * An `GeneralInteractionHandler` provides a mechanism for customizing the mouse and
+ * An `BasicInteractionHandler` provides a mechanism for customizing the mouse and
  * touch handling in the viewer.
  *
  * When an interaction handler is registered with the viewer, it'll call the
@@ -10,7 +10,7 @@ import { Disposable } from '../disposable';
  *
  * @example
  * ```
- * class CustomInteractionHandler extends GeneralInteractionHandler {
+ * class CustomInteractionHandler extends BasicInteractionHandler {
  *   private element: HTMLElement;
  *
  *   public dispose(): void {
@@ -31,7 +31,7 @@ import { Disposable } from '../disposable';
  * viewer.registerInteractionHandler(new CustomInteractionHandler);
  * ```
  */
-export interface GeneralInteractionHandler extends Disposable {
+export interface BasicInteractionHandler extends Disposable {
   /**
    * Called by the viewer when the interaction handler is registered with the
    * viewer. Used to setup any necessary event listeners to handle user

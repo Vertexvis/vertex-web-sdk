@@ -2,6 +2,7 @@
 
 <!-- Auto Generated Below -->
 
+
 ## Properties
 
 | Property            | Attribute            | Description                                                                                                                                                                                                                                                                               | Type                                                                                                                                                                                                                                                                                                                     | Default     |
@@ -20,6 +21,7 @@
 | `visibilityHandler` | --                   | An optional handler that will override this cell's default visibility behavior. The registered handler will receive the `pointerup` event, the node data for the row this cell is associated with, and a reference to the parent `<vertex-scene-tree>` element for performing operations. | `((event: PointerEvent, node: AsObject, tree: HTMLVertexSceneTreeElement) => void) \| undefined`                                                                                                                                                                                                                         | `undefined` |
 | `visibilityToggle`  | `visibility-toggle`  | Indicates whether to display a button for toggling the visibility state of the node associated with this cell.                                                                                                                                                                            | `boolean \| undefined`                                                                                                                                                                                                                                                                                                   | `undefined` |
 
+
 ## Events
 
 | Event               | Description                                                                                                                                  | Type                                          |
@@ -30,6 +32,7 @@
 | `selectionToggled`  | An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled. | `CustomEvent<SceneTreeTableCellEventDetails>` |
 | `visibilityToggled` | An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.      | `CustomEvent<SceneTreeTableCellEventDetails>` |
 
+
 ## CSS Custom Properties
 
 | Name                                    | Description                                                                             |
@@ -39,6 +42,7 @@
 | `--scene-tree-cell-padding`             | CSS lengths that specifies the amount of padding between the cell's border and content. |
 | `--scene-tree-cell-text-positioning`    | A CSS text alignment value that indicates how text should be positioned.                |
 
+
 ## Dependencies
 
 ### Depends on
@@ -46,13 +50,12 @@
 - [vertex-viewer-icon](../viewer-icon)
 
 ### Graph
-
 ```mermaid
 graph TD;
   vertex-scene-tree-table-cell --> vertex-viewer-icon
   style vertex-scene-tree-table-cell fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
----
+----------------------------------------------
 
-_Built with [StencilJS](https://stenciljs.com/)_
+*Built with [StencilJS](https://stenciljs.com/)*

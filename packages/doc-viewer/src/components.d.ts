@@ -10,14 +10,14 @@ import { InteractionMode } from "./components/document-viewer/document-viewer";
 import { DocumentApiState } from "./lib/document/api";
 import { DocumentLayersController } from "./lib/document/layers/controller";
 import { PartialConfig } from "./lib/config";
-import { Disposable, GeneralInteractionHandler } from "@vertexvis/utils";
+import { BasicInteractionHandler, Disposable } from "@vertexvis/utils";
 import { Point } from "@vertexvis/geometry";
 export { DocumentProvider } from "./lib/document/provider";
 export { InteractionMode } from "./components/document-viewer/document-viewer";
 export { DocumentApiState } from "./lib/document/api";
 export { DocumentLayersController } from "./lib/document/layers/controller";
 export { PartialConfig } from "./lib/config";
-export { Disposable, GeneralInteractionHandler } from "@vertexvis/utils";
+export { BasicInteractionHandler, Disposable } from "@vertexvis/utils";
 export { Point } from "@vertexvis/geometry";
 export namespace Components {
     interface VertexDocumentViewer {
@@ -62,7 +62,7 @@ export namespace Components {
           * @param interactionHandler The interaction handler to register.
           * @returns A promise containing the disposable to use to deregister the handler.
          */
-        "registerInteractionHandler": (interactionHandler: GeneralInteractionHandler) => Promise<Disposable>;
+        "registerBasicInteractionHandler": (interactionHandler: BasicInteractionHandler) => Promise<Disposable>;
         /**
           * An optional value that will debounce image updates when resizing this viewer element.
           * @default 100

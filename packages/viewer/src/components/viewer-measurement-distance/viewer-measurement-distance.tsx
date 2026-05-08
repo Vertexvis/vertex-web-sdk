@@ -393,6 +393,7 @@ export class ViewerMeasurementDistance {
    * @ignore
    */
   protected render(): h.JSX.IntrinsicElements {
+    console.log(this.distance);
     return (
       <Host>
         {this.showAxisReferenceLines && (

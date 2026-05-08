@@ -29,7 +29,7 @@ import { CanvasController } from "./lib/canvases";
 import { TapEventDetails } from "./lib/interactions/tapEventDetails";
 import { ConnectionStatus, LoadOptions } from "./components/viewer/viewer";
 import { Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
-import { Color, Disposable } from "@vertexvis/utils";
+import { BasicInteractionHandler, BasicViewer, Color, Disposable } from "@vertexvis/utils";
 import { InteractionHandler } from "./lib/interactions/interactionHandler";
 import { KeyInteraction } from "./lib/interactions/keyInteraction";
 import { Cursor } from "./lib/cursors";
@@ -88,7 +88,7 @@ export { CanvasController } from "./lib/canvases";
 export { TapEventDetails } from "./lib/interactions/tapEventDetails";
 export { ConnectionStatus, LoadOptions } from "./components/viewer/viewer";
 export { Dimensions, Euler, Matrix4, Point, Quaternion, Rectangle, Vector3 } from "@vertexvis/geometry";
-export { Color, Disposable } from "@vertexvis/utils";
+export { BasicInteractionHandler, BasicViewer, Color, Disposable } from "@vertexvis/utils";
 export { InteractionHandler } from "./lib/interactions/interactionHandler";
 export { KeyInteraction } from "./lib/interactions/keyInteraction";
 export { Cursor } from "./lib/cursors";
@@ -714,6 +714,34 @@ export namespace Components {
           * @param interactionHandler The interaction handler to register.
           * @returns A promise containing the disposable to use to deregister the handler.
          */
+        "registerBasicInteractionHandler": (interactionHandler: BasicInteractionHandler) => Promise<Disposable>;
+        /**
+          * Registers and initializes an interaction handler with the viewer. Returns a `Disposable` that should be used to deregister the interaction handler.
+          *
+          * `InteractionHandler`s are used to build custom mouse and touch interactions for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable the default camera controls provided by the viewer.
+          * @example 
+* ```
+* class CustomInteractionHandler extends InteractionHandler {
+*   private element: HTMLElement;
+*   private api: InteractionApi;
+*   public dispose(): void {
+*     this.element.removeEventListener('click', this.handleElementClick);
+*   }
+*   public initialize(element: HTMLElement, api: InteractionApi): void {
+*     this.api = api;
+*     this.element = element;
+*     this.element.addEventListener('click', this.handleElementClick);
+*   }
+*   private handleElementClick = (event: MouseEvent) => {
+*     api.tap({ x: event.clientX, y: event.clientY });
+*   };
+* }
+* const viewer = document.querySelector('vertex-viewer');
+* viewer.registerInteractionHandler(new CustomInteractionHandler());
+* ```
+          * @param interactionHandler The interaction handler to register.
+          * @returns A promise containing the disposable to use to deregister the handler.
+         */
         "registerInteractionHandler": (interactionHandler: InteractionHandler) => Promise<Disposable>;
         /**
           * Registers a key interaction to be invoked when a specific set of keys are pressed during a `tap` event.
@@ -1270,7 +1298,7 @@ export namespace Components {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+        "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMarkupCircle {
         /**
@@ -1322,7 +1350,7 @@ export namespace Components {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMarkupFreeform {
         /**
@@ -1386,7 +1414,7 @@ export namespace Components {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMarkupTool {
         /**
@@ -1460,7 +1488,7 @@ export namespace Components {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMeasurementDetails {
         /**
@@ -3788,7 +3816,7 @@ declare namespace LocalJSX {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+        "viewer"?: HTMLVertexViewerElement;
     }
     interface VertexViewerMarkupCircle {
         /**
@@ -3851,7 +3879,7 @@ declare namespace LocalJSX {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMarkupFreeform {
         /**
@@ -3926,7 +3954,7 @@ declare namespace LocalJSX {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMarkupTool {
         /**
@@ -4004,7 +4032,7 @@ declare namespace LocalJSX {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMeasurementDetails {
         /**

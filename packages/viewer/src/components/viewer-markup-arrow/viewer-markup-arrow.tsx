@@ -167,7 +167,7 @@ export class ViewerMarkupArrow {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+  public viewer?: HTMLVertexViewerElement;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -247,8 +247,11 @@ export class ViewerMarkupArrow {
    */
   @Watch('viewer')
   protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement
+    newViewer?: HTMLVertexViewerElement
   ): Promise<void> {
+    console.log("handleViewerChanged");
+    console.log(newViewer);
+
     this.registeredInteraction?.dispose();
     this.registeredInteraction = undefined;
 

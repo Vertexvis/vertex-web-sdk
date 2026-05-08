@@ -148,6 +148,7 @@ in degrees, and should return a string.
 
 <!-- Auto Generated Below -->
 
+
 ## Properties
 
 | Property              | Attribute           | Description                                                                                                                                                                        | Type                                                                                           | Default         |
@@ -163,6 +164,7 @@ in degrees, and should return a string.
 | `measurementOverlays` | --                  | The manager that the component will use to present measurement overlays.                                                                                                           | `MeasurementOverlayManager \| undefined`                                                       | `undefined`     |
 | `resultTypes`         | --                  | A set of result types to display. If `undefined`, then all results will be displayed.                                                                                              | `("minimum-distance" \| "planar-angle" \| "planar-distance" \| "surface-area")[] \| undefined` | `undefined`     |
 
+
 ## CSS Custom Properties
 
 | Name                                   | Description                                                               |
@@ -171,6 +173,7 @@ in degrees, and should return a string.
 | `--viewer-measurement-details-y-color` | The color of the `X` label in measurements. Defaults to var(--green-500). |
 | `--viewer-measurement-details-z-color` | The color of the `X` label in measurements. Defaults to blue.             |
 
----
 
-_Built with [StencilJS](https://stenciljs.com/)_
+----------------------------------------------
+
+*Built with [StencilJS](https://stenciljs.com/)*

@@ -68,7 +68,7 @@ Type: `Promise<void>`
 
 
 
-### `registerInteractionHandler(interactionHandler: GeneralInteractionHandler) => Promise<Disposable>`
+### `registerBasicInteractionHandler(interactionHandler: BasicInteractionHandler) => Promise<Disposable>`
 
 Registers and initializes an interaction handler with the document viewer. Returns a
 `Disposable` that should be used to deregister the interaction handler.
@@ -77,9 +77,9 @@ Registers and initializes an interaction handler with the document viewer. Retur
 
 #### Parameters
 
-| Name                 | Type                        | Description                          |
-| -------------------- | --------------------------- | ------------------------------------ |
-| `interactionHandler` | `GeneralInteractionHandler` | The interaction handler to register. |
+| Name                 | Type                      | Description                          |
+| -------------------- | ------------------------- | ------------------------------------ |
+| `interactionHandler` | `BasicInteractionHandler` | The interaction handler to register. |
 
 #### Returns
 

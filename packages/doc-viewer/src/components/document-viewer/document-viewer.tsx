@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, Watch } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { Disposable, GeneralInteractionHandler } from '@vertexvis/utils';
+import { BasicInteractionHandler, BasicViewer, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { PartialConfig } from '../../lib/config';
@@ -20,7 +20,7 @@ export type InteractionMode = 'none' | 'pan';
   styleUrl: 'document-viewer.css',
   shadow: true,
 })
-export class VertexDocumentViewer {
+export class VertexDocumentViewer implements BasicViewer {
   /**
    * A URI of the document to load when the component is mounted in the DOM tree.
    * Currently only supports URLs for client-side rendering.
@@ -113,7 +113,7 @@ export class VertexDocumentViewer {
   private pageLoadedDisposable?: Disposable;
   private pageDrawnDisposable?: Disposable;
 
-  private interactionHandlers: GeneralInteractionHandler[] = [];
+  private interactionHandlers: BasicInteractionHandler[] = [];
   private panInteractionHandler?: PanInteractionHandler;
 
   protected componentWillLoad(): void {
@@ -155,7 +155,7 @@ export class VertexDocumentViewer {
    *  deregister the handler.
    */
   @Method()
-  public async registerInteractionHandler(interactionHandler: GeneralInteractionHandler): Promise<Disposable> {
+  public async registerBasicInteractionHandler(interactionHandler: BasicInteractionHandler): Promise<Disposable> {
     this.interactionHandlers.push(interactionHandler);
     this.initializeInteractionHandler(interactionHandler);
     return {
@@ -336,7 +336,7 @@ export class VertexDocumentViewer {
     }, this.resizeDebounce);
   }
 
-  private initializeInteractionHandler(handler: GeneralInteractionHandler): void {
+  private initializeInteractionHandler(handler: BasicInteractionHandler): void {
     if (this.canvasEl == null) {
       throw new Error('Cannot initialize interaction handler');
     }

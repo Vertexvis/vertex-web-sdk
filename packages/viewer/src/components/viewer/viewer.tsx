@@ -14,7 +14,13 @@ import {
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { toProtoDuration, WebSocketClientImpl } from '@vertexvis/stream-api';
-import { Color, Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
+import {
+  Color,
+  Disposable,
+  EventDispatcher,
+  UUID,
+    BasicInteractionHandler
+} from '@vertexvis/utils';
 import classnames from 'classnames';
 
 import {
@@ -743,6 +749,61 @@ export class Viewer {
   ): Promise<Disposable> {
     this.interactionHandlers.push(interactionHandler);
     this.initializeInteractionHandler(interactionHandler);
+    return {
+      dispose: () => {
+        const index = this.interactionHandlers.indexOf(interactionHandler);
+        if (index !== -1) {
+          this.interactionHandlers[index].dispose();
+          this.interactionHandlers.splice(index, 1);
+        }
+      },
+    };
+  }
+
+  /**
+   * Registers and initializes an interaction handler with the viewer. Returns a
+   * `Disposable` that should be used to deregister the interaction handler.
+   *
+   * `InteractionHandler`s are used to build custom mouse and touch interactions
+   * for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable
+   * the default camera controls provided by the viewer.
+   *
+   * @example
+   * ```
+   * class CustomInteractionHandler extends InteractionHandler {
+   *   private element: HTMLElement;
+   *   private api: InteractionApi;
+   *
+   *   public dispose(): void {
+   *     this.element.removeEventListener('click', this.handleElementClick);
+   *   }
+   *
+   *   public initialize(element: HTMLElement, api: InteractionApi): void {
+   *     this.api = api;
+   *     this.element = element;
+   *     this.element.addEventListener('click', this.handleElementClick);
+   *   }
+   *
+   *   private handleElementClick = (event: MouseEvent) => {
+   *     api.tap({ x: event.clientX, y: event.clientY });
+   *   }
+   * }
+   *
+   * const viewer = document.querySelector("vertex-viewer");
+   * viewer.registerInteractionHandler(new CustomInteractionHandler);
+   * ```
+   *
+   * @param interactionHandler The interaction handler to register.
+   * @returns {Promise<void>} A promise containing the disposable to use to
+   *  deregister the handler.
+   */
+  @Method()
+  public async registerBasicInteractionHandler(
+    interactionHandler: BasicInteractionHandler
+  ): Promise<Disposable> {
+    console.log("registerBasicInteractionHandler");
+    this.interactionHandlers.push(interactionHandler);
+    this.initializeBasicInteractionHandler(interactionHandler);
     return {
       dispose: () => {
         const index = this.interactionHandlers.indexOf(interactionHandler);
@@ -1524,6 +1585,15 @@ export class Viewer {
       );
     }
     handler.initialize(this.stateMap.interactionTarget, this.interactionApi);
+  }
+
+  private initializeBasicInteractionHandler(handler: BasicInteractionHandler): void {
+    if (this.stateMap.interactionTarget == null) {
+      throw new InteractionHandlerError(
+        'Cannot initialize interaction handler. Interaction target is undefined.'
+      );
+    }
+    handler.initialize(this.stateMap.interactionTarget);
   }
 
   private createInteractionApi(): InteractionApi {
