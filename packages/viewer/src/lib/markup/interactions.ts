@@ -1,7 +1,6 @@
 import { BasicInteractionHandler } from '@vertexvis/utils';
-import {InteractionHandler} from "../interactions";
 
-export abstract class MarkupInteractionHandler implements InteractionHandler {
+export abstract class MarkupInteractionHandler implements BasicInteractionHandler {
   protected element?: HTMLElement;
   protected elementBounds?: DOMRect;
 
@@ -14,6 +13,8 @@ export abstract class MarkupInteractionHandler implements InteractionHandler {
   }
 
   public initialize(element: HTMLElement): void {
+    console.log("initialize for MarkupInteractionHandler");
+    console.log(element);
     this.element = element;
 
     this.elementBounds = this.computeBoundingRect();
@@ -35,6 +36,7 @@ export abstract class MarkupInteractionHandler implements InteractionHandler {
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
+    console.log("handlePointerDown for MarkupInteractionHandler");
     this.handleInteractionAttempt(event);
   };
 

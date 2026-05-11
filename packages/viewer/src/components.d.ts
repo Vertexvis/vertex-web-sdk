@@ -1298,7 +1298,7 @@ export namespace Components {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMarkupCircle {
         /**
@@ -3816,7 +3816,7 @@ declare namespace LocalJSX {
           *
           * This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.
          */
-        "viewer"?: HTMLVertexViewerElement;
+        "viewer"?: BasicViewer;
     }
     interface VertexViewerMarkupCircle {
         /**

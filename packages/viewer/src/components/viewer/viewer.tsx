@@ -108,6 +108,7 @@ import {
   getElementBoundingClientRect,
   getElementPropertyValue,
 } from './utils';
+import { BasicViewer } from '@vertexvis/utils';
 
 interface ConnectedStatus {
   jwt: string;
@@ -156,7 +157,7 @@ export type ConnectionStatus =
   styleUrl: 'viewer.css',
   shadow: true,
 })
-export class Viewer {
+export class Viewer implements BasicViewer {
   @Element() private hostElement!: HTMLVertexViewerElement;
 
   /**
@@ -1546,6 +1547,8 @@ export class Viewer {
   }
 
   private async initializeDefaultTapInteractionHandler(): Promise<void> {
+    console.log("window.PointerEvent: ");
+    console.log(window.PointerEvent);
     if (this.tapHandlerDisposable == null) {
       if (window.PointerEvent != null) {
         const tapInteractionHandler = new TapInteractionHandler(

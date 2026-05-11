@@ -38,6 +38,7 @@ import {
   parsePoint,
 } from './utils';
 import { BoundingBox1d } from './viewer-markup-arrow-components';
+import {BasicViewer} from "@vertexvis/utils";
 
 /**
  * The supported arrow markup modes.
@@ -167,7 +168,7 @@ export class ViewerMarkupArrow {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: BasicViewer;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -247,7 +248,7 @@ export class ViewerMarkupArrow {
    */
   @Watch('viewer')
   protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement
+    newViewer?: BasicViewer
   ): Promise<void> {
     console.log("handleViewerChanged");
     console.log(newViewer);
@@ -256,7 +257,7 @@ export class ViewerMarkupArrow {
     this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.registeredInteraction = await newViewer.registerInteractionHandler(
+      this.registeredInteraction = await newViewer.registerBasicInteractionHandler(
         this.interactionHandler
       );
     }
