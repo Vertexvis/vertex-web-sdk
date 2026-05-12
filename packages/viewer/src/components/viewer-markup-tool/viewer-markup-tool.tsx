@@ -182,56 +182,14 @@ export class ViewerMarkupTool {
   /**
    * @ignore
    */
-  @Watch('tool')
-  protected handleToolChanged(): void {
-    this.updateMarkupElement();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('arrowTemplateId')
-  protected handleArrowTemplateIdChanged(): void {
-    this.updateMarkupElement();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('circleTemplateId')
-  protected handleCircleTemplateIdChanged(): void {
-    this.updateMarkupElement();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('freeformTemplateId')
-  protected handleFreeformTemplateIdChanged(): void {
-    this.updateMarkupElement();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('disabled')
-  protected handleDisabledChanged(): void {
-    this.updateMarkupElement();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('startLineAnchorStyle')
-  protected handleStartLineAnchorStyleChanged(): void {
-    this.updateMarkupElement();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('endLineAnchorStyle')
-  protected handleEndLineAnchorStyleChanged(): void {
+  @Watch('freeformTemplateId')
+  @Watch('startLineAnchorStyle')
+  @Watch('tool')
+  protected handlePropertyChanged(): void {
     this.updateMarkupElement();
   }
 
@@ -392,6 +350,7 @@ export class ViewerMarkupTool {
 
     if (!this.disabled) {
       const newMarkupElement = this.createNewMarkupElement();
+      this.hostEl.append(newMarkupElement);
 
       if (this.tool === 'arrow') {
         (
@@ -417,7 +376,6 @@ export class ViewerMarkupTool {
         this.handleMarkupInteractionEnd
       );
       this.stateMap.markupElement = newMarkupElement;
-      this.hostEl.append(newMarkupElement);
     }
   }
 
