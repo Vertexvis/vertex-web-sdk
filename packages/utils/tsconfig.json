@@ -2,8 +2,6 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@vertexwebsdk/build/tsconfig",
   "compilerOptions": {
-    "downlevelIteration": true,
-    "lib": ["ES2019", "WebWorker"]
+    "lib": ["es2022", "WebWorker"],
   },
-  "exclude": ["dist", "node_modules"]
 }
