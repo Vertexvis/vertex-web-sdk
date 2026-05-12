@@ -229,30 +229,33 @@ export class ViewerMarkup {
       const { start, end, id } = markup;
 
       const el = this.createArrowMarkupElement();
+      this.appendMarkupElement(el);
       el.id = id;
       el.start = start;
       el.end = end;
       el.startLineAnchorStyle = this.startLineAnchorStyle;
       el.endLineAnchorStyle = this.endLineAnchorStyle;
 
-      return this.appendMarkupElement(el);
+      return el;
     } else if (markup instanceof CircleMarkup) {
       const { bounds, id } = markup;
 
       const el = this.createCircleMarkupElement();
+      this.appendMarkupElement(el);
       el.id = id;
       el.bounds = bounds;
 
-      return this.appendMarkupElement(el);
+      return el;
     } else if (markup instanceof FreeformMarkup) {
       const { bounds, points, id } = markup;
 
       const el = this.createFreeformMarkupElement();
+      this.appendMarkupElement(el);
       el.id = id;
       el.points = points;
       el.bounds = bounds;
 
-      return this.appendMarkupElement(el);
+      return el;
     } else {
       throw new Error(`Cannot add markup. Unknown type '${markup}'.`);
     }
@@ -354,32 +357,11 @@ export class ViewerMarkup {
   /**
    * @ignore
    */
-  @Watch('tool')
-  protected handleToolChanged(): void {
-    this.updatePropsOnMarkupTool();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('arrowTemplateId')
-  protected handleArrowTemplateIdChanged(): void {
-    this.updatePropsOnMarkupTool();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('circleTemplateId')
-  protected handleCircleTemplateIdChanged(): void {
-    this.updatePropsOnMarkupTool();
-  }
-
-  /**
-   * @ignore
-   */
   @Watch('freeformTemplateId')
-  protected handleFreeformTemplateIdChanged(): void {
+  @Watch('tool')
+  protected handlePropertyChanged(): void {
     this.updatePropsOnMarkupTool();
   }
 
