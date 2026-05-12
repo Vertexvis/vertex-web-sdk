@@ -1,6 +1,6 @@
-import { GeneralInteractionHandler } from '@vertexvis/utils';
+import { BasicInteractionHandler } from '@vertexvis/utils';
 
-export abstract class MarkupInteractionHandler implements GeneralInteractionHandler {
+export abstract class MarkupInteractionHandler implements BasicInteractionHandler {
   protected element?: HTMLElement;
   protected elementBounds?: DOMRect;
 

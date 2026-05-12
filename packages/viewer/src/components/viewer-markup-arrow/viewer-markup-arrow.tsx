@@ -11,7 +11,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
@@ -167,7 +167,7 @@ export class ViewerMarkupArrow {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+  public viewer?: BasicViewer;
 
   /**
    * An event that is dispatched anytime the user begins interacting with the
@@ -246,16 +246,15 @@ export class ViewerMarkupArrow {
    * @ignore
    */
   @Watch('viewer')
-  protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement
-  ): Promise<void> {
+  protected async handleViewerChanged(newViewer?: BasicViewer): Promise<void> {
     this.registeredInteraction?.dispose();
     this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.registeredInteraction = await newViewer.registerInteractionHandler(
-        this.interactionHandler
-      );
+      this.registeredInteraction =
+        await newViewer.registerBasicInteractionHandler(
+          this.interactionHandler
+        );
     }
   }
 

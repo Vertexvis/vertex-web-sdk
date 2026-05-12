@@ -10,8 +10,8 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import {} from '@vertexvis/doc-viewer';
 import { Dimensions, Point } from '@vertexvis/geometry';
+import { BasicViewer } from '@vertexvis/utils';
 
 import { stampTemplateWithId } from '../../lib/templates';
 import {
@@ -95,7 +95,7 @@ export class ViewerMarkupTool {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement | HTMLVertexDocumentViewerElement;
+  public viewer?: BasicViewer;
 
   /**
    * The style of the starting anchor. This defaults to none.
