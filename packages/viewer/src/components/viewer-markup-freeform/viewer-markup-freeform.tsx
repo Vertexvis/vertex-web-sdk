@@ -165,13 +165,6 @@ export class ViewerMarkupFreeform {
   @Event({ bubbles: true })
   public interactionEnd!: EventEmitter<MarkupInteraction>;
 
-  /**
-   * An event that is dispatched when this markup element is in view
-   * mode (`this.mode === ""`), and it completes a rerender.
-   */
-  @Event({ bubbles: true })
-  public viewRendered!: EventEmitter<void>;
-
   @Element()
   private hostEl!: HTMLVertexViewerMarkupFreeformElement;
 
@@ -204,12 +197,6 @@ export class ViewerMarkupFreeform {
 
     if (this.mode === 'create') {
       window.addEventListener('pointerdown', this.handleWindowPointerDown);
-    }
-  }
-
-  protected componentDidRender(): void {
-    if (this.mode === '') {
-      this.viewRendered.emit();
     }
   }
 
