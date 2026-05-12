@@ -802,7 +802,6 @@ export class Viewer implements BasicViewer {
   public async registerBasicInteractionHandler(
     interactionHandler: BasicInteractionHandler
   ): Promise<Disposable> {
-    console.log('registerBasicInteractionHandler');
     this.interactionHandlers.push(interactionHandler);
     this.initializeBasicInteractionHandler(interactionHandler);
     return {
