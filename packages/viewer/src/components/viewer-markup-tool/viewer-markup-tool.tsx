@@ -400,6 +400,8 @@ export class ViewerMarkupTool {
 
     if (!this.disabled) {
       const newMarkupElement = this.createNewMarkupElement();
+      
+      this.hostEl.append(newMarkupElement);
 
       if (this.tool === 'arrow') {
         (
@@ -425,7 +427,6 @@ export class ViewerMarkupTool {
         this.handleMarkupInteractionEnd
       );
       this.stateMap.markupElement = newMarkupElement;
-      this.hostEl.append(newMarkupElement);
     }
   }
 
