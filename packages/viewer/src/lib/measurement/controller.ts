@@ -20,6 +20,7 @@ import { MeasurementOutcome } from './outcomes';
  */
 export class MeasurementController {
   private outcome = Promise.resolve<MeasurementOutcome | undefined>(undefined);
+  private debugLogs = false;
 
   public constructor(
     private model: MeasurementModel,
@@ -39,6 +40,16 @@ export class MeasurementController {
   public addEntity(
     entity: MeasurementEntity
   ): Promise<MeasurementOutcome | undefined> {
+    if (this.debugLogs) {
+      const deserializedEntity = ModelEntity.deserializeBinary(
+        entity.modelEntity
+      );
+
+      this.log(
+        `Adding ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`
+      );
+    }
+
     return this.performMeasurement(() => this.model.addEntity(entity));
   }
 
@@ -47,6 +58,8 @@ export class MeasurementController {
    * of measurement results.
    */
   public clearEntities(): Promise<MeasurementOutcome | undefined> {
+    this.log('Clearing all ModelEntities.');
+
     return this.performMeasurement(() => {
       this.model.clearEntities();
       this.model.clearOutcome();
@@ -65,6 +78,16 @@ export class MeasurementController {
   public removeEntity(
     entity: MeasurementEntity
   ): Promise<MeasurementOutcome | undefined> {
+    if (this.debugLogs) {
+      const deserializedEntity = ModelEntity.deserializeBinary(
+        entity.modelEntity
+      );
+
+      this.log(
+        `Removing ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`
+      );
+    }
+
     return this.performMeasurement(() => this.model.removeEntity(entity));
   }
 
@@ -78,7 +101,21 @@ export class MeasurementController {
   public setEntities(
     entities: Set<MeasurementEntity>
   ): Promise<MeasurementOutcome | undefined> {
+    if (this.debugLogs) {
+      const deserializedEntities = Array.from(entities).map((e) =>
+        ModelEntity.deserializeBinary(e.modelEntity)
+      );
+
+      this.log(
+        `Setting ${deserializedEntities.length} ModelEntities. [entityIds=[${deserializedEntities.map((e) => e.getEntityId()).join(', ')}], sceneItemIds=[${deserializedEntities.map((e) => e.getSceneItemId()).join(', ')}]]`
+      );
+    }
+
     return this.performMeasurement(() => this.model.setEntities(entities));
+  }
+
+  public setDebugLogs(debugLogs: boolean): void {
+    this.debugLogs = debugLogs;
   }
 
   private performMeasurement(
@@ -150,5 +187,11 @@ export class MeasurementController {
       req.setUpdatesList([...clearEntities, ...highlightEntities]);
       this.client.updateModelEntities(req, meta, handler);
     });
+  }
+
+  private log(message?: string, ...optionalParams: unknown[]): void {
+    if (this.debugLogs) {
+      console.debug(message, optionalParams);
+    }
   }
 }
