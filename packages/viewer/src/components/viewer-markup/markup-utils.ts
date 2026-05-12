@@ -1,5 +1,6 @@
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 
+import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { MarkupCenteringBehavior } from '../../lib/types';
 import { isVertexViewerArrowMarkup } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
@@ -147,16 +148,54 @@ export function translateRectToScreen(
  */
 export function translatePointToRelative(
   pt: Point.Point,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
+  contentDimensions: Dimensions.Dimensions = canvasDimensions,
+  centeringBehavior: MarkupCenteringBehavior = 'none',
+  scale = 1,
+  offset: Point.Point = Point.create(0, 0)
 ): Point.Point {
-  const scaleFactor = 1 / getScaleFactor(canvasDimensions);
-  const point = Point.scale(
-    Point.subtract(pt, Dimensions.center(canvasDimensions)),
-    scaleFactor,
-    scaleFactor
+  const canvasToContentScaleFactor = Math.min(
+    canvasDimensions.width / contentDimensions.width,
+    canvasDimensions.height / contentDimensions.height
+  );
+  const effectiveScalar = canvasToContentScaleFactor * scale;
+
+  // Include an offset for width and height to account for cases where the
+  // content dimensions are smaller than the canvas dimensions.
+  const scaledContentWidth = contentDimensions.width * effectiveScalar;
+  const scaledContentHeight = contentDimensions.height * effectiveScalar;
+  const centerOffsetX =
+    centeringBehavior === 'both' || centeringBehavior === 'x-only'
+      ? Math.max(0, (canvasDimensions.width - scaledContentWidth) / 2)
+      : 0;
+  const centerOffsetY =
+    centeringBehavior === 'both' || centeringBehavior === 'y-only'
+      ? Math.max(0, (canvasDimensions.height - scaledContentHeight) / 2)
+      : 0;
+
+  const pointWithoutOffset = Point.subtract(
+    pt,
+    Point.scale(
+      offset,
+      1 / getWindowDevicePixelRatio(),
+      1 / getWindowDevicePixelRatio()
+    )
+  );
+  const centeredContentPoint = Point.create(
+    (pointWithoutOffset.x - centerOffsetX) / effectiveScalar,
+    (pointWithoutOffset.y - centerOffsetY) / effectiveScalar
+  );
+  const contentScaleFactor = getScaleFactor(contentDimensions);
+  const contentCenterRelativePoint = Point.subtract(
+    centeredContentPoint,
+    Dimensions.center(contentDimensions)
   );
 
-  return point;
+  return Point.scale(
+    contentCenterRelativePoint,
+    1 / contentScaleFactor,
+    1 / contentScaleFactor
+  );
 }
 
 /**

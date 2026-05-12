@@ -490,10 +490,15 @@ export class ViewerMarkup {
   protected render(): h.JSX.IntrinsicElements {
     return (
       <Host>
-        <slot />
+        <slot onSlotchange={this.handleSlotChange} />
       </Host>
     );
   }
+
+  private handleSlotChange = (): void => {
+    this.updatePropsOnMarkupTool();
+    this.updatePropsOnMarkups();
+  };
 
   private handlePointerMove = (event: PointerEvent): void => {
     if (

@@ -193,6 +193,14 @@ export class ViewerMarkupTool {
     this.updateMarkupElement();
   }
 
+  @Watch('scale')
+  @Watch('offset')
+  @Watch('originatingViewport')
+  @Watch('centeringBehavior')
+  protected handleScalingConfigurationChanged(): void {
+    this.updateMarkupElement();
+  }
+
   /**
    * @ignore
    */
