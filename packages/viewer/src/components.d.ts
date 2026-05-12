@@ -3099,7 +3099,6 @@ declare global {
   interface HTMLVertexViewerMarkupArrowElementEventMap {
     interactionBegin: void;
     interactionEnd: MarkupInteraction;
-    viewRendered: void;
   }
   interface HTMLVertexViewerMarkupArrowElement
     extends Components.VertexViewerMarkupArrow, HTMLStencilElement {
@@ -3165,7 +3164,6 @@ declare global {
   interface HTMLVertexViewerMarkupCircleElementEventMap {
     interactionBegin: void;
     interactionEnd: MarkupInteraction;
-    viewRendered: void;
   }
   interface HTMLVertexViewerMarkupCircleElement
     extends Components.VertexViewerMarkupCircle, HTMLStencilElement {
@@ -3231,7 +3229,6 @@ declare global {
   interface HTMLVertexViewerMarkupFreeformElementEventMap {
     interactionBegin: void;
     interactionEnd: MarkupInteraction;
-    viewRendered: void;
   }
   interface HTMLVertexViewerMarkupFreeformElement
     extends Components.VertexViewerMarkupFreeform, HTMLStencilElement {
@@ -4852,10 +4849,6 @@ declare namespace LocalJSX {
       event: VertexViewerMarkupArrowCustomEvent<MarkupInteraction>
     ) => void;
     /**
-     * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
-     */
-    onViewRendered?: (event: VertexViewerMarkupArrowCustomEvent<void>) => void;
-    /**
      * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
      *
      * When provided, all NDC values will be considered relative to this viewport.
@@ -4936,10 +4929,6 @@ declare namespace LocalJSX {
       event: VertexViewerMarkupCircleCustomEvent<MarkupInteraction>
     ) => void;
     /**
-     * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
-     */
-    onViewRendered?: (event: VertexViewerMarkupCircleCustomEvent<void>) => void;
-    /**
      * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".
      *
      * When provided, all NDC values will be considered relative to this viewport.
@@ -5001,12 +4990,6 @@ declare namespace LocalJSX {
      */
     onInteractionEnd?: (
       event: VertexViewerMarkupFreeformCustomEvent<MarkupInteraction>
-    ) => void;
-    /**
-     * An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender.
-     */
-    onViewRendered?: (
-      event: VertexViewerMarkupFreeformCustomEvent<void>
     ) => void;
     /**
      * The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".

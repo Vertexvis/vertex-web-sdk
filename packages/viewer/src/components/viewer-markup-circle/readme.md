@@ -2,42 +2,33 @@
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
-| Property              | Attribute            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Type                                                                      | Default     |
-| --------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------- |
-| `bounds`              | --                   | The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.             | `Rectangle \| undefined`                                                  | `undefined` |
-| `boundsJson`          | `bounds`             | The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`.  Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.           | `string \| undefined`                                                     | `undefined` |
-| `centeringBehavior`   | `centering-behavior` | Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property.  Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default). | `"both" \| "none" \| "x-only" \| "y-only"`                                | `'none'`    |
-| `mode`                | `mode`               | A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.                                                                                                                                                       | `"" \| "create" \| "edit"`                                                | `''`        |
-| `offset`              | --                   | The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".  When provided, all computed coordinates will be offset by this amount.                                                                                                                                                                                                              | `Point \| undefined`                                                      | `undefined` |
-| `originatingViewport` | --                   | The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen".  When provided, all NDC values will be considered relative to this viewport.                                                                                                                                                                                 | `Dimensions \| undefined`                                                 | `undefined` |
-| `scale`               | `scale`              | The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates.  When provided, all computed coordinates will be scaled by this amount.                                                                                                                                                                                                                                               | `number`                                                                  | `1`         |
-| `viewer`              | --                   | The viewer to connect to markups.  This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.                                                                                                                                                                                                                                                                                                                             | `HTMLVertexDocumentViewerElement \| HTMLVertexViewerElement \| undefined` | `undefined` |
-
+| Property              | Attribute            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Type                                       | Default     |
+| --------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ | ----------- |
+| `bounds`              | --                   | The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 10, "height": 10}`. Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.             | `Rectangle \| undefined`                   | `undefined` |
+| `boundsJson`          | `bounds`             | The bounds of the circle. Can either be an instance of a `Rectangle` or a JSON string representation in the format of `[x, y, width, height]` or `{"x": 0, "y": 0, "width": 0.1, "height": 0.1}`. Bounds are expected to have relative coordinates, with `[x, y]` from `[-0.5, 0.5]` and `[width, height]` from `[0, 1]`, e.g. `[0, 0, 0.25, 0.25]`corresponds to a circle with a diameter of one fourth the viewport's smallest size in the center of the viewport.           | `string \| undefined`                      | `undefined` |
+| `centeringBehavior`   | `centering-behavior` | Defines the behavior of the provided markup when the originating viewport is smaller than the current viewport, or is scaled to a size smaller than the current viewport using the `scale` property. Options: - `x-only`: Markup will be centered horizontally, but not vertically. - `y-only`: Markup will be centered vertically, but not horizontally. - `both`: Markup will be centered both horizontally and vertically. - `none`: Markup will not be centered (default). | `"both" \| "none" \| "x-only" \| "y-only"` | `'none'`    |
+| `mode`                | `mode`               | A mode that specifies how the markup component should behave. When unset, the component will not respond to interactions with the handles. When `edit`, the markup anchors are interactive and the user is able to reposition them. When `create`, anytime the user clicks on the canvas, a new markup will be performed.                                                                                                                                                      | `"" \| "create" \| "edit"`                 | `''`        |
+| `offset`              | --                   | The current offset of the visible viewport. This value is used to determine where markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen". When provided, all computed coordinates will be offset by this amount.                                                                                                                                                                                                              | `Point \| undefined`                       | `undefined` |
+| `originatingViewport` | --                   | The original viewport dimensions where this markup was created. This value is used to determine where the markup should be rendered relative to the current viewport, enabling some markup to appear "off-screen". When provided, all NDC values will be considered relative to this viewport.                                                                                                                                                                                 | `Dimensions \| undefined`                  | `undefined` |
+| `scale`               | `scale`              | The scale to render this markup at. This value is used to scale the element's bounds along with any `offset` to determine the final computed coordinates. When provided, all computed coordinates will be scaled by this amount.                                                                                                                                                                                                                                               | `number`                                   | `1`         |
+| `viewer`              | --                   | The viewer to connect to markups. This property will automatically be set when a child of a `<vertex-viewer-markup>` or `<vertex-viewer>` element.                                                                                                                                                                                                                                                                                                                             | `HTMLVertexViewerElement \| undefined`     | `undefined` |
 
 ## Events
 
-| Event              | Description                                                                                                             | Type                             |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `interactionBegin` | An event that is dispatched anytime the user begins interacting with the markup.                                        | `CustomEvent<void>`              |
-| `interactionEnd`   | An event that is dispatched when the user has finished interacting with the markup.                                     | `CustomEvent<MarkupInteraction>` |
-| `viewRendered`     | An event that is dispatched when this markup element is in view mode (`this.mode === ""`), and it completes a rerender. | `CustomEvent<void>`              |
-
+| Event              | Description                                                                         | Type                             |
+| ------------------ | ----------------------------------------------------------------------------------- | -------------------------------- |
+| `interactionBegin` | An event that is dispatched anytime the user begins interacting with the markup.    | `CustomEvent<void>`              |
+| `interactionEnd`   | An event that is dispatched when the user has finished interacting with the markup. | `CustomEvent<MarkupInteraction>` |
 
 ## Methods
 
 ### `dispose() => Promise<void>`
 
-
-
 #### Returns
 
 Type: `Promise<void>`
-
-
-
 
 ## CSS Custom Properties
 
@@ -59,15 +50,15 @@ Type: `Promise<void>`
 | `--viewer-markup-circle-ellipse-stroke-width`                  | A CSS length that specifies the width of the circle's outline. Note that this is scaled by the component's scale factor, so providing a scale other than 1 will result in a different stroke width. |
 | `--viewer-markup-circle-scale`                                 | A number that specifies the scale of the circle. This is used to scale the circle's stroke width. Defaults to 1, and is managed internally by the component.                                        |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-markup](../viewer-markup)
- - [vertex-viewer-markup-tool](../viewer-markup-tool)
+- [vertex-viewer-markup](../viewer-markup)
+- [vertex-viewer-markup-tool](../viewer-markup-tool)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-markup --> vertex-viewer-markup-circle
@@ -75,6 +66,6 @@ graph TD;
   style vertex-viewer-markup-circle fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_
