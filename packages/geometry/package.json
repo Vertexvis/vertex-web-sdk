@@ -3,7 +3,7 @@
   "version": "0.24.5",
   "description": "Library for 2D and 3D geometric types.",
   "license": "MIT",
-  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
   "repository": {
     "type": "git",
@@ -56,7 +56,7 @@
     "rollup": "^2.80.0",
     "ts-jest": "^29.4.9",
     "tslib": "^2.4.0",
-    "typescript": "^4.5.4"
+    "typescript": "^5.2.0"
   },
   "peerDependencies": {
     "tslib": ">=2.4.0"

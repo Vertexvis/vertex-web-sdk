@@ -656,22 +656,24 @@ When binding data for metadata keys that include spaces, we expect that the spac
 
 <!-- Auto Generated Below -->
 
+
 ## Properties
 
-| Property                     | Attribute                      | Description                                                                                                                                                                                                                                                                                                                                                                            | Type                                                   | Default      |
-| ---------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
-| `config`                     | `config`                       | An object to configure the scene tree.                                                                                                                                                                                                                                                                                                                                                 | `Config \| string \| undefined`                        | `undefined`  |
-| `configEnv`                  | `config-env`                   | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts. Use the `config` property for manually setting hosts.                                                                                                                                                                                                                            | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
-| `controller`                 | --                             |                                                                                                                                                                                                                                                                                                                                                                                        | `SceneTreeController \| undefined`                     | `undefined`  |
-| `metadataKeys`               | --                             | A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template. **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name. | `string[]`                                             | `[]`         |
-| `metadataSearchExactMatch`   | `metadata-search-exact-match`  | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` Indicates whether the metadata search should use an exact match.<br/><br/>                                                                                                                                                                                                                                         | `boolean`                                              | `false`      |
-| `metadataSearchKeys`         | --                             | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.<br/><br/>                                                                                                                                                                                                                             | `string[]`                                             | `[]`         |
-| `operationAnimationDuration` | `operation-animation-duration` | The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.                                                                                                                                                                                                                           | `number`                                               | `500`        |
-| `overScanCount`              | `over-scan-count`              | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.                                                                                                                                                                                                                    | `number`                                               | `25`         |
-| `rowData`                    | --                             | A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.                                                                                                                                                                                                                              | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
-| `searchOptions`              | --                             | A set of options to configure scene tree searching behavior.                                                                                                                                                                                                                                                                                                                           | `FilterOptions`                                        | `{}`         |
-| `viewer`                     | --                             | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                                                                                                                                                                                                                                      | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
-| `viewerSelector`             | `viewer-selector`              | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                                                                                                                                                                                                                                               | `string \| undefined`                                  | `undefined`  |
+| Property                     | Attribute                      | Description                                                                                                                                                                                                                                                                                                                                                                             | Type                                                   | Default      |
+| ---------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------ |
+| `config`                     | `config`                       | An object to configure the scene tree.                                                                                                                                                                                                                                                                                                                                                  | `Config \| string \| undefined`                        | `undefined`  |
+| `configEnv`                  | `config-env`                   | Sets the default environment for the viewer. This setting is used for auto-configuring network hosts.  Use the `config` property for manually setting hosts.                                                                                                                                                                                                                            | `"platdev" \| "platprod" \| "platstaging"`             | `'platprod'` |
+| `controller`                 | --                             |                                                                                                                                                                                                                                                                                                                                                                                         | `SceneTreeController \| undefined`                     | `undefined`  |
+| `metadataKeys`               | --                             | A list of part metadata keys that will be made available to each row. This metadata can be used for data binding inside the scene tree's template.  **Note:** for the values of these metadata keys to be evaluated for search, they must be provided to the `metadataSearchKeys` specified in the `searchOptions`. Otherwise, the search will only be performed against the item name. | `string[]`                                             | `[]`         |
+| `metadataSearchExactMatch`   | `metadata-search-exact-match`  | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` Indicates whether the metadata search should use an exact match.<br/><br/>                                                                                                                                                                                                                                          | `boolean`                                              | `false`      |
+| `metadataSearchKeys`         | --                             | <span style="color:red">**[DEPRECATED]**</span> Use `searchOptions` A list of the metadata keys that a scene tree search should be performed on.<br/><br/>                                                                                                                                                                                                                              | `string[]`                                             | `[]`         |
+| `operationAnimationDuration` | `operation-animation-duration` | The duration of operations with animations, in milliseconds, when a user performs an action that results in an animation such as isolate. Defaults to 500ms.                                                                                                                                                                                                                            | `number`                                               | `500`        |
+| `overScanCount`              | `over-scan-count`              | The number of offscreen rows above and below the viewport to render. Having a higher number reduces the chance of the browser not displaying a row while scrolling.                                                                                                                                                                                                                     | `number`                                               | `25`         |
+| `rowData`                    | --                             | A callback that is invoked immediately before a row is about to be rendered. This callback can return additional data that can be bound to in a template.                                                                                                                                                                                                                               | `((row: Row) => Record<string, unknown>) \| undefined` | `undefined`  |
+| `searchOptions`              | --                             | A set of options to configure scene tree searching behavior.                                                                                                                                                                                                                                                                                                                            | `FilterOptions`                                        | `{}`         |
+| `viewer`                     | --                             | An instance of a `<vertex-viewer>` element. Either this property or `viewerSelector` must be set.                                                                                                                                                                                                                                                                                       | `HTMLVertexViewerElement \| null \| undefined`         | `undefined`  |
+| `viewerSelector`             | `viewer-selector`              | A CSS selector that points to a `<vertex-viewer>` element. Either this property or `viewer` must be set.                                                                                                                                                                                                                                                                                | `string \| undefined`                                  | `undefined`  |
+
 
 ## Events
 
@@ -679,6 +681,7 @@ When binding data for metadata keys that include spaces, we expect that the spac
 | ------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------ |
 | `connectionError`  | An event that is emitted when this <vertex-scene-tree> encounters a connection error.      | `CustomEvent<SceneTreeErrorDetails>` |
 | `firstRowRendered` | An event that is emitted when the first row of this <vertex-scene-tree> has been rendered. | `CustomEvent<void>`                  |
+
 
 ## Methods
 
@@ -689,6 +692,8 @@ Performs an API call to collapse all nodes in the tree.
 #### Returns
 
 Type: `Promise<void>`
+
+
 
 ### `collapseItem(row: RowArg) => Promise<void>`
 
@@ -705,6 +710,8 @@ specified row or row index.
 
 Type: `Promise<void>`
 
+
+
 ### `deselectItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will deselect the item associated to the given
@@ -720,6 +727,8 @@ row or row index.
 
 Type: `Promise<void>`
 
+
+
 ### `expandAll() => Promise<void>`
 
 Performs an API call to expand all nodes in the tree.
@@ -727,6 +736,8 @@ Performs an API call to expand all nodes in the tree.
 #### Returns
 
 Type: `Promise<void>`
+
+
 
 ### `expandItem(row: RowArg) => Promise<void>`
 
@@ -742,6 +753,8 @@ row or row index.
 #### Returns
 
 Type: `Promise<void>`
+
+
 
 ### `fetchMetadataKeys() => Promise<MetadataKey[]>`
 
@@ -859,6 +872,8 @@ or row index.
 
 Type: `Promise<void>`
 
+
+
 ### `invalidateRows() => Promise<void>`
 
 Schedules a render of the rows in the scene tree. Useful if any custom
@@ -871,6 +886,8 @@ next frame.
 #### Returns
 
 Type: `Promise<void>`
+
+
 
 ### `isolateItem(row: RowArg) => Promise<void>`
 
@@ -887,6 +904,8 @@ the given row or row index and fit the camera to the item's bounding box.
 
 Type: `Promise<void>`
 
+
+
 ### `scrollToIndex(index: number, options?: ScrollToOptions) => Promise<void>`
 
 Scrolls the tree to the given row index.
@@ -901,6 +920,8 @@ Scrolls the tree to the given row index.
 #### Returns
 
 Type: `Promise<void>`
+
+
 
 ### `scrollToItem(itemId: string, options?: ScrollToOptions) => Promise<void>`
 
@@ -961,6 +982,8 @@ selection.
 
 Type: `Promise<void>`
 
+
+
 ### `showItem(row: RowArg) => Promise<void>`
 
 Performs an API call that will show the item associated to the given row
@@ -975,6 +998,8 @@ or row index.
 #### Returns
 
 Type: `Promise<void>`
+
+
 
 ### `toggleExpandItem(row: RowArg) => Promise<void>`
 
@@ -991,6 +1016,8 @@ associated to the given row or row index.
 
 Type: `Promise<void>`
 
+
+
 ### `toggleItemVisibility(row: RowArg) => Promise<void>`
 
 Performs an API call that will either hide or show the item associated to
@@ -1006,12 +1033,16 @@ the given row or row index.
 
 Type: `Promise<void>`
 
+
+
+
 ## Slots
 
 | Slot       | Description                                                                                                                                                                           |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `"footer"` | A slot that places content below the rows in the tree. Elements can be stacked by assigning multiple elements to this slot.                                                           |
 | `"header"` | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. Elements can be stacked by assigning multiple elements to this slot. |
+
 
 ## CSS Custom Properties
 
@@ -1028,6 +1059,7 @@ Type: `Promise<void>`
 | `--scene-tree-selected-row-background-color` | The background color to use when displaying selected rows. This value always takes precedence if the row is selected. Defaults to `unset`.                                                                                                                                                                                                        |
 | `--scene-tree-toolbar-separator`             | A CSS border value that specifies the border between scene tree toolbars.                                                                                                                                                                                                                                                                         |
 
+
 ## Dependencies
 
 ### Depends on
@@ -1039,7 +1071,6 @@ Type: `Promise<void>`
 - [vertex-scene-tree-table-layout](../scene-tree-table-layout)
 
 ### Graph
-
 ```mermaid
 graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
@@ -1053,6 +1084,6 @@ graph TD;
   style vertex-scene-tree fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
----
+----------------------------------------------
 
-_Built with [StencilJS](https://stenciljs.com/)_
+*Built with [StencilJS](https://stenciljs.com/)*

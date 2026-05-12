@@ -1,3 +1,14 @@
+// jsDom v20 does not have randomUUID(). remove after upgrade to jest-environment-jsdom 30+
+jest.mock('@vertexvis/utils', () => {
+  const utils = jest.requireActual('@vertexvis/utils');
+  return {
+    ...utils,
+    UUID: { create: jest.fn(() => 'mock-websocket-id') },
+  };
+});
+
+import { UUID } from '@vertexvis/utils';
+
 import { ConnectionDescriptor } from '../connection';
 import { WebSocketClientImpl } from '../webSocketClient';
 
@@ -16,6 +27,10 @@ describe('WebSocketClientImpl', () => {
     };
   });
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   afterAll(() => {
     (global as any).WebSocket = globalWebSocket;
   });
@@ -32,6 +47,7 @@ describe('WebSocketClientImpl', () => {
       await wsImpl.connect(descriptor);
       await wsImpl.connect(descriptor);
 
+      expect(UUID.create).toHaveBeenCalledTimes(2);
       expect(mockClose).toHaveBeenCalledTimes(1);
     });
   });
