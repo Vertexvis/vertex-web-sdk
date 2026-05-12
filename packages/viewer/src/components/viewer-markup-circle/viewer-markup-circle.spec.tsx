@@ -331,7 +331,9 @@ describe('vertex-viewer-markup-circle', () => {
       'vertex-viewer-markup-circle'
     ) as HTMLVertexViewerMarkupCircleElement;
 
-    expect(el.getAttribute('style')).toBeNull();
+    expect(el.getAttribute('style')).toContain(
+      '--viewer-markup-circle-scale: 1'
+    );
 
     el.scale = 2;
     await page.waitForChanges();

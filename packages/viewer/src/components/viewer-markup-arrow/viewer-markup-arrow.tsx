@@ -199,7 +199,13 @@ export class ViewerMarkupArrow {
   private interactionHandler = new ArrowMarkupInteractionHandler(
     this.hostEl,
     this.interactionBegin,
-    this.interactionEnd
+    this.interactionEnd,
+    {
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    }
   );
 
   private registeredInteraction?: Disposable;
@@ -210,6 +216,7 @@ export class ViewerMarkupArrow {
   protected componentWillLoad(): void {
     this.updateViewport();
     this.handleViewerChanged(this.viewer);
+    this.handleScaleChange();
     this.updatePointsFromProps();
   }
 
@@ -274,6 +281,19 @@ export class ViewerMarkupArrow {
     if (this.mode !== 'create') {
       window.removeEventListener('pointerdown', this.handleWindowPointerDown);
     }
+  }
+
+  @Watch('offset')
+  @Watch('originatingViewport')
+  @Watch('centeringBehavior')
+  @Watch('scale')
+  protected handleScalingConfigurationChange(): void {
+    this.interactionHandler.updateScalingOptions({
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    });
   }
 
   @Watch('scale')
