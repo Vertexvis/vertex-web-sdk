@@ -1,13 +1,13 @@
 import { Dimensions, Point } from '@vertexvis/geometry';
-
 import { BasicInteractionHandler } from '@vertexvis/utils';
+
 import { MarkupCenteringBehavior } from '../types';
 
 export interface MarkupInteractionHandlerScalingOptions {
-    scale?: number;
-    offset?: Point.Point;
-    originatingViewport?: Dimensions.Dimensions;
-    centeringBehavior?: MarkupCenteringBehavior;
+  scale?: number;
+  offset?: Point.Point;
+  originatingViewport?: Dimensions.Dimensions;
+  centeringBehavior?: MarkupCenteringBehavior;
 }
 
 export abstract class MarkupInteractionHandler implements BasicInteractionHandler {
