@@ -1,6 +1,6 @@
 import { Dimensions, Point } from '@vertexvis/geometry';
+import { BasicInteractionHandler } from '@vertexvis/utils';
 
-import { InteractionApi, InteractionHandler } from '../interactions';
 import { MarkupCenteringBehavior } from '../types';
 
 export interface MarkupInteractionHandlerScalingOptions {
@@ -10,10 +10,9 @@ export interface MarkupInteractionHandlerScalingOptions {
   centeringBehavior?: MarkupCenteringBehavior;
 }
 
-export abstract class MarkupInteractionHandler implements InteractionHandler {
+export abstract class MarkupInteractionHandler implements BasicInteractionHandler {
   protected element?: HTMLElement;
   protected elementBounds?: DOMRect;
-  protected api?: InteractionApi;
   protected scalingOptions: MarkupInteractionHandlerScalingOptions;
 
   private resizeObserver: ResizeObserver;
@@ -26,9 +25,8 @@ export abstract class MarkupInteractionHandler implements InteractionHandler {
     this.scalingOptions = scalingOptions ?? {};
   }
 
-  public initialize(element: HTMLElement, api: InteractionApi): void {
+  public initialize(element: HTMLElement): void {
     this.element = element;
-    this.api = api;
 
     this.elementBounds = this.computeBoundingRect();
     this.resizeObserver.observe(this.element);
@@ -41,7 +39,6 @@ export abstract class MarkupInteractionHandler implements InteractionHandler {
     this.element?.removeEventListener('pointerdown', this.handlePointerDown);
 
     this.element = undefined;
-    this.api = undefined;
   }
 
   public updateScalingOptions(

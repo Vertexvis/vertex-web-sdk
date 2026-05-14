@@ -31,6 +31,7 @@
   height: 100%;
   position: relative;
 }
+
 .enable-pointer-events {
   touch-action: none;
 }

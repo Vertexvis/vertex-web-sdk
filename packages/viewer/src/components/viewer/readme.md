@@ -143,6 +143,28 @@ Type: `Promise<void>`
 
 
 
+### `registerBasicInteractionHandler(interactionHandler: BasicInteractionHandler) => Promise<Disposable>`
+
+Registers and initializes an interaction handler with the viewer. Returns a
+`Disposable` that should be used to deregister the interaction handler.
+
+`InteractionHandler`s are used to build custom mouse and touch interactions
+for the viewer. Use `<vertex-viewer camera-controls="false" />` to disable
+the default camera controls provided by the viewer.
+
+#### Parameters
+
+| Name                 | Type                      | Description                          |
+| -------------------- | ------------------------- | ------------------------------------ |
+| `interactionHandler` | `BasicInteractionHandler` | The interaction handler to register. |
+
+#### Returns
+
+Type: `Promise<Disposable>`
+
+A promise containing the disposable to use to
+deregister the handler.
+
 ### `registerInteractionHandler(interactionHandler: InteractionHandler) => Promise<Disposable>`
 
 Registers and initializes an interaction handler with the viewer. Returns a

@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, Watch } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { BasicInteractionHandler, BasicViewer, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { PartialConfig } from '../../lib/config';
@@ -20,7 +20,7 @@ export type InteractionMode = 'none' | 'pan';
   styleUrl: 'document-viewer.css',
   shadow: true,
 })
-export class VertexDocumentViewer {
+export class VertexDocumentViewer implements BasicViewer {
   /**
    * A URI of the document to load when the component is mounted in the DOM tree.
    * Currently only supports URLs for client-side rendering.
@@ -109,10 +109,12 @@ export class VertexDocumentViewer {
 
   private documentRenderer?: DocumentRenderer;
   private documentApi?: DocumentApi;
-  private panInteractionHandler?: PanInteractionHandler;
   private documentApiStateChangedDisposable?: Disposable;
   private pageLoadedDisposable?: Disposable;
   private pageDrawnDisposable?: Disposable;
+
+  private interactionHandlers: BasicInteractionHandler[] = [];
+  private panInteractionHandler?: PanInteractionHandler;
 
   protected componentWillLoad(): void {
     this.handleElementResize = this.handleElementResize.bind(this);
@@ -140,6 +142,31 @@ export class VertexDocumentViewer {
     this.resizeObserver?.disconnect();
 
     this.clearCurrentDocument();
+  }
+
+  /**
+   * Registers and initializes an interaction handler with the document viewer. Returns a
+   * `Disposable` that should be used to deregister the interaction handler.
+   *
+   * `InteractionHandler`s are used to build custom mouse and touch interactions.
+   *
+   * @param interactionHandler The interaction handler to register.
+   * @returns {Promise<void>} A promise containing the disposable to use to
+   *  deregister the handler.
+   */
+  @Method()
+  public async registerBasicInteractionHandler(interactionHandler: BasicInteractionHandler): Promise<Disposable> {
+    this.interactionHandlers.push(interactionHandler);
+    this.initializeInteractionHandler(interactionHandler);
+    return {
+      dispose: () => {
+        const index = this.interactionHandlers.indexOf(interactionHandler);
+        if (index !== -1) {
+          this.interactionHandlers[index].dispose();
+          this.interactionHandlers.splice(index, 1);
+        }
+      },
+    };
   }
 
   /**
@@ -307,5 +334,13 @@ export class VertexDocumentViewer {
       this.updateComponentDimensions(dimensions);
       await this.documentApi?.updateViewport(this.dimensions);
     }, this.resizeDebounce);
+  }
+
+  private initializeInteractionHandler(handler: BasicInteractionHandler): void {
+    if (this.canvasEl == null) {
+      throw new Error('Cannot initialize interaction handler');
+    }
+
+    handler.initialize(this.canvasEl);
   }
 }
