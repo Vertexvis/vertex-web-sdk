@@ -217,6 +217,7 @@ export class ViewerMarkupArrow {
     this.updateViewport();
     this.handleViewerChanged(this.viewer);
     this.handleScaleChange();
+    this.handleScalingConfigurationChange();
     this.updatePointsFromProps();
   }
 
