@@ -50,6 +50,10 @@ export abstract class MarkupInteractionHandler implements BasicInteractionHandle
     };
   }
 
+  public getScalingOptions(): MarkupInteractionHandlerScalingOptions {
+    return this.scalingOptions;
+  }
+
   protected acceptInteraction(): void {
     window.addEventListener('pointermove', this.handlePointerMove);
     window.addEventListener('pointerup', this.handlePointerUp);

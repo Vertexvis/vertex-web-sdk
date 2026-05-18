@@ -9,7 +9,7 @@ import { DocumentApi, DocumentApiState } from '../../lib/document/api';
 import { DocumentLayersController } from '../../lib/document/layers/controller';
 import { DocumentProvider } from '../../lib/document/provider';
 import { DocumentRenderer } from '../../lib/document/renderer';
-import { getElementBoundingClientRect } from '../../lib/dom';
+import { getAllVertexElementChildren, getElementBoundingClientRect } from '../../lib/dom';
 import { PanInteractionHandler } from '../../lib/interactions/pan-interaction-handler';
 import { PdfJsProvider } from '../../lib/pdf/pdfjs-provider';
 
@@ -105,6 +105,7 @@ export class VertexDocumentViewer implements BasicViewer {
 
   private dimensions: Dimensions.Dimensions = Dimensions.create(0, 0);
   private resizeObserver?: ResizeObserver;
+  private mutationObserver?: MutationObserver;
   private resizeTimer?: number;
 
   private documentRenderer?: DocumentRenderer;
@@ -123,6 +124,8 @@ export class VertexDocumentViewer implements BasicViewer {
     this.handlePageDrawn = this.handlePageDrawn.bind(this);
 
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
+
+    this.registerSlotChangeListeners();
   }
 
   protected componentShouldUpdate(newValue: unknown, oldValue: unknown, propName: string): boolean {
@@ -136,6 +139,8 @@ export class VertexDocumentViewer implements BasicViewer {
 
     this.updateComponentDimensions();
     this.handleSrcChange();
+
+    this.injectViewerApi();
   }
 
   protected disconnectedCallback(): void {
@@ -342,5 +347,20 @@ export class VertexDocumentViewer implements BasicViewer {
     }
 
     handler.initialize(this.canvasEl);
+  }
+
+  private registerSlotChangeListeners(): void {
+    this.mutationObserver = new MutationObserver(_ => this.injectViewerApi());
+    this.mutationObserver.observe(this.hostEl, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  private injectViewerApi(): void {
+    getAllVertexElementChildren(this.hostEl).forEach(node => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).viewer = this.hostEl;
+    });
   }
 }
