@@ -307,7 +307,7 @@ export class VertexDocumentViewer implements BasicViewer {
     this.panInteractionHandler?.dispose();
 
     if (this.interactionMode === 'pan' && this.canvasEl != null && this.documentApi != null) {
-      this.panInteractionHandler = new PanInteractionHandler(this.canvasEl, this.documentApi);
+      this.panInteractionHandler = new PanInteractionHandler(this.canvasEl, this.hostEl, this.documentApi);
     }
   }
 
