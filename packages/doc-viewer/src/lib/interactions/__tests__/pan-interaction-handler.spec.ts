@@ -67,11 +67,17 @@ describe('PanInteractionHandler', () => {
       configurable: true,
     });
 
-    new PanInteractionHandler(element, hostElement, new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }));
+    const handler = new PanInteractionHandler(
+      element,
+      hostElement,
+      new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
+    );
 
     expect(hostElement.addEventListener).toHaveBeenCalledWith('wheel', expect.any(Function));
     expect(mockAddEventListener).toHaveBeenCalledWith('pointerdown', expect.any(Function));
     expect(mockAddEventListener).toHaveBeenCalledWith('wheel', expect.any(Function));
+
+    handler.dispose();
   });
 
   it('should remove listeners when disposed', () => {
@@ -109,7 +115,7 @@ describe('PanInteractionHandler', () => {
   it('should pan the document when the element is dragged', () => {
     const element = document.createElement('div');
 
-    new PanInteractionHandler(
+    const handler = new PanInteractionHandler(
       element,
       document.createElement('div'),
       new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
@@ -120,12 +126,14 @@ describe('PanInteractionHandler', () => {
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
 
     expect(mockPanByDelta).toHaveBeenCalledWith(Point.create(5, 5));
+
+    handler.dispose();
   });
 
   it('should not pan the document when the element is dragged with a different button than the primary button', () => {
     const element = document.createElement('div');
 
-    new PanInteractionHandler(
+    const handler = new PanInteractionHandler(
       element,
       document.createElement('div'),
       new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
@@ -136,29 +144,43 @@ describe('PanInteractionHandler', () => {
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
 
     expect(mockPanByDelta).not.toHaveBeenCalled();
+
+    handler.dispose();
   });
 
   it('should pan the document when a wheel event occurs on the host element', () => {
     const element = document.createElement('div');
     const hostElement = document.createElement('div');
 
-    new PanInteractionHandler(element, hostElement, new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }));
+    const handler = new PanInteractionHandler(
+      element,
+      hostElement,
+      new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
+    );
 
     hostElement.dispatchEvent(new Event('wheel', { deltaX: 100, deltaY: 100 } as unknown as EventInit));
 
     expect(mockPanByDelta).toHaveBeenCalledWith(Point.create(-50, -50));
+
+    handler.dispose();
   });
 
   it('should continue to pan the document when a wheel event occurs after a pointerup', () => {
     const element = document.createElement('div');
     const hostElement = document.createElement('div');
 
-    new PanInteractionHandler(element, hostElement, new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }));
+    const handler = new PanInteractionHandler(
+      element,
+      hostElement,
+      new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
+    );
 
     element.dispatchEvent(new MouseEvent('pointerdown', { button: 0, clientX: 10, clientY: 10 }));
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
     hostElement.dispatchEvent(new Event('wheel', { deltaX: 100, deltaY: 100 } as unknown as EventInit));
 
     expect(mockPanByDelta).toHaveBeenCalledWith(Point.create(-50, -50));
+
+    handler.dispose();
   });
 });
