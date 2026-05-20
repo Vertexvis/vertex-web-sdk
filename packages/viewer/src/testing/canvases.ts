@@ -1,10 +1,5 @@
 import {
   ArrowEndShape as ApiArrowEndShape,
-  CalloutItem as ApiCalloutItem,
-  Canvas,
-  CanvasDocument,
-  CanvasDocumentV1,
-  CanvasItem,
   CircleEndShape as ApiCircleEndShape,
   DashEndShape as ApiDashEndShape,
   EndShape as ApiEndShape,
@@ -12,8 +7,15 @@ import {
   FreeformItem2d as ApiFreeformItem2d,
   LineItem2d as ApiLineItem2d,
   OvalItem2d as ApiOvalItem2d,
-  Pin2d as ApiPinItem2d,
   StrokeStyle as ApiStrokeStyle,
+} from '@vertexvis/scene-view-protos/core/protos/canvas_items_2d_pb';
+import {
+  CalloutItem as ApiCalloutItem,
+  Canvas,
+  CanvasDocument3d,
+  CanvasDocument3dV1,
+  CanvasItem,
+  Pin2d as ApiPinItem2d,
 } from '@vertexvis/scene-view-protos/core/protos/scene_canvas_pb';
 import { GetCanvasResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Color, UUID } from '@vertexvis/utils';
@@ -52,8 +54,8 @@ export function makeCanvas(
   ]
 ): Canvas {
   const canvas = new Canvas();
-  const doc = new CanvasDocument();
-  const v1 = new CanvasDocumentV1();
+  const doc = new CanvasDocument3d();
+  const v1 = new CanvasDocument3dV1();
   canvas.setId(makeUuid2l(id));
   v1.setItemsList(itemsList);
   doc.setV1(v1);

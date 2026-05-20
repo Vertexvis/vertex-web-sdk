@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - publish-testing
+      - animate_model_views_react_18
 
 permissions:
   contents: read

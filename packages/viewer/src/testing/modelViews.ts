@@ -1,3 +1,4 @@
+import { Camera } from '@vertexvis/scene-tree-protos/core/protos/camera_pb';
 import { ModelView } from '@vertexvis/scene-view-protos/core/protos/model_views_pb';
 import { ListItemModelViewsResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { UUID } from '@vertexvis/utils';
@@ -22,5 +23,6 @@ export function makeModelView(
   modelView.setId(makeUuid2l(id));
   modelView.setPartRevisionId(makeUuid2l(partRevisionId));
   modelView.setDisplayName(displayName);
+  modelView.setCamera(new Camera());
   return modelView;
 }
