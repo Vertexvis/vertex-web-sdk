@@ -1,14 +1,16 @@
 import {
-  CalloutItem as PBCalloutItem,
-  CanvasDocumentV1 as PBCanvasDocumentV1,
-  CanvasItem as PBCanvasItem,
   EndShape as PBEndShape,
   FillStyle as PBFillStyle,
   FreeformItem2d as PBFreeformItem2d,
   LineItem2d as PBLineItem2d,
   OvalItem2d as PBOvalItem2d,
-  Pin2d as PBPin2d,
   StrokeStyle as PBStrokeStyle,
+} from '@vertexvis/scene-view-protos/core/protos/canvas_items_2d_pb';
+import {
+  CalloutItem as PBCalloutItem,
+  CanvasDocument3dV1 as PBCanvasDocumentV1,
+  CanvasItem as PBCanvasItem,
+  Pin2d as PBPin2d,
 } from '@vertexvis/scene-view-protos/core/protos/scene_canvas_pb';
 import { GetCanvasResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Mapper as M } from '@vertexvis/utils';
