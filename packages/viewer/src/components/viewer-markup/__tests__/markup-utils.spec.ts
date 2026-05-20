@@ -167,6 +167,55 @@ describe('markup utils', () => {
         y: 0,
       });
     });
+
+    it('translates a screen point to relative coordinates based on the height of the provided dimensions with an offset', () => {
+      const canvasDimensions = Dimensions.create(400, 400);
+      const contentDimensions = Dimensions.create(100, 200);
+      const offset = Point.create(0, 10);
+      const pt = Point.create(0, 60);
+
+      // The point without offset is at [0, 50] in the current canvas dimensions, which maps to [0, 25] in the original content dimensions.
+      // Relative to the center of the content dimensions, this becomes [-50, -75], which then becomes [-0.25, -0.375] in relative coordinates
+      // leveraging the content's height as the scale factor.
+      expect(
+        translatePointToRelative(
+          pt,
+          canvasDimensions,
+          contentDimensions,
+          'none',
+          1,
+          offset
+        )
+      ).toMatchObject({
+        x: -0.25,
+        y: -0.375,
+      });
+    });
+
+    it('translates a screen point to relative coordinates based on the height of the provided dimensions with centering', () => {
+      const canvasDimensions = Dimensions.create(400, 400);
+      const contentDimensions = Dimensions.create(100, 200);
+      const offset = Point.create(0, 10);
+      const pt = Point.create(0, 60);
+
+      // The point without offset is at [0, 50] in the current canvas dimensions, which maps to [0, 50] in the original content dimensions.
+      // With centering, this becomes [-150, -50], and relative to the center of the content dimensions, this becomes [-200, -150] (this
+      // is technically outside of the content dimensions, but we still want to return a value that can be rendered when zoomed out). This
+      // then becomes [-1, -0.75] in relative coordinates.
+      expect(
+        translatePointToRelative(
+          pt,
+          canvasDimensions,
+          contentDimensions,
+          'both',
+          0.5,
+          offset
+        )
+      ).toMatchObject({
+        x: -1,
+        y: -0.75,
+      });
+    });
   });
 
   describe(translateDimensionsToScreen, () => {

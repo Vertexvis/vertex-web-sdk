@@ -315,7 +315,9 @@ describe('vertex-viewer-markup-freeform', () => {
       'vertex-viewer-markup-freeform'
     ) as HTMLVertexViewerMarkupFreeformElement;
 
-    expect(el.getAttribute('style')).toBeNull();
+    expect(el.getAttribute('style')).toContain(
+      '--viewer-markup-freeform-scale: 1'
+    );
 
     el.scale = 2;
     await page.waitForChanges();

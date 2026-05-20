@@ -11,7 +11,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
@@ -83,7 +83,7 @@ export class ViewerMarkupCircle {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: BasicViewer;
 
   /**
    * The original viewport dimensions where this markup was created. This value is used
@@ -150,7 +150,13 @@ export class ViewerMarkupCircle {
   private interactionHandler = new CircleMarkupInteractionHandler(
     this.hostEl,
     this.interactionBegin,
-    this.interactionEnd
+    this.interactionEnd,
+    {
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    }
   );
 
   private registeredHandler?: Disposable;
@@ -161,6 +167,8 @@ export class ViewerMarkupCircle {
   protected componentWillLoad(): void {
     this.updateViewport();
     this.handleViewerChanged(this.viewer);
+    this.handleScaleChange();
+    this.handleScalingConfigurationChange();
     this.updateBoundsFromProps();
   }
 
@@ -191,14 +199,12 @@ export class ViewerMarkupCircle {
    * @ignore
    */
   @Watch('viewer')
-  protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement
-  ): Promise<void> {
+  protected async handleViewerChanged(newViewer?: BasicViewer): Promise<void> {
     this.registeredHandler?.dispose();
     this.registeredHandler = undefined;
 
     if (newViewer != null) {
-      this.registeredHandler = await newViewer.registerInteractionHandler(
+      this.registeredHandler = await newViewer.registerBasicInteractionHandler(
         this.interactionHandler
       );
     }
@@ -214,6 +220,19 @@ export class ViewerMarkupCircle {
     if (this.mode !== 'create') {
       window.removeEventListener('pointerdown', this.handleWindowPointerDown);
     }
+  }
+
+  @Watch('offset')
+  @Watch('originatingViewport')
+  @Watch('centeringBehavior')
+  @Watch('scale')
+  protected handleScalingConfigurationChange(): void {
+    this.interactionHandler.updateScalingOptions({
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    });
   }
 
   @Watch('scale')

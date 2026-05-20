@@ -2,7 +2,10 @@ import type { EventEmitter } from '@stencil/core';
 import { Point } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../../lib/dom';
-import { MarkupInteractionHandler } from '../../lib/markup/interactions';
+import {
+  MarkupInteractionHandler,
+  MarkupInteractionHandlerScalingOptions,
+} from '../../lib/markup/interactions';
 import { MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
@@ -19,9 +22,10 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupArrowElement,
     private readonly interactionBegin: EventEmitter<void>,
-    private readonly interactionEnd: EventEmitter<MarkupInteraction>
+    private readonly interactionEnd: EventEmitter<MarkupInteraction>,
+    scalingOptions?: MarkupInteractionHandlerScalingOptions
   ) {
-    super();
+    super(scalingOptions);
   }
 
   public editAnchor(
@@ -53,7 +57,11 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
         this.markupEl.start ??
         translatePointToRelative(
           getMouseClientPosition(event, this.elementBounds),
-          this.elementBounds
+          this.elementBounds,
+          this.scalingOptions.originatingViewport,
+          this.scalingOptions.centeringBehavior,
+          this.scalingOptions.scale,
+          this.scalingOptions.offset
         );
 
       this.interactionBegin.emit();
@@ -65,7 +73,11 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
     if (this.elementBounds != null && this.pointerId === event.pointerId) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
+        this.elementBounds,
+        this.scalingOptions.originatingViewport,
+        this.scalingOptions.centeringBehavior,
+        this.scalingOptions.scale,
+        this.scalingOptions.offset
       );
       if (this.anchor === 'start') {
         this.markupEl.start = position;

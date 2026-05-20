@@ -1,8 +1,18 @@
+jest.mock('../../lib/dom', () => {
+  const original = jest.requireActual('../../lib/dom');
+
+  return {
+    ...original,
+    getAllVertexElementChildren: jest.fn(() => []),
+  };
+});
+
 import { newSpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
 
 import { mockGetDocument, mockGetPage, mockGetViewport, mockPageRender } from '../../__mocks__/pdfjs-mock';
 import { triggerResizeObserver } from '../../__setup__/resize-observer';
+import { getAllVertexElementChildren } from '../../lib/dom';
 import { VertexDocumentViewer } from './document-viewer';
 
 describe('vertex-document-viewer', () => {
@@ -95,6 +105,22 @@ describe('vertex-document-viewer', () => {
 
       const viewer = root as HTMLVertexDocumentViewerElement;
       await expect(viewer.loadPage(1)).rejects.toThrow('No document has been loaded. Ensure that the `src` property is set and the resource is accessible.');
+    });
+  });
+
+  describe('injectViewerApi', () => {
+    it('injects the viewer API into vertex custom element children', async () => {
+      const testElement = { nodeName: 'VERTEX-VIEWER-MARKUP', viewer: undefined };
+      (getAllVertexElementChildren as jest.Mock).mockReturnValue([testElement]);
+
+      const page = await newSpecPage({
+        components: [VertexDocumentViewer],
+        html: `<vertex-document-viewer></vertex-document-viewer>`,
+      });
+
+      await page.waitForChanges();
+
+      expect(testElement.viewer).toBeDefined();
     });
   });
 });

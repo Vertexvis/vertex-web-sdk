@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, Element, Event, EventEmitter, h, Host, Method, Prop, Watch } from '@stencil/core';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { BasicInteractionHandler, BasicViewer, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
 import { PartialConfig } from '../../lib/config';
@@ -9,7 +9,7 @@ import { DocumentApi, DocumentApiState } from '../../lib/document/api';
 import { DocumentLayersController } from '../../lib/document/layers/controller';
 import { DocumentProvider } from '../../lib/document/provider';
 import { DocumentRenderer } from '../../lib/document/renderer';
-import { getElementBoundingClientRect } from '../../lib/dom';
+import { getAllVertexElementChildren, getElementBoundingClientRect } from '../../lib/dom';
 import { PanInteractionHandler } from '../../lib/interactions/pan-interaction-handler';
 import { PdfJsProvider } from '../../lib/pdf/pdfjs-provider';
 
@@ -20,7 +20,7 @@ export type InteractionMode = 'none' | 'pan';
   styleUrl: 'document-viewer.css',
   shadow: true,
 })
-export class VertexDocumentViewer {
+export class VertexDocumentViewer implements BasicViewer {
   /**
    * A URI of the document to load when the component is mounted in the DOM tree.
    * Currently only supports URLs for client-side rendering.
@@ -105,14 +105,17 @@ export class VertexDocumentViewer {
 
   private dimensions: Dimensions.Dimensions = Dimensions.create(0, 0);
   private resizeObserver?: ResizeObserver;
+  private mutationObserver?: MutationObserver;
   private resizeTimer?: number;
 
   private documentRenderer?: DocumentRenderer;
   private documentApi?: DocumentApi;
-  private panInteractionHandler?: PanInteractionHandler;
   private documentApiStateChangedDisposable?: Disposable;
   private pageLoadedDisposable?: Disposable;
   private pageDrawnDisposable?: Disposable;
+
+  private interactionHandlers: BasicInteractionHandler[] = [];
+  private panInteractionHandler?: PanInteractionHandler;
 
   protected componentWillLoad(): void {
     this.handleElementResize = this.handleElementResize.bind(this);
@@ -121,6 +124,8 @@ export class VertexDocumentViewer {
     this.handlePageDrawn = this.handlePageDrawn.bind(this);
 
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
+
+    this.registerSlotChangeListeners();
   }
 
   protected componentShouldUpdate(newValue: unknown, oldValue: unknown, propName: string): boolean {
@@ -134,12 +139,39 @@ export class VertexDocumentViewer {
 
     this.updateComponentDimensions();
     this.handleSrcChange();
+
+    this.injectViewerApi();
   }
 
   protected disconnectedCallback(): void {
     this.resizeObserver?.disconnect();
 
     this.clearCurrentDocument();
+  }
+
+  /**
+   * Registers and initializes an interaction handler with the document viewer. Returns a
+   * `Disposable` that should be used to deregister the interaction handler.
+   *
+   * `InteractionHandler`s are used to build custom mouse and touch interactions.
+   *
+   * @param interactionHandler The interaction handler to register.
+   * @returns {Promise<void>} A promise containing the disposable to use to
+   *  deregister the handler.
+   */
+  @Method()
+  public async registerBasicInteractionHandler(interactionHandler: BasicInteractionHandler): Promise<Disposable> {
+    this.interactionHandlers.push(interactionHandler);
+    this.initializeInteractionHandler(interactionHandler);
+    return {
+      dispose: () => {
+        const index = this.interactionHandlers.indexOf(interactionHandler);
+        if (index !== -1) {
+          this.interactionHandlers[index].dispose();
+          this.interactionHandlers.splice(index, 1);
+        }
+      },
+    };
   }
 
   /**
@@ -275,7 +307,7 @@ export class VertexDocumentViewer {
     this.panInteractionHandler?.dispose();
 
     if (this.interactionMode === 'pan' && this.canvasEl != null && this.documentApi != null) {
-      this.panInteractionHandler = new PanInteractionHandler(this.canvasEl, this.documentApi);
+      this.panInteractionHandler = new PanInteractionHandler(this.canvasEl, this.hostEl, this.documentApi);
     }
   }
 
@@ -307,5 +339,28 @@ export class VertexDocumentViewer {
       this.updateComponentDimensions(dimensions);
       await this.documentApi?.updateViewport(this.dimensions);
     }, this.resizeDebounce);
+  }
+
+  private initializeInteractionHandler(handler: BasicInteractionHandler): void {
+    if (this.canvasEl == null) {
+      throw new Error('Cannot initialize interaction handler');
+    }
+
+    handler.initialize(this.canvasEl);
+  }
+
+  private registerSlotChangeListeners(): void {
+    this.mutationObserver = new MutationObserver(_ => this.injectViewerApi());
+    this.mutationObserver.observe(this.hostEl, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  private injectViewerApi(): void {
+    getAllVertexElementChildren(this.hostEl).forEach(node => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).viewer = this.hostEl;
+    });
   }
 }

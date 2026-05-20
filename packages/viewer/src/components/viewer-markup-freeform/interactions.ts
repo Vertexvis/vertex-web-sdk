@@ -2,7 +2,10 @@ import type { EventEmitter } from '@stencil/core';
 import { Point, Rectangle } from '@vertexvis/geometry';
 
 import { getMouseClientPosition } from '../../lib/dom';
-import { MarkupInteractionHandler } from '../../lib/markup/interactions';
+import {
+  MarkupInteractionHandler,
+  MarkupInteractionHandlerScalingOptions,
+} from '../../lib/markup/interactions';
 import { MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
@@ -26,9 +29,10 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
   public constructor(
     private readonly markupEl: HTMLVertexViewerMarkupFreeformElement,
     private readonly interactionBegin: EventEmitter<void>,
-    private readonly interactionEnd: EventEmitter<MarkupInteraction>
+    private readonly interactionEnd: EventEmitter<MarkupInteraction>,
+    scalingOptions?: MarkupInteractionHandlerScalingOptions
   ) {
-    super();
+    super(scalingOptions);
   }
 
   public editAnchor(
@@ -41,7 +45,11 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
       this.anchor = anchor;
       this.resizeStartPosition = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
+        this.elementBounds,
+        this.scalingOptions.originatingViewport,
+        this.scalingOptions.centeringBehavior,
+        this.scalingOptions.scale,
+        this.scalingOptions.offset
       );
 
       window.addEventListener('pointermove', this.handleResizeInteractionMove);
@@ -67,7 +75,11 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
         screenPosition,
-        this.elementBounds
+        this.elementBounds,
+        this.scalingOptions.originatingViewport,
+        this.scalingOptions.centeringBehavior,
+        this.scalingOptions.scale,
+        this.scalingOptions.offset
       );
       this.updateMinAndMax(position);
       this.markupEl.points = this.markupEl.points ?? [position];
@@ -86,7 +98,11 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
       const screenPosition = getMouseClientPosition(event, this.elementBounds);
       const position = translatePointToRelative(
         screenPosition,
-        this.elementBounds
+        this.elementBounds,
+        this.scalingOptions.originatingViewport,
+        this.scalingOptions.centeringBehavior,
+        this.scalingOptions.scale,
+        this.scalingOptions.offset
       );
       this.updateMinAndMax(position);
       this.markupEl.points = [...this.markupEl.points, position];
@@ -107,7 +123,11 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         );
         const position = translatePointToRelative(
           screenPosition,
-          this.elementBounds
+          this.elementBounds,
+          this.scalingOptions.originatingViewport,
+          this.scalingOptions.centeringBehavior,
+          this.scalingOptions.scale,
+          this.scalingOptions.offset
         );
 
         this.updateMinAndMax(position);
@@ -135,7 +155,11 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
     ) {
       const position = translatePointToRelative(
         getMouseClientPosition(event, this.elementBounds),
-        this.elementBounds
+        this.elementBounds,
+        this.scalingOptions.originatingViewport,
+        this.scalingOptions.centeringBehavior,
+        this.scalingOptions.scale,
+        this.scalingOptions.offset
       );
 
       const updatedBounds = transformRectangle(

@@ -11,7 +11,7 @@ import {
   Watch,
 } from '@stencil/core';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
-import { Disposable } from '@vertexvis/utils';
+import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
@@ -107,7 +107,7 @@ export class ViewerMarkupFreeform {
    * `<vertex-viewer-markup>` or `<vertex-viewer>` element.
    */
   @Prop()
-  public viewer?: HTMLVertexViewerElement;
+  public viewer?: BasicViewer;
 
   /**
    * The original viewport dimensions where this markup was created. This value is used
@@ -177,7 +177,13 @@ export class ViewerMarkupFreeform {
   private interactionHandler = new FreeformMarkupInteractionHandler(
     this.hostEl,
     this.interactionBegin,
-    this.interactionEnd
+    this.interactionEnd,
+    {
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    }
   );
 
   private registeredInteraction?: Disposable;
@@ -188,6 +194,8 @@ export class ViewerMarkupFreeform {
   protected componentWillLoad(): void {
     this.updateViewport();
     this.handleViewerChanged(this.viewer);
+    this.handleScaleChange();
+    this.handleScalingConfigurationChange();
     this.updatePointsFromProps();
   }
 
@@ -216,16 +224,15 @@ export class ViewerMarkupFreeform {
    * @ignore
    */
   @Watch('viewer')
-  protected async handleViewerChanged(
-    newViewer?: HTMLVertexViewerElement
-  ): Promise<void> {
+  protected async handleViewerChanged(newViewer?: BasicViewer): Promise<void> {
     this.registeredInteraction?.dispose();
     this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.registeredInteraction = await newViewer.registerInteractionHandler(
-        this.interactionHandler
-      );
+      this.registeredInteraction =
+        await newViewer.registerBasicInteractionHandler(
+          this.interactionHandler
+        );
     }
   }
 
@@ -236,6 +243,19 @@ export class ViewerMarkupFreeform {
   @Watch('points')
   protected recomputePointsFromProps(): void {
     this.updatePointsFromProps();
+  }
+
+  @Watch('offset')
+  @Watch('originatingViewport')
+  @Watch('centeringBehavior')
+  @Watch('scale')
+  protected handleScalingConfigurationChange(): void {
+    this.interactionHandler.updateScalingOptions({
+      scale: this.scale,
+      offset: this.offset,
+      originatingViewport: this.originatingViewport,
+      centeringBehavior: this.centeringBehavior,
+    });
   }
 
   @Watch('scale')
