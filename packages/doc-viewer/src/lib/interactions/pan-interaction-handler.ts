@@ -12,6 +12,7 @@ export class PanInteractionHandler implements Disposable {
 
   public constructor(
     private readonly element: HTMLElement,
+    private readonly hostElement: HTMLElement,
     private readonly api: DocumentApi,
   ) {
     this.handlePointerDown = this.handlePointerDown.bind(this);
@@ -21,12 +22,13 @@ export class PanInteractionHandler implements Disposable {
 
     this.element.addEventListener('pointerdown', this.handlePointerDown);
     this.element.addEventListener('wheel', this.handleWheel);
-    window.addEventListener('wheel', this.handleWheel);
+    this.hostElement.addEventListener('wheel', this.handleWheel);
   }
 
   public dispose(): void {
     this.element.removeEventListener('pointerdown', this.handlePointerDown);
     this.element.removeEventListener('wheel', this.handleWheel);
+    this.hostElement.removeEventListener('wheel', this.handleWheel);
 
     this.removeWindowListeners();
   }
@@ -87,6 +89,5 @@ export class PanInteractionHandler implements Disposable {
   private removeWindowListeners(): void {
     window.removeEventListener('pointermove', this.handlePointerMove);
     window.removeEventListener('pointerup', this.handlePointerUp);
-    window.removeEventListener('wheel', this.handleWheel);
   }
 }
