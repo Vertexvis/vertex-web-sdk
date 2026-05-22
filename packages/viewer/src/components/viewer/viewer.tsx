@@ -535,6 +535,7 @@ export class Viewer implements BasicViewer {
   private isVisible = false;
 
   private resizeTimer?: NodeJS.Timeout;
+  private streamAttributesUpdateTimer?: NodeJS.Timeout;
   private frameRenderVersion = 0;
 
   private interactionHandlers: InteractionHandler[] = [];
@@ -977,19 +978,32 @@ export class Viewer implements BasicViewer {
   /**
    * @ignore
    */
-  @Watch('experimentalRenderingOptions')
+  @Watch('crossSectioning')
   @Watch('depthBuffers')
+  @Watch('experimentalRenderingOptions')
   @Watch('featureHighlighting')
   @Watch('featureLines')
   @Watch('featureMaps')
   @Watch('noDefaultLights')
   @Watch('phantom')
   @Watch('sceneComparison')
-  @Watch('crossSectioning')
   @Watch('selectionHighlighting')
   protected handleStreamAttributesChanged(): void {
-    this.updateStreamAttributes();
+    this.handleUpdateStreamAttributesWithTimer();
   }
+
+  // Group stream attribute changes happening in quick succession to
+  // ensure the correct attributes are applied to the stream
+  private handleUpdateStreamAttributesWithTimer = (): void => {
+    const streamAttributesUpdateThrottleInMilliseconds = 50;
+
+    if (this.streamAttributesUpdateTimer == null) {
+      this.streamAttributesUpdateTimer = setTimeout(() => {
+        this.streamAttributesUpdateTimer = undefined;
+        this.updateStreamAttributes();
+      }, streamAttributesUpdateThrottleInMilliseconds);
+    }
+  };
 
   /**
    * @ignore
