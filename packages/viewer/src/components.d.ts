@@ -1760,6 +1760,7 @@ export namespace Components {
         "submit": () => Promise<void>;
         /**
           * The current text value of the component. Value is updated on user interaction.
+          * @default ''
          */
         "value": string;
     }
@@ -4312,6 +4313,7 @@ declare namespace LocalJSX {
         "pinController"?: PinController;
         /**
           * The current text value of the component. Value is updated on user interaction.
+          * @default ''
          */
         "value"?: string;
     }
