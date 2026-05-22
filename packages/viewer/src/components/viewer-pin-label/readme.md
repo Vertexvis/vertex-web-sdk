@@ -12,7 +12,7 @@
 | `elementBounds` | --        | The dimensions of the canvas for the pins                                      | `DOMRect \| undefined`       | `undefined` |
 | `pin`           | --        | The pin to draw for the group                                                  | `TextPin \| undefined`       | `undefined` |
 | `pinController` | --        | The controller that drives behavior for pin operations                         | `PinController \| undefined` | `undefined` |
-| `value`         | `value`   | The current text value of the component. Value is updated on user interaction. | `string`                     | `undefined` |
+| `value`         | `value`   | The current text value of the component. Value is updated on user interaction. | `string`                     | `''`        |
 
 
 ## Events
