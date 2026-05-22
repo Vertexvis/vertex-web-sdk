@@ -53,7 +53,7 @@ export class VertexPinLabel {
    * interaction.
    */
   @Prop({ mutable: true })
-  public value: string;
+  public value = '';
 
   /**
    * The controller that drives behavior for pin operations
@@ -105,10 +105,6 @@ export class VertexPinLabel {
   private resizeObserver?: ResizeObserver;
   private contentResizeObserver?: ResizeObserver;
 
-  public constructor() {
-    this.value = this.getPinText();
-  }
-
   /**
    * Gives focus to the component's internal text input.
    */
@@ -152,7 +148,7 @@ export class VertexPinLabel {
 
   @Watch('pin')
   protected watchPinChange(): void {
-    this.value = this.getPinText();
+    this.value = this.pin?.label.text ?? '';
     this.computeScreenPosition();
   }
 
@@ -162,6 +158,7 @@ export class VertexPinLabel {
   }
 
   protected componentWillLoad(): void {
+    this.value = this.pin?.label.text ?? '';
     this.computeScreenPosition();
   }
 
@@ -297,16 +294,6 @@ export class VertexPinLabel {
     return `calc(${this.elementBounds?.height.toString() || 0}px - ${
       this.computedScreenPosition?.y.toString() || 0
     }px)`;
-  }
-
-  private getPinText(): string {
-    if (this.pin?.label.text != null) {
-      this.value = this.pin.label.text;
-    } else {
-      this.value = '';
-    }
-
-    return this.value;
   }
 
   private computeScreenPosition(): void {
