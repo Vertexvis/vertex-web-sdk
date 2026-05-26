@@ -439,16 +439,22 @@ describe('vertex-viewer', () => {
       const update = jest.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
-      viewer.depthBuffers = 'final';
+      jest.useFakeTimers();
+      viewer.depthBuffers = 'all';
+      jest.advanceTimersByTime(50);
+      jest.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
-            depthBuffers: 'final',
+            depthBuffers: 'all',
           }),
         })
       );
 
+      jest.useFakeTimers();
       viewer.phantom = { opacity: 1 };
+      jest.advanceTimersByTime(50);
+      jest.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -457,7 +463,10 @@ describe('vertex-viewer', () => {
         })
       );
 
+      jest.useFakeTimers();
       viewer.featureLines = { width: 1 };
+      jest.advanceTimersByTime(50);
+      jest.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -466,7 +475,10 @@ describe('vertex-viewer', () => {
         })
       );
 
+      jest.useFakeTimers();
       viewer.featureHighlighting = { highlightColor: 0xff0000 };
+      jest.advanceTimersByTime(50);
+      jest.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -475,7 +487,10 @@ describe('vertex-viewer', () => {
         })
       );
 
+      jest.useFakeTimers();
       viewer.featureMaps = 'final';
+      jest.advanceTimersByTime(50);
+      jest.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -484,9 +499,12 @@ describe('vertex-viewer', () => {
         })
       );
 
+      jest.useFakeTimers();
       viewer.crossSectioning = {};
       viewer.crossSectioning.endCapEnabled = true;
       viewer.crossSectioning.endCapColor = '#112233';
+      jest.advanceTimersByTime(50);
+      jest.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
