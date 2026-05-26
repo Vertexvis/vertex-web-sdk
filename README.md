@@ -5,15 +5,15 @@ web platform.
 
 ## Packages
 
-| Package      | Version | Description |
-| ------------ | ------- | ----------- |
-| [@vertexvis/geometry]        | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)        | 2D/3D geometry utilities. |
-| [@vertexvis/stream-api]      | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)      | The API client for streaming 3D images. |
-| [@vertexvis/utils]           | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)           | General Node and Web utilities used within Vertex. |
-| [@vertexvis/html-templates]  | ![npm](https://img.shields.io/npm/v/@vertexvis/html-templates)  | HTML templating utilities used with web components. |
-| [@vertexvis/viewer]          | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)          | The Web SDK containing web components to view 3D models. |
-| [@vertexvis/viewer-react]    | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)    | Contains React bindings for Vertex's Web SDK. |
-| [@vertexvis/viewer-vue]      | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-vue)      | Contains Vue bindings for Vertex's Web SDK. |
+| Package                     | Version                                                        | Description                                              |
+| --------------------------- | -------------------------------------------------------------- | -------------------------------------------------------- |
+| [@vertexvis/geometry]       | ![npm](https://img.shields.io/npm/v/@vertexvis/geometry)       | 2D/3D geometry utilities.                                |
+| [@vertexvis/stream-api]     | ![npm](https://img.shields.io/npm/v/@vertexvis/stream-api)     | The API client for streaming 3D images.                  |
+| [@vertexvis/utils]          | ![npm](https://img.shields.io/npm/v/@vertexvis/utils)          | General Node and Web utilities used within Vertex.       |
+| [@vertexvis/html-templates] | ![npm](https://img.shields.io/npm/v/@vertexvis/html-templates) | HTML templating utilities used with web components.      |
+| [@vertexvis/viewer]         | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer)         | The Web SDK containing web components to view 3D models. |
+| [@vertexvis/viewer-react]   | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-react)   | Contains React bindings for Vertex's Web SDK.            |
+| [@vertexvis/viewer-vue]     | ![npm](https://img.shields.io/npm/v/@vertexvis/viewer-vue)     | Contains Vue bindings for Vertex's Web SDK.              |
 
 ## Documentation
 
@@ -21,7 +21,7 @@ Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-w
 our [developer guides](https://developer.vertexvis.com/docs/guides/render-your-first-scene).
 
 Each component of the `@vertexvis/viewer` package also exposes a component-level README with
-additional examples and property definitions. See the 
+additional examples and property definitions. See the
 [@vertexvis/viewer documentation section](./packages/viewer/readme.md#documentation)
 for a list of components and their READMEs.
 
@@ -79,16 +79,13 @@ Additionally, the project exposes a top-level script to check code coverage
 ## Bumping Versions
 
 The project's release scripts will automatically bump version based on the
-`nextBumpVersion` that's specified in the projects `package.json` file. When
+`nextVersionBump` that's specified in the projects `package.json` file. When
 making a breaking change, you should run `yarn version:bump` and specify
 `minor`. This should be done as part of your PR.
 
-**Note:** minor is being used to signal breaking changes until the Web SDK hits
-1.0.
-
 ## Releasing
 
-Run `yarn release` to create a release based on the `nextBumpVersion` that's
+Run `yarn release` to create a release based on the `nextVersionBump` that's
 specified in the projects `package.json` file. This field tracks if the next
 version should be a `major`, `minor` or `patch` release.
 
