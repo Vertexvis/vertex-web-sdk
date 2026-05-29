@@ -12,6 +12,7 @@ import {
   FrameImage,
   FrameScene,
   ImageAttributesLike,
+  ItemModelView,
   Orientation,
   SceneViewSummary,
 } from '../types';
@@ -23,7 +24,7 @@ import {
   fromPbVector3f,
 } from './geometry';
 import { fromPbRGBi } from './material';
-import { fromPbBytesValue } from './scalar';
+import { fromPbBoolValue, fromPbBytesValue } from './scalar';
 
 export const fromPbPerspectiveCamera: M.Func<
   vertexvis.protobuf.stream.IPerspectiveCamera,
@@ -167,6 +168,21 @@ const fromPbDisplayListSummary: M.Func<
     })
 );
 
+const fromPbItemModelView: M.Func<
+  vertexvis.protobuf.stream.IItemModelViewAttributes,
+  ItemModelView.ItemModelView
+> = M.defineMapper(
+  M.read(
+    M.mapProp('modelViewId', M.ifDefined(fromPbJsUuid)),
+    M.mapProp('sceneItemId', M.ifDefined(fromPbJsUuid))
+  ),
+  ([modelViewId, sceneItemId]) =>
+    ItemModelView.create({
+      modelViewId: modelViewId ?? undefined,
+      sceneItemId: sceneItemId ?? undefined,
+    })
+);
+
 const fromPbFrameImageAttributes: M.Func<
   vertexvis.protobuf.stream.IDrawFramePayload,
   ImageAttributesLike
@@ -197,6 +213,7 @@ const fromPbSceneAttributes: M.Func<
     hasChanged: boolean;
     displayListSummary: SceneViewSummary.SceneViewSummary;
     modelViewId: UUID.UUID | undefined;
+    itemModelView: ItemModelView.ItemModelView | undefined;
   }
 > = M.defineMapper(
   M.read(
@@ -205,7 +222,8 @@ const fromPbSceneAttributes: M.Func<
     M.mapRequiredProp('crossSectioning', fromPbCrossSectioning),
     M.requiredProp('hasChanged'),
     M.mapRequiredProp('displayListSummary', fromPbDisplayListSummary),
-    M.mapProp('modelViewId', M.ifDefined(fromPbJsUuid2l))
+    M.mapProp('modelViewId', M.ifDefined(fromPbJsUuid2l)),
+    M.mapProp('itemModelView', M.ifDefined(fromPbItemModelView))
   ),
   ([
     camera,
@@ -214,6 +232,7 @@ const fromPbSceneAttributes: M.Func<
     hasChanged,
     displayListSummary,
     modelViewId,
+    itemModelView,
   ]) => ({
     camera,
     boundingBox,
@@ -221,6 +240,7 @@ const fromPbSceneAttributes: M.Func<
     hasChanged,
     displayListSummary,
     modelViewId: modelViewId != null ? modelViewId : undefined,
+    itemModelView: itemModelView != null ? itemModelView : undefined,
   })
 );
 
@@ -233,6 +253,7 @@ const fromPbFrameSceneAttributes: M.Func<
     hasChanged: boolean;
     displayListSummary: SceneViewSummary.SceneViewSummary;
     modelViewId: UUID.UUID | undefined;
+    itemModelView: ItemModelView.ItemModelView | undefined;
   }
 > = M.defineMapper(
   M.read(
@@ -270,7 +291,8 @@ function fromPbFrameScene(
         worldOrientation,
         sceneAttr.hasChanged,
         sceneAttr.displayListSummary,
-        sceneAttr.modelViewId
+        sceneAttr.modelViewId,
+        sceneAttr.itemModelView
       )
   );
 }
@@ -289,10 +311,11 @@ export function fromPbFrame(
       M.mapProp('featureMap', fromPbBytesValue),
       M.mapProp('temporalRefinementCorrelationId', (id) =>
         id != null ? fromPbJsUuid(id) : null
-      )
+      ),
+      M.mapProp('partialFrame', M.ifDefined(fromPbBoolValue))
     ),
-    ([cIds, seq, fd, s, i, db, fm, trci]) =>
-      new Frame(cIds, trci || '', seq, fd, i, s, db, fm)
+    ([cIds, seq, fd, s, i, db, fm, trci, pF]) =>
+      new Frame(cIds, trci || '', seq, fd, i, s, db, fm, pF ?? false)
   );
 }
 
