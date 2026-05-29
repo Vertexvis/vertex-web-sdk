@@ -239,8 +239,8 @@ const fromPbSceneAttributes: M.Func<
     crossSectioning,
     hasChanged,
     displayListSummary,
-    modelViewId: modelViewId != null ? modelViewId : undefined,
-    itemModelView: itemModelView != null ? itemModelView : undefined,
+    modelViewId: modelViewId ?? undefined,
+    itemModelView: itemModelView ?? undefined,
   })
 );
 
