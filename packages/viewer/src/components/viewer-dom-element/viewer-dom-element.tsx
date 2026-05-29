@@ -35,7 +35,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('position')
+  @Watch('position', { immediate: true })
   protected handlePositionChange(): void {
     this.syncMatrix();
   }
@@ -51,7 +51,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('positionJson')
+  @Watch('positionJson', { immediate: true })
   protected handlePositionJsonChanged(): void {
     this.syncPosition();
   }
@@ -65,7 +65,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('rotation')
+  @Watch('rotation', { immediate: true })
   protected handleRotationChanged(): void {
     this.syncQuaternionWithRotation();
   }
@@ -81,7 +81,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('rotationJson')
+  @Watch('rotationJson', { immediate: true })
   protected handleRotationJsonChanged(): void {
     this.syncRotation();
   }
@@ -95,7 +95,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('quaternion')
+  @Watch('quaternion', { immediate: true })
   protected handleQuaternionChange(): void {
     this.syncMatrix();
   }
@@ -111,7 +111,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('quaternionJson')
+  @Watch('quaternionJson', { immediate: true })
   protected handleQuaternionJsonChanged(): void {
     this.syncQuaternion();
   }
@@ -125,7 +125,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('scale')
+  @Watch('scale', { immediate: true })
   protected handleScaleChange(): void {
     this.syncMatrix();
   }
@@ -141,7 +141,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * @ignore
    */
-  @Watch('scaleJson')
+  @Watch('scaleJson', { immediate: true })
   protected handleScaleJsonChanged(): void {
     this.syncScale();
   }
@@ -336,7 +336,13 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   }
 
   private syncMatrix(): void {
-    this.matrix = Matrix4.makeTRS(this.position, this.quaternion, this.scale);
+    if (
+      this.position != null &&
+      this.quaternion != null &&
+      this.scale != null
+    ) {
+      this.matrix = Matrix4.makeTRS(this.position, this.quaternion, this.scale);
+    }
   }
 
   private parseJson<T>(
