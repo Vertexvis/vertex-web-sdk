@@ -255,7 +255,12 @@ export class ViewerMarkupCircle {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    if (this.bounds != null && this.elementBounds != null) {
+    if (
+      this.bounds != null &&
+      this.elementBounds != null &&
+      this.elementBounds.width > 0 &&
+      this.elementBounds.height > 0
+    ) {
       const relativeBounds = translateRectToScreen(
         this.bounds,
         this.elementBounds,

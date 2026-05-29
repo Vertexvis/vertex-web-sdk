@@ -288,7 +288,12 @@ export class ViewerMarkupFreeform {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    if (this.screenPoints.length > 0 && this.elementBounds != null) {
+    if (
+      this.screenPoints.length > 0 &&
+      this.elementBounds != null &&
+      this.elementBounds.width > 0 &&
+      this.elementBounds.height > 0
+    ) {
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
       const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
 
