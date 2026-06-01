@@ -81,7 +81,7 @@ function workerTypescript(): Plugin {
       const output = ts.transpileModule(code, {
         compilerOptions: {
           module: ts.ModuleKind.ESNext,
-          target: ts.ScriptTarget.ES2019,
+          target: ts.ScriptTarget.ES2022,
         },
         fileName: id,
       });

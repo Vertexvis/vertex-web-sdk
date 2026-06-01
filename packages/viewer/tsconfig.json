@@ -4,9 +4,9 @@
   "compilerOptions": {
     "inlineSources": false,
     "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "jsx": "react",
     "jsxFactory": "h",
-    "target": "ES2019",
   },
   "include": [
     "src",
