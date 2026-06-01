@@ -8,7 +8,7 @@
  * prevents flashing of elements before Stencil has a time to position the
  * element in 3D space.
  */
-:host(.hydrated) {
+:host([hydrated]) {
   visibility: hidden;
 }
 
