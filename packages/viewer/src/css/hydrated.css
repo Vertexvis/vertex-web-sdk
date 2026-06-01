@@ -7,30 +7,13 @@
  * `src/components.d.ts` file.
  */
 
-vertex-viewer-dom-renderer {
+vertex-viewer-dom-renderer:not([hydrated]),
+vertex-scene-tree-toolbar:not([hydrated]),
+vertex-viewer-toolbar:not([hydrated]) {
   visibility: hidden;
 }
-vertex-viewer-dom-renderer.hydrated {
-  visibility: inherit;
-}
-
-vertex-scene-tree-toolbar {
-  visibility: hidden;
-}
-vertex-scene-tree-toolbar.hydrated {
-  visibility: inherit;
-}
-
-vertex-scene-tree-toolbar {
-  visibility: hidden;
-}
-vertex-scene-tree-toolbar.hydrated {
-  visibility: inherit;
-}
-
-vertex-viewer-toolbar {
-  visibility: hidden;
-}
-vertex-viewer-toolbar.hydrated {
+vertex-viewer-dom-renderer[hydrated],
+vertex-scene-tree-toolbar[hydrated],
+vertex-viewer-toolbar[hydrated] {
   visibility: inherit;
 }
