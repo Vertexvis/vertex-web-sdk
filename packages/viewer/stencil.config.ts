@@ -59,6 +59,9 @@ export const config: Config = {
   extras: {
     experimentalImportInjection: true,
   },
+  hydratedFlag: {
+    selector: 'attribute',
+  },
 };
 
 function copyright(): string {
