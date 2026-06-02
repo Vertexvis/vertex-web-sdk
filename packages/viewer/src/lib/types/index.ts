@@ -9,6 +9,7 @@ import * as Flags from './flags';
 import * as FlyTo from './flyToOptions';
 import * as FrameCamera from './frameCamera';
 import * as Interactions from './interactions';
+import * as ItemModelView from './itemModelView';
 import * as LoadableResource from './loadableResource';
 import * as SceneViewStateIdentifier from './sceneViewStateIdentifier';
 import * as SceneViewSummary from './sceneViewSummary';
@@ -35,6 +36,7 @@ export {
   FlyTo,
   FrameCamera,
   Interactions,
+  ItemModelView,
   LoadableResource,
   SceneViewStateIdentifier,
   SceneViewSummary,
