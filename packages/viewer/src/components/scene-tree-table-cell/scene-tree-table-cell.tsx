@@ -242,7 +242,7 @@ export class SceneTreeTableCell {
           {showSpaceForExpansionIcon && (
             <button
               class="expand-btn no-shrink"
-              data-test-id={'expand-' + this.node?.name}
+              data-testid={'expand-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(
                 this.toggleExpansion
               )}
@@ -260,7 +260,7 @@ export class SceneTreeTableCell {
           {showSpaceForEndItemIcon && (
             <button
               class="end-item-btn no-shrink"
-              data-test-id={'end-item-' + this.node?.name}
+              data-testid={'end-item-' + this.node?.name}
             >
               {endItemIcon && (
                 <vertex-viewer-icon
@@ -282,7 +282,7 @@ export class SceneTreeTableCell {
           {this.isolateButton && (
             <button
               class="isolate-btn no-shrink"
-              data-test-id={'isolate-btn-' + this.node?.name}
+              data-testid={'isolate-btn-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(this.isolate)}
             >
               {isolateIcon && (
@@ -293,7 +293,7 @@ export class SceneTreeTableCell {
           {this.visibilityToggle && (
             <button
               class="visibility-btn no-shrink"
-              data-test-id={'visibility-btn-' + this.node?.name}
+              data-testid={'visibility-btn-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(
                 this.toggleVisibility
               )}
