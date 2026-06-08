@@ -348,6 +348,34 @@ describe('vertex-viewer-markup-circle', () => {
     );
   });
 
+  it('does not render svg content when the element width or height is 0', async () => {
+    (getMarkupBoundingClientRect as jest.Mock).mockReturnValueOnce({
+      left: 0,
+      top: 0,
+      bottom: 0,
+      right: 0,
+      width: 0,
+      height: 0,
+    });
+
+    const page = await newSpecPage({
+      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
+      template: () => (
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-circle bounds={bounds} />
+          </vertex-viewer-markup>
+        </vertex-viewer>
+      ),
+    });
+
+    expect(
+      page.root
+        ?.querySelector('vertex-viewer-markup-circle')
+        ?.shadowRoot?.querySelector('svg')
+    ).toBeNull();
+  });
+
   it('removes event listeners when the viewer changes', async () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],

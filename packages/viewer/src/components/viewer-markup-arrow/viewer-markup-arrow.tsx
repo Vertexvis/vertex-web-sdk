@@ -343,7 +343,13 @@ export class ViewerMarkupArrow {
   }
 
   public render(): h.JSX.IntrinsicElements {
-    if (this.start != null && this.end != null && this.elementBounds != null) {
+    if (
+      this.start != null &&
+      this.end != null &&
+      this.elementBounds != null &&
+      this.elementBounds.width > 0 &&
+      this.elementBounds.height > 0
+    ) {
       const elementBounds = this.elementBounds;
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
       const offsetY = (this.offset?.y ?? 0) / getWindowDevicePixelRatio();
