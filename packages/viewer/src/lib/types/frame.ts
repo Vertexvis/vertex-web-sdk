@@ -20,6 +20,7 @@ import * as CrossSectioning from './crossSectioning';
 import { DepthBuffer } from './depthBuffer';
 import { FeatureMap } from './featureMap';
 import * as FrameCamera from './frameCamera';
+import * as ItemModelView from './itemModelView';
 import { Orientation } from './orientation';
 import * as SceneViewSummary from './sceneViewSummary';
 
@@ -36,6 +37,7 @@ export class Frame {
     public readonly scene: FrameScene,
     public readonly depthBufferBytes: Uint8Array | undefined,
     private readonly featureMapBytes: Uint8Array | undefined,
+    public readonly partialFrame: boolean,
     private readonly id = UUID.create()
   ) {}
 
@@ -82,6 +84,7 @@ export class Frame {
     scene,
     depthBufferBytes,
     featureMapBytes,
+    partialFrame,
   }: {
     correlationIds?: string[];
     temporalRefinementCorrelationId?: string;
@@ -91,6 +94,7 @@ export class Frame {
     scene?: FrameScene;
     depthBufferBytes?: Uint8Array;
     featureMapBytes?: Uint8Array;
+    partialFrame?: boolean;
   }): Frame {
     return new Frame(
       correlationIds ?? this.correlationIds,
@@ -101,6 +105,7 @@ export class Frame {
       scene ?? this.scene,
       depthBufferBytes ?? this.depthBufferBytes,
       featureMapBytes ?? this.featureMapBytes,
+      partialFrame ?? this.partialFrame,
       this.id
     );
   }
@@ -131,7 +136,8 @@ export class FrameScene {
     public readonly worldOrientation: Orientation,
     public readonly hasChanged: boolean,
     public readonly sceneViewSummary: SceneViewSummary.SceneViewSummary,
-    public readonly modelViewId: UUID.UUID | undefined
+    public readonly modelViewId: UUID.UUID | undefined,
+    public readonly itemModelView: ItemModelView.ItemModelView | undefined
   ) {}
 
   public copy({
@@ -142,6 +148,7 @@ export class FrameScene {
     hasChanged,
     sceneViewSummary,
     modelViewId,
+    itemModelView,
   }: Partial<{
     camera: FrameCameraBase;
     boundingBox: BoundingBox.BoundingBox;
@@ -150,6 +157,7 @@ export class FrameScene {
     hasChanged: boolean;
     sceneViewSummary: SceneViewSummary.SceneViewSummary;
     modelViewId: UUID.UUID | undefined;
+    itemModelView: ItemModelView.ItemModelView;
   }>): FrameScene {
     return new FrameScene(
       camera ?? this.camera,
@@ -158,7 +166,8 @@ export class FrameScene {
       worldOrientation ?? this.worldOrientation,
       hasChanged ?? this.hasChanged,
       sceneViewSummary ?? this.sceneViewSummary,
-      modelViewId ?? this.modelViewId
+      modelViewId ?? this.modelViewId,
+      itemModelView ?? this.itemModelView
     );
   }
 }

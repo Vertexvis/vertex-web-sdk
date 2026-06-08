@@ -26,7 +26,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       });
 
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-test-id="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]'
       );
       expect(btn).toBeDefined();
     });
@@ -41,7 +41,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       await page.waitForChanges();
 
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-test-id="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]'
       );
       btn?.dispatchEvent(new MouseEvent('click'));
 
@@ -65,7 +65,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       await page.waitForChanges();
 
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-test-id="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]'
       );
       btn?.dispatchEvent(new MouseEvent('click'));
 

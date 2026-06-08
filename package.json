@@ -1,7 +1,7 @@
 {
   "name": "root",
   "private": true,
-  "nextVersionBump": "major",
+  "nextVersionBump": "patch",
   "devDependencies": {
     "eslint": "^8.57.1",
     "lerna": "^6.6.2",

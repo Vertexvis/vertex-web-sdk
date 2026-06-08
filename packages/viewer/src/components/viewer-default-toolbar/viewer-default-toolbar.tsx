@@ -55,7 +55,7 @@ export class ViewerDefaultToolbar {
         >
           <vertex-viewer-button
             class="group-item btn"
-            data-test-id="fit-all-btn"
+            data-testid="fit-all-btn"
             onClick={() => this.viewAll()}
           >
             <vertex-viewer-icon class="icon" name="fit-all" size="md" />
