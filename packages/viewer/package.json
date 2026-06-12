@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
-    "@stencil/core": "^4.0.0",
+    "@stencil/core": "^4.43.5",
     "@vertexvis/frame-streaming-protos": "^0.18.4",
     "@vertexvis/geometry": "1.0.0",
     "@vertexvis/html-templates": "1.0.0",
@@ -100,8 +100,8 @@
     "tslib": "^2.4.0"
   },
   "devDependencies": {
-    "@stencil/react-output-target": "^1.4.2",
-    "@stencil/vue-output-target": "^0.13.1",
+    "@stencil/react-output-target": "^1.5.3",
+    "@stencil/vue-output-target": "^0.13.2",
     "@types/chance": "^1.1.1",
     "@types/google-protobuf": "^3.15.12",
     "@types/jest": "^29.5.14",
@@ -120,7 +120,7 @@
     "rollup": "^2.80.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "ts-jest": "^29.4.9",
+    "ts-jest": "^29.4.11",
     "ts-toolbelt": "^9.6.0",
     "typedoc": "^0.28.14",
     "typescript": "^5.2.0"

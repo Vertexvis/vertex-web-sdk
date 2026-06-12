@@ -60,7 +60,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "protobufjs": "^7.5.4",
     "rollup": "^2.80.0",
-    "ts-jest": "^29.4.9",
+    "ts-jest": "^29.4.11",
     "tslib": "^2.4.0",
     "typescript": "^5.2.0"
   },

@@ -62,7 +62,7 @@
     "eslint": "^8.57.1",
     "jest": "^29.5.14",
     "rollup": "^2.80.0",
-    "ts-jest": "^29.4.9"
+    "ts-jest": "^29.4.11"
   },
   "peerDependencies": {
     "rollup": "^2"
