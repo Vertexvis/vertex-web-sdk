@@ -180,7 +180,6 @@ export class VertexPinLabel {
     if (this.contentEl != null) {
       this.contentResizeObserver.observe(this.contentEl);
     }
-
   }
 
   protected disconnectedCallback(): void {
