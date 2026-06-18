@@ -154,19 +154,28 @@ export class ZoomInteraction extends MouseInteraction {
     this.startPt = undefined;
   }
 
-  public async zoom(delta: number, api: InteractionApi): Promise<void> {
-    await this.operateWithTimer(api, () =>
-      api.zoomCamera(this.getDirectionalDelta(delta))
+  public async zoom(
+    delta: number,
+    api: InteractionApi,
+    interactionDelay?: number
+  ): Promise<void> {
+    await this.operateWithTimer(
+      api,
+      () => api.zoomCamera(this.getDirectionalDelta(delta)),
+      interactionDelay
     );
   }
 
   public async zoomToPoint(
     pt: Point.Point,
     delta: number,
-    api: InteractionApi
+    api: InteractionApi,
+    interactionDelay?: number
   ): Promise<void> {
-    await this.operateWithTimer(api, () =>
-      api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta))
+    await this.operateWithTimer(
+      api,
+      () => api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta)),
+      interactionDelay
     );
   }
 
@@ -180,9 +189,9 @@ export class ZoomInteraction extends MouseInteraction {
     await api.endInteraction();
   }
 
-  private resetInteractionTimer(api: InteractionApi): void {
+  private resetInteractionTimer(api: InteractionApi, delay?: number): void {
     this.stopInteractionTimer();
-    this.startInteractionTimer(api);
+    this.startInteractionTimer(api, delay);
   }
 
   private getDirectionalDelta(delta: number): number {
@@ -195,11 +204,11 @@ export class ZoomInteraction extends MouseInteraction {
     return this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
   }
 
-  private startInteractionTimer(api: InteractionApi): void {
+  private startInteractionTimer(api: InteractionApi, delay?: number): void {
     this.interactionTimer = window.setTimeout(async () => {
       this.interactionTimer = undefined;
       await this.endInteraction(api);
-    }, this.getInteractionDelay());
+    }, delay ?? this.getInteractionDelay());
   }
 
   private stopInteractionTimer(): void {
@@ -211,14 +220,15 @@ export class ZoomInteraction extends MouseInteraction {
 
   private async operateWithTimer(
     api: InteractionApi,
-    f: () => void | Promise<void>
+    f: () => void | Promise<void>,
+    interactionDelay?: number
   ): Promise<void> {
     if (!this.didTransformBegin) {
       await this.beginInteraction(api);
     }
 
-    this.resetInteractionTimer(api);
-    f();
+    await f();
+    this.resetInteractionTimer(api, interactionDelay);
   }
 }
 
