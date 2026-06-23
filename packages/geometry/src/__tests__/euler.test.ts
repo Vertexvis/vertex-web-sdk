@@ -31,44 +31,50 @@ describe(Euler.fromDegrees, () => {
 describe(Euler.fromRotationMatrix, () => {
   const quat = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
   const m = Matrix4.makeRotation(quat);
+  const mTransposed = Matrix4.transpose(m);
 
   it('returns xyz euler', () => {
-    const euler90 = Euler.fromRotationMatrix(m, 'xyz');
+    const euler90 = Euler.fromRotationMatrix(m, 'xyz', false);
     expect(euler90.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns yxz euler', () => {
-    const euler90 = Euler.fromRotationMatrix(m, 'yxz');
+    const euler90 = Euler.fromRotationMatrix(m, 'yxz', false);
     expect(euler90.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns zxy euler', () => {
-    const euler = Euler.fromRotationMatrix(m, 'zxy');
+    const euler = Euler.fromRotationMatrix(m, 'zxy', false);
     expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns zyx euler', () => {
-    const euler = Euler.fromRotationMatrix(m, 'zyx');
+    const euler = Euler.fromRotationMatrix(m, 'zyx', false);
     expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns yzx euler', () => {
-    const euler = Euler.fromRotationMatrix(m, 'yzx');
+    const euler = Euler.fromRotationMatrix(m, 'yzx', false);
     expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns zxy euler', () => {
-    const euler = Euler.fromRotationMatrix(m, 'zxy');
+    const euler = Euler.fromRotationMatrix(m, 'zxy', false);
     expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns yzw euler', () => {
-    const euler = Euler.fromRotationMatrix(m, 'yzx');
+    const euler = Euler.fromRotationMatrix(m, 'yzx', false);
     expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 
   it('returns xzy euler', () => {
-    const euler = Euler.fromRotationMatrix(m, 'xzy');
+    const euler = Euler.fromRotationMatrix(m, 'xzy', false);
+    expect(euler.y).toBeCloseTo(Angle.toRadians(90));
+  });
+
+  it('returns xzy euler for column major matrix', () => {
+    const euler = Euler.fromRotationMatrix(mTransposed, 'xzy', true);
     expect(euler.y).toBeCloseTo(Angle.toRadians(90));
   });
 });

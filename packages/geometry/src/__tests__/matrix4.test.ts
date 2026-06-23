@@ -10,29 +10,6 @@ const camera = {
   up: Vector3.create(0, 1, 0),
 };
 
-describe(Matrix4.fromObject, () => {
-  it('returns Matrix4 from object representation', () => {
-    /* eslint-disable prettier/prettier */
-    const obj = Matrix4.toObject(Matrix4.fromValues(
-      1, 1, 1, 1,
-      2, 2, 2, 2,
-      3, 3, 3, 3,
-      4, 4, 4, 4,
-    ));
-    /* eslint-enable prettier/prettier */
-    const m = Matrix4.fromObject(obj);
-
-    /* eslint-disable prettier/prettier */
-    expect(m).toEqual([
-      1, 2, 3, 4,
-      1, 2, 3, 4,
-      1, 2, 3, 4,
-      1, 2, 3, 4,
-    ])
-    /* eslint-enable prettier/prettier */
-  });
-});
-
 describe(Matrix4.makeZero, () => {
   it('returns zero matrix', () => {
     /* eslint-disable prettier/prettier */
@@ -64,18 +41,8 @@ describe(Matrix4.makeRotation, () => {
   it('creates matrix with rotation components', () => {
     const q = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
     const m = Matrix4.makeRotation(q);
-    const e = Euler.fromRotationMatrix(m, 'xyz');
+    const e = Euler.fromRotationMatrix(m, 'xyz', false);
     expect(e.y).toBeCloseTo(Angle.toRadians(90));
-  });
-});
-
-describe(Matrix4.makeRotationAxis, () => {
-  it('creates a rotation matrix from axis and angle', () => {
-    const matrix = Matrix4.makeRotationAxis(Vector3.up(), Angle.toRadians(90));
-    const pt = Vector3.transformMatrix(Vector3.create(1, 0, 0), matrix);
-    expect(pt.x).toBeCloseTo(0);
-    expect(pt.y).toBeCloseTo(0);
-    expect(pt.z).toBeCloseTo(-1);
   });
 });
 
@@ -117,6 +84,8 @@ describe(Matrix4.makeTRS, () => {
     const s = Vector3.create(1, 2, 3);
     const m = Matrix4.makeTRS(t, r, s);
 
+    console.log(m);
+
     const tt = Vector3.fromMatrixPosition(m);
     const rr = Euler.fromRotationMatrix(m, 'xyz');
     const ss = Vector3.fromMatrixScale(m);
@@ -129,7 +98,7 @@ describe(Matrix4.makeTRS, () => {
 
 describe(Matrix4.makePerspective, () => {
   it('returns projection matrix', () => {
-    const m = Matrix4.toObject(Matrix4.makePerspective(1, 2, 90, 1));
+    const m = Matrix4.toObjectColumnMajor(Matrix4.makePerspective(1, 2, 90, 1));
 
     expect(m.m11).toBeCloseTo(1);
     expect(m.m22).toBeCloseTo(1);
@@ -141,7 +110,9 @@ describe(Matrix4.makePerspective, () => {
 
 describe(Matrix4.makeOrthographic, () => {
   it('returns projection matrix for uniform horizontal and vertical clipping planes', () => {
-    const m = Matrix4.toObject(Matrix4.makeOrthographic(-2, 2, -2, 2, 0, 10));
+    const m = Matrix4.toObjectColumnMajor(
+      Matrix4.makeOrthographic(-2, 2, -2, 2, 0, 10)
+    );
 
     expect(m.m11).toBeCloseTo(0.5);
     expect(m.m41).toBeCloseTo(0);
@@ -153,7 +124,9 @@ describe(Matrix4.makeOrthographic, () => {
   });
 
   it('returns projection matrix for non-uniform horizontal and vertical clipping planes', () => {
-    const m = Matrix4.toObject(Matrix4.makeOrthographic(-8, 2, -8, 2, 0, 10));
+    const m = Matrix4.toObjectColumnMajor(
+      Matrix4.makeOrthographic(-8, 2, -8, 2, 0, 10)
+    );
 
     expect(m.m11).toBeCloseTo(0.2);
     expect(m.m41).toBeCloseTo(0.6);
@@ -169,7 +142,7 @@ describe(Matrix4.makeLookAtView, () => {
   it('returns view matrix that looks at target', () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
-    const m = Matrix4.toObject(
+    const m = Matrix4.toObjectColumnMajor(
       Matrix4.makeLookAtView(camera.position, camera.lookAt, camera.up)
     );
 
@@ -187,7 +160,7 @@ describe(Matrix4.makeLookAt, () => {
   it('returns matrix that looks at target', () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
-    const m = Matrix4.toObject(
+    const m = Matrix4.toObjectColumnMajor(
       Matrix4.makeLookAt(camera.position, camera.lookAt, camera.up)
     );
 
@@ -231,17 +204,17 @@ describe(Matrix4.multiply, () => {
       4, 4, 4, 4,
     );
     const matrix2 = Matrix4.fromValues(
-      4, 4, 4, 4,
+      5, 4, 4, 4,
       3, 3, 3, 3,
-      2, 2, 2, 2,
-      1, 1, 1, 1,
+      2, 5, 2, 2,
+      1, 1, 5, 1,
     );
 
     expect(Matrix4.multiply(matrix1, matrix2)).toEqual([
-      10, 20, 30, 40,
-      10, 20, 30, 40,
-      10, 20, 30, 40,
-      10, 20, 30, 40,
+      11, 13, 14, 10,
+      22, 26, 28, 20,
+      33, 39, 42, 30,
+      44, 52, 56, 40
     ]);
     /* eslint-enable prettier/prettier */
   });
@@ -258,7 +231,7 @@ describe(Matrix4.lookAt, () => {
     );
     const r = Euler.fromRotationMatrix(m);
 
-    expect(r.y).toBeCloseTo(-Angle.toRadians(90));
+    expect(r.y).toBeCloseTo(Angle.toRadians(-90));
   });
 });
 
@@ -285,16 +258,37 @@ describe(Matrix4.transpose, () => {
       const transposed = Matrix4.transpose(matrix);
 
       expect(transposed).toEqual([
-        1, 2, 3, 4,
-        5, 6, 7, 8,
-        9, 10, 11, 12,
-        13, 14, 15, 16
+        1, 5, 9, 13,
+        2, 6, 10, 14,
+        3, 7, 11, 15,
+        4, 8, 12, 16
       ]);
       /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.toObject, () => {
+describe(Matrix4.toObjectColumnMajor, () => {
+  it('converts matrix to column major', () => {
+    /* eslint-disable prettier/prettier */
+      const matrix = Matrix4.fromValues(
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16
+      );
+
+      const values = Matrix4.toObjectColumnMajor(matrix);
+      expect(values).toMatchObject({
+        m11: 1, m12: 5, m13: 9, m14: 13,
+        m21: 2, m22: 6, m23: 10, m24: 14,
+        m31: 3, m32: 7, m33: 11, m34: 15,
+        m41: 4, m42: 8, m43: 12, m44: 16
+      })
+      /* eslint-enable prettier/prettier */
+  });
+});
+
+describe(Matrix4.toObjectRowMajor, () => {
   it('converts matrix to row major', () => {
     /* eslint-disable prettier/prettier */
       const matrix = Matrix4.fromValues(
@@ -304,7 +298,7 @@ describe(Matrix4.toObject, () => {
         13, 14, 15, 16
       );
 
-      const values = Matrix4.toObject(matrix);
+      const values = Matrix4.toObjectRowMajor(matrix);
       expect(values).toMatchObject({
         m11: 1, m12: 2, m13: 3, m14: 4,
         m21: 5, m22: 6, m23: 7, m24: 8,

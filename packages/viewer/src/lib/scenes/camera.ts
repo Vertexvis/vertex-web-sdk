@@ -360,7 +360,7 @@ export abstract class Camera {
       Vector3.cross(Vector3.normalize(this.viewVector), worldX)
     );
 
-    // Invert the world y axis if the provided normal is more than 90 degrees from it
+    // Invert the world y-axis if the provided normal is more than 90 degrees from it
     // to compute a proper angle to rotate the view vector by
     const worldY =
       Vector3.angleTo(normal, positiveWorldY) > Math.PI / 2
@@ -370,7 +370,7 @@ export abstract class Camera {
       ? worldX
       : Vector3.normalize(Vector3.cross(worldY, normal));
 
-    const transformedViewVector = Vector3.transformMatrix(
+    const transformedViewVector = Vector3.multiplyByTransformMatrixRowMajor(
       this.viewVector,
       Matrix4.makeRotation(
         Quaternion.fromAxisAngle(localX, Vector3.angleTo(normal, worldY))

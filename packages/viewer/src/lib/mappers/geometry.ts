@@ -96,22 +96,24 @@ export const fromPbMatrix4f: M.Func<
     M.mapRequiredProp('r3', fromPbVector4f)
   ),
   ([r0, r1, r2, r3]) =>
-    Matrix4.fromValues(
-      r0.x,
-      r0.y,
-      r0.z,
-      r0.w,
-      r1.x,
-      r1.y,
-      r1.z,
-      r1.w,
-      r2.x,
-      r2.y,
-      r2.z,
-      r2.w,
-      r3.x,
-      r3.y,
-      r3.z,
-      r3.w
+    Matrix4.transpose(
+      Matrix4.fromValues(
+        r0.x,
+        r0.y,
+        r0.z,
+        r0.w,
+        r1.x,
+        r1.y,
+        r1.z,
+        r1.w,
+        r2.x,
+        r2.y,
+        r2.z,
+        r2.w,
+        r3.x,
+        r3.y,
+        r3.z,
+        r3.w
+      )
     )
 );

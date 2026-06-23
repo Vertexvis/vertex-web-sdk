@@ -257,7 +257,10 @@ export class ViewerPinGroup {
     projectionViewMatrix: Matrix4.Matrix4,
     dimensions: Dimensions.Dimensions
   ): Point.Point {
-    const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
+    const ndcPt = Vector3.multiplyByTransformMatrixColumnMajor(
+      pt,
+      projectionViewMatrix
+    );
     return Viewport.fromDimensions(dimensions).transformVectorToViewport(ndcPt);
   }
 }

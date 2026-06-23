@@ -16,7 +16,7 @@ export const Renderer3d: FunctionalComponent<Props> = (
   { camera, viewport },
   children
 ) => {
-  const pMatrix = Matrix4.toObject(camera.projectionMatrix);
+  const pMatrix = Matrix4.toObjectColumnMajor(camera.projectionMatrix);
   const fovY = camera.isOrthographic()
     ? ((camera.far * 2) / (camera.fovHeight * 2)) * (viewport.height / 2)
     : pMatrix.m22 * (viewport.height / 2);
@@ -67,7 +67,7 @@ function updateElement(
   camera: FrameCameraBase,
   depthBuffer: DepthBuffer | undefined
 ): void {
-  const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
+  const worldMatrix = Matrix4.multiply(element.matrix, parentWorldMatrix);
 
   const positionWorld = Vector3.fromMatrixPosition(worldMatrix);
   const depthBufferIsNull = depthBuffer == null;
@@ -84,17 +84,28 @@ function updateElement(
   if (element.billboardOff) {
     element.style.transform = getElementCssMatrix(worldMatrix);
   } else {
-    let m = camera.viewMatrix;
-    m = Matrix4.transpose(m);
-    m = Matrix4.position(m, worldMatrix);
-    m = Matrix4.scale(m, element.scale);
+    const originalViewMatrixAsColumnMajor = camera.viewMatrix;
+    const originalViewMatrixAsRowMajor = Matrix4.transpose(
+      originalViewMatrixAsColumnMajor
+    );
+    const viewMatrixWithUpdatedPosition = Matrix4.position(
+      originalViewMatrixAsRowMajor,
+      worldMatrix
+    );
+    const viewMatrixWithUpdatedPositionAndScale = Matrix4.scale(
+      viewMatrixWithUpdatedPosition,
+      element.scale
+    );
 
-    m[3] = 0;
-    m[7] = 0;
-    m[11] = 0;
-    m[15] = 1;
+    // Not sure about this part
+    viewMatrixWithUpdatedPositionAndScale[3] = 0;
+    viewMatrixWithUpdatedPositionAndScale[7] = 0;
+    viewMatrixWithUpdatedPositionAndScale[11] = 0;
+    viewMatrixWithUpdatedPositionAndScale[15] = 1;
 
-    element.style.transform = getElementCssMatrix(m);
+    element.style.transform = getElementCssMatrix(
+      viewMatrixWithUpdatedPositionAndScale
+    );
   }
 
   update3d(element, worldMatrix, viewport, camera, depthBuffer);
@@ -107,7 +118,7 @@ function updateGroup(
   camera: FrameCameraBase,
   depthBuffer: DepthBuffer | undefined
 ): void {
-  const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
+  const worldMatrix = Matrix4.multiply(element.matrix, parentWorldMatrix);
   update3d(element, worldMatrix, viewport, camera, depthBuffer);
 }
 

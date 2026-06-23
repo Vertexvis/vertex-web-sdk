@@ -220,10 +220,6 @@ export class FrameCameraBase {
     return this.computeCameraMatrices().projectionViewMatrix;
   }
 
-  public get frustumProjectionViewMatrix(): Matrix4.Matrix4 {
-    return this.computeCameraMatrices().projectionViewMatrix;
-  }
-
   public static fromBoundingBox(
     camera: FrameCamera.FrameCamera,
     boundingBox: BoundingBox.BoundingBox,
@@ -393,8 +389,8 @@ export class FramePerspectiveCamera extends FrameCameraBase {
       );
       const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
       const projectionViewMatrix = Matrix4.multiply(
-        projectionMatrix,
-        viewMatrix
+        viewMatrix,
+        projectionMatrix
       );
 
       return super.updateCameraMatrices({
@@ -457,21 +453,6 @@ export class FrameOrthographicCamera extends FrameCameraBase {
     return true;
   }
 
-  public override get frustumProjectionViewMatrix(): Matrix4.Matrix4 {
-    const frustumProjectionMatrix = Matrix4.makeFrustum(
-      this.left,
-      this.right,
-      this.top,
-      this.bottom,
-      this.near,
-      this.far
-    );
-    return Matrix4.multiply(
-      frustumProjectionMatrix,
-      this.computeCameraMatrices().viewMatrix
-    );
-  }
-
   protected override computeCameraMatrices(): FrameCameraMatrices {
     if (this.cameraMatrices == null) {
       const viewMatrix = Matrix4.makeLookAtView(
@@ -490,8 +471,8 @@ export class FrameOrthographicCamera extends FrameCameraBase {
       );
       const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
       const projectionViewMatrix = Matrix4.multiply(
-        projectionMatrix,
-        viewMatrix
+        viewMatrix,
+        projectionMatrix
       );
 
       return super.updateCameraMatrices({

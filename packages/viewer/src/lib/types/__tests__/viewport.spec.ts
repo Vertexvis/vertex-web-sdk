@@ -23,8 +23,8 @@ describe('viewport utilities', () => {
       const viewport = new Viewport(100, 100);
 
       const expectedOrigin = Vector3.create(0, 0, -1);
-      const lookAtPoint = Vector3.transformMatrix(
-        Vector3.transformMatrix(
+      const lookAtPoint = Vector3.multiplyByTransformMatrixColumnMajor(
+        Vector3.multiplyByTransformMatrixColumnMajor(
           Vector3.create(-0.8, 0.8, 0.5),
           perspective.projectionMatrixInverse
         ),
@@ -49,8 +49,8 @@ describe('viewport utilities', () => {
     it('creates an orthographic ray', () => {
       const viewport = new Viewport(100, 100);
 
-      const expectedOrigin = Vector3.transformMatrix(
-        Vector3.transformMatrix(
+      const expectedOrigin = Vector3.multiplyByTransformMatrixColumnMajor(
+        Vector3.multiplyByTransformMatrixColumnMajor(
           Vector3.create(-0.8, 0.8, 0),
           orthographic.projectionMatrixInverse
         ),

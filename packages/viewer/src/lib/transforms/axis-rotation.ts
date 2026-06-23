@@ -66,15 +66,15 @@ function computeRotationNdcValues(
   rotationSizeScalar = 1,
   translationSizeScalar = 1
 ): TriangleMeshPoints {
-  const transformedDirection = Vector3.transformMatrix(
+  const transformedDirection = Vector3.multiplyByTransformMatrixRowMajor(
     Vector3.add(xDirection, yDirection),
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
-  const transformedX = Vector3.transformMatrix(
+  const transformedX = Vector3.multiplyByTransformMatrixRowMajor(
     xDirection,
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
-  const transformedY = Vector3.transformMatrix(
+  const transformedY = Vector3.multiplyByTransformMatrixRowMajor(
     yDirection,
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
   );
@@ -132,9 +132,21 @@ function computeRotationNdcValues(
     left,
     right,
     up,
-    Vector3.transformMatrix(base, camera.projectionViewMatrix),
-    Vector3.transformMatrix(left, camera.projectionViewMatrix),
-    Vector3.transformMatrix(right, camera.projectionViewMatrix),
-    Vector3.transformMatrix(up, camera.projectionViewMatrix)
+    Vector3.multiplyByTransformMatrixColumnMajor(
+      base,
+      camera.projectionViewMatrix
+    ),
+    Vector3.multiplyByTransformMatrixColumnMajor(
+      left,
+      camera.projectionViewMatrix
+    ),
+    Vector3.multiplyByTransformMatrixColumnMajor(
+      right,
+      camera.projectionViewMatrix
+    ),
+    Vector3.multiplyByTransformMatrixColumnMajor(
+      up,
+      camera.projectionViewMatrix
+    )
   );
 }

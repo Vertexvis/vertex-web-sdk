@@ -3,13 +3,12 @@ import * as Quaternion from './quaternion';
 import * as Vector3 from './vector3';
 
 /**
- * A type alias representing a 4x4 column-major matrix.
+ * A type alias representing a 4x4 row-major matrix.
  *
  * The common use-case for 4x4 matrices in 3D computer graphics are for
- * [transformation
- * matrices](https://en.wikipedia.org/wiki/Transformation_matrix). This allows a
- * point in 3D space to be projected onto a 2D screen using transformations such
- * as translation, rotation and scale.
+ * [transformation matrices](https://en.wikipedia.org/wiki/Transformation_matrix).
+ * This allows a point in 3D space to be projected onto a 2D screen using
+ * transformations such as translation, rotation and scale.
  */
 export type Matrix4 = [
   /* eslint-disable prettier/prettier */
@@ -67,25 +66,11 @@ export function fromValues(
 ): Matrix4 {
   /* eslint-disable prettier/prettier */
   return [
-    m11, m21, m31, m41,
-    m12, m22, m32, m42,
-    m13, m23, m33, m43,
-    m14, m24, m34, m44,
+    m11, m12, m13, m14,
+    m21, m22, m23, m24,
+    m31, m32, m33, m34,
+    m41, m42, m43, m44,
   ]
-  /* eslint-enable prettier/prettier */
-}
-
-/**
- * Creates a `Matrix4` from an object representation.
- */
-export function fromObject(obj: Matrix4AsObject): Matrix4 {
-  /* eslint-disable prettier/prettier */
-  return fromValues(
-    obj.m11, obj.m12, obj.m13, obj.m14,
-    obj.m21, obj.m22, obj.m23, obj.m24,
-    obj.m31, obj.m32, obj.m33, obj.m34,
-    obj.m41, obj.m42, obj.m43, obj.m44
-  );
   /* eslint-enable prettier/prettier */
 }
 
@@ -160,9 +145,9 @@ export function makeRotation(rotation: Quaternion.Quaternion): Matrix4 {
 
   /* eslint-disable prettier/prettier */
   return [
-    1 - ( yy + zz ), xy + wz, xz - wy, 0,
-    xy - wz, 1 - ( xx + zz ), yz + wx, 0,
-    xz + wy, yz - wx, 1 - ( xx + yy ), 0,
+    1 - ( yy + zz ), xy - wz, xz + wy, 0,
+    xy + wz, 1 - ( xx + zz ), yz - wx, 0,
+    xz - wy, yz + wx, 1 - ( xx + yy ), 0,
     0, 0, 0, 1
   ];
   /* eslint-enable prettier/prettier */
@@ -194,7 +179,7 @@ export function makeScale(scale: Vector3.Vector3): Matrix4 {
 }
 
 /**
- * Creates a matrix that has translation, rotation and scale applied to it.
+ * Creates a matrix that has translation, rotation, and scale applied to it.
  *
  * @param translation The translation applied to the matrix.
  * @param rotation The rotation applied to the matrix.
@@ -206,10 +191,11 @@ export function makeTRS(
   rotation: Quaternion.Quaternion,
   scale: Vector3.Vector3
 ): Matrix4 {
+  // T is row-major and r is column-major. Why does this work?
   const t = makeTranslation(translation);
-  const r = makeRotation(rotation);
+  const r = transpose(makeRotation(rotation));
   const s = makeScale(scale);
-  return multiply(multiply(t, r), s);
+  return multiply(s, multiply(r, t));
 }
 
 /**
@@ -217,15 +203,15 @@ export function makeTRS(
  * the following x, y, and z axis.
  *
  * ```
- * x.x  y.x  z.x  0
- * x.y  y.y  z.y  0
- * x.z  y.z  z.z  0
+ * x.x  x.y  x.z  0
+ * y.x  y.y  y.z  0
+ * z.x  z.y  z.z  0
  * 0    0    0    0
  * ```
  *
- * @param x The x axis to set.
- * @param y The y axis to set.
- * @param z The z axis to set.
+ * @param x The x-axis to set.
+ * @param y The y-axis to set.
+ * @param z The z-axis to set.
  * @returns A matrix with its basis components populated.
  */
 export function makeBasis(
@@ -239,37 +225,6 @@ export function makeBasis(
     y.x, y.y, y.z, 0,
     z.x, z.y, z.z, 0,
     0, 0, 0, 1
-  ]
-  /* eslint-enable prettier/prettier */
-}
-
-/**
- * Creates a rotation matrix that is rotated around a given axis by the given
- * angle.
- *
- * @param axis The axis of rotation.
- * @param radians The angle of rotation.
- * @returns A rotation matrix.
- */
-export function makeRotationAxis(
-  axis: Vector3.Vector3,
-  radians: number
-): Matrix4 {
-  const c = Math.cos(radians);
-  const s = Math.sin(radians);
-  const t = 1 - c;
-
-  const { x, y, z } = axis;
-
-  const tx = t * x;
-  const ty = t * y;
-
-  /* eslint-disable prettier/prettier */
-  return [
-    tx * x + c,       tx * y + s * z,   tx * z - s * y,   0,
-    tx * y - s * z,   ty * y + c,       ty * z + s * x,   0,
-    tx * z + s * y,   ty * z - s * x,   t * z * z + c,    0,
-    0,                0,                0,                1
   ]
   /* eslint-enable prettier/prettier */
 }
@@ -506,34 +461,34 @@ export function invert(matrix: Matrix4): Matrix4 {
   const b11 = a22 * a33 - a23 * a32;
 
   // Calculate the determinant
-  let det =
+  const det =
     b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
   if (!det) {
     return makeZero();
   }
-  det = 1.0 / det;
+  const oneOverDet = 1.0 / det;
 
   return [
-    (a11 * b11 - a12 * b10 + a13 * b09) * det,
-    (a02 * b10 - a01 * b11 - a03 * b09) * det,
-    (a31 * b05 - a32 * b04 + a33 * b03) * det,
-    (a22 * b04 - a21 * b05 - a23 * b03) * det,
+    (a11 * b11 - a12 * b10 + a13 * b09) * oneOverDet,
+    (a02 * b10 - a01 * b11 - a03 * b09) * oneOverDet,
+    (a31 * b05 - a32 * b04 + a33 * b03) * oneOverDet,
+    (a22 * b04 - a21 * b05 - a23 * b03) * oneOverDet,
 
-    (a12 * b08 - a10 * b11 - a13 * b07) * det,
-    (a00 * b11 - a02 * b08 + a03 * b07) * det,
-    (a32 * b02 - a30 * b05 - a33 * b01) * det,
-    (a20 * b05 - a22 * b02 + a23 * b01) * det,
+    (a12 * b08 - a10 * b11 - a13 * b07) * oneOverDet,
+    (a00 * b11 - a02 * b08 + a03 * b07) * oneOverDet,
+    (a32 * b02 - a30 * b05 - a33 * b01) * oneOverDet,
+    (a20 * b05 - a22 * b02 + a23 * b01) * oneOverDet,
 
-    (a10 * b10 - a11 * b08 + a13 * b06) * det,
-    (a01 * b08 - a00 * b10 - a03 * b06) * det,
-    (a30 * b04 - a31 * b02 + a33 * b00) * det,
-    (a21 * b02 - a20 * b04 - a23 * b00) * det,
+    (a10 * b10 - a11 * b08 + a13 * b06) * oneOverDet,
+    (a01 * b08 - a00 * b10 - a03 * b06) * oneOverDet,
+    (a30 * b04 - a31 * b02 + a33 * b00) * oneOverDet,
+    (a21 * b02 - a20 * b04 - a23 * b00) * oneOverDet,
 
-    (a11 * b07 - a10 * b09 - a12 * b06) * det,
-    (a00 * b09 - a01 * b07 + a02 * b06) * det,
-    (a31 * b01 - a30 * b03 - a32 * b00) * det,
-    (a20 * b03 - a21 * b01 + a22 * b00) * det,
+    (a11 * b07 - a10 * b09 - a12 * b06) * oneOverDet,
+    (a00 * b09 - a01 * b07 + a02 * b06) * oneOverDet,
+    (a31 * b01 - a30 * b03 - a32 * b00) * oneOverDet,
+    (a20 * b03 - a21 * b01 + a22 * b00) * oneOverDet,
   ];
 }
 
@@ -576,76 +531,37 @@ export function lookAt(
 
   const res: Matrix4 = [...m];
   /* eslint-disable prettier/prettier */
-  res[0] = x.x; res[4] = y.x; res[8] = z.x;
-  res[1] = x.y; res[5] = y.y; res[9] = z.y;
-  res[2] = x.z; res[6] = y.z; res[10] = z.z;
+  res[0] = x.x; res[1] = x.y; res[2] = x.z;
+  res[4] = y.x; res[5] = y.y; res[6] = y.z;
+  res[8] = z.x; res[9] = z.y; res[10] = z.z;
   /* eslint-enable prettier/prettier */
   return res;
 }
 
 /**
- * Returns a post-multiplied matrix.
+ * Returns a post-multiplied matrix equal to ab.
  */
 export function multiply(a: Matrix4, b: Matrix4): Matrix4 {
-  const ae = a;
-  const be = b;
+  const result = makeIdentity();
 
-  const a11 = ae[0],
-    a12 = ae[4],
-    a13 = ae[8],
-    a14 = ae[12];
-  const a21 = ae[1],
-    a22 = ae[5],
-    a23 = ae[9],
-    a24 = ae[13];
-  const a31 = ae[2],
-    a32 = ae[6],
-    a33 = ae[10],
-    a34 = ae[14];
-  const a41 = ae[3],
-    a42 = ae[7],
-    a43 = ae[11],
-    a44 = ae[15];
+  // Consider each row i in the final matrix
+  for (let i = 0; i < 4; i++) {
+    // Consider each column j in the final matrix
+    for (let j = 0; j < 4; j++) {
+      // Calculate the value at row i and column j
+      let value = 0;
 
-  const b11 = be[0],
-    b12 = be[4],
-    b13 = be[8],
-    b14 = be[12];
-  const b21 = be[1],
-    b22 = be[5],
-    b23 = be[9],
-    b24 = be[13];
-  const b31 = be[2],
-    b32 = be[6],
-    b33 = be[10],
-    b34 = be[14];
-  const b41 = be[3],
-    b42 = be[7],
-    b43 = be[11],
-    b44 = be[15];
+      for (let k = 0; k < 4; k++) {
+        // Calculate (ik + kj) and add it to the value
+        value += a[i * 4 + k] * b[k * 4 + j];
+      }
 
-  const mat = makeIdentity();
-  mat[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
-  mat[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
-  mat[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
-  mat[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+      const positionInResultingMatrix = 4 * i + j;
+      result[positionInResultingMatrix] = value;
+    }
+  }
 
-  mat[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
-  mat[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
-  mat[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
-  mat[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
-
-  mat[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
-  mat[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
-  mat[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
-  mat[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
-
-  mat[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
-  mat[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
-  mat[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
-  mat[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
-
-  return mat;
+  return result;
 }
 
 /**
@@ -664,25 +580,32 @@ export function transpose(matrix: Matrix4): Matrix4 {
 }
 
 /**
- * Multiplies the columns of a matrix by the given vector.
+ * Multiplies the columns of a row-major matrix by the given vector.
  */
 export function scale(matrix: Matrix4, scale: Vector3.Vector3): Matrix4 {
   const { x, y, z } = scale;
   const m: Matrix4 = [...matrix];
   /* eslint-disable prettier/prettier */
-  m[0] *= x; m[4] *= y; m[8] *= z;
-  m[1] *= x; m[5] *= y; m[9] *= z;
-  m[2] *= x; m[6] *= y; m[10] *= z;
-  m[3] *= x; m[7] *= y; m[11] *= z;
+  m[0] *= x; m[1] *= x; m[2] *= x; m[3] *= x;
+  m[4] *= y; m[5] *= y; m[6] *= y; m[7] *= y;
+  m[8] *= z; m[9] *= z; m[10] *= z; m[11] *= z;
   /* eslint-enable prettier/prettier */
   return m;
 }
 
-export function position(matrix: Matrix4, other: Matrix4): Matrix4 {
-  const m: Matrix4 = [...matrix];
-  m[12] = other[12];
-  m[13] = other[13];
-  m[14] = other[14];
+/**
+ * Sets the position of the matrix given as the first parameter
+ * to the position of the matrix given as the second parameter.
+ * Both matrices should have row-major format.
+ */
+export function position(
+  originalMatrix: Matrix4,
+  matrixWithDesiredPosition: Matrix4
+): Matrix4 {
+  const m: Matrix4 = [...originalMatrix];
+  m[12] = matrixWithDesiredPosition[12];
+  m[13] = matrixWithDesiredPosition[13];
+  m[14] = matrixWithDesiredPosition[14];
   return m;
 }
 
@@ -698,13 +621,27 @@ export function isIdentity(matrix: Matrix4): boolean {
 /**
  * Returns an object representation of a `Matrix4`.
  */
-export function toObject(m: Matrix4): Matrix4AsObject {
+export function toObjectColumnMajor(m: Matrix4): Matrix4AsObject {
   /* eslint-disable prettier/prettier */
   return {
     m11: m[0], m12: m[4], m13: m[8], m14: m[12],
     m21: m[1], m22: m[5], m23: m[9], m24: m[13],
     m31: m[2], m32: m[6], m33: m[10], m34: m[14],
     m41: m[3], m42: m[7], m43: m[11], m44: m[15],
+  }
+  /* eslint-enable prettier/prettier */
+}
+
+/**
+ * Returns an object representation of a `Matrix4`.
+ */
+export function toObjectRowMajor(m: Matrix4): Matrix4AsObject {
+  /* eslint-disable prettier/prettier */
+  return {
+    m11: m[0], m12: m[1], m13: m[2], m14: m[3],
+    m21: m[4], m22: m[5], m23: m[6], m24: m[7],
+    m31: m[8], m32: m[9], m33: m[10], m34: m[11],
+    m41: m[12], m42: m[13], m43: m[14], m44: m[15],
   }
   /* eslint-enable prettier/prettier */
 }

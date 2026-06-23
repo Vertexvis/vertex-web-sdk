@@ -11,8 +11,8 @@ describe('transformation delta functions', () => {
     const direction = Vector3.normalize(Vector3.cross(normal1, normal2));
 
     const angle = Vector3.angleTo(normal2, normal1);
-    return Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(direction, angle + Math.PI)
+    return Matrix4.transpose(
+      Matrix4.makeRotation(Quaternion.fromAxisAngle(direction, angle + Math.PI))
     );
   };
   describe('calculateOrthogonalCoordinate', () => {
@@ -198,7 +198,7 @@ describe('transformation delta functions', () => {
       const normal1 = randomNormalVector3();
       const normal2 = randomNormalVector3();
 
-      const matrix = Matrix4.toObject(
+      const matrix = Matrix4.toObjectColumnMajor(
         TransformationDelta.computeTransformationDelta(
           normal1,
           position,
@@ -207,7 +207,7 @@ describe('transformation delta functions', () => {
         )
       );
 
-      const expectedTranslationMatrixDelta = Matrix4.toObject(
+      const expectedTranslationMatrixDelta = Matrix4.toObjectColumnMajor(
         TransformationDelta.computeRotationMatrix(normal1, normal2)
       );
 

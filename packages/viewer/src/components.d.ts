@@ -61,7 +61,7 @@ import { PinController } from "./lib/pins/controller";
 import { SpinnerSize } from "./components/viewer-spinner/viewer-spinner";
 import { ViewerTeleportMode, WalkModeModel } from "./lib/walk-mode/model";
 import { WalkModeController } from "./lib/walk-mode/controller";
-import { TransformController } from "./lib/transforms/controller";
+import { TransformController } from "./lib/transforms";
 import { ModifierKey } from "./lib/types/keys";
 import { Drawable } from "./lib/transforms/drawable";
 export { FilterOptions, MetadataKey, RowArg, RowDataProvider, SceneTreeOperationOptions, ScrollToOptions, SelectItemOptions } from "./components/scene-tree/types";
@@ -120,7 +120,7 @@ export { PinController } from "./lib/pins/controller";
 export { SpinnerSize } from "./components/viewer-spinner/viewer-spinner";
 export { ViewerTeleportMode, WalkModeModel } from "./lib/walk-mode/model";
 export { WalkModeController } from "./lib/walk-mode/controller";
-export { TransformController } from "./lib/transforms/controller";
+export { TransformController } from "./lib/transforms";
 export { ModifierKey } from "./lib/types/keys";
 export { Drawable } from "./lib/transforms/drawable";
 export namespace Components {
@@ -920,7 +920,7 @@ export namespace Components {
          */
         "billboardOff": boolean;
         /**
-          * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
+          * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when it's detached.
           * @example 
 * ```html
 * <style>
@@ -3411,7 +3411,7 @@ declare namespace LocalJSX {
          */
         "billboardOff"?: boolean;
         /**
-          * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when its detached.
+          * **EXPERIMENTAL** Indicates if the element is detached from geometry. This property can be used with a CSS selector to modify the appearance of the element when it's detached.
           * @example 
 * ```html
 * <style>

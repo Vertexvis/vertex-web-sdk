@@ -43,7 +43,7 @@ export function computeRotationMatrix(
     const axisDirection = calculateOrthogonalCoordinate(normal1);
 
     const quaternion = Quaternion.fromAxisAngle(axisDirection, Math.PI);
-    return Matrix4.makeRotation(quaternion);
+    return Matrix4.transpose(Matrix4.makeRotation(quaternion));
   }
   // the angle is almost 180 in this case.
   else if (dot <= -ALMOST_ONE) {
@@ -53,8 +53,10 @@ export function computeRotationMatrix(
   else {
     const angle = Vector3.angleTo(normal2, normal1);
     const axisDirection = Vector3.normalize(Vector3.cross(normal1, normal2));
-    return Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(axisDirection, angle + Math.PI)
+    return Matrix4.transpose(
+      Matrix4.makeRotation(
+        Quaternion.fromAxisAngle(axisDirection, angle + Math.PI)
+      )
     );
   }
 }
@@ -82,7 +84,7 @@ export function computeTransformationDelta(
 
   const translationDeltaMatrix = Matrix4.makeTranslation(position2);
   return Matrix4.multiply(
-    Matrix4.multiply(translationDeltaMatrix, rotationMatrix),
-    Matrix4.makeTranslation(Vector3.negate(position1))
+    Matrix4.makeTranslation(Vector3.negate(position1)),
+    Matrix4.multiply(rotationMatrix, translationDeltaMatrix)
   );
 }
