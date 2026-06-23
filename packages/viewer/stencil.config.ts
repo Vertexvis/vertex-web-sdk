@@ -1,9 +1,9 @@
-import { Config } from '@stencil/core';
-import { reactOutputTarget } from '@stencil/react-output-target';
-import { vueOutputTarget } from '@stencil/vue-output-target';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
+import { Config } from '@stencil/core';
+import { reactOutputTarget } from '@stencil/react-output-target';
+import { vueOutputTarget } from '@stencil/vue-output-target';
 import workers from '@vertexvis/rollup-plugin-web-workers';
 import * as path from 'path';
 import type { Plugin } from 'rollup';
