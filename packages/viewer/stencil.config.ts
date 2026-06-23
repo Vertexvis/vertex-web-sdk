@@ -1,11 +1,12 @@
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
 import { vueOutputTarget } from '@stencil/vue-output-target';
+import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
 import workers from '@vertexvis/rollup-plugin-web-workers';
+import * as path from 'path';
 import type { Plugin } from 'rollup';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
 import * as ts from 'typescript';
 
 import jestConfig from './jest-shared.config';
@@ -18,8 +19,9 @@ export const config: Config = {
   plugins: [
     workers({
       plugins: [
+        resolveThreadsEsm(),
         commonjs(),
-        resolve({ browser: true }),
+        nodeResolve({ browser: true }),
         workerTypescript(),
         terser(),
       ],
@@ -87,6 +89,24 @@ function workerTypescript(): Plugin {
       });
 
       return { code: output.outputText, map: null };
+    },
+  };
+}
+
+function resolveThreadsEsm(): Plugin {
+  return {
+    name: 'resolve-threads-esm',
+    resolveId(source: string) {
+      if (source !== 'threads') {
+        return null;
+      }
+
+      // Preserve the legacy resolver behavior. The package exports default
+      // points at index.mjs, which omits `expose`; the module build includes it.
+      return path.resolve(
+        process.cwd(),
+        '../../node_modules/threads/dist-esm/index.js'
+      );
     },
   };
 }
