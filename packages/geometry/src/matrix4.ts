@@ -467,7 +467,7 @@ export function invert(matrix: Matrix4): Matrix4 {
   if (!det) {
     return makeZero();
   }
-  const oneOverDet = 1.0 / det;
+  const oneOverDet = 1 / det;
 
   return [
     (a11 * b11 - a12 * b10 + a13 * b09) * oneOverDet,

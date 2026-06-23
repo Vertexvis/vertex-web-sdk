@@ -97,7 +97,6 @@ function updateElement(
       element.scale
     );
 
-    // Not sure about this part
     viewMatrixWithUpdatedPositionAndScale[3] = 0;
     viewMatrixWithUpdatedPositionAndScale[7] = 0;
     viewMatrixWithUpdatedPositionAndScale[11] = 0;

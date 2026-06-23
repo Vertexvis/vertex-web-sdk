@@ -110,7 +110,7 @@ export function fromMatrixRotation(matrix: Matrix4.Matrix4): Quaternion {
 
   const trace = sM.m11 + sM.m22 + sM.m33;
   if (trace > 0) {
-    const s = Math.sqrt(trace + 1.0) * 2;
+    const s = Math.sqrt(trace + 1) * 2;
     return {
       x: (sM.m23 - sM.m32) / s,
       y: (sM.m31 - sM.m13) / s,
@@ -118,7 +118,7 @@ export function fromMatrixRotation(matrix: Matrix4.Matrix4): Quaternion {
       w: 0.25 * s,
     };
   } else if (sM.m11 > sM.m22 && sM.m11 > sM.m33) {
-    const s = Math.sqrt(1.0 + sM.m11 - sM.m22 - sM.m33) * 2;
+    const s = Math.sqrt(1 + sM.m11 - sM.m22 - sM.m33) * 2;
     return {
       x: 0.25 * s,
       y: (sM.m12 + sM.m21) / s,
@@ -126,7 +126,7 @@ export function fromMatrixRotation(matrix: Matrix4.Matrix4): Quaternion {
       w: (sM.m23 - sM.m32) / s,
     };
   } else if (sM.m22 > sM.m33) {
-    const s = Math.sqrt(1.0 + sM.m22 - sM.m11 - sM.m33) * 2;
+    const s = Math.sqrt(1 + sM.m22 - sM.m11 - sM.m33) * 2;
     return {
       x: (sM.m12 + sM.m21) / s,
       y: 0.25 * s,
@@ -134,7 +134,7 @@ export function fromMatrixRotation(matrix: Matrix4.Matrix4): Quaternion {
       w: (sM.m31 - sM.m13) / s,
     };
   } else {
-    const s = Math.sqrt(1.0 + sM.m33 - sM.m11 - sM.m22) * 2;
+    const s = Math.sqrt(1 + sM.m33 - sM.m11 - sM.m22) * 2;
     return {
       x: (sM.m31 + sM.m13) / s,
       y: (sM.m23 + sM.m32) / s,
