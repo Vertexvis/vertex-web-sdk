@@ -300,7 +300,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
   }
 
-  protected async handleMouseWheel(event: WheelEvent): Promise<void> {
+  protected handleMouseWheel(event: WheelEvent): void {
     event.preventDefault();
 
     if (
@@ -312,28 +312,32 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
       const rect = this.element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
+      const scrollSize = Math.abs(event.deltaY);
 
-      if (Math.abs(event.deltaY) < 10) {
+      if (scrollSize < 12) {
         // For small wheel movements, send a single zoom event.
-        await this.zoomInteraction.zoomToPoint(
+        void this.zoomInteraction.zoomToPoint(
           point,
           delta,
           this.interactionApi
         );
       } else {
-        // For large wheel movements, divide the delta into 10 equal zoom events.
-        // This results in a smoother zoom experience for the end user.
-        for (let index = 1; index <= 10; index++) {
+        const divisions = Math.min(10, Math.ceil(scrollSize / 12));
+        const zoomDelta = delta / divisions;
+        // For larger wheel movements, divide the delta into multiple zoom events with increasing delay
+        // which approximates a smooth zoom deceleration curve for the end user.
+        for (let i = 1; i <= divisions; i++) {
+          const delayMs = i * 5;
           window.setTimeout(() => {
             if (this.interactionApi != null) {
-              const zoomDelta = delta / 10;
               this.zoomInteraction.zoomToPoint(
                 point,
                 zoomDelta,
-                this.interactionApi
+                this.interactionApi,
+                delayMs
               );
             }
-          }, index * 5);
+          }, delayMs);
         }
       }
     }
