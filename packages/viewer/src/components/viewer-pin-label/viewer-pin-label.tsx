@@ -58,7 +58,7 @@ export class VertexPinLabel {
   /**
    * The controller that drives behavior for pin operations
    */
-  @Prop()
+  @Prop({ mutable: true })
   public pinController?: PinController;
 
   /**
@@ -160,6 +160,10 @@ export class VertexPinLabel {
   protected componentWillLoad(): void {
     this.value = this.pin?.label.text ?? '';
     this.computeScreenPosition();
+
+    if (this.pinController == null) {
+      this.pinController = new PinController(new PinModel());
+    }
   }
 
   protected componentDidLoad(): void {
@@ -175,10 +179,6 @@ export class VertexPinLabel {
 
     if (this.contentEl != null) {
       this.contentResizeObserver.observe(this.contentEl);
-    }
-
-    if (this.pinController == null) {
-      this.pinController = new PinController(new PinModel());
     }
   }
 

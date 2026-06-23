@@ -226,6 +226,7 @@ export class SceneTreeTableLayout {
   public componentWillLoad(): void {
     this.updateColumnElements();
     this.createPools();
+    this.initializeColumnLayout();
 
     this.headerResizeObserver = new ResizeObserver(() => {
       this.stateMap.headerHeight = undefined;
@@ -243,13 +244,6 @@ export class SceneTreeTableLayout {
   }
 
   public async componentDidLoad(): Promise<void> {
-    this.computeInitialColumnWidths();
-    this.computeColumnGridLayout();
-    this.ensureDividerTemplateDefined();
-    this.computeCellHeight();
-    this.computeHeaderHeight();
-    this.rebindHeaderData();
-
     this.tableElement?.addEventListener('scroll', this.handleScrollChanged, {
       passive: true,
     });
@@ -259,6 +253,11 @@ export class SceneTreeTableLayout {
     }
 
     this.resizeObserver?.observe(this.hostEl);
+
+    // These measurements require rendered DOM, but mutating tracked values
+    // directly in componentDidLoad triggers Stencil dev warnings.
+    await Promise.resolve();
+    await this.initializeMeasuredLayout();
   }
 
   public async componentWillRender(): Promise<void> {
@@ -390,6 +389,18 @@ export class SceneTreeTableLayout {
       this.viewportEndIndex = endIndex;
       this.stateMap.viewportRows = rows;
     }
+  }
+
+  private initializeColumnLayout(): void {
+    this.computeInitialColumnWidths();
+    this.computeColumnGridLayout();
+    this.ensureDividerTemplateDefined();
+    this.rebindHeaderData();
+  }
+
+  private async initializeMeasuredLayout(): Promise<void> {
+    await this.computeCellHeight();
+    this.computeHeaderHeight();
   }
 
   private async computeAndUpdateViewportRows(): Promise<void> {

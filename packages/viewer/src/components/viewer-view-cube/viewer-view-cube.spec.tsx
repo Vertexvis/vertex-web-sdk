@@ -181,16 +181,18 @@ describe('vertex-viewer-view-cube interactions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
+    Object.assign(viewer, {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    });
     resetAwaiter(sceneMock);
   });
 
   it('performs standard view when side clicked', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube />,
+      template: () => <vertex-viewer-view-cube viewer={viewer} />,
     });
-
-    page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.querySelector(
       '.cube-side-face-front'
@@ -218,10 +220,10 @@ describe('vertex-viewer-view-cube interactions', () => {
   it('performs a standard view without a fit all when side clicked with viewAll set to false', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube viewAll={false} />,
+      template: () => (
+        <vertex-viewer-view-cube viewer={viewer} viewAll={false} />
+      ),
     });
-
-    page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.querySelector(
       '.cube-side-face-front'
@@ -253,10 +255,8 @@ describe('vertex-viewer-view-cube interactions', () => {
 
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube />,
+      template: () => <vertex-viewer-view-cube viewer={viewer} />,
     });
-
-    page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.querySelector(
       '.cube-side-face-front'
@@ -284,10 +284,10 @@ describe('vertex-viewer-view-cube interactions', () => {
   it('does not animation if animation duration is 0', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube animationDuration={0} />,
+      template: () => (
+        <vertex-viewer-view-cube viewer={viewer} animationDuration={0} />
+      ),
     });
-
-    page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.querySelector(
       '.cube-side-face-front'
@@ -302,10 +302,10 @@ describe('vertex-viewer-view-cube interactions', () => {
   it('does not perform standard view if disabled', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube standardViewsOff />,
+      template: () => (
+        <vertex-viewer-view-cube viewer={viewer} standardViewsOff />
+      ),
     });
-
-    page.rootInstance.viewer = viewer;
 
     const frontEl = page.root?.shadowRoot?.querySelector(
       '.cube-side-face-front'

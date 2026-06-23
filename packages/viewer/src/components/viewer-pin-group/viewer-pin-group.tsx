@@ -62,7 +62,7 @@ export class ViewerPinGroup {
   /**
    * The controller that drives behavior for pin operations
    */
-  @Prop()
+  @Prop({ mutable: true })
   public pinController?: PinController;
 
   /**
@@ -92,12 +92,14 @@ export class ViewerPinGroup {
 
   private resizeObserver?: ResizeObserver;
 
-  protected componentDidLoad(): void {
-    this.setLabelObserver();
-
+  protected componentWillLoad(): void {
     if (this.pinController == null) {
       this.pinController = new PinController(this.pinModel);
     }
+  }
+
+  protected componentDidLoad(): void {
+    this.setLabelObserver();
 
     if (this.selected) {
       this.labelEl?.setFocus();
