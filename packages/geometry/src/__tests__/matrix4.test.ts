@@ -84,8 +84,6 @@ describe(Matrix4.makeTRS, () => {
     const s = Vector3.create(1, 2, 3);
     const m = Matrix4.makeTRS(t, r, s);
 
-    console.log(m);
-
     const tt = Vector3.fromMatrixPosition(m);
     const rr = Euler.fromRotationMatrix(m, 'xyz');
     const ss = Vector3.fromMatrixScale(m);
