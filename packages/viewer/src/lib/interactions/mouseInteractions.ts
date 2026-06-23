@@ -204,14 +204,14 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   /**
-   * if this value gets too low, can cause animation jitter in certain scenarios
+   * If this value gets too low, can cause animation jitter in certain scenarios
    */
   private getInteractionDelay(): number {
     return this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
   }
 
   /**
-   * uses a configured interaction delay, but certain interactions like wheel zoom benefit from extra delay
+   * Uses a configured interaction delay, but certain interactions like wheel zoom benefit from extra delay
    */
   private startInteractionTimer(api: InteractionApi, extraDelayMs = 0): void {
     this.interactionTimer = window.setTimeout(async () => {
@@ -237,7 +237,7 @@ export class ZoomInteraction extends MouseInteraction {
     }
 
     this.resetInteractionTimer(api, extraDelayMs);
-    await f();
+    f();
   }
 }
 
