@@ -36,7 +36,7 @@ export class ViewerMeasurementDetails {
    * which can then be used to update the display.
    */
   @Prop()
-  public measurementModel?: MeasurementModel;
+  public measurementModel?: MeasurementModel = new MeasurementModel();
 
   /**
    * The manager that the component will use to present measurement overlays.
@@ -118,10 +118,7 @@ export class ViewerMeasurementDetails {
    * @internal
    */
   protected connectedCallback(): void {
-    this.onOutcomeChangedHandler = this.measurementModel?.onOutcomeChanged(
-      this.handleOutcomeChange
-    );
-    this.updateStateFromModel();
+    this.handleMeasurementModelChanged();
   }
 
   /**
@@ -134,7 +131,7 @@ export class ViewerMeasurementDetails {
   /**
    * @internal
    */
-  @Watch('distanceUnits')
+  @Watch('distanceUnits', { immediate: true })
   protected handleDistanceUnitsChanged(): void {
     this.distanceMeasurementUnits = new DistanceUnits(this.distanceUnits);
     this.areaMeasurementUnits = new AreaUnits(this.distanceUnits);
@@ -143,7 +140,7 @@ export class ViewerMeasurementDetails {
   /**
    * @internal
    */
-  @Watch('angleUnits')
+  @Watch('angleUnits', { immediate: true })
   protected handleAngleUnitsChanged(): void {
     this.angleMeasurementUnits = new AngleUnits(this.angleUnits);
   }
@@ -151,7 +148,7 @@ export class ViewerMeasurementDetails {
   /**
    * @internal
    */
-  @Watch('measurementModel')
+  @Watch('measurementModel', { immediate: true })
   protected handleMeasurementModelChanged(): void {
     this.onOutcomeChangedHandler?.dispose();
     this.onOutcomeChangedHandler = this.measurementModel?.onOutcomeChanged(
