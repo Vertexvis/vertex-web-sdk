@@ -1,7 +1,6 @@
-import config from './jest-shared.config';
+import config from './jest-shared.config.js';
 
 export default {
   ...config,
   preset: '@stencil/core/testing',
-  testRunner: 'jasmine2',
 };
