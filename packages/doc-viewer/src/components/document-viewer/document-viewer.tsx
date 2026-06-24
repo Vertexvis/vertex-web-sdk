@@ -123,6 +123,7 @@ export class VertexDocumentViewer implements BasicViewer {
     this.handlePageLoaded = this.handlePageLoaded.bind(this);
     this.handlePageDrawn = this.handlePageDrawn.bind(this);
 
+    this.layers = new DocumentLayersController();
     this.resizeObserver = new ResizeObserver(this.handleElementResize);
 
     this.registerSlotChangeListeners();
@@ -138,7 +139,7 @@ export class VertexDocumentViewer implements BasicViewer {
     this.resizeObserver?.observe(this.hostEl);
 
     this.updateComponentDimensions();
-    this.handleSrcChange();
+    this.loadInitialSrc();
 
     this.injectViewerApi();
   }
@@ -224,7 +225,7 @@ export class VertexDocumentViewer implements BasicViewer {
       const { api, renderer } = this.provider.create(this.canvasEl, this.config);
       this.documentApi = api;
       this.documentRenderer = renderer;
-      this.layers = new DocumentLayersController(api);
+      this.layers?.setApi(api);
       this.updateInteractionHandler();
       this.updateDocumentApiListeners();
 
@@ -274,6 +275,11 @@ export class VertexDocumentViewer implements BasicViewer {
     return this.documentApi;
   }
 
+  private async loadInitialSrc(): Promise<void> {
+    await Promise.resolve();
+    await this.handleSrcChange();
+  }
+
   private clearCurrentDocument(): void {
     this.documentRenderer?.dispose();
     this.documentApi?.dispose();
@@ -281,7 +287,13 @@ export class VertexDocumentViewer implements BasicViewer {
     this.documentApiStateChangedDisposable?.dispose();
     this.pageLoadedDisposable?.dispose();
     this.pageDrawnDisposable?.dispose();
-    this.layers = undefined;
+    this.documentRenderer = undefined;
+    this.documentApi = undefined;
+    this.panInteractionHandler = undefined;
+    this.documentApiStateChangedDisposable = undefined;
+    this.pageLoadedDisposable = undefined;
+    this.pageDrawnDisposable = undefined;
+    this.layers?.clear();
   }
 
   private handleDocumentApiStateChanged(state: DocumentApiState): void {
