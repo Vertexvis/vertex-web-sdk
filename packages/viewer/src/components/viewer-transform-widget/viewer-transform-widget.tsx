@@ -262,9 +262,6 @@ export class ViewerTransformWidget {
   @State()
   protected isEndingTransform = false;
 
-  @State()
-  protected inputShouldFocus = false;
-
   @Element()
   private hostEl!: HTMLElement;
 
@@ -293,6 +290,7 @@ export class ViewerTransformWidget {
   private canvasRef?: HTMLCanvasElement;
   private inputWrapperRef?: HTMLDivElement;
   private inputRef?: HTMLInputElement;
+  private inputShouldFocus = false;
 
   private hoveredChangeDisposable?: Disposable;
 
@@ -541,8 +539,8 @@ export class ViewerTransformWidget {
             ref={(el) => {
               if (el != null) {
                 this.inputResizeObserver?.observe(el);
-              } else if (this.inputRef != null) {
-                this.inputResizeObserver?.unobserve(this.inputRef);
+              } else if (this.inputWrapperRef != null) {
+                this.inputResizeObserver?.unobserve(this.inputWrapperRef);
               }
               this.inputWrapperRef = el;
             }}

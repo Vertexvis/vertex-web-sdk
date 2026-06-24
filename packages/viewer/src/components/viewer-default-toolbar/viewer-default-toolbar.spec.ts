@@ -1,5 +1,6 @@
 jest.mock('../viewer/viewer');
 
+import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 import {
@@ -34,11 +35,8 @@ describe('<vertex-viewer-default-toolbar>', () => {
     it('performs fit all with animation when fit all button is clicked', async () => {
       const page = await newSpecPage({
         components: [ViewerDefaultToolbar],
-        html: `<vertex-viewer-default-toolbar></vertex-viewer-default-toolbar>`,
+        template: () => h('vertex-viewer-default-toolbar', { viewer }),
       });
-
-      page.rootInstance.viewer = viewer;
-      await page.waitForChanges();
 
       const btn = page.root?.shadowRoot?.querySelector(
         '[data-testid="fit-all-btn"]'
@@ -58,11 +56,12 @@ describe('<vertex-viewer-default-toolbar>', () => {
     it('performs fit all without animation if disabled', async () => {
       const page = await newSpecPage({
         components: [ViewerDefaultToolbar],
-        html: `<vertex-viewer-default-toolbar animations-disabled></vertex-viewer-default-toolbar>`,
+        template: () =>
+          h('vertex-viewer-default-toolbar', {
+            animationsDisabled: true,
+            viewer,
+          }),
       });
-
-      page.rootInstance.viewer = viewer;
-      await page.waitForChanges();
 
       const btn = page.root?.shadowRoot?.querySelector(
         '[data-testid="fit-all-btn"]'

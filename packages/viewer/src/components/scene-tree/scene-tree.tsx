@@ -725,6 +725,7 @@ export class SceneTree {
     );
 
     this.connectToViewer();
+    this.updateMissingViewerError();
   }
 
   /**
@@ -744,13 +745,6 @@ export class SceneTree {
     this.stateMap.componentLoaded = true;
 
     this.controller?.setMetadataKeys(this.metadataKeys);
-
-    if (this.viewer == null) {
-      this.errorDetails = new SceneTreeErrorDetails(
-        'MISSING_VIEWER',
-        SceneTreeErrorCode.MISSING_VIEWER
-      );
-    }
   }
 
   public componentWillRender(): void {
@@ -896,6 +890,8 @@ export class SceneTree {
     }
 
     if (this.viewer != null) {
+      this.clearMissingViewerError();
+
       const handleSceneReady = async (): Promise<void> => {
         const layoutEl = this.getLayoutElement();
 
@@ -912,6 +908,24 @@ export class SceneTree {
       };
     } else {
       this.attemptingRetry = false;
+      if (this.stateMap.componentLoaded) {
+        this.updateMissingViewerError();
+      }
+    }
+  }
+
+  private updateMissingViewerError(): void {
+    if (this.viewer == null) {
+      this.errorDetails = new SceneTreeErrorDetails(
+        'MISSING_VIEWER',
+        SceneTreeErrorCode.MISSING_VIEWER
+      );
+    }
+  }
+
+  private clearMissingViewerError(): void {
+    if (this.errorDetails?.code === SceneTreeErrorCode.MISSING_VIEWER) {
+      this.errorDetails = undefined;
     }
   }
 
