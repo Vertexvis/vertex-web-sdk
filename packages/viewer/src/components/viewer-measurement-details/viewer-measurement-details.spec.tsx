@@ -78,6 +78,46 @@ describe('vertex-viewer-measurement-details', () => {
     ).toContain('formatted distance');
   });
 
+  it('creates a default measurement model', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      template: () => <vertex-viewer-measurement-details />,
+    });
+
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
+    expect(comp.measurementModel).toBeInstanceOf(MeasurementModel);
+  });
+
+  it('renders with initial distance units', async () => {
+    const model = new MeasurementModel();
+    model.setOutcome({
+      isApproximate: true,
+      results: [
+        {
+          type: 'minimum-distance',
+          point1: Vector3.create(0, 0, 0),
+          point2: Vector3.create(0, 0, 25.4),
+          distance: 25.4,
+        },
+      ],
+    });
+
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      template: () => (
+        <vertex-viewer-measurement-details
+          distanceUnits="inches"
+          measurementModel={model}
+        />
+      ),
+    });
+
+    expect(
+      page.root?.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML
+    ).toContain('~1.00 in');
+  });
+
   it('displays planar angle', async () => {
     const angle = Angle.toRadians(90);
     const { model, page } = await newMeasurementDetailsSpec();
