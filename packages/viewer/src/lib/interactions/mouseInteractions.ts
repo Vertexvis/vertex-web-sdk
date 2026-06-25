@@ -185,14 +185,14 @@ export class ZoomInteraction extends MouseInteraction {
     await api.beginInteraction();
   }
 
-  private async softEndInteraction(api: InteractionApi): Promise<void> {
-    this.didTransformBegin = false;
-    await api.softEndInteraction();
-  }
-
   private async endInteraction(api: InteractionApi): Promise<void> {
     this.didTransformBegin = false;
     await api.endInteraction();
+  }
+
+  private async softEndInteraction(api: InteractionApi): Promise<void> {
+    this.didTransformBegin = false;
+    await api.softEndInteraction();
   }
 
   private resetInteractionTimer(
@@ -220,27 +220,23 @@ export class ZoomInteraction extends MouseInteraction {
    * Uses a configured interaction delay, but certain interactions like wheel zoom benefit from extra delay
    */
   private startInteractionTimer(api: InteractionApi, extraDelayMs = 0): void {
-    this.softInteractionTimer = window.setTimeout(
+    this.softInteractionTimer = window.setTimeout(async () => {
+      this.softInteractionTimer = undefined;
+      await this.softEndInteraction(api);
+    }, extraDelayMs + this.getInteractionDelay());
+    this.interactionTimer = window.setTimeout(
       async () => {
-        this.softInteractionTimer = undefined;
-        await this.softEndInteraction(api);
+        this.interactionTimer = undefined;
+        await this.endInteraction(api);
       },
       extraDelayMs + this.getInteractionDelay() * 3
     );
-    this.interactionTimer = window.setTimeout(async () => {
-      this.interactionTimer = undefined;
-      await this.endInteraction(api);
-    }, extraDelayMs + this.getInteractionDelay());
   }
 
   private stopInteractionTimer(): void {
     if (this.interactionTimer != null) {
       window.clearTimeout(this.interactionTimer);
       this.interactionTimer = undefined;
-    }
-    if (this.softInteractionTimer != null) {
-      window.clearTimeout(this.softInteractionTimer);
-      this.softInteractionTimer = undefined;
     }
   }
 

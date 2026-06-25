@@ -60,6 +60,7 @@ export interface ZoomData {
  * the internal state of an interaction.
  */
 export abstract class InteractionApi<T extends Camera = Camera> {
+  protected currentCamera?: Camera;
   protected interacting = false;
   private sceneLoadingPromise?: Promise<Scene>;
   private lastAngle: Angle.Angle | undefined;
@@ -79,8 +80,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>,
     private interactionStartedEmitter: EventEmitter<void>,
-    private interactionFinishedEmitter: EventEmitter<void>,
-    public currentCamera?: Camera
+    private interactionFinishedEmitter: EventEmitter<void>
   ) {
     this.tap = this.tap.bind(this);
     this.doubleTap = this.doubleTap.bind(this);
@@ -213,8 +213,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
       this.interacting = true;
       this.interactionStartedEmitter.emit();
       this.sceneLoadingPromise = this.getScene();
-      this.currentCamera =
-        this.currentCamera ?? (await this.sceneLoadingPromise).camera();
+      this.currentCamera = (await this.sceneLoadingPromise).camera();
       this.sceneLoadingPromise = undefined;
       await this.stream.beginInteraction();
     }
@@ -613,6 +612,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
   public async softEndInteraction(): Promise<void> {
     await this.sceneLoadingPromise;
 
+    console.log('TESTING: soft end interaction');
     if (this.isInteracting()) {
       this.interacting = false;
       this.worldRotationPoint = undefined;
@@ -631,6 +631,8 @@ export abstract class InteractionApi<T extends Camera = Camera> {
   public async endInteraction(): Promise<void> {
     await this.sceneLoadingPromise;
 
+    console.log('TESTING: end interaction');
+    this.currentCamera = undefined;
     if (this.isInteracting()) {
       this.interacting = false;
       this.currentCamera = undefined;
@@ -655,7 +657,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * Indicates if the API is in an interacting state.
    */
   public isInteracting(): boolean {
-    return this.interacting;
+    return this.currentCamera != null;
   }
 
   /**
