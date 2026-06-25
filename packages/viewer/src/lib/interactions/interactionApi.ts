@@ -60,7 +60,7 @@ export interface ZoomData {
  * the internal state of an interaction.
  */
 export abstract class InteractionApi<T extends Camera = Camera> {
-  protected currentCamera?: Camera;
+  protected interacting = false;
   private sceneLoadingPromise?: Promise<Scene>;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
@@ -79,7 +79,8 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     private doubleTapEmitter: EventEmitter<TapEventDetails>,
     private longPressEmitter: EventEmitter<TapEventDetails>,
     private interactionStartedEmitter: EventEmitter<void>,
-    private interactionFinishedEmitter: EventEmitter<void>
+    private interactionFinishedEmitter: EventEmitter<void>,
+    public currentCamera?: Camera
   ) {
     this.tap = this.tap.bind(this);
     this.doubleTap = this.doubleTap.bind(this);
@@ -209,9 +210,11 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    */
   public async beginInteraction(): Promise<void> {
     if (!this.isInteracting()) {
+      this.interacting = true;
       this.interactionStartedEmitter.emit();
       this.sceneLoadingPromise = this.getScene();
-      this.currentCamera = (await this.sceneLoadingPromise).camera();
+      this.currentCamera =
+        this.currentCamera ?? (await this.sceneLoadingPromise).camera();
       this.sceneLoadingPromise = undefined;
       await this.stream.beginInteraction();
     }
@@ -607,6 +610,21 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     });
   }
 
+  public async softEndInteraction(): Promise<void> {
+    await this.sceneLoadingPromise;
+
+    if (this.isInteracting()) {
+      this.interacting = false;
+      this.worldRotationPoint = undefined;
+      this.panData = undefined;
+      this.zoomData = undefined;
+      this.resetLastAngle();
+
+      this.interactionFinishedEmitter.emit();
+      await this.stream.endInteraction();
+    }
+  }
+
   /**
    * Marks the end of an interaction.
    */
@@ -614,6 +632,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     await this.sceneLoadingPromise;
 
     if (this.isInteracting()) {
+      this.interacting = false;
       this.currentCamera = undefined;
       this.worldRotationPoint = undefined;
       this.panData = undefined;
@@ -636,7 +655,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * Indicates if the API is in an interacting state.
    */
   public isInteracting(): boolean {
-    return this.currentCamera != null;
+    return this.interacting;
   }
 
   /**

@@ -32,6 +32,7 @@ import { buildFlyToOperation } from './mapper';
 import ISceneItemQueryExpression = vertexvis.protobuf.stream.ISceneItemQueryExpression;
 
 export interface CameraRenderOptions {
+  correlationId?: string;
   animation?: Animation.Animation;
 }
 
@@ -268,7 +269,7 @@ export abstract class Camera {
     }
 
     try {
-      const corrId = UUID.create();
+      const corrId = renderOptions?.correlationId ?? UUID.create();
       if (this.flyToOptions != null) {
         const payload = buildFlyToOperation(
           corrId,

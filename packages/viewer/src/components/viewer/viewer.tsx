@@ -541,7 +541,7 @@ export class Viewer implements BasicViewer {
   private interactionHandlers: InteractionHandler[] = [];
   private defaultInteractionHandlerDisposables: Array<Disposable> = [];
   private tapHandlerDisposable?: Disposable;
-  private interactionApi!: InteractionApi;
+  private interactionApi?: InteractionApi;
   private tapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private defaultTapKeyInteractions: KeyInteraction<TapEventDetails>[] = [];
   private baseInteractionHandler?: BaseInteractionHandler;
