@@ -260,7 +260,6 @@ export abstract class Camera {
     renderOptions: CameraRenderOptions = {}
   ): Promise<CameraRenderResult> {
     if (this.flyToOptions == null && renderOptions.animation) {
-      console.log('init flyToOptions', renderOptions);
       this.flyToOptions = {
         flyTo: {
           type: 'camera',
@@ -270,8 +269,6 @@ export abstract class Camera {
     }
 
     try {
-      console.log('renderOptions.correlationId', renderOptions.correlationId);
-      // const corrId = renderOptions.correlationId ?? UUID.create();
       renderOptions.correlationId ??= UUID.create();
       if (this.flyToOptions != null) {
         const payload = buildFlyToOperation(
