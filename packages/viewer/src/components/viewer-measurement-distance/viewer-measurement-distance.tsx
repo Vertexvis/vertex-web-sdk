@@ -468,7 +468,7 @@ export class ViewerMeasurementDistance {
   /**
    * @ignore
    */
-  @Watch('units')
+  @Watch('units', { immediate: true })
   protected handleUnitsChanged(): void {
     this.measurementUnits = new DistanceUnits(this.units);
   }
