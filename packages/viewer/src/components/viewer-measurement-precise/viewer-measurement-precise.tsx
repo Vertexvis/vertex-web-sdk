@@ -116,7 +116,7 @@ export class ViewerMeasurementPrecise {
   /**
    * @ignore
    */
-  @Watch('measurementModel')
+  @Watch('measurementModel', { immediate: true })
   protected handleMeasurementModelChanged(): void {
     this.setupController();
   }
