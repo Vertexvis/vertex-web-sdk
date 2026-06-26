@@ -43,7 +43,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   protected disableIndividualInteractions = false;
 
-  private computedBodyStyle?: CSSStyleDeclaration;
+  private bodyStyleCache?: {
+    fontSize: number;
+    lineHeight: number;
+    height: number;
+  };
 
   private primaryInteractionTypeChange = new EventDispatcher<void>();
 
@@ -344,35 +348,33 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected wheelDeltaToPixels(deltaY: number, deltaMode: number): number {
-    if (this.computedBodyStyle == null) {
-      this.computedBodyStyle = window.getComputedStyle(document.body);
+    // MouseWheel events can happen dozen or hundreds of times per scroll,
+    // so cached values here makes sense.
+    // TODO: figure out when to clear the cache...
+    if (this.bodyStyleCache == null) {
+      const bodyStyle = window.getComputedStyle(document.body);
+      this.bodyStyleCache = {
+        fontSize:
+          parseFloat(bodyStyle.getPropertyValue('fontSize')) ||
+          DEFAULT_FONT_SIZE,
+        lineHeight:
+          parseFloat(bodyStyle.getPropertyValue('lineHeight')) ||
+          DEFAULT_LINE_HEIGHT,
+        height:
+          parseFloat(bodyStyle.getPropertyValue('height')) ||
+          window.innerHeight,
+      };
     }
 
     const defaultLineHeight =
-      this.computedBodyStyle.getPropertyValue('fontSize') != null &&
-      this.computedBodyStyle.getPropertyValue('fontSize') !== '' &&
-      !isNaN(parseFloat(this.computedBodyStyle.getPropertyValue('fontSize')))
-        ? parseFloat(this.computedBodyStyle.getPropertyValue('fontSize')) *
-          DEFAULT_LINE_HEIGHT
-        : DEFAULT_FONT_SIZE * DEFAULT_LINE_HEIGHT;
+      this.bodyStyleCache.fontSize * this.bodyStyleCache.lineHeight;
 
     if (deltaMode === 1) {
       // deltaMode 1 corresponds to DOM_DELTA_LINE, which computes deltas in lines
-      return this.computedBodyStyle.getPropertyValue('lineHeight') != null &&
-        this.computedBodyStyle.getPropertyValue('lineHeight') !== '' &&
-        !isNaN(
-          parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight'))
-        )
-        ? deltaY *
-            parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight'))
-        : deltaY * defaultLineHeight;
+      return deltaY * defaultLineHeight;
     } else if (deltaMode === 2) {
       // deltaMode 2 corresponds to DOM_DELTA_PAGE, which computes deltas in pages
-      return this.computedBodyStyle.getPropertyValue('height') != null &&
-        this.computedBodyStyle.getPropertyValue('height') !== '' &&
-        !isNaN(parseFloat(this.computedBodyStyle.getPropertyValue('height')))
-        ? deltaY * parseFloat(this.computedBodyStyle.getPropertyValue('height'))
-        : deltaY * window.innerHeight;
+      return deltaY * this.bodyStyleCache.height;
     }
     // deltaMode 0 corresponds to DOM_DELTA_PIXEL, which computes deltas in pixels
     return deltaY;
