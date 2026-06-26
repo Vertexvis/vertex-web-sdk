@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/viewer-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React bindings for the Vertex Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@stencil/react-output-target": "^1.5.3",
-    "@vertexvis/viewer": "1.0.0"
+    "@vertexvis/viewer": "1.0.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

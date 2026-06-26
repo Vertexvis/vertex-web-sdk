@@ -25,11 +25,11 @@ file that references our published JS bundles from a CDN.
   <head>
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@1.0.0/dist/viewer/viewer.css"
+      href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@1.0.1/dist/viewer/viewer.css"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@1.0.0/dist/viewer/viewer.esm.js"
+      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@1.0.1/dist/viewer/viewer.esm.js"
     ></script>
   </head>
 
@@ -51,7 +51,7 @@ These utilities can be imported from a CDN as shown below:
   </head>
   <body>
     <script type="module">
-      import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@1.0.0/dist/esm/index.mjs';
+      import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@1.0.1/dist/esm/index.mjs';
 
       function main() {
         const color = ColorMaterial.fromHex('#ff0000');
@@ -88,7 +88,7 @@ dependency to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@vertexvis/viewer": "^1.0.0"
+    "@vertexvis/viewer": "^1.0.1"
   }
 }
 ```
