@@ -349,8 +349,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   protected wheelDeltaToPixels(deltaY: number, deltaMode: number): number {
     // MouseWheel events can happen dozen or hundreds of times per scroll,
-    // so cached values here makes sense.
-    // TODO: figure out when to clear the cache...
+    // but body style is not likely to change frequently, so cached values are an optimization.
+    // TODO: figure out when to clear the cache... window.onresize? after a extra delay of mouseInteractions.endInteraction? 
     if (this.bodyStyleCache == null) {
       const bodyStyle = window.getComputedStyle(document.body);
       this.bodyStyleCache = {
@@ -366,12 +366,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       };
     }
 
-    const defaultLineHeight =
-      this.bodyStyleCache.fontSize * this.bodyStyleCache.lineHeight;
-
     if (deltaMode === 1) {
       // deltaMode 1 corresponds to DOM_DELTA_LINE, which computes deltas in lines
-      return deltaY * defaultLineHeight;
+      return (
+        deltaY * (this.bodyStyleCache.fontSize * this.bodyStyleCache.lineHeight)
+      );
     } else if (deltaMode === 2) {
       // deltaMode 2 corresponds to DOM_DELTA_PAGE, which computes deltas in pages
       return deltaY * this.bodyStyleCache.height;
