@@ -86,7 +86,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     this.element?.removeEventListener('mousedown', this.handleDoubleClick);
     this.element?.removeEventListener('wheel', this.handleMouseWheel);
     this.element = undefined;
-    window.removeEventListener('resize', this.clearBodyStyleCache);
   }
 
   public onPrimaryInteractionTypeChange(listener: Listener<void>): Disposable {
@@ -349,8 +348,9 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   }
 
   protected wheelDeltaToPixels(deltaY: number, deltaMode: number): number {
-    // MouseWheel events can happen dozen or hundreds of times per scroll,
-    // but body style is very unlikely to change frequently, so cached values are an optimization.
+    // Cached values are an optimization we can use given mouseWheel
+    // events can happen dozen or hundreds of times per scroll, but body style
+    // is very unlikely to change frequently or while doing wheel movements.
     if (this.bodyStyleCache == null) {
       const bodyStyle = window.getComputedStyle(document.body);
       this.bodyStyleCache = {
@@ -365,10 +365,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
           window.innerHeight,
       };
       window.setTimeout(() => {
-        this.clearBodyStyleCache();
-        window.removeEventListener('resize', this.clearBodyStyleCache);
-      }, 45000);
-      window.addEventListener('resize', this.clearBodyStyleCache);
+        this.bodyStyleCache = undefined;
+      }, 4800); // For now hardcoded. Could be derived. eg mouseWheelInteractionEndDebounce * 12
     }
 
     if (deltaMode === 1) {
@@ -383,10 +381,6 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     // deltaMode 0 corresponds to DOM_DELTA_PIXEL, which computes deltas in pixels
     return deltaY;
   }
-
-  private clearBodyStyleCache = (): void => {
-    this.bodyStyleCache = undefined;
-  };
 
   protected getCanvasPosition(event: BaseEvent): Point.Point | undefined {
     const canvasBounds = this.element?.getBoundingClientRect();
