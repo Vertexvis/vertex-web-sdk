@@ -12,9 +12,7 @@ function asBlobPart(bytes: Uint8Array): ArrayBuffer {
   return copy.buffer;
 }
 
-function loadImageBytesAsImageElement(
-  imageData: Uint8Array
-): Promise<HtmlImage> {
+function loadImageBytesAsImageElement(imageData: Uint8Array): Promise<HtmlImage> {
   return new Promise((resolve, reject) => {
     const blob = new Blob([asBlobPart(imageData)]);
     const blobUrl = URL.createObjectURL(blob);
@@ -33,9 +31,7 @@ function loadImageBytesAsImageElement(
   });
 }
 
-async function loadImageBytesAsImageBitmap(
-  imageData: Uint8Array
-): Promise<HtmlImage> {
+async function loadImageBytesAsImageBitmap(imageData: Uint8Array): Promise<HtmlImage> {
   const blob = new Blob([asBlobPart(imageData)]);
   const bitmap = await window.createImageBitmap(blob);
   return { image: bitmap, dispose: () => bitmap.close() };

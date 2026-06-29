@@ -31,8 +31,7 @@ export class ViewerMeasurementPrecise {
    * component.
    */
   @Prop()
-  public measurementOverlays: MeasurementOverlayManager =
-    new MeasurementOverlayManager();
+  public measurementOverlays: MeasurementOverlayManager = new MeasurementOverlayManager();
 
   /**
    * The controller that is responsible for performing measurements and updating
@@ -150,7 +149,7 @@ export class ViewerMeasurementPrecise {
       this.measurementModel,
       client,
       () => this.viewer?.token,
-      this.viewer?.deviceId
+      this.viewer?.deviceId,
     );
   }
 
@@ -163,13 +162,12 @@ export class ViewerMeasurementPrecise {
     this.clearInteractionHandler();
 
     if (this.measurementController != null) {
-      this.registeredInteractionHandler =
-        this.viewer?.registerInteractionHandler(
-          new MeasurementInteractionHandler(
-            this.measurementController,
-            this.measurableEntityTypes
-          )
-        );
+      this.registeredInteractionHandler = this.viewer?.registerInteractionHandler(
+        new MeasurementInteractionHandler(
+          this.measurementController,
+          this.measurableEntityTypes,
+        ),
+      );
     }
   }
 }

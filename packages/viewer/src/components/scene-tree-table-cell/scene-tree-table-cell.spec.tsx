@@ -203,9 +203,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    expect(
-      cell.shadowRoot?.querySelector('vertex-icon.icon-locate')
-    ).toBeDefined();
+    expect(cell.shadowRoot?.querySelector('vertex-icon.icon-locate')).toBeDefined();
   });
 
   it('renders with depth-based background color variables', async () => {
@@ -213,15 +211,13 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const nodeDepthOne = createNode({ depth: 1, expanded: false });
     const { page, cell } = await newComponentSpec({
       template: () => (
-        <vertex-scene-tree-table-cell
-          expand-toggle
-        ></vertex-scene-tree-table-cell>
+        <vertex-scene-tree-table-cell expand-toggle></vertex-scene-tree-table-cell>
       ),
       node: nodeDepthZero,
     });
 
     expect(cell.style.backgroundColor).toBe(
-      'var(--scene-tree-row-background-color-depth-0, var(--scene-tree-row-background-color, unset))'
+      'var(--scene-tree-row-background-color-depth-0, var(--scene-tree-row-background-color, unset))',
     );
 
     cell.node = nodeDepthOne;
@@ -229,7 +225,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     await page.waitForChanges();
 
     expect(cell.style.backgroundColor).toBe(
-      'var(--scene-tree-row-background-color-depth-1, var(--scene-tree-row-background-color, unset))'
+      'var(--scene-tree-row-background-color-depth-1, var(--scene-tree-row-background-color, unset))',
     );
   });
 
@@ -237,15 +233,13 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const node = createNode({ expanded: false, selected: true });
     const { cell } = await newComponentSpec({
       template: () => (
-        <vertex-scene-tree-table-cell
-          expand-toggle
-        ></vertex-scene-tree-table-cell>
+        <vertex-scene-tree-table-cell expand-toggle></vertex-scene-tree-table-cell>
       ),
       node,
     });
 
     expect(cell.style.backgroundColor).toBe(
-      'var(--scene-tree-selected-row-background-color, var(--scene-tree-cell-background-selected, unset))'
+      'var(--scene-tree-selected-row-background-color, var(--scene-tree-cell-background-selected, unset))',
     );
   });
 
@@ -262,7 +256,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     });
 
     expect(cell.style.backgroundColor).toBe(
-      'var(--scene-tree-hovered-row-background-color, var(--scene-tree-cell-background-hover, unset))'
+      'var(--scene-tree-hovered-row-background-color, var(--scene-tree-cell-background-hover, unset))',
     );
   });
 
@@ -494,7 +488,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ append: true })
+      expect.objectContaining({ append: true }),
     );
   });
 
@@ -512,13 +506,11 @@ describe('<vertex-scene-tree-table-cell>', () => {
     (cell as any).tree = tree;
 
     cell.dispatchEvent(pointerDownEvent);
-    cell.dispatchEvent(
-      new MouseEvent('pointerup', { button: 0, ctrlKey: true })
-    );
+    cell.dispatchEvent(new MouseEvent('pointerup', { button: 0, ctrlKey: true }));
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ append: true })
+      expect.objectContaining({ append: true }),
     );
   });
 
@@ -540,7 +532,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       node,
-      expect.objectContaining({ recurseParent: true })
+      expect.objectContaining({ recurseParent: true }),
     );
   });
 
@@ -559,9 +551,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
     cell.dispatchEvent(pointerDownEvent);
 
-    cell.dispatchEvent(
-      new MouseEvent('pointerup', { button: 0, metaKey: true })
-    );
+    cell.dispatchEvent(new MouseEvent('pointerup', { button: 0, metaKey: true }));
 
     expect(tree.deselectItem).toHaveBeenCalled();
   });

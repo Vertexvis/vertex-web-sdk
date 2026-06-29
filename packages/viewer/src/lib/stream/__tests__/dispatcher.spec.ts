@@ -1,9 +1,4 @@
-import {
-  encode,
-  Fixtures,
-  StreamApi,
-  WebSocketClientMock,
-} from '@vertexvis/stream-api';
+import { encode, Fixtures, StreamApi, WebSocketClientMock } from '@vertexvis/stream-api';
 
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
@@ -16,14 +11,13 @@ describe(StreamApiEventDispatcher, () => {
   const dispatcher = new StreamApiEventDispatcher(
     stream,
     (msg) =>
-      msg.request?.drawFrame?.frameCorrelationIds?.some(
-        (id) => id === correlationId
-      ) ?? false,
+      msg.request?.drawFrame?.frameCorrelationIds?.some((id) => id === correlationId) ??
+      false,
     (msg) =>
       msg.request?.drawFrame != null
         ? fromPbFrameOrThrow(Orientation.DEFAULT)(msg.request.drawFrame)
         : undefined,
-    5
+    5,
   );
 
   beforeEach(async () => {
@@ -42,14 +36,14 @@ describe(StreamApiEventDispatcher, () => {
       encode(
         Fixtures.Requests.drawFrame({
           payload: { frameCorrelationIds: [correlationId] },
-        })
-      )
+        }),
+      ),
     );
 
     expect(await res).toMatchObject(
       expect.objectContaining({
         correlationIds: expect.arrayContaining([correlationId]),
-      })
+      }),
     );
   });
 
@@ -60,8 +54,8 @@ describe(StreamApiEventDispatcher, () => {
       encode(
         Fixtures.Requests.drawFrame({
           payload: { frameCorrelationIds: [] },
-        })
-      )
+        }),
+      ),
     );
 
     expect(res).rejects.toEqual(new Error('Promise timed out after 5ms'));

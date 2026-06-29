@@ -1,6 +1,4 @@
-jest.mock(
-  '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service'
-);
+jest.mock('@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service');
 
 import { grpc } from '@improbable-eng/grpc-web';
 import { OffsetPager } from '@vertexvis/scene-tree-protos/core/protos/paging_pb';
@@ -64,13 +62,13 @@ function signJwt(viewId: string): string {
       view: viewId,
       exp: 1618269553,
     },
-    'secret'
+    'secret',
   );
 }
 
 function createController(
   rowLimit: number,
-  subscriptionHandshakeGracePeriodInMs?: number
+  subscriptionHandshakeGracePeriodInMs?: number,
 ): {
   controller: SceneTreeController;
   client: SceneTreeAPIClient;
@@ -80,8 +78,7 @@ function createController(
   const controller = new SceneTreeController(client, rowLimit, {
     lostConnectionReconnectInSeconds: 0.025,
     spinnerDelay: 2000,
-    subscriptionHandshakeGracePeriodInMs:
-      subscriptionHandshakeGracePeriodInMs || 1000,
+    subscriptionHandshakeGracePeriodInMs: subscriptionHandshakeGracePeriodInMs || 1000,
   });
 
   const stream = new ResponseStreamMock<SubscribeResponse>();
@@ -99,9 +96,7 @@ describe(SceneTreeController, () => {
     'jwt-context': JSON.stringify({ jwt }),
   });
 
-  const initiateHandshakeOnStream = (
-    stream: ResponseStreamMock<unknown>
-  ): void => {
+  const initiateHandshakeOnStream = (stream: ResponseStreamMock<unknown>): void => {
     const resp = new SubscribeResponse();
     resp.setHandshake(new Handshake());
 
@@ -111,12 +106,8 @@ describe(SceneTreeController, () => {
   describe(SceneTreeController.prototype.connect, () => {
     it('emits connecting and connected state changes', async () => {
       const { controller, client, stream } = createController(10);
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree)
-      );
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(getTree));
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
       await controller.connect(jwtProvider);
@@ -127,30 +118,26 @@ describe(SceneTreeController, () => {
           connection: expect.objectContaining({
             type: 'connecting',
           }),
-        })
+        }),
       );
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           totalRows: 100,
-        })
+        }),
       );
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({
             type: 'connected',
           }),
-        })
+        }),
       );
     });
 
     it('does not clear rows in disconnected state if scene views are same', async () => {
       const { controller, client, stream } = createController(10);
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree)
-      );
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(getTree));
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
@@ -172,18 +159,14 @@ describe(SceneTreeController, () => {
         expect.objectContaining({
           connection: expect.objectContaining({ type: 'disconnected' }),
           rows: connectedState?.rows,
-        })
+        }),
       );
     });
 
     it('disconnects if connected', async () => {
       const { controller, client, stream } = createController(10);
-      const getTree1 = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree1)
-      );
+      const getTree1 = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(getTree1));
 
       await controller.connect(jwtProvider);
 
@@ -191,12 +174,8 @@ describe(SceneTreeController, () => {
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
 
-      const getTree2 = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree2)
-      );
+      const getTree2 = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(getTree2));
 
       const newJwt = signJwt(random.guid());
       await controller.connect(() => newJwt);
@@ -204,28 +183,21 @@ describe(SceneTreeController, () => {
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({ type: 'disconnected' }),
-        })
+        }),
       );
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          rows: [
-            ...fromNodeProto(0, getTree2.getItemsList(), []),
-            ...new Array(90),
-          ],
+          rows: [...fromNodeProto(0, getTree2.getItemsList(), []), ...new Array(90)],
           totalRows: 100,
           connection: expect.objectContaining({ type: 'connected' }),
-        })
+        }),
       );
     });
 
     it('clears row state if scene views are different', async () => {
       const { controller, client } = createController(10);
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree)
-      );
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(getTree));
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
@@ -240,16 +212,14 @@ describe(SceneTreeController, () => {
         expect.objectContaining({
           connection: expect.objectContaining({ type: 'disconnected' }),
           rows: [],
-        })
+        }),
       );
     });
 
     it('responds to a ListChange without active rows', async () => {
       const { controller, client, stream } = createController(10);
       const getTreeEmpty = createGetTreeResponse(0, 0);
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
 
       (client.getTree as jest.Mock)
         .mockImplementationOnce(mockGrpcUnaryResult(getTreeEmpty))
@@ -276,14 +246,14 @@ describe(SceneTreeController, () => {
         expect.objectContaining({
           connection: expect.objectContaining({ type: 'connected' }),
           totalRows: 100,
-        })
+        }),
       );
     });
 
     it('emits failure if connect failed', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryError(new Error('oops'))
+        mockGrpcUnaryError(new Error('oops')),
       );
 
       const onStateChange = jest.fn();
@@ -296,15 +266,13 @@ describe(SceneTreeController, () => {
           connection: expect.objectContaining({
             type: 'failure',
           }),
-        })
+        }),
       );
     });
 
     it('does not throw an error if the controller is cancelled before a connection completes', async () => {
       const { controller, client } = createController(10);
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
       (client.getTree as jest.Mock).mockImplementation(async (...args) => {
         await new Promise((resolve) => setTimeout(resolve, 25));
         mockGrpcUnaryResult(getTree)(...args);
@@ -323,37 +291,33 @@ describe(SceneTreeController, () => {
           connection: expect.objectContaining({
             type: 'failure',
           }),
-        })
+        }),
       );
       expect(onStateChange).not.toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({
             type: 'connected',
           }),
-        })
+        }),
       );
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({
             type: 'cancelled',
           }),
-        })
+        }),
       );
     });
 
     it('includes unauthorized in error details', async () => {
       const { controller, client } = createController(10);
       const error = { code: grpc.Code.Unauthenticated, metadata: {} };
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryError(error)
-      );
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryError(error));
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
 
-      await expect(controller.connect(jwtProvider)).rejects.toMatchObject(
-        error
-      );
+      await expect(controller.connect(jwtProvider)).rejects.toMatchObject(error);
 
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -361,25 +325,18 @@ describe(SceneTreeController, () => {
             type: 'failure',
             details: new SceneTreeErrorDetails(
               'UNAUTHORIZED',
-              SceneTreeErrorCode.UNAUTHORIZED
+              SceneTreeErrorCode.UNAUTHORIZED,
             ),
           }),
-        })
+        }),
       );
     });
 
     it('emits subscription failure if no handshake is received within the timeout', async () => {
       const subscriptionHandshakeTimeout = 50;
-      const { controller, client } = createController(
-        10,
-        subscriptionHandshakeTimeout
-      );
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree)
-      );
+      const { controller, client } = createController(10, subscriptionHandshakeTimeout);
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(getTree));
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
@@ -396,10 +353,10 @@ describe(SceneTreeController, () => {
             type: 'failure',
             details: new SceneTreeErrorDetails(
               'SUBSCRIPTION_FAILURE',
-              SceneTreeErrorCode.SUBSCRIPTION_FAILURE
+              SceneTreeErrorCode.SUBSCRIPTION_FAILURE,
             ),
           }),
-        })
+        }),
       );
     });
 
@@ -407,11 +364,9 @@ describe(SceneTreeController, () => {
       const subscriptionHandshakeTimeout = 50;
       const { controller, client, stream } = createController(
         10,
-        subscriptionHandshakeTimeout
+        subscriptionHandshakeTimeout,
       );
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
       (client.getTree as jest.Mock).mockImplementation((...args) => {
         initiateHandshakeOnStream(stream);
         mockGrpcUnaryResult(getTree, 250)(...args);
@@ -433,14 +388,10 @@ describe(SceneTreeController, () => {
       const subscriptionHandshakeTimeout = 50;
       const { controller, client, stream } = createController(
         10,
-        subscriptionHandshakeTimeout
+        subscriptionHandshakeTimeout,
       );
-      const getTree = createGetTreeResponse(10, 100, (node) =>
-        node.setVisible(false)
-      );
-      (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(getTree)
-      );
+      const getTree = createGetTreeResponse(10, 100, (node) => node.setVisible(false));
+      (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(getTree));
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
@@ -462,10 +413,10 @@ describe(SceneTreeController, () => {
             type: 'failure',
             details: new SceneTreeErrorDetails(
               'SUBSCRIPTION_FAILURE',
-              SceneTreeErrorCode.SUBSCRIPTION_FAILURE
+              SceneTreeErrorCode.SUBSCRIPTION_FAILURE,
             ),
           }),
-        })
+        }),
       );
     });
   });
@@ -474,7 +425,7 @@ describe(SceneTreeController, () => {
     it('subscribes to remote changes', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -486,7 +437,7 @@ describe(SceneTreeController, () => {
     it('should invalidate the tree on subscription failures', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
       const stream = new ResponseStreamMock<SubscribeResponse>();
 
@@ -512,7 +463,7 @@ describe(SceneTreeController, () => {
     it('should invalidate the tree when the subscription call ends', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
       const stream = new ResponseStreamMock<SubscribeResponse>();
 
@@ -538,7 +489,7 @@ describe(SceneTreeController, () => {
     it('cancels subscription when disconnected', async () => {
       const { controller, stream, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       const cancel = jest.spyOn(stream, 'cancel');
@@ -553,7 +504,7 @@ describe(SceneTreeController, () => {
     it('resubscribes on server termination', async () => {
       const { controller, client, stream } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
       await controller.connect(jwtProvider);
 
@@ -568,7 +519,7 @@ describe(SceneTreeController, () => {
       const { controller, client, stream } = createController(10);
 
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 20))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 20)),
       );
 
       await controller.connect(jwtProvider);
@@ -587,15 +538,12 @@ describe(SceneTreeController, () => {
       stream.invokeOnData(resp);
 
       await Async.delay(25);
-      await Promise.all([
-        controller.getPage(0)?.res,
-        controller.getPage(1)?.res,
-      ]);
+      await Promise.all([controller.getPage(0)?.res, controller.getPage(1)?.res]);
 
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           totalRows: 20,
-        })
+        }),
       );
     });
 
@@ -607,8 +555,8 @@ describe(SceneTreeController, () => {
           createGetTreeResponse(100, 100, (node) => {
             node.setVisible(true);
             node.setPartiallyVisible(true);
-          })
-        )
+          }),
+        ),
       );
 
       await controller.connect(jwtProvider);
@@ -656,8 +604,8 @@ describe(SceneTreeController, () => {
           createGetTreeResponse(100, 100, (node) => {
             node.setVisible(false);
             node.setPartiallyVisible(true);
-          })
-        )
+          }),
+        ),
       );
 
       await controller.connect(jwtProvider);
@@ -704,8 +652,8 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(
           createGetTreeResponse(100, 100, (node) => {
             node.setPartiallyVisible(false);
-          })
-        )
+          }),
+        ),
       );
 
       await controller.connect(jwtProvider);
@@ -741,8 +689,8 @@ describe(SceneTreeController, () => {
 
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(
-          createGetTreeResponse(100, 100, (node) => node.setSelected(false))
-        )
+          createGetTreeResponse(100, 100, (node) => node.setSelected(false)),
+        ),
       );
 
       await controller.connect(jwtProvider);
@@ -778,8 +726,8 @@ describe(SceneTreeController, () => {
 
       (client.getTree as jest.Mock).mockImplementation(
         mockGrpcUnaryResult(
-          createGetTreeResponse(100, 100, (node) => node.setSelected(true))
-        )
+          createGetTreeResponse(100, 100, (node) => node.setSelected(true)),
+        ),
       );
 
       await controller.connect(jwtProvider);
@@ -815,10 +763,10 @@ describe(SceneTreeController, () => {
     it('makes call to collapse node', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(100, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(100, 100)),
       );
       (client.collapseNode as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(new CollapseNodeResponse())
+        mockGrpcUnaryResult(new CollapseNodeResponse()),
       );
       await controller.connect(jwtProvider);
 
@@ -829,41 +777,33 @@ describe(SceneTreeController, () => {
       req.setNodeId(nodeId);
 
       await controller.collapseNode(nodeId.getHex());
-      expect(client.collapseNode).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.collapseNode).toHaveBeenCalledWith(req, metadata, expect.anything());
     });
 
     it('throws if grpc call errors', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(100, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(100, 100)),
       );
       (client.collapseNode as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryError(new Error('oops'))
+        mockGrpcUnaryError(new Error('oops')),
       );
       await controller.connect(jwtProvider);
 
-      return expect(
-        controller.collapseNode(random.guid())
-      ).rejects.toThrowError();
+      return expect(controller.collapseNode(random.guid())).rejects.toThrowError();
     });
 
     it('throws if grpc error and result are null', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(100, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(100, 100)),
       );
-      (client.collapseNode as jest.Mock).mockImplementationOnce(
-        (_, __, handler) => handler(null, null)
+      (client.collapseNode as jest.Mock).mockImplementationOnce((_, __, handler) =>
+        handler(null, null),
       );
       await controller.connect(jwtProvider);
 
-      return expect(
-        controller.collapseNode(random.guid())
-      ).rejects.toThrowError();
+      return expect(controller.collapseNode(random.guid())).rejects.toThrowError();
     });
   });
 
@@ -871,10 +811,10 @@ describe(SceneTreeController, () => {
     it('makes call to expand node', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(100, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(100, 100)),
       );
       (client.expandNode as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(new ExpandNodeResponse())
+        mockGrpcUnaryResult(new ExpandNodeResponse()),
       );
       await controller.connect(jwtProvider);
 
@@ -885,11 +825,7 @@ describe(SceneTreeController, () => {
       req.setNodeId(nodeId);
 
       await controller.expandNode(nodeId.getHex());
-      expect(client.expandNode).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.expandNode).toHaveBeenCalledWith(req, metadata, expect.anything());
     });
   });
 
@@ -897,20 +833,16 @@ describe(SceneTreeController, () => {
     it('makes call to expand all nodes', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(100, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(100, 100)),
       );
       (client.expandAll as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(new ExpandAllResponse())
+        mockGrpcUnaryResult(new ExpandAllResponse()),
       );
       await controller.connect(jwtProvider);
 
       const req = new ExpandAllRequest();
       await controller.expandAll();
-      expect(client.expandAll).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.expandAll).toHaveBeenCalledWith(req, metadata, expect.anything());
     });
   });
 
@@ -918,20 +850,16 @@ describe(SceneTreeController, () => {
     it('makes call to collapse all nodes', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(100, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(100, 100)),
       );
       (client.collapseAll as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(new CollapseAllResponse())
+        mockGrpcUnaryResult(new CollapseAllResponse()),
       );
       await controller.connect(jwtProvider);
 
       const req = new CollapseAllRequest();
       await controller.collapseAll();
-      expect(client.collapseAll).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.collapseAll).toHaveBeenCalledWith(req, metadata, expect.anything());
     });
   });
 
@@ -939,7 +867,7 @@ describe(SceneTreeController, () => {
     it('does nothing if index is outside bounds', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(100, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(100, 100)),
       );
       await controller.connect(jwtProvider);
 
@@ -951,7 +879,7 @@ describe(SceneTreeController, () => {
     it('does nothing if page exists at index', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(createGetTreeResponse(1, 1))
+        mockGrpcUnaryResult(createGetTreeResponse(1, 1)),
       );
 
       await controller.connect(jwtProvider);
@@ -963,7 +891,7 @@ describe(SceneTreeController, () => {
     it('fetches page with correct offset', async () => {
       const { controller, client } = createController(100);
       (client.getTree as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(createGetTreeResponse(1, 1))
+        mockGrpcUnaryResult(createGetTreeResponse(1, 1)),
       );
       await controller.connect(jwtProvider);
 
@@ -974,11 +902,7 @@ describe(SceneTreeController, () => {
       const req = new GetTreeRequest();
       req.setPager(pager);
 
-      expect(client.getTree).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.getTree).toHaveBeenCalledWith(req, metadata, expect.anything());
     });
 
     it('state change contains fetched rows and total count', async () => {
@@ -987,12 +911,8 @@ describe(SceneTreeController, () => {
       const getTree1 = createGetTreeResponse(10, 100);
       const getTree2 = createGetTreeResponse(10, 100);
 
-      (client.getTree as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(getTree1)
-      );
-      (client.getTree as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(getTree2)
-      );
+      (client.getTree as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(getTree1));
+      (client.getTree as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(getTree2));
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
@@ -1001,12 +921,9 @@ describe(SceneTreeController, () => {
 
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          rows: [
-            ...fromNodeProto(0, getTree1.getItemsList(), []),
-            ...new Array(90),
-          ],
+          rows: [...fromNodeProto(0, getTree1.getItemsList(), []), ...new Array(90)],
           totalRows: 100,
-        })
+        }),
       );
 
       await controller.fetchPage(1);
@@ -1018,7 +935,7 @@ describe(SceneTreeController, () => {
             ...new Array(80),
           ],
           totalRows: 100,
-        })
+        }),
       );
     });
 
@@ -1030,9 +947,7 @@ describe(SceneTreeController, () => {
       };
 
       const { controller, client } = createController(100);
-      (client.getTree as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryError(error)
-      );
+      (client.getTree as jest.Mock).mockImplementationOnce(mockGrpcUnaryError(error));
 
       await expect(controller.connect(jwtProvider)).rejects.toMatchObject({
         code: grpc.Code.FailedPrecondition,
@@ -1046,7 +961,7 @@ describe(SceneTreeController, () => {
     it('does nothing if index is outside bounds', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1060,7 +975,7 @@ describe(SceneTreeController, () => {
     it('fetches the correct page from given offset', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1074,11 +989,7 @@ describe(SceneTreeController, () => {
       const req = new GetTreeRequest();
       req.setPager(pager);
 
-      expect(client.getTree).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.getTree).toHaveBeenCalledWith(req, metadata, expect.anything());
     });
   });
 
@@ -1086,7 +997,7 @@ describe(SceneTreeController, () => {
     it('constrains range', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1107,22 +1018,14 @@ describe(SceneTreeController, () => {
       const req2 = new GetTreeRequest();
       req2.setPager(pager2);
 
-      expect(client.getTree).toHaveBeenCalledWith(
-        req1,
-        metadata,
-        expect.anything()
-      );
-      expect(client.getTree).toHaveBeenCalledWith(
-        req2,
-        metadata,
-        expect.anything()
-      );
+      expect(client.getTree).toHaveBeenCalledWith(req1, metadata, expect.anything());
+      expect(client.getTree).toHaveBeenCalledWith(req2, metadata, expect.anything());
     });
 
     it('fetches for each page', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1141,14 +1044,12 @@ describe(SceneTreeController, () => {
     it('defaults to including full tree and non-exact match', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       const filterRes = new FilterResponse();
       filterRes.setNumberOfResults(5);
-      (client.filter as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(filterRes)
-      );
+      (client.filter as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(filterRes));
 
       const onStateChange = jest.fn();
       controller.onStateChange.on(onStateChange);
@@ -1162,28 +1063,22 @@ describe(SceneTreeController, () => {
 
       await controller.filter(term);
 
-      expect(client.filter).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.filter).toHaveBeenCalledWith(req, metadata, expect.anything());
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           totalFilteredRows: 5,
-        })
+        }),
       );
     });
 
     it('does not filter whole tree when include collapsed is false', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
       const filterRes = new FilterResponse();
       filterRes.setNumberOfResults(5);
-      (client.filter as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(filterRes)
-      );
+      (client.filter as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(filterRes));
 
       await controller.connect(jwtProvider);
 
@@ -1201,29 +1096,25 @@ describe(SceneTreeController, () => {
         removeHiddenItems: true,
       });
 
-      expect(client.filter).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.filter).toHaveBeenCalledWith(req, metadata, expect.anything());
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           totalFilteredRows: 5,
-        })
+        }),
       );
     });
 
     it('cancels in-flight filter requests when a new request is made', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       const filterRes = new FilterResponse();
       filterRes.setNumberOfResults(5);
       const firstFilterCancel = jest.fn();
       (client.filter as jest.Mock).mockImplementationOnce(
-        mockCancellableGrpcUnaryResult(filterRes, 10000, firstFilterCancel)
+        mockCancellableGrpcUnaryResult(filterRes, 10000, firstFilterCancel),
       );
 
       const onStateChange = jest.fn();
@@ -1241,21 +1132,17 @@ describe(SceneTreeController, () => {
       const secondFilterRes = new FilterResponse();
       secondFilterRes.setNumberOfResults(10);
       (client.filter as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(secondFilterRes)
+        mockGrpcUnaryResult(secondFilterRes),
       );
 
       await controller.filter(term);
 
-      expect(client.filter).toHaveBeenCalledWith(
-        req,
-        metadata,
-        expect.anything()
-      );
+      expect(client.filter).toHaveBeenCalledWith(req, metadata, expect.anything());
       expect(firstFilterCancel).toHaveBeenCalled();
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           totalFilteredRows: 10,
-        })
+        }),
       );
     });
   });
@@ -1264,7 +1151,7 @@ describe(SceneTreeController, () => {
     it('returns page indices for pages that have been fetched', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1279,7 +1166,7 @@ describe(SceneTreeController, () => {
     it('removes pages that are furthest from start and end range', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1297,7 +1184,7 @@ describe(SceneTreeController, () => {
     it('does nothing if threshold is not met', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1317,7 +1204,7 @@ describe(SceneTreeController, () => {
     it('constrains offset', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1332,7 +1219,7 @@ describe(SceneTreeController, () => {
     it('constrains ranges', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1347,7 +1234,7 @@ describe(SceneTreeController, () => {
     it('reloads tree if call responds with require reload', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       const index = new UInt64Value();
@@ -1357,7 +1244,7 @@ describe(SceneTreeController, () => {
       locateRes.setRequiresReload(true);
 
       (client.locateItem as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(locateRes)
+        mockGrpcUnaryResult(locateRes),
       );
 
       await controller.connect(jwtProvider);
@@ -1381,12 +1268,12 @@ describe(SceneTreeController, () => {
       expect(client.getTree).toHaveBeenCalledWith(
         expectedReq1,
         expect.anything(),
-        expect.anything()
+        expect.anything(),
       );
       expect(client.getTree).toHaveBeenCalledWith(
         expectedReq2,
         expect.anything(),
-        expect.anything()
+        expect.anything(),
       );
     });
   });
@@ -1395,7 +1282,7 @@ describe(SceneTreeController, () => {
     it('fetches pages in active rows that have not been fetched', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1419,7 +1306,7 @@ describe(SceneTreeController, () => {
     it('uses default values for start or end indices if NaN', async () => {
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1451,10 +1338,10 @@ describe(SceneTreeController, () => {
 
       const { controller, client } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
       (client.getAvailableColumns as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(columnRes)
+        mockGrpcUnaryResult(columnRes),
       );
 
       await controller.connect(jwtProvider);
@@ -1468,7 +1355,7 @@ describe(SceneTreeController, () => {
     it('refetches pages in active rows with additional metadata values', async () => {
       const { controller, client, stream } = createController(10);
       (client.getTree as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(createGetTreeResponse(10, 100))
+        mockGrpcUnaryResult(createGetTreeResponse(10, 100)),
       );
 
       await controller.connect(jwtProvider);
@@ -1483,8 +1370,8 @@ describe(SceneTreeController, () => {
         mockGrpcUnaryResult(
           createGetTreeResponse(10, 100, (node) => {
             node.setColumnsList(['val1', 'val2']);
-          })
-        )
+          }),
+        ),
       );
       await controller.setMetadataKeys(['key1', 'key2']);
 
@@ -1492,10 +1379,7 @@ describe(SceneTreeController, () => {
       expect(
         rows
           .slice(0, 10)
-          .every(
-            (row) =>
-              row?.metadata.key1 === 'val1' && row.metadata.key2 === 'val2'
-          )
+          .every((row) => row?.metadata.key1 === 'val1' && row.metadata.key2 === 'val2'),
       ).toBe(true);
     });
   });

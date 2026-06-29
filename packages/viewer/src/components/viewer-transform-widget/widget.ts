@@ -4,10 +4,7 @@ import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
 
-import {
-  axisPositions,
-  rotationAxisPositions,
-} from '../../lib/transforms/axis-lines';
+import { axisPositions, rotationAxisPositions } from '../../lib/transforms/axis-lines';
 import {
   xAxisRotationPositions,
   yAxisRotationPositions,
@@ -21,10 +18,7 @@ import {
   yzAxisTranslationPositions,
   zAxisArrowPositions,
 } from '../../lib/transforms/axis-translation';
-import {
-  computeDrawable2dBounds,
-  Drawable,
-} from '../../lib/transforms/drawable';
+import { computeDrawable2dBounds, Drawable } from '../../lib/transforms/drawable';
 import { testDrawable } from '../../lib/transforms/hits';
 import { AxisLine, RotationLine } from '../../lib/transforms/line';
 import { TriangleMesh } from '../../lib/transforms/mesh';
@@ -133,7 +127,7 @@ export class TransformWidget extends ReglComponent {
   public constructor(
     canvasElement: HTMLCanvasElement,
     private customization: TransformWidgetCustomization = {},
-    initialDisabledAxes: Partial<DisabledAxis> = {}
+    initialDisabledAxes: Partial<DisabledAxis> = {},
   ) {
     super(canvasElement);
 
@@ -146,12 +140,9 @@ export class TransformWidget extends ReglComponent {
     this.disabledAxis.xTranslation = initialDisabledAxes.xTranslation ?? false;
     this.disabledAxis.yTranslation = initialDisabledAxes.yTranslation ?? false;
     this.disabledAxis.zTranslation = initialDisabledAxes.zTranslation ?? false;
-    this.disabledAxis.xyTranslation =
-      initialDisabledAxes.xyTranslation ?? false;
-    this.disabledAxis.xzTranslation =
-      initialDisabledAxes.xzTranslation ?? false;
-    this.disabledAxis.yzTranslation =
-      initialDisabledAxes.yzTranslation ?? false;
+    this.disabledAxis.xyTranslation = initialDisabledAxes.xyTranslation ?? false;
+    this.disabledAxis.xzTranslation = initialDisabledAxes.xzTranslation ?? false;
+    this.disabledAxis.yzTranslation = initialDisabledAxes.yzTranslation ?? false;
     this.disabledAxis.xRotation = initialDisabledAxes.xRotation ?? false;
     this.disabledAxis.yRotation = initialDisabledAxes.yRotation ?? false;
     this.disabledAxis.zRotation = initialDisabledAxes.zRotation ?? false;
@@ -214,8 +205,7 @@ export class TransformWidget extends ReglComponent {
     this.xArrowFillColor = colors.xArrow ?? this.xArrowFillColor;
     this.yArrowFillColor = colors.yArrow ?? this.yArrowFillColor;
     this.zArrowFillColor = colors.zArrow ?? this.zArrowFillColor;
-    this.twoAxesSquareFillColor =
-      colors.twoAxesSquare ?? this.twoAxesSquareFillColor;
+    this.twoAxesSquareFillColor = colors.twoAxesSquare ?? this.twoAxesSquareFillColor;
     this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
     this.outlineColor = colors.outline ?? this.outlineColor;
 
@@ -225,18 +215,9 @@ export class TransformWidget extends ReglComponent {
     this.xRotation?.updateFillColor(this.getXRotationColor(), true);
     this.yRotation?.updateFillColor(this.getYRotationColor(), true);
     this.zRotation?.updateFillColor(this.getZRotationColor(), true);
-    this.xyTranslation?.updateFillColor(
-      this.getTwoAxesTranslationColor(),
-      true
-    );
-    this.xzTranslation?.updateFillColor(
-      this.getTwoAxesTranslationColor(),
-      true
-    );
-    this.yzTranslation?.updateFillColor(
-      this.getTwoAxesTranslationColor(),
-      true
-    );
+    this.xyTranslation?.updateFillColor(this.getTwoAxesTranslationColor(), true);
+    this.xzTranslation?.updateFillColor(this.getTwoAxesTranslationColor(), true);
+    this.yzTranslation?.updateFillColor(this.getTwoAxesTranslationColor(), true);
 
     this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
   }
@@ -252,9 +233,7 @@ export class TransformWidget extends ReglComponent {
     }
   }
 
-  public onHoveredChanged(
-    listener: Listener<Drawable | undefined>
-  ): Disposable {
+  public onHoveredChanged(listener: Listener<Drawable | undefined>): Disposable {
     return this.hoveredChanged.on(listener);
   }
 
@@ -292,7 +271,7 @@ export class TransformWidget extends ReglComponent {
         .find((m) =>
           this.cursor != null
             ? testDrawable(m, currentFrame, this.viewport, this.cursor)
-            : false
+            : false,
         );
 
       if (this.hoveredElement !== previousHovered) {
@@ -358,13 +337,13 @@ export class TransformWidget extends ReglComponent {
       this.interactiveBounds = computeDrawable2dBounds(
         this.viewport,
         ...this.rotationMeshes,
-        ...this.translationMeshes
+        ...this.translationMeshes,
       );
       this.fullBounds = computeDrawable2dBounds(
         this.viewport,
         ...this.rotationMeshes,
         ...this.translationMeshes,
-        ...this.axisLines
+        ...this.axisLines,
       );
     }
   }
@@ -378,7 +357,7 @@ export class TransformWidget extends ReglComponent {
 
     const triangleSize = this.computeTriangleSize(
       Vector3.fromMatrixPosition(transform),
-      frame
+      frame,
     );
 
     this.xArrow = new TriangleMesh(
@@ -388,10 +367,10 @@ export class TransformWidget extends ReglComponent {
         transform,
         frame.scene.camera,
         triangleSize,
-        this.customization.scalars?.xTranslation
+        this.customization.scalars?.xTranslation,
       ),
       this.outlineColor,
-      this.getXTranslationColor()
+      this.getXTranslationColor(),
     );
     this.xRotation = new TriangleMesh(
       createShape,
@@ -401,17 +380,17 @@ export class TransformWidget extends ReglComponent {
         frame.scene.camera,
         triangleSize,
         this.customization.scalars?.xRotation,
-        this.customization.scalars?.xTranslation
+        this.customization.scalars?.xTranslation,
       ),
       this.outlineColor,
-      this.getXRotationColor()
+      this.getXRotationColor(),
     );
     this.xAxis = new AxisLine(
       createShape,
       'x-axis',
       axisPositions(transform, frame.scene.camera, this.xArrow),
       this.outlineColor,
-      this.getXTranslationColor()
+      this.getXTranslationColor(),
     );
 
     this.yArrow = new TriangleMesh(
@@ -421,10 +400,10 @@ export class TransformWidget extends ReglComponent {
         transform,
         frame.scene.camera,
         triangleSize,
-        this.customization.scalars?.yTranslation
+        this.customization.scalars?.yTranslation,
       ),
       this.outlineColor,
-      this.getYTranslationColor()
+      this.getYTranslationColor(),
     );
     this.yRotation = new TriangleMesh(
       createShape,
@@ -434,17 +413,17 @@ export class TransformWidget extends ReglComponent {
         frame.scene.camera,
         triangleSize,
         this.customization.scalars?.yRotation,
-        this.customization.scalars?.yTranslation
+        this.customization.scalars?.yTranslation,
       ),
       this.outlineColor,
-      this.getYRotationColor()
+      this.getYRotationColor(),
     );
     this.yAxis = new AxisLine(
       createShape,
       'y-axis',
       axisPositions(transform, frame.scene.camera, this.yArrow),
       this.outlineColor,
-      this.getYTranslationColor()
+      this.getYTranslationColor(),
     );
 
     this.zArrow = new TriangleMesh(
@@ -454,17 +433,17 @@ export class TransformWidget extends ReglComponent {
         transform,
         frame.scene.camera,
         triangleSize,
-        this.customization.scalars?.zTranslation
+        this.customization.scalars?.zTranslation,
       ),
       this.outlineColor,
-      this.getZTranslationColor()
+      this.getZTranslationColor(),
     );
     this.zAxis = new AxisLine(
       createShape,
       'z-axis',
       axisPositions(transform, frame.scene.camera, this.zArrow),
       this.outlineColor,
-      this.getZTranslationColor()
+      this.getZTranslationColor(),
     );
     this.zRotation = new TriangleMesh(
       createShape,
@@ -474,10 +453,10 @@ export class TransformWidget extends ReglComponent {
         frame.scene.camera,
         triangleSize,
         this.customization.scalars?.zRotation,
-        this.customization.scalars?.zTranslation
+        this.customization.scalars?.zTranslation,
       ),
       this.outlineColor,
-      this.getZRotationColor()
+      this.getZRotationColor(),
     );
 
     this.xyTranslation = new TriangleMesh(
@@ -487,10 +466,10 @@ export class TransformWidget extends ReglComponent {
         transform,
         frame.scene.camera,
         triangleSize,
-        this.customization.scalars?.xyTranslation
+        this.customization.scalars?.xyTranslation,
       ),
       this.outlineColor,
-      this.getTwoAxesTranslationColor()
+      this.getTwoAxesTranslationColor(),
     );
     this.xzTranslation = new TriangleMesh(
       createShape,
@@ -499,10 +478,10 @@ export class TransformWidget extends ReglComponent {
         transform,
         frame.scene.camera,
         triangleSize,
-        this.customization.scalars?.xzTranslation
+        this.customization.scalars?.xzTranslation,
       ),
       this.outlineColor,
-      this.getTwoAxesTranslationColor()
+      this.getTwoAxesTranslationColor(),
     );
     this.yzTranslation = new TriangleMesh(
       createShape,
@@ -511,10 +490,10 @@ export class TransformWidget extends ReglComponent {
         transform,
         frame.scene.camera,
         triangleSize,
-        this.customization.scalars?.yzTranslation
+        this.customization.scalars?.yzTranslation,
       ),
       this.outlineColor,
-      this.getTwoAxesTranslationColor()
+      this.getTwoAxesTranslationColor(),
     );
 
     this.createRotationLines(createShape, transform, frame);
@@ -570,48 +549,48 @@ export class TransformWidget extends ReglComponent {
   private createRotationLines(
     createShape: CreateShape,
     transform: Matrix4.Matrix4,
-    frame: Frame
+    frame: Frame,
   ): void {
     const triangleSize = this.computeTriangleSize(
       Vector3.fromMatrixPosition(transform),
-      frame
+      frame,
     );
 
     const xyRotationLinePoints = rotationAxisPositions(
       frame.scene.camera,
       this.xRotation,
       this.yArrow?.points.worldTip,
-      triangleSize
+      triangleSize,
     );
     const xzRotationLinePoints = rotationAxisPositions(
       frame.scene.camera,
       this.xRotation,
       this.zArrow?.points.worldTip,
-      triangleSize
+      triangleSize,
     );
     const yxRotationLinePoints = rotationAxisPositions(
       frame.scene.camera,
       this.yRotation,
       this.xArrow?.points.worldTip,
-      triangleSize
+      triangleSize,
     );
     const yzRotationLinePoints = rotationAxisPositions(
       frame.scene.camera,
       this.yRotation,
       this.zArrow?.points.worldTip,
-      triangleSize
+      triangleSize,
     );
     const zxRotationLinePoints = rotationAxisPositions(
       frame.scene.camera,
       this.zRotation,
       this.xArrow?.points.worldTip,
-      triangleSize
+      triangleSize,
     );
     const zyRotationLinePoints = rotationAxisPositions(
       frame.scene.camera,
       this.zRotation,
       this.yArrow?.points.worldTip,
-      triangleSize
+      triangleSize,
     );
 
     if (xyRotationLinePoints != null) {
@@ -619,7 +598,7 @@ export class TransformWidget extends ReglComponent {
         createShape,
         'xy-rotation-line',
         xyRotationLinePoints,
-        this.outlineColor
+        this.outlineColor,
       );
     }
     if (xzRotationLinePoints != null) {
@@ -627,7 +606,7 @@ export class TransformWidget extends ReglComponent {
         createShape,
         'xz-rotation-line',
         xzRotationLinePoints,
-        this.outlineColor
+        this.outlineColor,
       );
     }
     if (yxRotationLinePoints != null) {
@@ -635,7 +614,7 @@ export class TransformWidget extends ReglComponent {
         createShape,
         'yx-rotation-line',
         yxRotationLinePoints,
-        this.outlineColor
+        this.outlineColor,
       );
     }
     if (yzRotationLinePoints != null) {
@@ -643,7 +622,7 @@ export class TransformWidget extends ReglComponent {
         createShape,
         'yz-rotation-line',
         yzRotationLinePoints,
-        this.outlineColor
+        this.outlineColor,
       );
     }
     if (zxRotationLinePoints != null) {
@@ -651,7 +630,7 @@ export class TransformWidget extends ReglComponent {
         createShape,
         'zx-rotation-line',
         zxRotationLinePoints,
-        this.outlineColor
+        this.outlineColor,
       );
     }
     if (zyRotationLinePoints != null) {
@@ -659,7 +638,7 @@ export class TransformWidget extends ReglComponent {
         createShape,
         'zy-rotation-line',
         zyRotationLinePoints,
-        this.outlineColor
+        this.outlineColor,
       );
     }
 
@@ -676,7 +655,7 @@ export class TransformWidget extends ReglComponent {
   private updateElements(transform: Matrix4.Matrix4, frame: Frame): void {
     const triangleSize = this.computeTriangleSize(
       Vector3.fromMatrixPosition(transform),
-      frame
+      frame,
     );
 
     if (this.xArrow != null) {
@@ -685,12 +664,10 @@ export class TransformWidget extends ReglComponent {
           transform,
           frame.scene.camera,
           triangleSize,
-          this.customization.scalars?.xTranslation
-        )
+          this.customization.scalars?.xTranslation,
+        ),
       );
-      this.xAxis?.updatePoints(
-        axisPositions(transform, frame.scene.camera, this.xArrow)
-      );
+      this.xAxis?.updatePoints(axisPositions(transform, frame.scene.camera, this.xArrow));
     }
     this.xRotation?.updatePoints(
       xAxisRotationPositions(
@@ -698,8 +675,8 @@ export class TransformWidget extends ReglComponent {
         frame.scene.camera,
         triangleSize,
         this.customization.scalars?.xRotation,
-        this.customization.scalars?.xTranslation
-      )
+        this.customization.scalars?.xTranslation,
+      ),
     );
 
     if (this.yArrow != null) {
@@ -708,12 +685,10 @@ export class TransformWidget extends ReglComponent {
           transform,
           frame.scene.camera,
           triangleSize,
-          this.customization.scalars?.yTranslation
-        )
+          this.customization.scalars?.yTranslation,
+        ),
       );
-      this.yAxis?.updatePoints(
-        axisPositions(transform, frame.scene.camera, this.yArrow)
-      );
+      this.yAxis?.updatePoints(axisPositions(transform, frame.scene.camera, this.yArrow));
     }
     this.yRotation?.updatePoints(
       yAxisRotationPositions(
@@ -721,8 +696,8 @@ export class TransformWidget extends ReglComponent {
         frame.scene.camera,
         triangleSize,
         this.customization.scalars?.yRotation,
-        this.customization.scalars?.yTranslation
-      )
+        this.customization.scalars?.yTranslation,
+      ),
     );
 
     if (this.zArrow != null) {
@@ -731,12 +706,10 @@ export class TransformWidget extends ReglComponent {
           transform,
           frame.scene.camera,
           triangleSize,
-          this.customization.scalars?.zTranslation
-        )
+          this.customization.scalars?.zTranslation,
+        ),
       );
-      this.zAxis?.updatePoints(
-        axisPositions(transform, frame.scene.camera, this.zArrow)
-      );
+      this.zAxis?.updatePoints(axisPositions(transform, frame.scene.camera, this.zArrow));
     }
     this.zRotation?.updatePoints(
       zAxisRotationPositions(
@@ -744,8 +717,8 @@ export class TransformWidget extends ReglComponent {
         frame.scene.camera,
         triangleSize,
         this.customization.scalars?.zRotation,
-        this.customization.scalars?.zTranslation
-      )
+        this.customization.scalars?.zTranslation,
+      ),
     );
 
     this.xyRotationLine?.updatePoints(
@@ -753,48 +726,48 @@ export class TransformWidget extends ReglComponent {
         frame.scene.camera,
         this.xRotation,
         this.yArrow?.points.worldTip,
-        triangleSize
-      )
+        triangleSize,
+      ),
     );
     this.xzRotationLine?.updatePoints(
       rotationAxisPositions(
         frame.scene.camera,
         this.xRotation,
         this.zArrow?.points.worldTip,
-        triangleSize
-      )
+        triangleSize,
+      ),
     );
     this.yxRotationLine?.updatePoints(
       rotationAxisPositions(
         frame.scene.camera,
         this.yRotation,
         this.xArrow?.points.worldTip,
-        triangleSize
-      )
+        triangleSize,
+      ),
     );
     this.yzRotationLine?.updatePoints(
       rotationAxisPositions(
         frame.scene.camera,
         this.yRotation,
         this.zArrow?.points.worldTip,
-        triangleSize
-      )
+        triangleSize,
+      ),
     );
     this.zxRotationLine?.updatePoints(
       rotationAxisPositions(
         frame.scene.camera,
         this.zRotation,
         this.xArrow?.points.worldTip,
-        triangleSize
-      )
+        triangleSize,
+      ),
     );
     this.zyRotationLine?.updatePoints(
       rotationAxisPositions(
         frame.scene.camera,
         this.zRotation,
         this.yArrow?.points.worldTip,
-        triangleSize
-      )
+        triangleSize,
+      ),
     );
 
     if (this.xyTranslation != null) {
@@ -803,8 +776,8 @@ export class TransformWidget extends ReglComponent {
           transform,
           frame.scene.camera,
           triangleSize,
-          this.customization.scalars?.xyTranslation
-        )
+          this.customization.scalars?.xyTranslation,
+        ),
       );
     }
     if (this.xzTranslation != null) {
@@ -813,8 +786,8 @@ export class TransformWidget extends ReglComponent {
           transform,
           frame.scene.camera,
           triangleSize,
-          this.customization.scalars?.xzTranslation
-        )
+          this.customization.scalars?.xzTranslation,
+        ),
       );
     }
     if (this.yzTranslation != null) {
@@ -823,8 +796,8 @@ export class TransformWidget extends ReglComponent {
           transform,
           frame.scene.camera,
           triangleSize,
-          this.customization.scalars?.yzTranslation
-        )
+          this.customization.scalars?.yzTranslation,
+        ),
       );
     }
   }

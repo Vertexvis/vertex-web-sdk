@@ -34,13 +34,11 @@ import {
   SceneViewItemOverride,
 } from './types';
 
-const mapPropertyKey: M.Func<
-  PropertyKey.AsObject,
-  DomainPropertyKey | null | undefined
-> = M.defineMapper(
-  M.read(M.requiredProp('name'), M.requiredProp('category')),
-  ([name, category]) => ({ name, category })
-);
+const mapPropertyKey: M.Func<PropertyKey.AsObject, DomainPropertyKey | null | undefined> =
+  M.defineMapper(
+    M.read(M.requiredProp('name'), M.requiredProp('category')),
+    ([name, category]) => ({ name, category }),
+  );
 
 const mapGetStringValue: M.Func<StringValue.AsObject, DomainPropertyValue> =
   M.defineMapper(M.read(M.getProp('value')), ([value]) => ({
@@ -64,26 +62,22 @@ const mapLongValue: M.Func<
   DomainPropertyValue | null | undefined
 > = M.mapProp('pb_long', M.ifDefined(mapGetLongValue));
 
-const mapGetDoubleValue: M.Func<
-  PropertyValueDouble.AsObject,
-  DomainPropertyValue
-> = M.defineMapper(M.read(M.getProp('value')), ([value]) => ({
-  type: 'double',
-  value,
-}));
+const mapGetDoubleValue: M.Func<PropertyValueDouble.AsObject, DomainPropertyValue> =
+  M.defineMapper(M.read(M.getProp('value')), ([value]) => ({
+    type: 'double',
+    value,
+  }));
 
 const mapDoubleValue: M.Func<
   PropertyValue.AsObject,
   DomainPropertyValue | null | undefined
 > = M.mapProp('pb_double', M.ifDefined(mapGetDoubleValue));
 
-const mapGetTimestampValue: M.Func<
-  PropertyValueDate.AsObject,
-  DomainPropertyValue
-> = M.defineMapper(M.read(M.requiredProp('value')), ([value]) => ({
-  type: 'timestamp',
-  value: value,
-}));
+const mapGetTimestampValue: M.Func<PropertyValueDate.AsObject, DomainPropertyValue> =
+  M.defineMapper(M.read(M.requiredProp('value')), ([value]) => ({
+    type: 'timestamp',
+    value: value,
+  }));
 
 const mapTimestampValue: M.Func<
   PropertyValue.AsObject,
@@ -95,7 +89,7 @@ const mapPropertyValue: M.Func<
   DomainPropertyValue | null | undefined
 > = M.compose(
   M.pickFirst(mapStringValue, mapLongValue, mapDoubleValue, mapTimestampValue),
-  M.required('value')
+  M.required('value'),
 );
 
 const mapEntriesList: M.Func<PropertyEntry.AsObject, DomainPropertyEntry> =
@@ -103,9 +97,9 @@ const mapEntriesList: M.Func<PropertyEntry.AsObject, DomainPropertyEntry> =
     M.read(
       M.requiredProp('id'),
       M.mapProp('key', M.ifDefined(mapPropertyKey)),
-      M.mapProp('value', M.ifDefined(mapPropertyValue))
+      M.mapProp('value', M.ifDefined(mapPropertyValue)),
     ),
-    ([id, key, value]) => ({ id, key, value })
+    ([id, key, value]) => ({ id, key, value }),
   );
 
 const mapListSceneItemMetadataResponse: M.Func<
@@ -114,18 +108,18 @@ const mapListSceneItemMetadataResponse: M.Func<
 > = M.defineMapper(
   M.read(
     M.mapProp('cursor', mapCursor),
-    M.mapRequiredProp('entriesList', M.mapArray(mapEntriesList))
+    M.mapRequiredProp('entriesList', M.mapArray(mapEntriesList)),
   ),
   ([cursor, entries]) => ({
     paging: {
       next: cursor,
     },
     entries,
-  })
+  }),
 );
 
 export const mapListSceneItemMetadataResponseOrThrow = M.ifInvalidThrow(
-  mapListSceneItemMetadataResponse
+  mapListSceneItemMetadataResponse,
 );
 
 const mapSceneViewItemOverride: M.Func<
@@ -140,7 +134,7 @@ const mapSceneViewItemOverride: M.Func<
     M.mapProp('isVisible', M.ifDefined(fromPbBoolValue)),
     M.mapProp('isSelected', M.ifDefined(fromPbBoolValue)),
     M.mapProp('isPhantom', M.ifDefined(fromPbBoolValue)),
-    M.mapProp('endItem', M.ifDefined(fromPbBoolValue))
+    M.mapProp('endItem', M.ifDefined(fromPbBoolValue)),
   ),
   ([
     id,
@@ -160,7 +154,7 @@ const mapSceneViewItemOverride: M.Func<
     isSelected,
     isPhantom,
     endItem,
-  })
+  }),
 );
 
 export const mapSceneViewItem: M.Func<PBSceneViewItem.AsObject, SceneViewItem> =
@@ -173,7 +167,7 @@ export const mapSceneViewItem: M.Func<PBSceneViewItem.AsObject, SceneViewItem> =
       M.mapProp('suppliedId', M.ifDefined(fromPbStringValue)),
       M.mapProp('boundingBox', M.ifDefined(fromPbBoundingBox3f)),
       M.mapProp('worldTransform', M.ifDefined(fromPbMatrix4f)),
-      M.mapProp('override', M.ifDefined(mapSceneViewItemOverride))
+      M.mapProp('override', M.ifDefined(mapSceneViewItemOverride)),
     ),
     ([
       id,
@@ -193,7 +187,7 @@ export const mapSceneViewItem: M.Func<PBSceneViewItem.AsObject, SceneViewItem> =
       boundingBox,
       worldTransform,
       override,
-    })
+    }),
   );
 
 export const mapGetSceneViewItemResponseOrThrow: M.ThrowIfInvalidFunc<
@@ -202,6 +196,6 @@ export const mapGetSceneViewItemResponseOrThrow: M.ThrowIfInvalidFunc<
 > = M.ifInvalidThrow(
   M.defineMapper(
     M.read(M.mapProp('item', M.ifDefined(mapSceneViewItem))),
-    ([item]) => item ?? undefined
-  )
+    ([item]) => item ?? undefined,
+  ),
 );

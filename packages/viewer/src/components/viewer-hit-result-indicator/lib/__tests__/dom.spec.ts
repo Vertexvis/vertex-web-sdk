@@ -11,9 +11,7 @@ describe('DOM utils', () => {
     it('parses values with double quotes', async () => {
       const styles = createMockStyles();
 
-      (styles.getPropertyValue as jest.Mock).mockImplementation(
-        () => '"#ff0000"'
-      );
+      (styles.getPropertyValue as jest.Mock).mockImplementation(() => '"#ff0000"');
 
       expect(parseCssColorValue(styles, '--property')).toBe('#ff0000');
     });
@@ -21,9 +19,7 @@ describe('DOM utils', () => {
     it('parses values with single quotes', async () => {
       const styles = createMockStyles();
 
-      (styles.getPropertyValue as jest.Mock).mockImplementation(
-        () => "'#ff0000'"
-      );
+      (styles.getPropertyValue as jest.Mock).mockImplementation(() => "'#ff0000'");
 
       expect(parseCssColorValue(styles, '--property')).toBe('#ff0000');
     });

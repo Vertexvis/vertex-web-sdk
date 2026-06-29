@@ -48,7 +48,7 @@ function createMeshes(
   transform: Matrix4.Matrix4,
   frame: Frame,
   canvas: HTMLCanvasElement,
-  triangleSize?: number
+  triangleSize?: number,
 ): {
   xArrow: TriangleMesh;
   yArrow: TriangleMesh;
@@ -62,15 +62,15 @@ function createMeshes(
     Vector3.magnitude(
       Vector3.subtract(
         Vector3.fromMatrixPosition(transform),
-        frame.scene.camera.position
-      )
+        frame.scene.camera.position,
+      ),
     ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
   const canvasArea = canvas.height * canvas.width;
   const screenSizeAdjustment = Math.max(
     TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_NUMERATOR /
       (canvasArea + TRIANGLE_SIZE_CANVAS_AREA_ADJUSTMENT_DENOMINATOR),
-    1
+    1,
   );
 
   const expectedTriangleSize = baseExpectedTriangleSize * screenSizeAdjustment;
@@ -80,42 +80,42 @@ function createMeshes(
     'x-translate',
     xAxisArrowPositions(transform, frame.scene.camera, expectedTriangleSize),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const xAxis = new AxisLine(
     mockShapeBuilder().createShape,
     'x-axis',
     axisPositions(transform, frame.scene.camera, xArrow),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const yArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'y-translate',
     yAxisArrowPositions(transform, frame.scene.camera, expectedTriangleSize),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const yAxis = new AxisLine(
     mockShapeBuilder().createShape,
     'y-axis',
     axisPositions(transform, frame.scene.camera, yArrow),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const zArrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'z-translate',
     zAxisArrowPositions(transform, frame.scene.camera, expectedTriangleSize),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const zAxis = new AxisLine(
     mockShapeBuilder().createShape,
     'z-axis',
     axisPositions(transform, frame.scene.camera, zArrow),
     '#000000',
-    '#000000'
+    '#000000',
   );
 
   return {
@@ -128,10 +128,7 @@ function createMeshes(
   };
 }
 
-function updateFrameCameraPosition(
-  baseFrame: Frame,
-  position: Vector3.Vector3
-): Frame {
+function updateFrameCameraPosition(baseFrame: Frame, position: Vector3.Vector3): Frame {
   return new Frame(
     baseFrame.correlationIds,
     baseFrame.temporalRefinementCorrelationId,
@@ -145,17 +142,17 @@ function updateFrameCameraPosition(
         baseFrame.scene.camera.up,
         baseFrame.scene.camera.near,
         baseFrame.scene.camera.far,
-        baseFrame.scene.camera.aspectRatio
+        baseFrame.scene.camera.aspectRatio,
       ),
       baseFrame.scene.boundingBox,
       baseFrame.scene.crossSection,
       baseFrame.scene.worldOrientation,
       baseFrame.scene.hasChanged,
       baseFrame.scene.sceneViewSummary,
-      baseFrame.scene.modelViewId
+      baseFrame.scene.modelViewId,
     ),
     makeDepthImagePng(100, 50),
-    makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0))
+    makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0)),
   );
 }
 
@@ -182,7 +179,7 @@ describe(TransformWidget, () => {
       expect.objectContaining({
         canvas,
         extensions: 'angle_instanced_arrays',
-      })
+      }),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalled();
     expect(regl().frame).toHaveBeenCalled();
@@ -200,27 +197,27 @@ describe(TransformWidget, () => {
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.xArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.yArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.zArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.xAxis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.yAxis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.zAxis.points),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -233,7 +230,7 @@ describe(TransformWidget, () => {
       frame,
       canvas,
       (frame.scene.camera as FrameOrthographicCamera).fovHeight *
-        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
+        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
     );
 
     mockShapeBuilder().createShape.mockClear();
@@ -242,27 +239,27 @@ describe(TransformWidget, () => {
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.xArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.yArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.zArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.xAxis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.yAxis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.zAxis.points),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -275,7 +272,7 @@ describe(TransformWidget, () => {
       frame,
       smallCanvas,
       (frame.scene.camera as FrameOrthographicCamera).fovHeight *
-        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
+        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
     );
 
     mockShapeBuilder().createShape.mockClear();
@@ -284,45 +281,36 @@ describe(TransformWidget, () => {
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.xArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.yArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.zArrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.xAxis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.yAxis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.zAxis.points),
-      expect.anything()
+      expect.anything(),
     );
   });
 
   it('sorts the meshes', async () => {
     const widget = new TransformWidget(canvas);
     const baseFrame = makePerspectiveFrame();
-    const xFrame = updateFrameCameraPosition(
-      baseFrame,
-      Vector3.create(100, 10, 0)
-    );
-    const yFrame = updateFrameCameraPosition(
-      baseFrame,
-      Vector3.create(0, 100, 10)
-    );
-    const zFrame = updateFrameCameraPosition(
-      baseFrame,
-      Vector3.create(10, 0, 100)
-    );
+    const xFrame = updateFrameCameraPosition(baseFrame, Vector3.create(100, 10, 0));
+    const yFrame = updateFrameCameraPosition(baseFrame, Vector3.create(0, 100, 10));
+    const zFrame = updateFrameCameraPosition(baseFrame, Vector3.create(10, 0, 100));
 
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
@@ -349,7 +337,7 @@ describe(TransformWidget, () => {
         'xz-rotation-line',
         'z-axis',
         'z-translate',
-      ].reverse()
+      ].reverse(),
     );
 
     widget.updateFrame(yFrame);
@@ -374,7 +362,7 @@ describe(TransformWidget, () => {
         'yx-rotation-line',
         'x-axis',
         'x-translate',
-      ].reverse()
+      ].reverse(),
     );
 
     widget.updateFrame(zFrame);
@@ -399,7 +387,7 @@ describe(TransformWidget, () => {
         'zy-rotation-line',
         'y-axis',
         'y-translate',
-      ].reverse()
+      ].reverse(),
     );
   });
 
@@ -414,9 +402,7 @@ describe(TransformWidget, () => {
     const meshes = createMeshes(positionTransform, frame, canvas);
     const hoveredListener = jest.fn();
 
-    (testDrawable as jest.Mock).mockImplementation(
-      (m) => m.identifier === 'x-translate'
-    );
+    (testDrawable as jest.Mock).mockImplementation((m) => m.identifier === 'x-translate');
 
     widget.onHoveredChanged(hoveredListener);
     widget.updateFrame(frame);
@@ -441,9 +427,7 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    widget.updateFrame(
-      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
-    );
+    widget.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
     widget.updateTransform(positionTransform);
 
     widget.updateColors({
@@ -452,15 +436,15 @@ describe(TransformWidget, () => {
       zArrow: undefined,
     });
 
-    expect(
-      widget.getDrawableElements().some((e) => e.fillColor === '#333333')
-    ).toBe(true);
-    expect(
-      widget.getDrawableElements().some((e) => e.fillColor === '#444444')
-    ).toBe(true);
-    expect(
-      widget.getDrawableElements().some((e) => e.fillColor === '#555555')
-    ).toBe(true);
+    expect(widget.getDrawableElements().some((e) => e.fillColor === '#333333')).toBe(
+      true,
+    );
+    expect(widget.getDrawableElements().some((e) => e.fillColor === '#444444')).toBe(
+      true,
+    );
+    expect(widget.getDrawableElements().some((e) => e.fillColor === '#555555')).toBe(
+      true,
+    );
 
     widget.updateColors({
       xArrow: undefined,
@@ -468,15 +452,15 @@ describe(TransformWidget, () => {
       zArrow: '#111111',
     });
 
-    expect(
-      widget.getDrawableElements().some((e) => e.fillColor === '#333333')
-    ).toBe(true);
-    expect(
-      widget.getDrawableElements().some((e) => e.fillColor === '#444444')
-    ).toBe(true);
-    expect(
-      widget.getDrawableElements().some((e) => e.fillColor === '#111111')
-    ).toBe(true);
+    expect(widget.getDrawableElements().some((e) => e.fillColor === '#333333')).toBe(
+      true,
+    );
+    expect(widget.getDrawableElements().some((e) => e.fillColor === '#444444')).toBe(
+      true,
+    );
+    expect(widget.getDrawableElements().some((e) => e.fillColor === '#111111')).toBe(
+      true,
+    );
   });
 
   it('uses an opacity if the specific axis are disabled', async () => {
@@ -496,39 +480,34 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    widget.updateFrame(
-      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
-    );
+    widget.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
     widget.updateTransform(positionTransform);
 
     // the rotation meshes should all have the disabled fill color
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.disabled && e.identifier.includes('rotate')).length
+        .filter((e) => e.disabled && e.identifier.includes('rotate')).length,
     ).toBe(3);
 
     // The disabled rotation meshes should have no impact on the translation meshes
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#777777' && e.identifier.includes('translate')
-        ).length
+        .filter((e) => e.fillColor === '#777777' && e.identifier.includes('translate'))
+        .length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#888888' && e.identifier.includes('translate')
-        ).length
+        .filter((e) => e.fillColor === '#888888' && e.identifier.includes('translate'))
+        .length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#999999' && e.identifier.includes('translate')
-        ).length
+        .filter((e) => e.fillColor === '#999999' && e.identifier.includes('translate'))
+        .length,
     ).toBe(1);
 
     // re-enabling the rotation axis should draw the client given color
@@ -542,30 +521,27 @@ describe(TransformWidget, () => {
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.disabled && e.identifier.includes('rotate')).length
+        .filter((e) => e.disabled && e.identifier.includes('rotate')).length,
     ).toBe(0);
 
     // the colors should now be present
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#777777' && e.identifier.includes('rotate')
-        ).length
+        .filter((e) => e.fillColor === '#777777' && e.identifier.includes('rotate'))
+        .length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#888888' && e.identifier.includes('rotate')
-        ).length
+        .filter((e) => e.fillColor === '#888888' && e.identifier.includes('rotate'))
+        .length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter(
-          (e) => e.fillColor === '#999999' && e.identifier.includes('rotate')
-        ).length
+        .filter((e) => e.fillColor === '#999999' && e.identifier.includes('rotate'))
+        .length,
     ).toBe(1);
   });
 
@@ -581,21 +557,19 @@ describe(TransformWidget, () => {
       },
       {
         xRotation: true,
-      }
+      },
     );
 
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    widget.updateFrame(
-      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
-    );
+    widget.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
     widget.updateTransform(positionTransform);
 
     expect(
       widget
         .getDrawableElements()
-        .find((e) => e.disabled && e.identifier.includes('x-rotate'))
+        .find((e) => e.disabled && e.identifier.includes('x-rotate')),
     ).toBeDefined();
   });
 
@@ -619,13 +593,9 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    unscaled.updateFrame(
-      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
-    );
+    unscaled.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
     unscaled.updateTransform(positionTransform);
-    scaled.updateFrame(
-      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
-    );
+    scaled.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
     scaled.updateTransform(positionTransform);
 
     const unscaledDrawableElements = unscaled.getDrawableElements();
@@ -635,7 +605,7 @@ describe(TransformWidget, () => {
       identifier: string,
       scalar: number,
       unscaled: Drawable<DrawablePoints>[],
-      scaled: Drawable<DrawablePoints>[]
+      scaled: Drawable<DrawablePoints>[],
     ): void {
       const scaledPoints = scaled
         .find((e) => e.identifier === identifier)
@@ -653,55 +623,55 @@ describe(TransformWidget, () => {
       'x-translate',
       sizes.xTranslation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'y-translate',
       sizes.yTranslation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'z-translate',
       sizes.zTranslation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'x-rotate',
       sizes.xRotation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'y-rotate',
       sizes.yRotation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'z-rotate',
       sizes.zRotation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'xy-translate',
       sizes.xyTranslation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'xz-translate',
       sizes.xzTranslation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
     validatePointScaling(
       'yz-translate',
       sizes.yzTranslation,
       unscaledDrawableElements,
-      scaledDrawableElements
+      scaledDrawableElements,
     );
   });
 });

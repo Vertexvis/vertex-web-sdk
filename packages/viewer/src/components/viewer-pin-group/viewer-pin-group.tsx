@@ -111,7 +111,7 @@ export class ViewerPinGroup {
    */
   @Listen('occlusionStateChanged')
   protected async handleOcclusionStateChanged(
-    event: CustomEvent<boolean>
+    event: CustomEvent<boolean>,
   ): Promise<void> {
     this.occluded = event.detail;
   }
@@ -120,9 +120,7 @@ export class ViewerPinGroup {
    * @ignore
    */
   @Listen('detachedStateChanged')
-  protected async handleDetachedStateChanged(
-    event: CustomEvent<boolean>
-  ): Promise<void> {
+  protected async handleDetachedStateChanged(event: CustomEvent<boolean>): Promise<void> {
     this.detached = event.detail;
   }
 
@@ -204,29 +202,20 @@ export class ViewerPinGroup {
     return { pinPoint: pin.worldPosition };
   }
 
-  private computeDefaultPinPoints(
-    pin: Pin,
-    elementBounds: DOMRect
-  ): ComputedPoints {
+  private computeDefaultPinPoints(pin: Pin, elementBounds: DOMRect): ComputedPoints {
     return {
       pinPoint: this.getFromWorldPosition(
         pin.worldPosition,
         this.projectionViewMatrix,
-        elementBounds
+        elementBounds,
       ),
     };
   }
 
-  private computeTextPinPoints(
-    pin: TextPin,
-    elementBounds: DOMRect
-  ): ComputedPoints {
+  private computeTextPinPoints(pin: TextPin, elementBounds: DOMRect): ComputedPoints {
     const { pinPoint } = this.computeDefaultPinPoints(pin, elementBounds);
 
-    const screenPosition = translatePointToScreen(
-      pin.label.point,
-      elementBounds
-    );
+    const screenPosition = translatePointToScreen(pin.label.point, elementBounds);
 
     const labelWidth = this.labelEl?.firstElementChild?.clientWidth || 0;
     const labelHeight = this.labelEl?.firstElementChild?.clientHeight || 0;
@@ -257,7 +246,7 @@ export class ViewerPinGroup {
   private getFromWorldPosition(
     pt: Vector3.Vector3,
     projectionViewMatrix: Matrix4.Matrix4,
-    dimensions: Dimensions.Dimensions
+    dimensions: Dimensions.Dimensions,
   ): Point.Point {
     const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
     return Viewport.fromDimensions(dimensions).transformVectorToViewport(ndcPt);

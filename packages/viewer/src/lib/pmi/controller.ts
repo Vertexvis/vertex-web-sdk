@@ -21,7 +21,7 @@ export class PmiController {
   public constructor(
     private client: SceneViewAPIClient,
     private jwtProvider: JwtProvider,
-    private deviceIdProvider: () => string | undefined
+    private deviceIdProvider: () => string | undefined,
   ) {}
 
   public async listAnnotations({
@@ -29,27 +29,25 @@ export class PmiController {
     cursor,
     size = 50,
   }: ListAnnotationsOptions = {}): Promise<PmiAnnotationListResponse> {
-    const res: ListPmiAnnotationsResponse = await requestUnary(
-      async (handler) => {
-        const deviceId = this.deviceIdProvider();
-        const meta = await createMetadata(this.jwtProvider, deviceId);
-        const req = new ListPmiAnnotationsRequest();
+    const res: ListPmiAnnotationsResponse = await requestUnary(async (handler) => {
+      const deviceId = this.deviceIdProvider();
+      const meta = await createMetadata(this.jwtProvider, deviceId);
+      const req = new ListPmiAnnotationsRequest();
 
-        if (modelViewId != null) {
-          const modelViewId2l = toUuid2l(modelViewId);
-          req.setModelViewId(modelViewId2l);
-        }
-
-        const page = new Pager();
-        page.setLimit(size);
-        if (cursor != null) {
-          page.setCursor(cursor);
-        }
-        req.setPage(page);
-
-        this.client.listPmiAnnotations(req, meta, handler);
+      if (modelViewId != null) {
+        const modelViewId2l = toUuid2l(modelViewId);
+        req.setModelViewId(modelViewId2l);
       }
-    );
+
+      const page = new Pager();
+      page.setLimit(size);
+      if (cursor != null) {
+        page.setCursor(cursor);
+      }
+      req.setPage(page);
+
+      this.client.listPmiAnnotations(req, meta, handler);
+    });
 
     return mapListPmiAnnotationsResponseOrThrow(res.toObject());
   }

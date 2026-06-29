@@ -13,19 +13,15 @@ export class SceneOperationExecuteResult {
     stream: StreamApi,
     decodeFrame: FrameDecoder,
     correlationId: string,
-    timeout?: number
+    timeout?: number,
   ) {
     this.onFrameDrawn = new StreamApiEventDispatcher<Frame>(
       stream,
       (msg) =>
-        !!msg.request?.drawFrame?.frameCorrelationIds?.some(
-          (id) => id === correlationId
-        ),
+        !!msg.request?.drawFrame?.frameCorrelationIds?.some((id) => id === correlationId),
       (msg) =>
-        msg.request?.drawFrame != null
-          ? decodeFrame(msg.request.drawFrame)
-          : undefined,
-      timeout ?? SCENE_ALTERATION_DEFAULT_TIMEOUT_MS
+        msg.request?.drawFrame != null ? decodeFrame(msg.request.drawFrame) : undefined,
+      timeout ?? SCENE_ALTERATION_DEFAULT_TIMEOUT_MS,
     );
   }
 }

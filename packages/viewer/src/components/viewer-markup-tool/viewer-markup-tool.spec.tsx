@@ -19,8 +19,7 @@ describe('vertex-viewer-markup-tool', () => {
       html: `<vertex-viewer-markup-tool></vertex-viewer-markup-tool>`,
     });
 
-    const markupEl = page.root
-      ?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
+    const markupEl = page.root?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
 
     expect(markupEl.mode).toBe('create');
   });
@@ -37,8 +36,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
 
     expect(markupEl).toHaveClass('my-markup');
   });
@@ -55,8 +53,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
 
     expect(markupEl).not.toHaveClass('my-markup');
   });
@@ -73,8 +70,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
 
     expect(markupEl).not.toHaveClass('my-markup');
   });
@@ -85,8 +81,7 @@ describe('vertex-viewer-markup-tool', () => {
       html: `<vertex-viewer-markup-tool tool="circle"></vertex-viewer-markup-tool>`,
     });
 
-    const markupEl = page.root
-      ?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
+    const markupEl = page.root?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
 
     expect(markupEl.mode).toBe('create');
   });
@@ -103,8 +98,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
 
     expect(markupEl).toHaveClass('my-markup');
   });
@@ -121,8 +115,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
 
     expect(markupEl).not.toHaveClass('my-markup');
   });
@@ -139,8 +132,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupCircleElement;
 
     expect(markupEl).not.toHaveClass('my-markup');
   });
@@ -157,13 +149,12 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector(
-      'vertex-viewer-markup-tool'
+      'vertex-viewer-markup-tool',
     ) as HTMLVertexViewerMarkupToolElement;
     toolEl.circleTemplateId = 'my-template';
     await page.waitForChanges();
 
-    const markupEl =
-      toolEl.firstElementChild as HTMLVertexViewerMarkupCircleElement;
+    const markupEl = toolEl.firstElementChild as HTMLVertexViewerMarkupCircleElement;
 
     expect(markupEl.className).toBe('my-markup');
   });
@@ -192,8 +183,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
 
     expect(markupEl).toHaveClass('my-markup');
   });
@@ -210,8 +200,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
 
     expect(markupEl).not.toHaveClass('my-markup');
   });
@@ -228,8 +217,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector('vertex-viewer-markup-tool');
-    const markupEl =
-      toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+    const markupEl = toolEl?.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
 
     expect(markupEl).not.toHaveClass('my-markup');
   });
@@ -246,13 +234,12 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector(
-      'vertex-viewer-markup-tool'
+      'vertex-viewer-markup-tool',
     ) as HTMLVertexViewerMarkupToolElement;
     toolEl.freeformTemplateId = 'my-template';
     await page.waitForChanges();
 
-    const markupEl =
-      toolEl.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
+    const markupEl = toolEl.firstElementChild as HTMLVertexViewerMarkupFreeformElement;
 
     expect(markupEl.className).toBe('my-markup');
   });
@@ -273,7 +260,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector(
-      'vertex-viewer-markup-tool'
+      'vertex-viewer-markup-tool',
     ) as HTMLVertexViewerMarkupToolElement;
 
     toolEl.disabled = true;
@@ -293,8 +280,7 @@ describe('vertex-viewer-markup-tool', () => {
 
     toolEl.viewer = viewer;
     await page.waitForChanges();
-    const markupEl = page.root
-      ?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
+    const markupEl = page.root?.firstElementChild as HTMLVertexViewerMarkupArrowElement;
     expect(markupEl?.viewer).toBe(viewer);
   });
 
@@ -313,8 +299,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.root as HTMLVertexViewerMarkupToolElement;
-    const markupEl =
-      toolEl.firstElementChild as HTMLVertexViewerMarkupArrowElement;
+    const markupEl = toolEl.firstElementChild as HTMLVertexViewerMarkupArrowElement;
 
     markupEl.dispatchEvent(new CustomEvent('interactionBegin'));
     expect(onMarkupBegin).toHaveBeenCalled();
@@ -330,7 +315,7 @@ describe('vertex-viewer-markup-tool', () => {
           end,
           id: expect.stringContaining('markup'),
         }),
-      })
+      }),
     );
 
     markupEl.start = undefined;

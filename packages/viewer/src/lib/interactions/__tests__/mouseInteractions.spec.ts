@@ -3,10 +3,7 @@ jest.mock('../interactionApiPerspective');
 
 import { Point } from '@vertexvis/geometry';
 
-import {
-  defaultInteractionConfig,
-  InteractionConfig,
-} from '../../types/interactions';
+import { defaultInteractionConfig, InteractionConfig } from '../../types/interactions';
 import { InteractionApi } from '../interactionApi';
 import { InteractionApiPerspective } from '../interactionApiPerspective';
 import {
@@ -115,9 +112,7 @@ describe(PanInteraction, () => {
       interaction.beginDrag(event1, canvasPoint, api, element);
       interaction.drag(event2, api);
 
-      expect(api.panCameraToScreenPoint).toHaveBeenCalledWith(
-        Point.create(15, 10)
-      );
+      expect(api.panCameraToScreenPoint).toHaveBeenCalledWith(Point.create(15, 10));
     });
 
     it('continuous drags rotate camera using delta between calls', () => {
@@ -126,10 +121,7 @@ describe(PanInteraction, () => {
       interaction.drag(event2, api);
       interaction.drag(event3, api);
 
-      expect(api.panCameraToScreenPoint).toHaveBeenNthCalledWith(
-        2,
-        Point.create(25, 20)
-      );
+      expect(api.panCameraToScreenPoint).toHaveBeenNthCalledWith(2, Point.create(25, 20));
     });
 
     it('does nothing if begin drag has not been called', () => {
@@ -159,8 +151,7 @@ describe(PanInteraction, () => {
 });
 
 describe(ZoomInteraction, () => {
-  const api =
-    new (InteractionApiPerspective as jest.Mock<InteractionApiPerspective>)();
+  const api = new (InteractionApiPerspective as jest.Mock<InteractionApiPerspective>)();
 
   const defaultConfigProvider = (): InteractionConfig => ({
     ...defaultInteractionConfig,

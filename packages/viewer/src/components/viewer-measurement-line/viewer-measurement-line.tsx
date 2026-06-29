@@ -38,17 +38,12 @@ export class ViewerMeasurementLine {
    */
   protected render(): h.JSX.IntrinsicElements {
     const angle = Angle.fromPoints(this.start, this.end);
-    const lineFillEndCaps = getEndCapPoints(
-      this.start,
-      this.end,
-      angle,
-      this.capLength
-    );
+    const lineFillEndCaps = getEndCapPoints(this.start, this.end, angle, this.capLength);
     const lineStrokeEndCaps = getEndCapPoints(
       this.start,
       this.end,
       angle,
-      this.capLength + 1
+      this.capLength + 1,
     );
 
     return (
@@ -123,7 +118,7 @@ function getEndCapPoints(
   start: Point.Point,
   end: Point.Point,
   angle: number,
-  length: number
+  length: number,
 ): LinePoints {
   return {
     startEndCap: getPerpendicularLine(start, angle, length),
@@ -134,7 +129,7 @@ function getEndCapPoints(
 function getPerpendicularLine(
   pt: Point.Point,
   angle: number,
-  length: number
+  length: number,
 ): { start: Point.Point; end: Point.Point } {
   const perpAngle = angle + Math.PI / 2;
   const start = Point.add(pt, Point.polar(length / 2, perpAngle));

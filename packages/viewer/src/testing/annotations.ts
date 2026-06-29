@@ -61,7 +61,7 @@ export function makeListSceneViewAnnotationSetsResponse(
   annotationSets: SceneAnnotationSet[] = [
     makeSceneAnnotationSet(),
     makeSceneAnnotationSet(),
-  ]
+  ],
 ): ListSceneViewAnnotationSetsResponse {
   const res = new ListSceneViewAnnotationSetsResponse();
   res.setSceneAnnotationSetsList(annotationSets);
@@ -69,10 +69,7 @@ export function makeListSceneViewAnnotationSetsResponse(
 }
 
 export function makeListSceneAnnotationsResponse(
-  annotations: SceneAnnotation[] = [
-    makeSceneAnnotation(),
-    makeSceneAnnotation(),
-  ]
+  annotations: SceneAnnotation[] = [makeSceneAnnotation(), makeSceneAnnotation()],
 ): ListSceneAnnotationsResponse {
   const res = new ListSceneAnnotationsResponse();
   res.setSceneAnnotationsList(annotations);

@@ -35,7 +35,7 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
     doubleTapEmitter: EventEmitter<TapEventDetails>,
     longPressEmitter: EventEmitter<TapEventDetails>,
     interactionStartedEmitter: EventEmitter<void>,
-    interactionFinishedEmitter: EventEmitter<void>
+    interactionFinishedEmitter: EventEmitter<void>,
   ) {
     super(
       stream,
@@ -48,7 +48,7 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
       doubleTapEmitter,
       longPressEmitter,
       interactionStartedEmitter,
-      interactionFinishedEmitter
+      interactionFinishedEmitter,
     );
   }
 
@@ -76,17 +76,14 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
 
       const offset = Vector3.add(
         Vector3.scale(epsilonX, xvec),
-        Vector3.scale(epsilonY, yvec)
+        Vector3.scale(epsilonY, yvec),
       );
 
       return camera.moveBy(offset);
     });
   }
 
-  public async zoomCameraToPoint(
-    point: Point.Point,
-    delta: number
-  ): Promise<void> {
+  public async zoomCameraToPoint(point: Point.Point, delta: number): Promise<void> {
     return this.transformCamera(
       ({ camera, viewport, frame, depthBuffer, boundingBox }) => {
         const cam = frame.scene.camera;
@@ -96,14 +93,11 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
         const ray = viewport.transformPointToRay(point, frame.image, frameCam);
 
         if (this.zoomData == null) {
-          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
-            dir,
-            cam.lookAt
-          );
+          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(dir, cam.lookAt);
           const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
           if (fallbackPt == null) {
             console.warn(
-              'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+              'Cannot determine fallback point for zoom. Ray does not intersect plane.',
             );
             return camera;
           }
@@ -125,7 +119,7 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
               viewport,
               boundingBox,
               ray,
-              this.zoomData
+              this.zoomData,
             );
 
           if (isPastHitPlane && !keepCurrent) {
@@ -146,7 +140,7 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
           }
         }
         return camera;
-      }
+      },
     );
   }
 
@@ -158,26 +152,17 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
       const normalizedViewVector = Vector3.normalize(camera.viewVector);
 
       const boundingBoxScalar = Math.min(
-        ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+        ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
       );
       const scaledDelta = Vector3.scale(boundingBoxScalar, delta);
       const localX = Vector3.cross(normalizedUp, normalizedViewVector);
       const localZ = Vector3.cross(localX, normalizedUp);
 
-      const translationX = Vector3.scale(
-        scaledDelta.x,
-        Vector3.normalize(localX)
-      );
-      const translationY = Vector3.scale(
-        scaledDelta.y,
-        Vector3.normalize(normalizedUp)
-      );
-      const translationZ = Vector3.scale(
-        scaledDelta.z,
-        Vector3.normalize(localZ)
-      );
+      const translationX = Vector3.scale(scaledDelta.x, Vector3.normalize(localX));
+      const translationY = Vector3.scale(scaledDelta.y, Vector3.normalize(normalizedUp));
+      const translationZ = Vector3.scale(scaledDelta.z, Vector3.normalize(localZ));
       const translation = Vector3.negate(
-        Vector3.add(translationX, translationY, translationZ)
+        Vector3.add(translationX, translationY, translationZ),
       );
 
       return camera.update({
@@ -194,7 +179,7 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
     viewport: Viewport,
     boundingBox: BoundingBox.BoundingBox,
     pointRay: Ray.Ray,
-    zoomData: ZoomData
+    zoomData: ZoomData,
   ): ZoomPositionData {
     const config = this.getConfig();
     const { hitPt, hitPlane } = zoomData;
@@ -210,15 +195,9 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
       origin: expectedPosition,
       direction: Vector3.normalize(camera.viewVector),
     });
-    const expectedIntersection = Ray.intersectPlane(
-      expectedViewVector,
-      hitPlane
-    );
+    const expectedIntersection = Ray.intersectPlane(expectedViewVector, hitPlane);
 
-    if (
-      expectedIntersection == null &&
-      config.useMinimumPerspectiveZoomDistance
-    ) {
+    if (expectedIntersection == null && config.useMinimumPerspectiveZoomDistance) {
       const minDistanceEpsilon = (6 * minDistance * delta) / viewport.height;
       const position = Ray.at(pointRay, minDistanceEpsilon);
 
@@ -247,7 +226,7 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
 
   private computeZoomMinimumDistance(
     camera: PerspectiveCamera,
-    boundingBox: BoundingBox.BoundingBox
+    boundingBox: BoundingBox.BoundingBox,
   ): number {
     const xLength = Math.abs(boundingBox.min.x) + Math.abs(boundingBox.max.x);
     const yLength = Math.abs(boundingBox.min.y) + Math.abs(boundingBox.max.y);
@@ -255,13 +234,13 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
     const maxLength = Math.max(xLength, yLength, zLength);
 
     const absDotX = Math.abs(
-      Vector3.dot(Vector3.normalize(camera.viewVector), Vector3.right())
+      Vector3.dot(Vector3.normalize(camera.viewVector), Vector3.right()),
     );
     const absDotY = Math.abs(
-      Vector3.dot(Vector3.normalize(camera.viewVector), Vector3.up())
+      Vector3.dot(Vector3.normalize(camera.viewVector), Vector3.up()),
     );
     const absDotZ = Math.abs(
-      Vector3.dot(Vector3.normalize(camera.viewVector), Vector3.back())
+      Vector3.dot(Vector3.normalize(camera.viewVector), Vector3.back()),
     );
 
     const scaledLengthX = xLength * absDotX;

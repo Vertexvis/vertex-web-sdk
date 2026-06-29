@@ -85,8 +85,8 @@ describe('storage', () => {
         getStorageEntry(
           localStorageKey,
           (entry) => ({ ...entry, newValue: 'value' }),
-          localStorage
-        )
+          localStorage,
+        ),
       ).toMatchObject({
         ...value1,
         newValue: 'value',
@@ -95,7 +95,7 @@ describe('storage', () => {
 
     it('returns nothing if the item does not exist', () => {
       expect(
-        getStorageEntry(localStorageKey, (entry) => entry, localStorage)
+        getStorageEntry(localStorageKey, (entry) => entry, localStorage),
       ).toBeUndefined();
     });
   });

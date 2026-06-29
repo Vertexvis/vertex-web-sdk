@@ -14,9 +14,7 @@ export const MeasurementDetailsEntry: FunctionalComponent<
 > = ({ label, ...props }, children) => {
   return (
     <div {...props} class="measurement-details-entry">
-      <div
-        class={classNames('measurement-details-entry-label', paramCase(label))}
-      >
+      <div class={classNames('measurement-details-entry-label', paramCase(label))}>
         {label}:
       </div>
       {children}

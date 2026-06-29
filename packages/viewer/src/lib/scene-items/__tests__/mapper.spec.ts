@@ -18,10 +18,8 @@ describe('ListSceneItemMetadataResponse', () => {
   it('paging next cursor', () => {
     expect(
       validate(
-        new ListSceneItemMetadataResponseBuilder()
-          .withCursor(CURSOR_VALUE)
-          .build()
-      )
+        new ListSceneItemMetadataResponseBuilder().withCursor(CURSOR_VALUE).build(),
+      ),
     ).toEqual({
       paging: {
         next: CURSOR_VALUE,
@@ -33,10 +31,8 @@ describe('ListSceneItemMetadataResponse', () => {
   it('paging cursor undefined', () => {
     expect(
       validate(
-        new ListSceneItemMetadataResponseBuilder()
-          .withCursor(UNDEFINED_CURSOR)
-          .build()
-      )
+        new ListSceneItemMetadataResponseBuilder().withCursor(UNDEFINED_CURSOR).build(),
+      ),
     ).toEqual({
       paging: {
         next: UNDEFINED_CURSOR,
@@ -49,11 +45,9 @@ describe('ListSceneItemMetadataResponse', () => {
     expect(
       validate(
         new ListSceneItemMetadataResponseBuilder()
-          .withProperties([
-            new PropertyEntryBuilder().withId('random-id').build(),
-          ])
-          .build()
-      )
+          .withProperties([new PropertyEntryBuilder().withId('random-id').build()])
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -70,11 +64,9 @@ describe('ListSceneItemMetadataResponse', () => {
     expect(
       validate(
         new ListSceneItemMetadataResponseBuilder()
-          .withProperties([
-            new PropertyEntryBuilder().withId('random-id').build(),
-          ])
-          .build()
-      )
+          .withProperties([new PropertyEntryBuilder().withId('random-id').build()])
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -97,8 +89,8 @@ describe('ListSceneItemMetadataResponse', () => {
               .withKey(new PropertyKeyBuilder().withName('name').build())
               .build(),
           ])
-          .build()
-      )
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -128,15 +120,12 @@ describe('ListSceneItemMetadataResponse', () => {
             new PropertyEntryBuilder()
               .withId('random-id')
               .withKey(
-                new PropertyKeyBuilder()
-                  .withName('name')
-                  .withCategory(category)
-                  .build()
+                new PropertyKeyBuilder().withName('name').withCategory(category).build(),
               )
               .build(),
           ])
-          .build()
-      )
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -160,13 +149,11 @@ describe('ListSceneItemMetadataResponse', () => {
           .withProperties([
             new PropertyEntryBuilder()
               .withId('random-id')
-              .withValue(
-                new PropertyValueBuilder().withString('string-value').build()
-              )
+              .withValue(new PropertyValueBuilder().withString('string-value').build())
               .build(),
           ])
-          .build()
-      )
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -193,8 +180,8 @@ describe('ListSceneItemMetadataResponse', () => {
               .withValue(new PropertyValueBuilder().withLong(1).build())
               .build(),
           ])
-          .build()
-      )
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -221,8 +208,8 @@ describe('ListSceneItemMetadataResponse', () => {
               .withValue(new PropertyValueBuilder().withDouble(1).build())
               .build(),
           ])
-          .build()
-      )
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -252,8 +239,8 @@ describe('ListSceneItemMetadataResponse', () => {
               .withValue(new PropertyValueBuilder().withDate(timestamp).build())
               .build(),
           ])
-          .build()
-      )
+          .build(),
+      ),
     ).toEqual({
       paging: {
         next: undefined,
@@ -274,8 +261,6 @@ describe('ListSceneItemMetadataResponse', () => {
   });
 });
 
-const validate = (
-  response: ListSceneItemMetadataResponse
-): SceneItemMetadataResponse => {
+const validate = (response: ListSceneItemMetadataResponse): SceneItemMetadataResponse => {
   return mapListSceneItemMetadataResponseOrThrow(response.toObject());
 };

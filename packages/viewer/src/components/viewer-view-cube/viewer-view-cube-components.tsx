@@ -59,11 +59,7 @@ export const TriadAxis: FunctionalComponent<TriadAxisProps> = ({
   return (
     <Fragment>
       <vertex-viewer-dom-group quaternion={quaternion}>
-        <vertex-viewer-dom-element
-          style={axisStyles}
-          billboardOff
-          interactionsOff
-        >
+        <vertex-viewer-dom-element style={axisStyles} billboardOff interactionsOff>
           <div class={`triad-axis triad-axis-${label.toLowerCase()}`} />
         </vertex-viewer-dom-element>
         <vertex-viewer-dom-element
@@ -75,9 +71,7 @@ export const TriadAxis: FunctionalComponent<TriadAxisProps> = ({
           <div class={`triad-axis triad-axis-${label.toLowerCase()}`} />
         </vertex-viewer-dom-element>
         <vertex-viewer-dom-element position={labelPos} interactionsOff>
-          <div class={`triad-label triad-label-${label.toLowerCase()}`}>
-            {label}
-          </div>
+          <div class={`triad-label triad-label-${label.toLowerCase()}`}>{label}</div>
         </vertex-viewer-dom-element>
       </vertex-viewer-dom-group>
     </Fragment>
@@ -111,9 +105,7 @@ export const ViewCubeSide: FunctionalComponent<ViewCubeSideProps> = ({
       onPointerDown={onPointerDown}
       billboardOff
     >
-      <div class={`cube-side-face cube-side-face-${label.toLowerCase()}`}>
-        {label}
-      </div>
+      <div class={`cube-side-face cube-side-face-${label.toLowerCase()}`}>{label}</div>
     </vertex-viewer-dom-element>
   );
 };
@@ -238,9 +230,7 @@ interface ViewCubeShadowProps {
   length: number;
 }
 
-export const ViewCubeShadow: FunctionalComponent<ViewCubeShadowProps> = ({
-  length,
-}) => {
+export const ViewCubeShadow: FunctionalComponent<ViewCubeShadowProps> = ({ length }) => {
   const { direction, quaternion } = viewCubeSides.top;
   const position = Vector3.scale(-length / 2, direction);
 

@@ -24,7 +24,7 @@ describe('PinsInteractionHandler', () => {
     { emit: jest.fn() },
     { emit: jest.fn() },
     { emit: jest.fn() },
-    { emit: jest.fn() }
+    { emit: jest.fn() },
   );
 
   const pin: TextPin = {
@@ -100,13 +100,8 @@ describe('PinsInteractionHandler', () => {
     getEntityTypeAtPoint.mockResolvedValue(type);
   }
 
-  function mockGetWorldPointFromViewport(
-    mockedPoint = Vector3.create(1, 2, 3)
-  ): void {
-    const getWorldPointFromViewport = jest.spyOn(
-      api,
-      'getWorldPointFromViewport'
-    );
+  function mockGetWorldPointFromViewport(mockedPoint = Vector3.create(1, 2, 3)): void {
+    const getWorldPointFromViewport = jest.spyOn(api, 'getWorldPointFromViewport');
     getWorldPointFromViewport.mockResolvedValue(mockedPoint);
   }
 });

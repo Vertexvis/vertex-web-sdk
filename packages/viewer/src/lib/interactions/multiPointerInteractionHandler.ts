@@ -41,10 +41,7 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
 
   private handlePointerMove(event: PointerEvent): void {
     if (this.touchPoints[event.pointerId] != null) {
-      this.touchPoints[event.pointerId] = Point.create(
-        event.screenX,
-        event.screenY
-      );
+      this.touchPoints[event.pointerId] = Point.create(event.screenX, event.screenY);
     }
 
     const keys = Object.keys(this.touchPoints);

@@ -65,15 +65,15 @@ export class ViewerHitResultIndicator {
 
       this.arrowColor = parseCssColorValue(
         hostStyles,
-        '--viewer-hit-result-indicator-arrow-color'
+        '--viewer-hit-result-indicator-arrow-color',
       );
       this.planeColor = parseCssColorValue(
         hostStyles,
-        '--viewer-hit-result-indicator-plane-color'
+        '--viewer-hit-result-indicator-plane-color',
       );
       this.outlineColor = parseCssColorValue(
         hostStyles,
-        '--viewer-hit-result-indicator-outline-color'
+        '--viewer-hit-result-indicator-outline-color',
       );
       this.planeOpacity = hostStyles
         .getPropertyValue('--viewer-hit-result-indicator-plane-opacity')
@@ -102,18 +102,12 @@ export class ViewerHitResultIndicator {
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
+    oldViewer?: HTMLVertexViewerElement,
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    oldViewer?.removeEventListener(
-      'dimensionschange',
-      this.handleViewerDimensionsChange
-    );
+    oldViewer?.removeEventListener('dimensionschange', this.handleViewerDimensionsChange);
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    newViewer?.addEventListener(
-      'dimensionschange',
-      this.handleViewerDimensionsChange
-    );
+    newViewer?.addEventListener('dimensionschange', this.handleViewerDimensionsChange);
   }
 
   /**
@@ -122,14 +116,14 @@ export class ViewerHitResultIndicator {
   @Watch('position')
   protected handlePositionChanged(
     newPosition?: Vector3.Vector3,
-    oldPosition?: Vector3.Vector3
+    oldPosition?: Vector3.Vector3,
   ): void {
     this.transform = this.createTransform();
 
     console.debug(
       `Updating indicator position [previous=${JSON.stringify(
-        oldPosition
-      )}, current=${JSON.stringify(newPosition)}]`
+        oldPosition,
+      )}, current=${JSON.stringify(newPosition)}]`,
     );
 
     this.indicator?.updateTransformAndNormal(this.transform, this.normal);
@@ -138,12 +132,12 @@ export class ViewerHitResultIndicator {
   @Watch('normal')
   protected handleNormalChanged(
     newNormal?: Vector3.Vector3,
-    oldNormal?: Vector3.Vector3
+    oldNormal?: Vector3.Vector3,
   ): void {
     console.debug(
       `Updating indicator normal [previous=${JSON.stringify(
-        oldNormal
-      )}, current=${JSON.stringify(newNormal)}]`
+        oldNormal,
+      )}, current=${JSON.stringify(newNormal)}]`,
     );
 
     if (newNormal) {
@@ -200,10 +194,10 @@ export class ViewerHitResultIndicator {
   private setupIndicator = (canvasRef: HTMLCanvasElement): HitIndicator => {
     console.debug(
       `Initializing hit indicator. [initial-position=${JSON.stringify(
-        this.position
+        this.position,
       )}, initial-normal=${JSON.stringify(this.normal)} has-initial-frame=${
         this.viewer?.frame != null
-      }]`
+      }]`,
     );
 
     this.indicator = new HitIndicator(
@@ -214,7 +208,7 @@ export class ViewerHitResultIndicator {
       },
       {
         plane: this.planeOpacity,
-      }
+      },
     );
 
     this.transform = this.createTransform();
@@ -245,7 +239,7 @@ export class ViewerHitResultIndicator {
       return this.indicator;
     } else {
       throw new Error(
-        'Hit indicator was not initialized. The canvas element may not have been initialized.'
+        'Hit indicator was not initialized. The canvas element may not have been initialized.',
       );
     }
   };

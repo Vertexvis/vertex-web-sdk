@@ -20,7 +20,7 @@ export interface RenderParams {
 
 export function translateWorldLineToViewport(
   line: Line3.Line3,
-  params: RenderParams
+  params: RenderParams,
 ): {
   start: Point.Point;
   end: Point.Point;
@@ -63,7 +63,7 @@ export function translateWorldLineToViewport(
 export function getViewingElementPositions(
   line: Line3.Line3,
   interactingAnchor: Anchor | 'none',
-  params: RenderParams
+  params: RenderParams,
 ): MeasurementElementPositions {
   const {
     start: startPt,
@@ -81,21 +81,20 @@ export function getViewingElementPositions(
 }
 
 export function isVertexViewerDistanceMeasurement(
-  el: unknown
+  el: unknown,
 ): el is HTMLVertexViewerMeasurementDistanceElement {
   return (
-    el instanceof HTMLElement &&
-    el.nodeName === 'VERTEX-VIEWER-MEASUREMENT-DISTANCE'
+    el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MEASUREMENT-DISTANCE'
   );
 }
 
 function getIndicatorPtForAnchor(
   line: Line3.Line3,
   anchor: Anchor,
-  params: RenderParams
+  params: RenderParams,
 ): Point.Point {
   return params.viewport.transformWorldToViewport(
     anchor === 'start' ? line.start : line.end,
-    params.camera.projectionViewMatrix
+    params.camera.projectionViewMatrix,
   );
 }

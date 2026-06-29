@@ -17,7 +17,7 @@ export class TransformController {
   }
 
   public async beginTransform(
-    delta: Matrix4.Matrix4 = Matrix4.makeIdentity()
+    delta: Matrix4.Matrix4 = Matrix4.makeIdentity(),
   ): Promise<void> {
     this.clearEndInteractionTimeout();
 
@@ -67,7 +67,7 @@ export class TransformController {
 
   public async endTransformDebounced(
     startCallback?: VoidFunction,
-    endCallback?: VoidFunction
+    endCallback?: VoidFunction,
   ): Promise<void> {
     if (this.isTransforming) {
       this.restartEndInteractionTimeout(startCallback, endCallback);
@@ -80,9 +80,7 @@ export class TransformController {
     this.endTransform();
   }
 
-  public async EXPERIMENTAL_undoTransform(): Promise<
-    Matrix4.Matrix4 | undefined
-  > {
+  public async EXPERIMENTAL_undoTransform(): Promise<Matrix4.Matrix4 | undefined> {
     if (this.previousDelta != null) {
       const undoDelta = Matrix4.invert(this.previousDelta);
 
@@ -117,7 +115,7 @@ export class TransformController {
 
   private restartEndInteractionTimeout(
     startCallback?: VoidFunction,
-    endCallback?: VoidFunction
+    endCallback?: VoidFunction,
   ): void {
     this.clearEndInteractionTimeout();
 
@@ -137,7 +135,7 @@ export class TransformController {
 
   private toDeltaTransform(
     delta: Matrix4.Matrix4,
-    columnMajor = false
+    columnMajor = false,
   ): vertexvis.protobuf.core.IAffineMatrix4f {
     const asObject = Matrix4.toObject(delta);
 

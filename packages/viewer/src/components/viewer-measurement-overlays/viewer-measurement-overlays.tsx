@@ -2,10 +2,7 @@
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
-import {
-  MeasurementOverlay,
-  MeasurementOverlayManager,
-} from '../../lib/measurement';
+import { MeasurementOverlay, MeasurementOverlayManager } from '../../lib/measurement';
 import { FrameCameraBase } from '../../lib/types';
 import { MeasurementOverlayView } from './viewer-measurement-overlays-components';
 
@@ -52,7 +49,7 @@ export class ViewerMeasurementOverlays {
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
+    oldViewer?: HTMLVertexViewerElement,
   ): void {
     this.removeViewerListeners(oldViewer);
     this.addViewerListeners();
@@ -75,8 +72,8 @@ export class ViewerMeasurementOverlays {
   }
 
   private addModelListeners(): void {
-    this.onOverlaysChangedListener = this.measurementOverlays.onOverlaysChanged(
-      () => this.updateOverlays()
+    this.onOverlaysChangedListener = this.measurementOverlays.onOverlaysChanged(() =>
+      this.updateOverlays(),
     );
   }
 

@@ -26,68 +26,64 @@ export class SceneItemController {
   public constructor(
     private readonly client: SceneViewAPIClient,
     private readonly jwtProvider: JwtProvider,
-    private readonly deviceIdProvider: () => string | undefined
+    private readonly deviceIdProvider: () => string | undefined,
   ) {}
 
   public async getSceneViewItem(
     itemId: UUID.UUID,
     viewId: UUID.UUID,
-    getOptions: GetSceneViewItemOptions
+    getOptions: GetSceneViewItemOptions,
   ): Promise<SceneViewItem | undefined> {
-    const res: GetSceneViewItemResponse = await requestUnary(
-      async (handler) => {
-        const deviceId = this.deviceIdProvider();
-        const meta = await createMetadata(this.jwtProvider, deviceId);
-        const req = new GetSceneViewItemRequest();
+    const res: GetSceneViewItemResponse = await requestUnary(async (handler) => {
+      const deviceId = this.deviceIdProvider();
+      const meta = await createMetadata(this.jwtProvider, deviceId);
+      const req = new GetSceneViewItemRequest();
 
-        // Set scene item and scene view ids
-        req.setSceneItemId(toUuid2l(itemId));
-        req.setViewId(toUuid2l(viewId));
+      // Set scene item and scene view ids
+      req.setSceneItemId(toUuid2l(itemId));
+      req.setViewId(toUuid2l(viewId));
 
-        const additionalFields = new FieldMask();
+      const additionalFields = new FieldMask();
 
-        if (getOptions.includeBoundingBox) {
-          additionalFields.addPaths('bounding_box');
-        }
-        if (getOptions.includeWorldTransform) {
-          additionalFields.addPaths('world_transform');
-        }
-        if (getOptions.includeOverride) {
-          additionalFields.addPaths('override');
-        }
-
-        req.setAdditionalFields(additionalFields);
-
-        this.client.getSceneViewItem(req, meta, handler);
+      if (getOptions.includeBoundingBox) {
+        additionalFields.addPaths('bounding_box');
       }
-    );
+      if (getOptions.includeWorldTransform) {
+        additionalFields.addPaths('world_transform');
+      }
+      if (getOptions.includeOverride) {
+        additionalFields.addPaths('override');
+      }
+
+      req.setAdditionalFields(additionalFields);
+
+      this.client.getSceneViewItem(req, meta, handler);
+    });
     return mapGetSceneViewItemResponseOrThrow(res.toObject());
   }
 
   public async listSceneItemMetadata(
     itemId: UUID.UUID,
-    listByOptions: ListSceneItemMetadataOptions
+    listByOptions: ListSceneItemMetadataOptions,
   ): Promise<SceneItemMetadataResponse> {
-    const res: ListSceneItemMetadataResponse = await requestUnary(
-      async (handler) => {
-        const deviceId = this.deviceIdProvider();
-        const meta = await createMetadata(this.jwtProvider, deviceId);
-        const req = new ListSceneItemMetadataRequest();
+    const res: ListSceneItemMetadataResponse = await requestUnary(async (handler) => {
+      const deviceId = this.deviceIdProvider();
+      const meta = await createMetadata(this.jwtProvider, deviceId);
+      const req = new ListSceneItemMetadataRequest();
 
-        req.setItemId(toUuid2l(itemId));
+      req.setItemId(toUuid2l(itemId));
 
-        const pager = new Pager();
-        if (listByOptions.size != null) {
-          pager.setLimit(listByOptions.size);
-        }
-        if (listByOptions.cursor != null) {
-          pager.setCursor(listByOptions.cursor);
-        }
-        req.setPager(pager);
-
-        this.client.listSceneItemMetadata(req, meta, handler);
+      const pager = new Pager();
+      if (listByOptions.size != null) {
+        pager.setLimit(listByOptions.size);
       }
-    );
+      if (listByOptions.cursor != null) {
+        pager.setCursor(listByOptions.cursor);
+      }
+      req.setPager(pager);
+
+      this.client.listSceneItemMetadata(req, meta, handler);
+    });
     return mapListSceneItemMetadataResponseOrThrow(res.toObject());
   }
 }

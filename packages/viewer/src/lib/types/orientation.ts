@@ -19,7 +19,7 @@ export class Orientation {
     /**
      * The forward orientation vector.
      */
-    public readonly z: Vector3.Vector3
+    public readonly z: Vector3.Vector3,
   ) {}
 
   /**

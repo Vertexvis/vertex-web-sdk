@@ -109,10 +109,7 @@ export class CursorManager {
    * @returns An identifier for the cursor.
    * @see {@link CursorManager.getActiveCursor} to query the current cursor.
    */
-  public add(
-    cursor: Cursor,
-    priority = CursorManager.NORMAL_PRIORITY
-  ): Disposable {
+  public add(cursor: Cursor, priority = CursorManager.NORMAL_PRIORITY): Disposable {
     // Ensure a duplicate cursor will not be added to the cursor manager.
     // If a matching cursor exists, delete it before proceeding.
     // Note that deleting the old cursor and adding the new one results in the
@@ -151,11 +148,10 @@ export class CursorManager {
    */
   private getExistingDuplicateCursor(
     cursorToCheck: Cursor,
-    priorityToCheck: number
+    priorityToCheck: number,
   ): CursorInstance | undefined {
     return this.cursors.find(
-      (cursor) =>
-        cursor.cursor === cursorToCheck && cursor.priority === priorityToCheck
+      (cursor) => cursor.cursor === cursorToCheck && cursor.priority === priorityToCheck,
     );
   }
 

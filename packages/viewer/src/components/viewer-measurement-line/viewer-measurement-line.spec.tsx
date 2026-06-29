@@ -12,9 +12,7 @@ describe('vertex-viewer-measurement-line', () => {
   it('renders a line between start and end', async () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementLine],
-      template: () => (
-        <vertex-viewer-measurement-line start={start} end={end} />
-      ),
+      template: () => <vertex-viewer-measurement-line start={start} end={end} />,
     });
 
     const el = page.root as HTMLVertexViewerMeasurementLineElement;
@@ -37,11 +35,7 @@ describe('vertex-viewer-measurement-line', () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementLine],
       template: () => (
-        <vertex-viewer-measurement-line
-          start={start}
-          end={end}
-          capLength={10}
-        />
+        <vertex-viewer-measurement-line start={start} end={end} capLength={10} />
       ),
     });
 
@@ -70,13 +64,9 @@ describe('vertex-viewer-measurement-line', () => {
     expect(parseFloat(fillEndCap.getAttribute('y2') ?? '')).toBeCloseTo(-5);
 
     expect(parseFloat(strokeStartCap.getAttribute('x1') ?? '')).toBeCloseTo(0);
-    expect(parseFloat(strokeStartCap.getAttribute('y1') ?? '')).toBeCloseTo(
-      5.5
-    );
+    expect(parseFloat(strokeStartCap.getAttribute('y1') ?? '')).toBeCloseTo(5.5);
     expect(parseFloat(strokeStartCap.getAttribute('x2') ?? '')).toBeCloseTo(0);
-    expect(parseFloat(strokeStartCap.getAttribute('y2') ?? '')).toBeCloseTo(
-      -5.5
-    );
+    expect(parseFloat(strokeStartCap.getAttribute('y2') ?? '')).toBeCloseTo(-5.5);
 
     expect(parseFloat(strokeEndCap.getAttribute('x1') ?? '')).toBeCloseTo(100);
     expect(parseFloat(strokeEndCap.getAttribute('y1') ?? '')).toBeCloseTo(5.5);

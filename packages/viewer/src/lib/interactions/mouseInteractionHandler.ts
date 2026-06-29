@@ -17,7 +17,7 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
     zoomInteraction = new ZoomInteraction(() => getConfig().interactions),
     panInteraction = new PanInteraction(),
     twistInteraction = new TwistInteraction(),
-    pivotInteraction = new PivotInteraction()
+    pivotInteraction = new PivotInteraction(),
   ) {
     super(
       'mousedown',
@@ -29,7 +29,7 @@ export class MouseInteractionHandler extends BaseInteractionHandler {
       panInteraction,
       twistInteraction,
       pivotInteraction,
-      getConfig
+      getConfig,
     );
   }
 }

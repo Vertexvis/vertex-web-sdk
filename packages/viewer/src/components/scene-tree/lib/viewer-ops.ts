@@ -14,7 +14,7 @@ export interface ViewerIsolateItemOptions extends ViewerItemOptions {
 export async function showItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  { suppliedCorrelationId }: ViewerItemOptions = {}
+  { suppliedCorrelationId }: ViewerItemOptions = {},
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
@@ -25,7 +25,7 @@ export async function showItem(
 export async function hideItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  { suppliedCorrelationId }: ViewerItemOptions = {}
+  { suppliedCorrelationId }: ViewerItemOptions = {},
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
@@ -38,7 +38,7 @@ export async function hideItem(
 export async function selectItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  { append = false, suppliedCorrelationId }: ViewerSelectItemOptions
+  { append = false, suppliedCorrelationId }: ViewerSelectItemOptions,
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
@@ -53,7 +53,7 @@ export async function selectRangeInSceneTree(
   viewer: HTMLVertexViewerElement,
   start: number,
   end: number,
-  { append = true, suppliedCorrelationId }: ViewerSelectItemOptions
+  { append = true, suppliedCorrelationId }: ViewerSelectItemOptions,
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
@@ -72,16 +72,14 @@ export async function selectFilterResults(
   keys: string[],
   exactMatch: boolean,
   removeHiddenResults: boolean,
-  { append = false, suppliedCorrelationId }: ViewerSelectItemOptions
+  { append = false, suppliedCorrelationId }: ViewerSelectItemOptions,
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
     .elements((op) => [
       ...(append ? [] : [op.items.where((q) => q.all()).deselect()]),
       op.items
-        .where((q) =>
-          q.withMetadata(filter, keys, exactMatch, removeHiddenResults)
-        )
+        .where((q) => q.withMetadata(filter, keys, exactMatch, removeHiddenResults))
         .select(),
     ])
     .execute({
@@ -92,7 +90,7 @@ export async function selectFilterResults(
 export async function deselectItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  { suppliedCorrelationId }: ViewerItemOptions = {}
+  { suppliedCorrelationId }: ViewerItemOptions = {},
 ): Promise<void> {
   const scene = await viewer.scene();
   return scene
@@ -105,7 +103,7 @@ export async function deselectItem(
 export async function isolateItem(
   viewer: HTMLVertexViewerElement,
   id: string,
-  { suppliedCorrelationId, animationDurationMs }: ViewerIsolateItemOptions = {}
+  { suppliedCorrelationId, animationDurationMs }: ViewerIsolateItemOptions = {},
 ): Promise<void> {
   const scene = await viewer.scene();
   await scene

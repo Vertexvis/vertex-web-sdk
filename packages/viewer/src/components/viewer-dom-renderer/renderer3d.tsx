@@ -14,7 +14,7 @@ interface Props {
 
 export const Renderer3d: FunctionalComponent<Props> = (
   { camera, viewport },
-  children
+  children,
 ) => {
   const pMatrix = Matrix4.toObject(camera.projectionMatrix);
   const fovY = camera.isOrthographic()
@@ -40,7 +40,7 @@ export function update3d(
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
   camera: FrameCameraBase,
-  depthBuffer: DepthBuffer | undefined
+  depthBuffer: DepthBuffer | undefined,
 ): void {
   for (let i = 0; i < element.children.length; i++) {
     const el = element.children[i] as HTMLElement;
@@ -50,7 +50,7 @@ export function update3d(
         parentWorldMatrix,
         viewport,
         camera,
-        depthBuffer
+        depthBuffer,
       );
     } else if (isVertexViewerDomGroup(el)) {
       updateGroup(el, parentWorldMatrix, viewport, camera, depthBuffer);
@@ -65,7 +65,7 @@ function updateElement(
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
   camera: FrameCameraBase,
-  depthBuffer: DepthBuffer | undefined
+  depthBuffer: DepthBuffer | undefined,
 ): void {
   const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
 
@@ -105,7 +105,7 @@ function updateGroup(
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
   camera: FrameCameraBase,
-  depthBuffer: DepthBuffer | undefined
+  depthBuffer: DepthBuffer | undefined,
 ): void {
   const worldMatrix = Matrix4.multiply(parentWorldMatrix, element.matrix);
   update3d(element, worldMatrix, viewport, camera, depthBuffer);

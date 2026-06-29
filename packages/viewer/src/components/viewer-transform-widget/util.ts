@@ -28,7 +28,7 @@ export interface PointAndPlacement {
 
 export function convertPointToCanvas(
   point: Point.Point,
-  bounds?: DOMRect
+  bounds?: DOMRect,
 ): Point.Point | undefined {
   return bounds != null
     ? Point.create(point.x - bounds.left, point.y - bounds.top)
@@ -39,17 +39,12 @@ export function convertCanvasPointToWorld(
   point?: Point.Point,
   frame?: Frame,
   viewport?: Viewport,
-  transform?: Matrix4.Matrix4
+  transform?: Matrix4.Matrix4,
 ): Vector3.Vector3 | undefined {
-  const position =
-    transform != null ? Vector3.fromMatrixPosition(transform) : undefined;
+  const position = transform != null ? Vector3.fromMatrixPosition(transform) : undefined;
 
   if (point != null && frame != null && viewport != null && position != null) {
-    const ray = viewport.transformPointToRay(
-      point,
-      frame.image,
-      frame.scene.camera
-    );
+    const ray = viewport.transformPointToRay(point, frame.image, frame.scene.camera);
 
     if (frame.scene.camera.isOrthographic()) {
       // Offset the point to past the bounding sphere of the model to
@@ -59,20 +54,17 @@ export function convertCanvasPointToWorld(
           origin: position,
           direction: frame.scene.camera.direction,
         }),
-        Vector3.magnitude(frame.scene.camera.viewVector) * 2
+        Vector3.magnitude(frame.scene.camera.viewVector) * 2,
       );
 
       return Ray.intersectPlane(
         ray,
-        Plane.fromNormalAndCoplanarPoint(
-          frame.scene.camera.direction,
-          offsetPoint
-        )
+        Plane.fromNormalAndCoplanarPoint(frame.scene.camera.direction, offsetPoint),
       );
     } else {
       return Ray.intersectPlane(
         ray,
-        Plane.fromNormalAndCoplanarPoint(frame.scene.camera.direction, position)
+        Plane.fromNormalAndCoplanarPoint(frame.scene.camera.direction, position),
       );
     }
   }
@@ -85,17 +77,11 @@ export function computeInputDeltaTransform(
   value: number,
   lastValue: number,
   distanceUnit: DistanceUnitType,
-  angleUnit: AngleUnitType
+  angleUnit: AngleUnitType,
 ): Matrix4.Matrix4 {
   return Matrix4.multiply(
     current,
-    computeInputGlobalTransform(
-      identifier,
-      value,
-      lastValue,
-      distanceUnit,
-      angleUnit
-    )
+    computeInputGlobalTransform(identifier, value, lastValue, distanceUnit, angleUnit),
   );
 }
 
@@ -104,14 +90,13 @@ function computeInputGlobalTransform(
   value: number,
   lastValue: number,
   distanceUnit: DistanceUnitType,
-  angleUnit: AngleUnitType
+  angleUnit: AngleUnitType,
 ): Matrix4.Matrix4 {
   const units = new DistanceUnits(distanceUnit);
   const angles = new AngleUnits(angleUnit);
 
   const rotation = (): number => angles.convertFrom(value - lastValue);
-  const position = (): number =>
-    units.convertRealValueToWorld(value - lastValue);
+  const position = (): number => units.convertRealValueToWorld(value - lastValue);
 
   switch (identifier) {
     case 'x-translate':
@@ -121,16 +106,12 @@ function computeInputGlobalTransform(
     case 'z-translate':
       return Matrix4.makeTranslation(Vector3.create(0, 0, position()));
     case 'x-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.left(), rotation())
-      );
+      return Matrix4.makeRotation(Quaternion.fromAxisAngle(Vector3.left(), rotation()));
     case 'y-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.down(), rotation())
-      );
+      return Matrix4.makeRotation(Quaternion.fromAxisAngle(Vector3.down(), rotation()));
     case 'z-rotate':
       return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.forward(), rotation())
+        Quaternion.fromAxisAngle(Vector3.forward(), rotation()),
       );
     default:
       return Matrix4.makeIdentity();
@@ -155,7 +136,7 @@ export function computeInputDisplayValue(
   current: Matrix4.Matrix4,
   start: Matrix4.Matrix4,
   distanceUnit: DistanceUnitType,
-  angleUnit: AngleUnitType
+  angleUnit: AngleUnitType,
 ): number {
   const units = new DistanceUnits(distanceUnit);
   const angles = new AngleUnits(angleUnit);
@@ -167,12 +148,12 @@ export function computeInputDisplayValue(
   const relativeTranslationDiff = (): Vector3.Vector3 =>
     Vector3.transformMatrix(
       Vector3.fromMatrixPosition(transformDiff()),
-      Matrix4.invert(rotation())
+      Matrix4.invert(rotation()),
     );
   const relativeRotationDiff = (): Euler.Euler =>
     Euler.fromRotationMatrix(
       Matrix4.multiply(Matrix4.invert(rotation()), start),
-      eulerOrderForIdentifier(identifier)
+      eulerOrderForIdentifier(identifier),
     );
 
   switch (identifier) {
@@ -199,14 +180,14 @@ export function computeHandleDeltaTransform(
   next: Vector3.Vector3,
   viewVector: Vector3.Vector3,
   angle: number,
-  identifier: string
+  identifier: string,
 ): Matrix4.Matrix4 {
   return computeHandleGlobalTransform(
     current,
     Vector3.subtract(next, previous),
     viewVector,
     angle,
-    identifier
+    identifier,
   );
 }
 
@@ -215,65 +196,65 @@ function computeHandleGlobalTransform(
   translationVectorWorld: Vector3.Vector3,
   viewVector: Vector3.Vector3,
   angle: number,
-  identifier: string
+  identifier: string,
 ): Matrix4.Matrix4 {
   switch (identifier) {
     case 'x-translate':
       return performTranslationConstrainedToAxis(
         currentTransformationMatrix,
         translationVectorWorld,
-        Vector3.right()
+        Vector3.right(),
       );
     case 'y-translate':
       return performTranslationConstrainedToAxis(
         currentTransformationMatrix,
         translationVectorWorld,
-        Vector3.up()
+        Vector3.up(),
       );
     case 'z-translate':
       return performTranslationConstrainedToAxis(
         currentTransformationMatrix,
         translationVectorWorld,
-        Vector3.back()
+        Vector3.back(),
       );
     case 'xy-translate':
       return performTranslationConstrainedToPlane(
         currentTransformationMatrix,
         translationVectorWorld,
-        Vector3.create(0, 0, 1)
+        Vector3.create(0, 0, 1),
       );
     case 'xz-translate':
       return performTranslationConstrainedToPlane(
         currentTransformationMatrix,
         translationVectorWorld,
-        Vector3.create(0, 1, 0)
+        Vector3.create(0, 1, 0),
       );
     case 'yz-translate':
       return performTranslationConstrainedToPlane(
         currentTransformationMatrix,
         translationVectorWorld,
-        Vector3.create(1, 0, 0)
+        Vector3.create(1, 0, 0),
       );
     case 'x-rotate':
       return performRotationAroundAxis(
         currentTransformationMatrix,
         viewVector,
         Vector3.right(),
-        angle
+        angle,
       );
     case 'y-rotate':
       return performRotationAroundAxis(
         currentTransformationMatrix,
         viewVector,
         Vector3.up(),
-        angle
+        angle,
       );
     case 'z-rotate':
       return performRotationAroundAxis(
         currentTransformationMatrix,
         viewVector,
         Vector3.forward(),
-        angle
+        angle,
       );
     default:
       return currentTransformationMatrix;
@@ -284,19 +265,19 @@ export function performRotationAroundAxis(
   currentTransformationMatrix: Matrix4.Matrix4,
   viewVector: Vector3.Vector3,
   localRotationAxis: Vector3.Vector3,
-  rotationAngle: number
+  rotationAngle: number,
 ): Matrix4.Matrix4 {
   // Determine the rotation axis in world coordinates
   const worldRotationAxis = computeRotationAxis(
     currentTransformationMatrix,
     viewVector,
-    localRotationAxis
+    localRotationAxis,
   );
 
   // Determine the rotation matrix in world coordinates
   const worldRotationQuaternion = Quaternion.fromAxisAngle(
     worldRotationAxis,
-    rotationAngle
+    rotationAngle,
   );
   const worldRotationMatrix = Matrix4.makeRotation(worldRotationQuaternion);
 
@@ -306,18 +287,18 @@ export function performRotationAroundAxis(
 export function computeRotationAxis(
   currentTransformationMatrix: Matrix4.Matrix4,
   viewVector: Vector3.Vector3,
-  localRotationAxis: Vector3.Vector3
+  localRotationAxis: Vector3.Vector3,
 ): Vector3.Vector3 {
   const changeOfBasisToWorld = Matrix4.makeRotation(
-    Quaternion.fromMatrixRotation(currentTransformationMatrix)
+    Quaternion.fromMatrixRotation(currentTransformationMatrix),
   );
   const worldRotationAxis = Vector3.transformMatrix(
     localRotationAxis,
-    changeOfBasisToWorld
+    changeOfBasisToWorld,
   );
   const worldNegatedRotationAxis = Vector3.transformMatrix(
     Vector3.negate(localRotationAxis),
-    changeOfBasisToWorld
+    changeOfBasisToWorld,
   );
 
   return Vector3.dot(viewVector, worldRotationAxis) >
@@ -329,30 +310,29 @@ export function computeRotationAxis(
 export function performTranslationConstrainedToAxis(
   currentTransformationMatrix: Matrix4.Matrix4,
   translationVectorWorld: Vector3.Vector3,
-  constrainToLocalAxis: Vector3.Vector3
+  constrainToLocalAxis: Vector3.Vector3,
 ): Matrix4.Matrix4 {
   // Ensure that constrainToLocalAxis is a unit vector
-  const constrainToLocalAxisUnitVector =
-    Vector3.normalize(constrainToLocalAxis);
+  const constrainToLocalAxisUnitVector = Vector3.normalize(constrainToLocalAxis);
 
   // Convert the axis to constrain the translation to from local to world
   const changeOfBasisToWorld = Matrix4.makeRotation(
-    Quaternion.fromMatrixRotation(currentTransformationMatrix)
+    Quaternion.fromMatrixRotation(currentTransformationMatrix),
   );
   const constrainToWorldAxis = Vector3.transformMatrix(
     constrainToLocalAxisUnitVector,
-    changeOfBasisToWorld
+    changeOfBasisToWorld,
   );
 
   // Project the translation vector onto the desired axis for translation
   const translationVectorProjectedToWorldAxis = Vector3.project(
     translationVectorWorld,
-    constrainToWorldAxis
+    constrainToWorldAxis,
   );
 
   // Use the projected vector to determine the translation matrix
   const translationMatrix = Matrix4.makeTranslation(
-    translationVectorProjectedToWorldAxis
+    translationVectorProjectedToWorldAxis,
   );
 
   // Multiply the translation matrix with the current transformation matrix to
@@ -363,35 +343,31 @@ export function performTranslationConstrainedToAxis(
 export function performTranslationConstrainedToPlane(
   currentTransformationMatrix: Matrix4.Matrix4,
   translationVectorWorld: Vector3.Vector3,
-  localNormalVectorToPlane: Vector3.Vector3
+  localNormalVectorToPlane: Vector3.Vector3,
 ): Matrix4.Matrix4 {
   // Ensure that localNormalVectorToPlane is a unit vector
-  const localNormalVectorToPlaneUnitVector = Vector3.normalize(
-    localNormalVectorToPlane
-  );
+  const localNormalVectorToPlaneUnitVector = Vector3.normalize(localNormalVectorToPlane);
 
   // Convert the normal vector from local to world
   const changeOfBasisToWorld = Matrix4.makeRotation(
-    Quaternion.fromMatrixRotation(currentTransformationMatrix)
+    Quaternion.fromMatrixRotation(currentTransformationMatrix),
   );
   const worldNormalVectorToPlane = Vector3.transformMatrix(
     localNormalVectorToPlaneUnitVector,
-    changeOfBasisToWorld
+    changeOfBasisToWorld,
   );
 
   // Use the worldNormalVectorToPlane and the current position of the widget to define the plane to translate on
-  const currentPosition = Vector3.fromMatrixPosition(
-    currentTransformationMatrix
-  );
+  const currentPosition = Vector3.fromMatrixPosition(currentTransformationMatrix);
   const worldPlaneToConstrainTranslationTo = Plane.fromNormalAndCoplanarPoint(
     worldNormalVectorToPlane,
-    currentPosition
+    currentPosition,
   );
 
   // Project the translation vector onto the desired plane for translation
   const translationVectorProjectedToWorldPlane = Plane.projectPoint(
     worldPlaneToConstrainTranslationTo,
-    translationVectorWorld
+    translationVectorWorld,
   );
 
   // Account for the plane offset to calculate the position change (the vector to translate by)
@@ -399,53 +375,44 @@ export function performTranslationConstrainedToPlane(
     translationVectorProjectedToWorldPlane,
     Vector3.scale(
       worldPlaneToConstrainTranslationTo.constant,
-      worldPlaneToConstrainTranslationTo.normal
-    )
+      worldPlaneToConstrainTranslationTo.normal,
+    ),
   );
 
   // Use the projected vector to perform the translation and determine the new transformation matrix
-  const translationMatrix = Matrix4.makeTranslation(
-    constrainedTranslationVector
-  );
+  const translationMatrix = Matrix4.makeTranslation(constrainedTranslationVector);
   return Matrix4.multiply(translationMatrix, currentTransformationMatrix);
 }
 
 export function computeInputPosition(
   viewport: Viewport,
   bounds: Rectangle.Rectangle,
-  shapePoints: Point.Point[]
+  shapePoints: Point.Point[],
 ): PointAndPlacement {
   if (shapePoints.length === 0) {
     throw new Error(
-      'Unable to compute input position. At least one shape point must be provided.'
+      'Unable to compute input position. At least one shape point must be provided.',
     );
   }
 
   const paddedBounds = Rectangle.pad(bounds, 5);
-  const canvasPoints = shapePoints.map((sp) =>
-    viewport.transformNdcPointToViewport(sp)
-  );
+  const canvasPoints = shapePoints.map((sp) => viewport.transformNdcPointToViewport(sp));
 
   const topLeft = Rectangle.topLeft(paddedBounds);
   const topRight = Point.add(topLeft, Point.create(paddedBounds.width, 0));
   const bottomRight = Rectangle.bottomRight(paddedBounds);
-  const bottomLeft = Point.subtract(
-    bottomRight,
-    Point.create(paddedBounds.width, 0)
-  );
+  const bottomLeft = Point.subtract(bottomRight, Point.create(paddedBounds.width, 0));
 
   const center = Point.scale(
     canvasPoints.reduce((sum, pt) => Point.add(sum, pt), Point.create()),
     1 / canvasPoints.length,
-    1 / canvasPoints.length
+    1 / canvasPoints.length,
   );
 
   const closestPoint = [topRight, bottomLeft, bottomRight].reduce(
     (closest, pt) =>
-      Point.distance(center, pt) < Point.distance(center, closest)
-        ? pt
-        : closest,
-    topLeft
+      Point.distance(center, pt) < Point.distance(center, closest) ? pt : closest,
+    topLeft,
   );
 
   switch (closestPoint) {
@@ -466,7 +433,7 @@ export function calculateNewRotationAngle(
   angleOfRotation: number, // In radians
   lastAngle: number, // In radians
   existingAngle?: number, // In degrees
-  rotationSnapDegrees?: number // In degrees
+  rotationSnapDegrees?: number, // In degrees
 ): number {
   const rotationSnapKeyIsHeld =
     (rotationSnapKey === 'alt' && event.altKey) ||
@@ -483,7 +450,7 @@ export function calculateNewRotationAngle(
   ) {
     const angleChangeRelativeToLastAngle = angleOfRotation - lastAngle;
     const angleChangeRelativeToLastAngleDegrees = Angle.toDegrees(
-      angleChangeRelativeToLastAngle
+      angleChangeRelativeToLastAngle,
     );
 
     // This method rounds the angle change to the nearest multiple of this.rotationSnapDegrees
@@ -497,13 +464,11 @@ export function calculateNewRotationAngle(
       // desired number, so the difference needs to be accounted for
       const existingAngleRounded =
         Math.round(existingAngle / rotationSnapDegrees) * rotationSnapDegrees;
-      const neededAdjustmentDueToExistingAngle =
-        existingAngle - existingAngleRounded;
+      const neededAdjustmentDueToExistingAngle = existingAngle - existingAngleRounded;
 
       // Adjust the rounded angle change to account for the existing angle, then
       // covert the rounded value to radians and return
-      const adjustedAngle =
-        angleChangeRounded - neededAdjustmentDueToExistingAngle;
+      const adjustedAngle = angleChangeRounded - neededAdjustmentDueToExistingAngle;
       const angleChangeRoundedRadians = Angle.toRadians(adjustedAngle);
       return angleChangeRoundedRadians + lastAngle;
     } else {

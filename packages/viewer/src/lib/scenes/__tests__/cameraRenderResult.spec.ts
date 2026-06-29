@@ -1,9 +1,4 @@
-import {
-  encode,
-  Fixtures,
-  StreamApi,
-  WebSocketClientMock,
-} from '@vertexvis/stream-api';
+import { encode, Fixtures, StreamApi, WebSocketClientMock } from '@vertexvis/stream-api';
 
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
@@ -21,7 +16,7 @@ describe(CameraRenderResult, () => {
       correlationId,
       animationId,
     },
-    50
+    50,
   );
 
   beforeEach(async () => {
@@ -38,9 +33,7 @@ describe(CameraRenderResult, () => {
     result.onAnimationCompleted.on(listener);
     const res = result.onAnimationCompleted.once();
 
-    mockWs.receiveMessage(
-      encode(Fixtures.Events.animationCompleted(animationId))
-    );
+    mockWs.receiveMessage(encode(Fixtures.Events.animationCompleted(animationId)));
 
     expect(await res).toBe(animationId);
     expect(listener).toHaveBeenCalledWith(animationId);
@@ -55,8 +48,8 @@ describe(CameraRenderResult, () => {
       encode(
         Fixtures.Requests.drawFrame({
           payload: { frameCorrelationIds: [correlationId] },
-        })
-      )
+        }),
+      ),
     );
 
     const r = await res;
@@ -64,12 +57,12 @@ describe(CameraRenderResult, () => {
     expect(r).toMatchObject(
       expect.objectContaining({
         correlationIds: expect.arrayContaining([correlationId]),
-      })
+      }),
     );
     expect(listener).toHaveBeenCalledWith(
       expect.objectContaining({
         correlationIds: expect.arrayContaining([correlationId]),
-      })
+      }),
     );
   });
 });

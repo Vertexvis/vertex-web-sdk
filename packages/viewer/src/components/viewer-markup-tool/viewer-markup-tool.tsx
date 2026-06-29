@@ -21,10 +21,7 @@ import {
   Markup,
   MarkupCenteringBehavior,
 } from '../../lib/types/markup';
-import {
-  isVertexViewerArrowMarkup,
-  LineAnchorStyle,
-} from '../viewer-markup-arrow/utils';
+import { isVertexViewerArrowMarkup, LineAnchorStyle } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 
@@ -237,11 +234,7 @@ export class ViewerMarkupTool {
    */
   protected render(): h.JSX.IntrinsicElements {
     if (!this.disabled) {
-      if (
-        this.tool === 'arrow' ||
-        this.tool === 'circle' ||
-        this.tool === 'freeform'
-      ) {
+      if (this.tool === 'arrow' || this.tool === 'circle' || this.tool === 'freeform') {
         return (
           <Host>
             <slot />
@@ -263,12 +256,12 @@ export class ViewerMarkupTool {
         isVertexViewerArrowMarkup,
         () =>
           console.warn(
-            `Arrow template with ID ${this.arrowTemplateId} not found. Using default arrow element.`
+            `Arrow template with ID ${this.arrowTemplateId} not found. Using default arrow element.`,
           ),
         () =>
           console.warn(
-            `Arrow template does not contain a vertex-viewer-markup-arrow. Using default arrow element.`
-          )
+            `Arrow template does not contain a vertex-viewer-markup-arrow. Using default arrow element.`,
+          ),
       );
 
       if (element != null) {
@@ -287,12 +280,12 @@ export class ViewerMarkupTool {
         isVertexViewerCircleMarkup,
         () =>
           console.warn(
-            `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`
+            `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`,
           ),
         () =>
           console.warn(
-            `Circle template does not contain a vertex-viewer-markup-circle. Using default circle element.`
-          )
+            `Circle template does not contain a vertex-viewer-markup-circle. Using default circle element.`,
+          ),
       );
 
       if (element != null) {
@@ -311,12 +304,12 @@ export class ViewerMarkupTool {
         isVertexViewerFreeformMarkup,
         () =>
           console.warn(
-            `Freeform template with ID ${this.freeformTemplateId} not found. Using default freeform element.`
+            `Freeform template with ID ${this.freeformTemplateId} not found. Using default freeform element.`,
           ),
         () =>
           console.warn(
-            `Freeform template does not contain a vertex-viewer-markup-freeform. Using default freeform element.`
-          )
+            `Freeform template does not contain a vertex-viewer-markup-freeform. Using default freeform element.`,
+          ),
       );
 
       if (element != null) {
@@ -349,11 +342,11 @@ export class ViewerMarkupTool {
       markupElement.viewer = undefined;
       markupElement.removeEventListener(
         'interactionBegin',
-        this.handleMarkupInteractionBegin
+        this.handleMarkupInteractionBegin,
       );
       markupElement.removeEventListener(
         'interactionEnd',
-        this.handleMarkupInteractionEnd
+        this.handleMarkupInteractionEnd,
       );
     }
 
@@ -362,12 +355,10 @@ export class ViewerMarkupTool {
       this.hostEl.append(newMarkupElement);
 
       if (this.tool === 'arrow') {
-        (
-          newMarkupElement as HTMLVertexViewerMarkupArrowElement
-        ).startLineAnchorStyle = this.startLineAnchorStyle;
-        (
-          newMarkupElement as HTMLVertexViewerMarkupArrowElement
-        ).endLineAnchorStyle = this.endLineAnchorStyle;
+        (newMarkupElement as HTMLVertexViewerMarkupArrowElement).startLineAnchorStyle =
+          this.startLineAnchorStyle;
+        (newMarkupElement as HTMLVertexViewerMarkupArrowElement).endLineAnchorStyle =
+          this.endLineAnchorStyle;
       }
 
       newMarkupElement.mode = 'create';
@@ -378,11 +369,11 @@ export class ViewerMarkupTool {
       newMarkupElement.scale = this.scale;
       newMarkupElement.addEventListener(
         'interactionBegin',
-        this.handleMarkupInteractionBegin
+        this.handleMarkupInteractionBegin,
       );
       newMarkupElement.addEventListener(
         'interactionEnd',
-        this.handleMarkupInteractionEnd
+        this.handleMarkupInteractionEnd,
       );
       this.stateMap.markupElement = newMarkupElement;
     }

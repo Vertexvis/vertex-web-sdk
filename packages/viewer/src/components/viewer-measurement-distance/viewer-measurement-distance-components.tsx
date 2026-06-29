@@ -37,9 +37,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<
   onEndAnchorPointerDown,
 }) => {
   const angle =
-    startPt != null && endPt != null
-      ? Angle.fromPoints(startPt, endPt)
-      : undefined;
+    startPt != null && endPt != null ? Angle.fromPoints(startPt, endPt) : undefined;
 
   const startLabelPt =
     angle != null && startPt != null && anchorLabelOffset != null
@@ -121,10 +119,7 @@ export const DistanceMeasurementRenderer: FunctionalComponent<
       )}
 
       {indicatorPt != null && (
-        <div
-          class="indicator"
-          style={{ transform: cssTransformCenterAt(indicatorPt) }}
-        >
+        <div class="indicator" style={{ transform: cssTransformCenterAt(indicatorPt) }}>
           <slot name="indicator">
             <div class="indicator-placeholder" />
           </slot>

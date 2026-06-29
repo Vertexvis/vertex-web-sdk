@@ -13,7 +13,7 @@ export interface RelativeAnchorProps {
 
 export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
   { id, transform, rotation, name, point, onPointerDown },
-  children
+  children,
 ) => {
   return (
     <div
@@ -45,10 +45,7 @@ export interface SvgShadowProps {
   scale?: number;
 }
 
-export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({
-  id,
-  scale,
-}) => {
+export const SvgShadow: FunctionalComponent<SvgShadowProps> = ({ id, scale }) => {
   // Scale default values for a `<filter>` element by the provided scale.
   // This prevents the filter area from being too small when scale is greater than 1,
   // and uses the default values for a scale less than 1 to prevent the same issue.

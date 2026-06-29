@@ -2,10 +2,7 @@ import { Color } from '@vertexvis/utils';
 
 import { random } from '../../../testing/random';
 import { ColorMaterial } from '../colorMaterial';
-import {
-  ItemOperationBuilder,
-  PmiAnnotationOperationBuilder,
-} from '../operations';
+import { ItemOperationBuilder, PmiAnnotationOperationBuilder } from '../operations';
 
 describe(ItemOperationBuilder, () => {
   it('creates a hide operation', () => {
@@ -71,9 +68,7 @@ describe(ItemOperationBuilder, () => {
     const builder = new ItemOperationBuilder();
     const definitions = builder.setPhantom(true).build();
 
-    expect(definitions).toEqual([
-      { type: 'change-phantom', phantomState: true },
-    ]);
+    expect(definitions).toEqual([{ type: 'change-phantom', phantomState: true }]);
   });
 
   it('creates a change phantom operation without parameter', () => {
@@ -94,9 +89,7 @@ describe(ItemOperationBuilder, () => {
     const builder = new ItemOperationBuilder();
     const definitions = builder.setEndItem(true).build();
 
-    expect(definitions).toEqual([
-      { type: 'change-end-item', endItemState: true },
-    ]);
+    expect(definitions).toEqual([{ type: 'change-end-item', endItemState: true }]);
   });
 
   it('creates a change end item operation without parameter', () => {

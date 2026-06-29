@@ -32,7 +32,7 @@ export function makeFrustumMatrix(
   top: number,
   bottom: number,
   near: number,
-  far: number
+  far: number,
 ): Matrix4.Matrix4 {
   const a = (right + left) / (right - left);
   const b = (top + bottom) / (top - bottom);
@@ -71,7 +71,7 @@ export function makePerspectiveMatrix(
   near: number,
   far: number,
   fovY: number,
-  aspect: number
+  aspect: number,
 ): Matrix4.Matrix4 {
   const ymax = near * Math.tan(Angle.toRadians(fovY / 2.0));
   const xmax = ymax * aspect;
@@ -101,9 +101,7 @@ export function makePerspectiveMatrix(
  * @param camera The camera to compute.
  * @returns A matrix.
  */
-export function makeLookAtViewMatrix(
-  camera: FrameCamera.FrameCamera
-): Matrix4.Matrix4 {
+export function makeLookAtViewMatrix(camera: FrameCamera.FrameCamera): Matrix4.Matrix4 {
   const { lookAt, up } = camera;
   const position = isOrthographicFrameCamera(camera)
     ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
@@ -134,9 +132,7 @@ export function makeLookAtViewMatrix(
  * @param camera The camera to compute the look at matrix for.
  * @returns A matrix.
  */
-export function makeLookAtMatrix(
-  camera: FrameCamera.FrameCamera
-): Matrix4.Matrix4 {
+export function makeLookAtMatrix(camera: FrameCamera.FrameCamera): Matrix4.Matrix4 {
   const { lookAt, up } = camera;
   const position = isOrthographicFrameCamera(camera)
     ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))

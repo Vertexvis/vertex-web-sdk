@@ -52,13 +52,7 @@ describe('markup utils', () => {
       // Expected point is at [75, 125] in the original dimensions, which will be scaled to [15, 25]
       // to map to canvas dimensions with 0.5 scale, and finally up to [50, 25] with centering.
       expect(
-        translatePointToScreen(
-          pt,
-          canvasDimensions,
-          contentDimensions,
-          'x-only',
-          0.5
-        )
+        translatePointToScreen(pt, canvasDimensions, contentDimensions, 'x-only', 0.5),
       ).toMatchObject({
         x: 50,
         y: 25,
@@ -73,13 +67,7 @@ describe('markup utils', () => {
       // Expected point is at [75, 125] in the original dimensions, which will be scaled to [15, 25]
       // to map to canvas dimensions with 0.5 scale, and finally up to [15, 50] with centering.
       expect(
-        translatePointToScreen(
-          pt,
-          canvasDimensions,
-          contentDimensions,
-          'y-only',
-          0.5
-        )
+        translatePointToScreen(pt, canvasDimensions, contentDimensions, 'y-only', 0.5),
       ).toMatchObject({
         x: 15,
         y: 50,
@@ -94,13 +82,7 @@ describe('markup utils', () => {
       // Expected point is at [75, 125] in the original dimensions, which will be scaled to [15, 25]
       // to map to canvas dimensions with 0.5 scale, and finally up to [50, 50] with centering.
       expect(
-        translatePointToScreen(
-          pt,
-          canvasDimensions,
-          contentDimensions,
-          'both',
-          0.5
-        )
+        translatePointToScreen(pt, canvasDimensions, contentDimensions, 'both', 0.5),
       ).toMatchObject({
         x: 50,
         y: 50,
@@ -115,13 +97,7 @@ describe('markup utils', () => {
       // Expected point is at [100, 100] in the original dimensions, which will be scaled to [50, 50]
       // to map to canvas dimensions, and finally up to [250, 250] with the 5x scale.
       expect(
-        translatePointToScreen(
-          pt,
-          canvasDimensions,
-          contentDimensions,
-          'both',
-          5
-        )
+        translatePointToScreen(pt, canvasDimensions, contentDimensions, 'both', 5),
       ).toMatchObject({
         x: 250,
         y: 250,
@@ -184,8 +160,8 @@ describe('markup utils', () => {
           contentDimensions,
           'none',
           1,
-          offset
-        )
+          offset,
+        ),
       ).toMatchObject({
         x: -0.25,
         y: -0.375,
@@ -209,8 +185,8 @@ describe('markup utils', () => {
           contentDimensions,
           'both',
           0.5,
-          offset
-        )
+          offset,
+        ),
       ).toMatchObject({
         x: -1,
         y: -0.75,
@@ -227,12 +203,7 @@ describe('markup utils', () => {
       // Initial dimensions are [125, 125] relative to the original dimensions, which will map to [50, 50] in
       // canvas dimensions. This value is then scaled down to [25, 25] with the 0.5 scale.
       expect(
-        translateDimensionsToScreen(
-          dimensions,
-          canvasDimensions,
-          contentDimensions,
-          0.5
-        )
+        translateDimensionsToScreen(dimensions, canvasDimensions, contentDimensions, 0.5),
       ).toMatchObject({
         width: 25,
         height: 25,

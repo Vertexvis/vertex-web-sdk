@@ -10,21 +10,19 @@ import { fromPbVector3f } from '../mappers';
 export class MeasurementEntity {
   public constructor(
     public readonly point: Vector3.Vector3,
-    public readonly modelEntity: Uint8Array
+    public readonly modelEntity: Uint8Array,
   ) {}
 
-  public static fromHit(
-    hit: vertexvis.protobuf.stream.IHit
-  ): MeasurementEntity {
+  public static fromHit(hit: vertexvis.protobuf.stream.IHit): MeasurementEntity {
     if (hit.hitPoint != null && hit.modelEntity != null) {
       const hitPoint = Mapper.ifInvalidThrow(fromPbVector3f)(hit.hitPoint);
       const modelEntity = vertexvis.protobuf.core.ModelEntity.encode(
-        hit.modelEntity
+        hit.modelEntity,
       ).finish();
       return new MeasurementEntity(hitPoint, modelEntity);
     } else {
       throw new Error(
-        'Cannot create MeasurementEntity from Hit. Hit is missing hit point and model entity'
+        'Cannot create MeasurementEntity from Hit. Hit is missing hit point and model entity',
       );
     }
   }

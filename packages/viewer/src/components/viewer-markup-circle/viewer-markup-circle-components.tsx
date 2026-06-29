@@ -57,9 +57,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'top-left')}
         onPointerDown={onTopLeftAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -68,9 +66,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'left')}
         onPointerDown={onLeftAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -79,9 +75,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'top-right')}
         onPointerDown={onTopRightAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -90,9 +84,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'right')}
         onPointerDown={onRightAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -101,9 +93,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'bottom-left')}
         onPointerDown={onBottomLeftAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -112,9 +102,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'bottom')}
         onPointerDown={onBottomAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -123,9 +111,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'bottom-right')}
         onPointerDown={onBottomRightAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -134,9 +120,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={getBoundingBox2dAnchorPosition(padded, 'top')}
         onPointerDown={onTopAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-edge-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-edge-anchor')} />
       </RelativeAnchor>
       <RelativeAnchor
         transform={transform}
@@ -145,9 +129,7 @@ export const BoundingBox2d: FunctionalComponent<BoundingBox2dProps> = ({
         point={center}
         onPointerDown={onCenterAnchorPointerDown}
       >
-        <div
-          class={classNames('bounds-default-anchor', 'bounds-center-anchor')}
-        />
+        <div class={classNames('bounds-default-anchor', 'bounds-center-anchor')} />
       </RelativeAnchor>
     </div>
   );

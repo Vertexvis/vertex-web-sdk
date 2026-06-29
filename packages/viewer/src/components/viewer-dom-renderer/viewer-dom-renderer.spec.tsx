@@ -2,12 +2,13 @@ const dispose = jest.fn();
 const mockRegisterAdditionalElement = jest.fn();
 jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
   const { MultiElementInteractionHandler } = jest.requireActual(
-    '../../lib/interactions/multiElementInteractionHandler'
+    '../../lib/interactions/multiElementInteractionHandler',
   );
   return {
     PointerInteractionHandler: class extends MultiElementInteractionHandler {
-      public registerAdditionalElement =
-        mockRegisterAdditionalElement.mockReturnValue({ dispose });
+      public registerAdditionalElement = mockRegisterAdditionalElement.mockReturnValue({
+        dispose,
+      });
     },
   };
 });
@@ -15,12 +16,7 @@ jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import {
-  BoundingBox,
-  Dimensions,
-  Rectangle,
-  Vector3,
-} from '@vertexvis/geometry';
+import { BoundingBox, Dimensions, Rectangle, Vector3 } from '@vertexvis/geometry';
 
 import { parseConfig } from '../../lib/config';
 import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
@@ -39,7 +35,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       fovY: 45,
     },
     BoundingBox.create({ x: -1, y: -1, z: -1 }, { x: 1, y: 1, z: 1 }),
-    1
+    1,
   );
   const depthBuffer = new DepthBuffer(
     camera,
@@ -48,7 +44,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       imageRect: Rectangle.create(0, 0, 100, 100),
       imageScale: 1,
     },
-    makeDepthImageBytes(100, 100, 0)
+    makeDepthImageBytes(100, 100, 0),
   );
 
   beforeEach(() => jest.resetAllMocks());
@@ -66,9 +62,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.style.transform).toContain('translate(-50%, -50%)');
     });
 
@@ -89,9 +83,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
 
@@ -112,9 +104,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('occluded')).toBe('');
     });
 
@@ -135,9 +125,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
   });
@@ -155,9 +143,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.style.transform).toContain('translate(-50%, -50%)');
       expect(el.style.transform).toContain('matrix3d');
     });
@@ -172,9 +158,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.style.transform).toContain('translate(-50%, -50%)');
       expect(el.style.transform).toContain('matrix3d');
     });
@@ -198,9 +182,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
 
@@ -221,9 +203,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('occluded')).toBe('');
     });
 
@@ -244,9 +224,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
   });
@@ -264,16 +242,12 @@ describe('<vertex-viewer-dom-renderer>', () => {
             camera={camera}
             depthBuffer={depthBuffer}
           >
-            <vertex-viewer-dom-element
-              detachedOff={false}
-            ></vertex-viewer-dom-element>
+            <vertex-viewer-dom-element detachedOff={false}></vertex-viewer-dom-element>
           </vertex-viewer-dom-renderer>
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('detached')).toBeNull();
     });
 
@@ -289,16 +263,12 @@ describe('<vertex-viewer-dom-renderer>', () => {
             camera={camera}
             depthBuffer={depthBuffer}
           >
-            <vertex-viewer-dom-element
-              detachedOff={false}
-            ></vertex-viewer-dom-element>
+            <vertex-viewer-dom-element detachedOff={false}></vertex-viewer-dom-element>
           </vertex-viewer-dom-renderer>
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('detached')).toBe('');
     });
 
@@ -319,9 +289,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         ),
       });
 
-      const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
-      ) as HTMLElement;
+      const el = page.root?.querySelector('vertex-viewer-dom-element') as HTMLElement;
       expect(el.getAttribute('detached')).toBeNull();
     });
   });
@@ -371,10 +339,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
       const el = page.root as HTMLVertexViewerDomRendererElement;
 
-      expect(addEventListener).toHaveBeenCalledWith(
-        'frameDrawn',
-        expect.any(Function)
-      );
+      expect(addEventListener).toHaveBeenCalledWith('frameDrawn', expect.any(Function));
       expect(el.camera).toMatchObject(camera);
 
       expect(getInteractionHandlers).not.toHaveBeenCalled();
@@ -383,9 +348,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
     it('will register itself with any multielement interaction handlers', async () => {
       const getInteractionHandlers = jest
         .fn()
-        .mockResolvedValue([
-          new PointerInteractionHandler(() => parseConfig('platdev')),
-        ]);
+        .mockResolvedValue([new PointerInteractionHandler(() => parseConfig('platdev'))]);
 
       const page = await newSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
@@ -415,9 +378,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
     it('dispose any handlers on the old viewer', async () => {
       const getInteractionHandlers = jest
         .fn()
-        .mockResolvedValue([
-          new PointerInteractionHandler(() => parseConfig('platdev')),
-        ]);
+        .mockResolvedValue([new PointerInteractionHandler(() => parseConfig('platdev'))]);
 
       const viewer = {
         addEventListener,
@@ -431,9 +392,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const page = await newSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
-          <vertex-viewer-dom-renderer
-            viewer={{ ...viewer }}
-          ></vertex-viewer-dom-renderer>
+          <vertex-viewer-dom-renderer viewer={{ ...viewer }}></vertex-viewer-dom-renderer>
         ),
       });
 

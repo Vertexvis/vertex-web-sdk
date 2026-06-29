@@ -21,11 +21,8 @@ describe(DepthBuffer, () => {
       up: Vector3.up(),
       fovY: 45,
     },
-    BoundingBox.create(
-      Vector3.create(-100, -100, -100),
-      Vector3.create(100, 100, 100)
-    ),
-    1
+    BoundingBox.create(Vector3.create(-100, -100, -100), Vector3.create(100, 100, 100)),
+    1,
   );
 
   const depthBuffer = new DepthBuffer(
@@ -35,12 +32,12 @@ describe(DepthBuffer, () => {
       imageRect: Rectangle.create(0, 0, 100, 100),
       imageScale: 1,
     },
-    makeDepthImageBytes(100, 100, (2 ** 16 - 1) / 2)
+    makeDepthImageBytes(100, 100, (2 ** 16 - 1) / 2),
   );
 
   function createDepthBufferWithDepth(
     cameraToConsider: FrameCameraBase,
-    depthValue: number
+    depthValue: number,
   ): {
     ray: Ray.Ray;
     depthBuffer: DepthBuffer;
@@ -53,7 +50,7 @@ describe(DepthBuffer, () => {
         imageRect: Rectangle.create(0, 0, 100, 100),
         imageScale: 1,
       },
-      makeDepthImageBytes(100, 100, depthValue)
+      makeDepthImageBytes(100, 100, depthValue),
     );
 
     const viewport = new Viewport(100, 100);
@@ -92,10 +89,7 @@ describe(DepthBuffer, () => {
     });
 
     it('returns fallback depth', () => {
-      const depth = depthBuffer.getNormalizedDepthAtPoint(
-        Point.create(-1, -1),
-        0.5
-      );
+      const depth = depthBuffer.getNormalizedDepthAtPoint(Point.create(-1, -1), 0.5);
       expect(depth).toBe(0.5);
     });
   });
@@ -104,7 +98,7 @@ describe(DepthBuffer, () => {
     it('returns true if distance of world point is further than depth value', () => {
       const occluded = depthBuffer.isOccluded(
         { x: 0, y: 0, z: 200 },
-        new Viewport(100, 100)
+        new Viewport(100, 100),
       );
       expect(occluded).toBe(true);
     });
@@ -112,7 +106,7 @@ describe(DepthBuffer, () => {
     it('returns false if distance of world point is closer than depth value', () => {
       const occluded = depthBuffer.isOccluded(
         { x: 0, y: 0, z: -100 },
-        new Viewport(100, 100)
+        new Viewport(100, 100),
       );
       expect(occluded).toBe(false);
     });
@@ -127,14 +121,11 @@ describe(DepthBuffer, () => {
         1,
         100,
         1,
-        45
+        45,
       );
 
       it('returns correct world position for near plane', () => {
-        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
-          perspectiveCamera,
-          0
-        );
+        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(perspectiveCamera, 0);
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(4);
       });
@@ -142,7 +133,7 @@ describe(DepthBuffer, () => {
       it('returns correct world position for far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
           perspectiveCamera,
-          DepthBuffer.MAX_DEPTH_VALUE
+          DepthBuffer.MAX_DEPTH_VALUE,
         );
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(-95);
@@ -151,7 +142,7 @@ describe(DepthBuffer, () => {
       it('returns correct world position between near and far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
           perspectiveCamera,
-          DepthBuffer.MAX_DEPTH_VALUE / 2
+          DepthBuffer.MAX_DEPTH_VALUE / 2,
         );
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBeCloseTo(-45.5);
@@ -166,13 +157,13 @@ describe(DepthBuffer, () => {
         -100,
         100,
         1,
-        1
+        1,
       );
 
       it('returns correct world position for near plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
           orthographicCamera,
-          0
+          0,
         );
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(-100);
@@ -181,7 +172,7 @@ describe(DepthBuffer, () => {
       it('returns correct world position for far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
           orthographicCamera,
-          DepthBuffer.MAX_DEPTH_VALUE
+          DepthBuffer.MAX_DEPTH_VALUE,
         );
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(100);
@@ -190,7 +181,7 @@ describe(DepthBuffer, () => {
       it('returns correct world position between near and far plane', () => {
         const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
           orthographicCamera,
-          DepthBuffer.MAX_DEPTH_VALUE / 2
+          DepthBuffer.MAX_DEPTH_VALUE / 2,
         );
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBeCloseTo(0);

@@ -19,25 +19,21 @@ export class CameraRenderResult implements Result {
     stream: StreamApi,
     decodeFrame: FrameDecoder,
     { animationId, correlationId }: RenderResultIds,
-    timeout?: number
+    timeout?: number,
   ) {
     this.onAnimationCompleted = new StreamApiEventDispatcher(
       stream,
       (msg) => msg.event?.animationCompleted?.animationId?.hex === animationId,
       (msg) => msg.event?.animationCompleted?.animationId?.hex || undefined,
-      timeout
+      timeout,
     );
     this.onFrameReceived = new StreamApiEventDispatcher<Frame>(
       stream,
       (msg) =>
-        !!msg.request?.drawFrame?.frameCorrelationIds?.some(
-          (id) => id === correlationId
-        ),
+        !!msg.request?.drawFrame?.frameCorrelationIds?.some((id) => id === correlationId),
       (msg) =>
-        msg.request?.drawFrame != null
-          ? decodeFrame(msg.request.drawFrame)
-          : undefined,
-      timeout
+        msg.request?.drawFrame != null ? decodeFrame(msg.request.drawFrame) : undefined,
+      timeout,
     );
   }
 }

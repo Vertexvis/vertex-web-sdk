@@ -14,11 +14,7 @@ import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { Viewport } from '../../lib/types';
 import { makePerspectiveFrame } from '../../testing/fixtures';
-import {
-  key1,
-  loadViewerStreamKey,
-  makeViewerStream,
-} from '../../testing/viewer';
+import { key1, loadViewerStreamKey, makeViewerStream } from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { HitIndicator } from './lib/indicator';
@@ -65,11 +61,9 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
       ),
     });
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer'
-    ) as HTMLVertexViewerElement;
+    const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
     const indicator = page.body.querySelector(
-      'vertex-viewer-hit-result-indicator'
+      'vertex-viewer-hit-result-indicator',
     ) as HTMLVertexViewerHitResultIndicatorElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -85,7 +79,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
 
     expect(mockIndicator.updateTransformAndNormal).toHaveBeenCalledWith(
       Matrix4.makeTranslation(indicator.position),
-      indicator.normal
+      indicator.normal,
     );
     expect(mockIndicator.updateFrame).toHaveBeenCalledWith(frame);
   });
@@ -101,11 +95,9 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
       ),
     });
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer'
-    ) as HTMLVertexViewerElement;
+    const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
     const indicator = page.body.querySelector(
-      'vertex-viewer-hit-result-indicator'
+      'vertex-viewer-hit-result-indicator',
     ) as HTMLVertexViewerHitResultIndicatorElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });

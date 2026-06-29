@@ -1,12 +1,4 @@
-import {
-  Component,
-  Element,
-  Event,
-  EventEmitter,
-  h,
-  Host,
-  Prop,
-} from '@stencil/core';
+import { Component, Element, Event, EventEmitter, h, Host, Prop } from '@stencil/core';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Disposable } from '@vertexvis/utils';
 
@@ -212,8 +204,7 @@ export class SceneTreeTableCell {
 
   public render(): h.JSX.IntrinsicElements {
     // Overrides the `.hydrated` visibility when we have nothing to display
-    const hiddenStyle =
-      this.node == null ? { visibility: 'hidden' } : undefined;
+    const hiddenStyle = this.node == null ? { visibility: 'hidden' } : undefined;
     const backgroundColorStyle = this.getBackgroundColorStyle();
 
     const endItemIcon = this.getEndItemIcon();
@@ -243,16 +234,10 @@ export class SceneTreeTableCell {
             <button
               class="expand-btn no-shrink"
               data-testid={'expand-' + this.node?.name}
-              onPointerUp={this.createActionPointerUpHandler(
-                this.toggleExpansion
-              )}
+              onPointerUp={this.createActionPointerUpHandler(this.toggleExpansion)}
             >
               {expansionIcon && (
-                <vertex-viewer-icon
-                  class="icon"
-                  name={expansionIcon}
-                  size="sm"
-                />
+                <vertex-viewer-icon class="icon" name={expansionIcon} size="sm" />
               )}
             </button>
           )}
@@ -263,11 +248,7 @@ export class SceneTreeTableCell {
               data-testid={'end-item-' + this.node?.name}
             >
               {endItemIcon && (
-                <vertex-viewer-icon
-                  class="end-item-icon"
-                  name={endItemIcon}
-                  size="sm"
-                />
+                <vertex-viewer-icon class="end-item-icon" name={endItemIcon} size="sm" />
               )}
             </button>
           )}
@@ -285,34 +266,24 @@ export class SceneTreeTableCell {
               data-testid={'isolate-btn-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(this.isolate)}
             >
-              {isolateIcon && (
-                <vertex-viewer-icon class="icon" name="locate" size="sm" />
-              )}
+              {isolateIcon && <vertex-viewer-icon class="icon" name="locate" size="sm" />}
             </button>
           )}
           {this.visibilityToggle && (
             <button
               class="visibility-btn no-shrink"
               data-testid={'visibility-btn-' + this.node?.name}
-              onPointerUp={this.createActionPointerUpHandler(
-                this.toggleVisibility
-              )}
+              onPointerUp={this.createActionPointerUpHandler(this.toggleVisibility)}
             >
               {visibilityIcon && (
-                <vertex-viewer-icon
-                  class="icon"
-                  name={visibilityIcon}
-                  size="sm"
-                />
+                <vertex-viewer-icon class="icon" name={visibilityIcon} size="sm" />
               )}
             </button>
           )}
           <div class="no-shrink">
             <slot name="right-gutter" />
           </div>
-          {!this.visibilityToggle && !this.isolateButton && (
-            <div class="column-spacer" />
-          )}
+          {!this.visibilityToggle && !this.isolateButton && <div class="column-spacer" />}
         </div>
       </Host>
     );
@@ -320,9 +291,7 @@ export class SceneTreeTableCell {
 
   private displayValue = (): string => {
     const resp =
-      this.value == null || this.value.trim() === ''
-        ? this.placeholder
-        : this.value;
+      this.value == null || this.value.trim() === '' ? this.placeholder : this.value;
 
     return resp;
   };
@@ -357,7 +326,7 @@ export class SceneTreeTableCell {
   };
 
   private createActionPointerUpHandler = (
-    action: (event: PointerEvent) => void
+    action: (event: PointerEvent) => void,
   ): ((event: PointerEvent) => void) => {
     return (event) => {
       // Blur the `hostEl` after a `preventDefault` to clear focus that
@@ -430,21 +399,21 @@ export class SceneTreeTableCell {
 
   private performDefaultVisibilityOperation = async (
     node: Node.AsObject,
-    tree: HTMLVertexSceneTreeElement
+    tree: HTMLVertexSceneTreeElement,
   ): Promise<void> => {
     await tree.toggleItemVisibility(node);
   };
 
   private performDefaultIsolateOperation = async (
     node: Node.AsObject,
-    tree: HTMLVertexSceneTreeElement
+    tree: HTMLVertexSceneTreeElement,
   ): Promise<void> => {
     await tree.isolateItem(node);
   };
 
   private performDefaultExpansionOperation = async (
     node: Node.AsObject,
-    tree: HTMLVertexSceneTreeElement
+    tree: HTMLVertexSceneTreeElement,
   ): Promise<void> => {
     await tree.toggleExpandItem(node);
   };
@@ -466,15 +435,15 @@ export class SceneTreeTableCell {
   private getBackgroundColorStyle(): string {
     const backgroundColorStyle = this.getCssVariableWithFallbacks(
       `--scene-tree-row-background-color-depth-${this.node?.depth}`,
-      '--scene-tree-row-background-color'
+      '--scene-tree-row-background-color',
     );
     const selectedBackgroundColorStyle = this.getCssVariableWithFallbacks(
       '--scene-tree-selected-row-background-color',
-      '--scene-tree-cell-background-selected'
+      '--scene-tree-cell-background-selected',
     );
     const hoveredBackgroundColorStyle = this.getCssVariableWithFallbacks(
       '--scene-tree-hovered-row-background-color',
-      '--scene-tree-cell-background-hover'
+      '--scene-tree-cell-background-hover',
     );
 
     if (!!this.node?.selected) {
@@ -485,15 +454,12 @@ export class SceneTreeTableCell {
     return backgroundColorStyle;
   }
 
-  private getCssVariableWithFallbacks(
-    variable: string,
-    ...fallbacks: string[]
-  ): string {
+  private getCssVariableWithFallbacks(variable: string, ...fallbacks: string[]): string {
     const sequencedFallbacks = [...fallbacks].reverse();
 
     return [...sequencedFallbacks, variable].reduce(
       (res, s) => `var(${s}, ${res})`,
-      'unset'
+      'unset',
     );
   }
 

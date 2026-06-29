@@ -38,27 +38,21 @@ export const MinimumDistanceResultEntry: FunctionalComponent<
       </MeasurementDetailsEntry>
       <MeasurementDetailsEntry
         label="X"
-        onMouseEnter={() =>
-          onShowOverlay(overlays?.addDistanceVectorFromResult(result))
-        }
+        onMouseEnter={() => onShowOverlay(overlays?.addDistanceVectorFromResult(result))}
         onMouseLeave={onHideOverlay}
       >
         {formatter(v.x)}
       </MeasurementDetailsEntry>
       <MeasurementDetailsEntry
         label="Y"
-        onMouseEnter={() =>
-          onShowOverlay(overlays?.addDistanceVectorFromResult(result))
-        }
+        onMouseEnter={() => onShowOverlay(overlays?.addDistanceVectorFromResult(result))}
         onMouseLeave={onHideOverlay}
       >
         {formatter(v.y)}
       </MeasurementDetailsEntry>
       <MeasurementDetailsEntry
         label="Z"
-        onMouseEnter={() =>
-          onShowOverlay(overlays?.addDistanceVectorFromResult(result))
-        }
+        onMouseEnter={() => onShowOverlay(overlays?.addDistanceVectorFromResult(result))}
         onMouseLeave={onHideOverlay}
       >
         {formatter(v.z)}

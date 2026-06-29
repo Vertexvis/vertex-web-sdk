@@ -238,17 +238,15 @@ export class SceneTreeSearch {
   private setupController(): void {
     this.onStateChangeDisposable?.dispose();
 
-    this.onStateChangeDisposable = this.controller?.onStateChange.on(
-      (state) => {
-        // If a search was previously being performed, but has now finished,
-        // emit the event that the search has completed.
-        if (this.isSearching && !state.isSearching) {
-          this.searchCompleted.emit(this.value);
-        }
-
-        this.isSearching = state.isSearching;
+    this.onStateChangeDisposable = this.controller?.onStateChange.on((state) => {
+      // If a search was previously being performed, but has now finished,
+      // emit the event that the search has completed.
+      if (this.isSearching && !state.isSearching) {
+        this.searchCompleted.emit(this.value);
       }
-    );
+
+      this.isSearching = state.isSearching;
+    });
   }
 
   private emitCurrentValue(): void {

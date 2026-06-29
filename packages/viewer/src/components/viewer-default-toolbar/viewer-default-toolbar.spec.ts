@@ -26,9 +26,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
         html: `<vertex-viewer-default-toolbar></vertex-viewer-default-toolbar>`,
       });
 
-      const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
-      );
+      const btn = page.root?.shadowRoot?.querySelector('[data-testid="fit-all-btn"]');
       expect(btn).toBeDefined();
     });
 
@@ -38,9 +36,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
         template: () => h('vertex-viewer-default-toolbar', { viewer }),
       });
 
-      const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
-      );
+      const btn = page.root?.shadowRoot?.querySelector('[data-testid="fit-all-btn"]');
       btn?.dispatchEvent(new MouseEvent('click'));
 
       await awaitScene;
@@ -49,7 +45,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       expect(cameraMock.render).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: { milliseconds: 1000 },
-        })
+        }),
       );
     });
 
@@ -63,9 +59,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
           }),
       });
 
-      const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
-      );
+      const btn = page.root?.shadowRoot?.querySelector('[data-testid="fit-all-btn"]');
       btn?.dispatchEvent(new MouseEvent('click'));
 
       await awaitScene;
@@ -73,7 +67,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       expect(cameraMock.render).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: undefined,
-        })
+        }),
       );
     });
   });
@@ -84,9 +78,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       html: `<vertex-viewer-default-toolbar placement="top-left"></vertex-viewer-default-toolbar>`,
     });
 
-    const toolbar = page.root?.shadowRoot?.querySelector(
-      'vertex-viewer-toolbar'
-    );
+    const toolbar = page.root?.shadowRoot?.querySelector('vertex-viewer-toolbar');
     expect(toolbar).toEqualAttribute('placement', 'top-left');
   });
 
@@ -96,9 +88,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       html: `<vertex-viewer-default-toolbar direction="vertical"></vertex-viewer-default-toolbar>`,
     });
 
-    const toolbar = page.root?.shadowRoot?.querySelector(
-      'vertex-viewer-toolbar'
-    );
+    const toolbar = page.root?.shadowRoot?.querySelector('vertex-viewer-toolbar');
     expect(toolbar).toEqualAttribute('direction', 'vertical');
 
     page.root?.shadowRoot

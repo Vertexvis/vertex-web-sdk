@@ -2,9 +2,7 @@ import { Point, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
 
 export interface CanvasDocument {
-  items: Array<
-    LineItem2d | OvalItem2d | FreeformItem2d | PinItem2d | CalloutItem
-  >;
+  items: Array<LineItem2d | OvalItem2d | FreeformItem2d | PinItem2d | CalloutItem>;
 }
 
 export interface StrokeStyle {

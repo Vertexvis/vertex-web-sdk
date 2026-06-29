@@ -4,11 +4,7 @@ import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Vector3 } from '@vertexvis/geometry';
 
 import { readDOM } from '../../lib/stencil';
-import {
-  FramePerspectiveCamera,
-  Orientation,
-  StandardView,
-} from '../../lib/types';
+import { FramePerspectiveCamera, Orientation, StandardView } from '../../lib/types';
 import {
   TriadAxis,
   ViewCubeCorner,
@@ -120,7 +116,7 @@ export class ViewerViewCube {
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
+    oldViewer?: HTMLVertexViewerElement,
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.updateMatrices);
     newViewer?.addEventListener('frameDrawn', this.updateMatrices);
@@ -135,7 +131,7 @@ export class ViewerViewCube {
       this.triadPosition = Vector3.create(
         -halfLength - 5,
         -halfLength - 5,
-        -halfLength - 5
+        -halfLength - 5,
       );
 
       // Used to scale the camera position so the cube is the same size as the
@@ -151,7 +147,7 @@ export class ViewerViewCube {
         0.1,
         100,
         1,
-        fovY
+        fovY,
       );
 
       this.worldOrientation = this.viewer.frame.scene.worldOrientation;
@@ -170,16 +166,13 @@ export class ViewerViewCube {
               ? { animation: { milliseconds: this.animationDuration } }
               : {};
           const worldStandardView = standardView.transformMatrix(
-            this.worldOrientation.matrix
+            this.worldOrientation.matrix,
           );
 
           // Check to see if any geometry is visible. If not, don't perform viewAll
           const currentBoundingBox = scene.boundingBox();
           if (!this.viewAll) {
-            scene
-              .camera()
-              .standardViewFixedLookAt(worldStandardView)
-              .render(animation);
+            scene.camera().standardViewFixedLookAt(worldStandardView).render(animation);
           } else if (
             currentBoundingBox?.max != null &&
             Vector3.isEqual(currentBoundingBox.max, Vector3.origin()) &&
@@ -187,11 +180,7 @@ export class ViewerViewCube {
           ) {
             scene.camera().standardView(worldStandardView).render(animation);
           } else {
-            scene
-              .camera()
-              .standardView(worldStandardView)
-              .viewAll()
-              .render(animation);
+            scene.camera().standardView(worldStandardView).viewAll().render(animation);
           }
         }
       };
@@ -238,10 +227,7 @@ export class ViewerViewCube {
         >
           {/* Triad */}
           {!this.triadOff && (
-            <vertex-viewer-dom-group
-              class="triad"
-              position={this.triadPosition}
-            >
+            <vertex-viewer-dom-group class="triad" position={this.triadPosition}>
               <TriadAxis
                 label="X"
                 length={this.boxLength}
@@ -261,10 +247,7 @@ export class ViewerViewCube {
           )}
 
           {/* Cube */}
-          <vertex-viewer-dom-group
-            class="cube"
-            matrix={this.worldOrientation.matrix}
-          >
+          <vertex-viewer-dom-group class="cube" matrix={this.worldOrientation.matrix}>
             <ViewCubeShadow length={this.boxLength + 10} />
 
             {/* Sides */}
@@ -430,9 +413,7 @@ export class ViewerViewCube {
               face2Corner="top-left"
               face3Side="left"
               face3Corner="top-right"
-              onPointerDown={this.handleStandardView(
-                StandardView.TOP_FRONT_RIGHT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.TOP_FRONT_RIGHT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeCorner
@@ -443,9 +424,7 @@ export class ViewerViewCube {
               face2Corner="top-right"
               face3Side="right"
               face3Corner="top-left"
-              onPointerDown={this.handleStandardView(
-                StandardView.TOP_FRONT_LEFT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.TOP_FRONT_LEFT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeCorner
@@ -456,9 +435,7 @@ export class ViewerViewCube {
               face2Corner="bottom-right"
               face3Side="right"
               face3Corner="bottom-left"
-              onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_FRONT_LEFT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_FRONT_LEFT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeCorner
@@ -469,9 +446,7 @@ export class ViewerViewCube {
               face2Corner="bottom-left"
               face3Side="left"
               face3Corner="bottom-right"
-              onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_FRONT_RIGHT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_FRONT_RIGHT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeCorner
@@ -482,9 +457,7 @@ export class ViewerViewCube {
               face2Corner="top-left"
               face3Side="right"
               face3Corner="top-right"
-              onPointerDown={this.handleStandardView(
-                StandardView.TOP_BACK_LEFT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.TOP_BACK_LEFT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeCorner
@@ -495,9 +468,7 @@ export class ViewerViewCube {
               face2Corner="top-right"
               face3Side="left"
               face3Corner="top-left"
-              onPointerDown={this.handleStandardView(
-                StandardView.TOP_BACK_RIGHT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.TOP_BACK_RIGHT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeCorner
@@ -508,9 +479,7 @@ export class ViewerViewCube {
               face2Corner="bottom-right"
               face3Side="left"
               face3Corner="bottom-left"
-              onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_BACK_RIGHT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_BACK_RIGHT)}
               disabled={this.standardViewsOff}
             />
             <ViewCubeCorner
@@ -521,9 +490,7 @@ export class ViewerViewCube {
               face2Corner="bottom-left"
               face3Side="right"
               face3Corner="bottom-right"
-              onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_BACK_LEFT
-              )}
+              onPointerDown={this.handleStandardView(StandardView.BOTTOM_BACK_LEFT)}
               disabled={this.standardViewsOff}
             />
           </vertex-viewer-dom-group>

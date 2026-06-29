@@ -1,13 +1,4 @@
-import {
-  Component,
-  Element,
-  h,
-  Host,
-  Listen,
-  Prop,
-  State,
-  Watch,
-} from '@stencil/core';
+import { Component, Element, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
 import { Matrix4 } from '@vertexvis/geometry';
 import { Disposable } from '@vertexvis/utils';
 
@@ -147,7 +138,7 @@ export class ViewerDomRenderer {
   @Watch('viewer')
   protected handleViewerChange(
     newViewer: HTMLVertexViewerElement | undefined,
-    oldViewer: HTMLVertexViewerElement | undefined
+    oldViewer: HTMLVertexViewerElement | undefined,
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
@@ -173,9 +164,7 @@ export class ViewerDomRenderer {
    * disposes any existing disposables, and registers new handlers on the newly provided viewer.
    * @param newViewer
    */
-  private handleEventPropagationToViewer(
-    newViewer: HTMLVertexViewerElement
-  ): void {
+  private handleEventPropagationToViewer(newViewer: HTMLVertexViewerElement): void {
     this.interactionDisposables.forEach((disposable) => {
       disposable.dispose();
     });
@@ -187,10 +176,7 @@ export class ViewerDomRenderer {
         if (handler instanceof MultiElementInteractionHandler) {
           const disposable = handler.registerAdditionalElement(this.hostEl);
 
-          this.interactionDisposables = [
-            ...this.interactionDisposables,
-            disposable,
-          ];
+          this.interactionDisposables = [...this.interactionDisposables, disposable];
         }
       });
     });

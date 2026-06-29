@@ -14,7 +14,7 @@ export interface ClippingPlanes {
 
 export function fromBoundingBoxAndLookAtCamera(
   boundingBox: BoundingBox.BoundingBox,
-  camera: FrameCamera
+  camera: FrameCamera,
 ): ClippingPlanes {
   return isOrthographicFrameCamera(camera)
     ? fromBoundingBoxAndOrthographicCamera(boundingBox, camera)
@@ -26,22 +26,20 @@ export function fromBoundingBoxAndLookAtCamera(
 // TODO: revisit computation of these values in a single location
 export function fromBoundingBoxAndPerspectiveCamera(
   boundingBox: BoundingBox.BoundingBox,
-  camera: PerspectiveFrameCamera
+  camera: PerspectiveFrameCamera,
 ): ClippingPlanes {
   const boundingSphere = BoundingSphere.create(boundingBox);
   const minRange = boundingSphere.epsilon * 1e2;
 
   const signedDistToEye = Vector3.dot(
     Vector3.subtract(boundingSphere.center, camera.position),
-    Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position))
+    Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position)),
   );
 
   const bRadius = Math.max(boundingSphere.radius, minRange);
 
   let newFar =
-    bRadius + signedDistToEye < minRange
-      ? bRadius * 3.0
-      : bRadius + signedDistToEye;
+    bRadius + signedDistToEye < minRange ? bRadius * 3.0 : bRadius + signedDistToEye;
 
   let newNear =
     newFar - bRadius * 2.0 < minRange
@@ -73,7 +71,7 @@ export function fromBoundingBoxAndPerspectiveCamera(
 // TODO: revisit computation of these values in a single location
 export function fromBoundingBoxAndOrthographicCamera(
   boundingBox: BoundingBox.BoundingBox,
-  camera: OrthographicFrameCamera
+  camera: OrthographicFrameCamera,
 ): ClippingPlanes {
   const boundingSphere = BoundingSphere.create(boundingBox);
   const minRange = boundingSphere.epsilon * 1e2;

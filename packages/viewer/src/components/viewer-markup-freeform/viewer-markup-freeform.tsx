@@ -15,10 +15,7 @@ import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
-import {
-  MarkupCenteringBehavior,
-  MarkupInteraction,
-} from '../../lib/types/markup';
+import { MarkupCenteringBehavior, MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidStartEvent,
@@ -183,7 +180,7 @@ export class ViewerMarkupFreeform {
       offset: this.offset,
       originatingViewport: this.originatingViewport,
       centeringBehavior: this.centeringBehavior,
-    }
+    },
   );
 
   private registeredInteraction?: Disposable;
@@ -229,10 +226,9 @@ export class ViewerMarkupFreeform {
     this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.registeredInteraction =
-        await newViewer.registerBasicInteractionHandler(
-          this.interactionHandler
-        );
+      this.registeredInteraction = await newViewer.registerBasicInteractionHandler(
+        this.interactionHandler,
+      );
     }
   }
 
@@ -263,7 +259,7 @@ export class ViewerMarkupFreeform {
     writeDOM(() => {
       this.hostEl.style.setProperty(
         '--viewer-markup-freeform-scale',
-        this.scale.toString()
+        this.scale.toString(),
       );
     });
   }
@@ -311,7 +307,7 @@ export class ViewerMarkupFreeform {
                 class="path"
                 d={this.screenPoints.reduce(
                   (d, pt) => `${d}L${pt.x},${pt.y}`,
-                  `M${this.screenPoints[0].x},${this.screenPoints[0].y}`
+                  `M${this.screenPoints[0].x},${this.screenPoints[0].y}`,
                 )}
                 fill="none"
               />
@@ -324,7 +320,7 @@ export class ViewerMarkupFreeform {
                 this.elementBounds,
                 this.originatingViewport,
                 this.centeringBehavior,
-                this.scale
+                this.scale,
               )}
               offset={{ x: offsetX, y: offsetY }}
               onTopLeftAnchorPointerDown={(e) =>
@@ -333,9 +329,7 @@ export class ViewerMarkupFreeform {
               onTopRightAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('top-right', e)
               }
-              onTopAnchorPointerDown={(e) =>
-                this.interactionHandler.editAnchor('top', e)
-              }
+              onTopAnchorPointerDown={(e) => this.interactionHandler.editAnchor('top', e)}
               onBottomLeftAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('bottom-left', e)
               }
@@ -357,20 +351,14 @@ export class ViewerMarkupFreeform {
             />
           )}
           {this.mode === 'create' && (
-            <div
-              class="create-overlay"
-              onTouchStart={this.handleTouchStart}
-            ></div>
+            <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
           )}
         </Host>
       );
     } else {
       return (
         <Host>
-          <div
-            class="create-overlay"
-            onTouchStart={this.handleTouchStart}
-          ></div>
+          <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
         </Host>
       );
     }
@@ -395,8 +383,8 @@ export class ViewerMarkupFreeform {
           elementBounds,
           this.originatingViewport,
           this.centeringBehavior,
-          this.scale
-        )
+          this.scale,
+        ),
       );
     }
   }

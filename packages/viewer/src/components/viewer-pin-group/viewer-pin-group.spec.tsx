@@ -241,7 +241,7 @@ describe('vertex-view-pin-group', () => {
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
     const line = el.querySelector(
-      'vertex-viewer-pin-label-line'
+      'vertex-viewer-pin-label-line',
     ) as HTMLVertexViewerPinLabelLineElement;
 
     line.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
@@ -288,7 +288,7 @@ describe('vertex-view-pin-group', () => {
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
     const label = el.querySelector(
-      'vertex-viewer-pin-label'
+      'vertex-viewer-pin-label',
     ) as HTMLVertexViewerPinLabelElement;
 
     label.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
@@ -313,9 +313,9 @@ describe(getClosestCenterToPoint, () => {
       x: boxPoint.x + dimensions.width / 2,
       y: boxPoint.y,
     };
-    expect(
-      getClosestCenterToPoint(boxPoint, rightAboveBox, dimensions)
-    ).toEqual(expectedTopPoint);
+    expect(getClosestCenterToPoint(boxPoint, rightAboveBox, dimensions)).toEqual(
+      expectedTopPoint,
+    );
   });
 
   it('should return the point to the left of the box', async () => {
@@ -326,7 +326,7 @@ describe(getClosestCenterToPoint, () => {
       y: boxPoint.y + dimensions.height / 2,
     };
     expect(getClosestCenterToPoint(boxPoint, leftOfBox, dimensions)).toEqual(
-      expectedPoint
+      expectedPoint,
     );
   });
 
@@ -338,7 +338,7 @@ describe(getClosestCenterToPoint, () => {
       y: boxPoint.y + dimensions.height,
     };
     expect(getClosestCenterToPoint(boxPoint, belowBox, dimensions)).toEqual(
-      expectedBottomPoint
+      expectedBottomPoint,
     );
   });
 
@@ -350,7 +350,7 @@ describe(getClosestCenterToPoint, () => {
       y: boxPoint.y + dimensions.height,
     };
     expect(getClosestCenterToPoint(boxPoint, rightOfBox, dimensions)).toEqual(
-      expectedRightOfBox
+      expectedRightOfBox,
     );
   });
 });

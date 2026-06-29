@@ -22,11 +22,9 @@ describe('<vertex-scene-tree-table-resize-divider>', () => {
       `,
     });
 
+    expect(divider.getAttribute('style')).toContain('height: var(--header-height)');
     expect(divider.getAttribute('style')).toContain(
-      'height: var(--header-height)'
-    );
-    expect(divider.getAttribute('style')).toContain(
-      'padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2)'
+      'padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2)',
     );
 
     divider.dispatchEvent(new MouseEvent('pointerdown'));
@@ -35,18 +33,16 @@ describe('<vertex-scene-tree-table-resize-divider>', () => {
 
     expect(divider.getAttribute('style')).toContain('height: 100%');
     expect(divider.getAttribute('style')).toContain(
-      'padding: 0 calc(var(--scene-tree-table-column-gap) / 2)'
+      'padding: 0 calc(var(--scene-tree-table-column-gap) / 2)',
     );
 
     window.dispatchEvent(new MouseEvent('pointerup'));
 
     await page.waitForChanges();
 
+    expect(divider.getAttribute('style')).toContain('height: var(--header-height)');
     expect(divider.getAttribute('style')).toContain(
-      'height: var(--header-height)'
-    );
-    expect(divider.getAttribute('style')).toContain(
-      'padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2)'
+      'padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2)',
     );
   });
 });

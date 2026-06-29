@@ -44,10 +44,7 @@ export class ViewerDefaultToolbar {
 
   public render(): h.JSX.IntrinsicElements {
     return (
-      <vertex-viewer-toolbar
-        placement={this.placement}
-        direction={this.direction}
-      >
+      <vertex-viewer-toolbar placement={this.placement} direction={this.direction}>
         <vertex-viewer-toolbar-group
           class="group"
           direction={this.direction}

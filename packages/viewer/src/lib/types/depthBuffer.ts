@@ -31,7 +31,7 @@ export class DepthBuffer implements FrameImageLike {
   public constructor(
     public readonly camera: FrameCameraBase,
     public readonly imageAttr: ImageAttributesLike,
-    public readonly pixels: Uint16Array
+    public readonly pixels: Uint16Array,
   ) {}
 
   /**
@@ -46,7 +46,7 @@ export class DepthBuffer implements FrameImageLike {
   public static fromPng(
     png: Pick<DecodedPng, 'data'>,
     camera: FrameCameraBase,
-    imageAttr: ImageAttributesLike
+    imageAttr: ImageAttributesLike,
   ): DepthBuffer {
     if (png.data instanceof Uint16Array) {
       return new DepthBuffer(camera, imageAttr, png.data);
@@ -70,17 +70,11 @@ export class DepthBuffer implements FrameImageLike {
    *   depth value, or cannot be determined.
    * @returns The depth at the point.
    */
-  public getDepthAtPoint(
-    point: Point.Point,
-    fallbackNormalizedDepth?: number
-  ): number {
+  public getDepthAtPoint(point: Point.Point, fallbackNormalizedDepth?: number): number {
     const { near, far } = this.camera;
     const isPerspectiveCamera = this.camera.isPerspective();
 
-    const depth = this.getNormalizedDepthAtPoint(
-      point,
-      fallbackNormalizedDepth
-    );
+    const depth = this.getNormalizedDepthAtPoint(point, fallbackNormalizedDepth);
 
     if (isPerspectiveCamera) {
       return depth * (far - near) + near;
@@ -124,7 +118,7 @@ export class DepthBuffer implements FrameImageLike {
    */
   public getNormalizedDepthAtPoint(
     point: Point.Point,
-    fallbackNormalizedDepth?: number
+    fallbackNormalizedDepth?: number,
   ): number {
     const { width, height } = this.imageAttr.imageRect;
 
@@ -141,8 +135,7 @@ export class DepthBuffer implements FrameImageLike {
           ? (fallbackNormalizedDepth ?? depth)
           : depth;
       return (
-        (depthOrFallback ?? DepthBuffer.MAX_DEPTH_VALUE) /
-        DepthBuffer.MAX_DEPTH_VALUE
+        (depthOrFallback ?? DepthBuffer.MAX_DEPTH_VALUE) / DepthBuffer.MAX_DEPTH_VALUE
       );
     } else {
       return fallbackNormalizedDepth ?? 1;
@@ -174,7 +167,7 @@ export class DepthBuffer implements FrameImageLike {
   public getWorldPoint(
     point: Point.Point,
     ray: Ray.Ray,
-    fallbackNormalizedDepth?: number
+    fallbackNormalizedDepth?: number,
   ): Vector3.Vector3 {
     const distance = this.getDepthAtPoint(point, fallbackNormalizedDepth);
 
@@ -219,17 +212,11 @@ export class DepthBuffer implements FrameImageLike {
    * @param viewport A viewport of the viewer.
    * @returns depth of the closest geometry at the corresponding point in the viewport.
    */
-  public depthOfClosestGeometry(
-    worldPt: Vector3.Vector3,
-    viewport: Viewport
-  ): number {
+  public depthOfClosestGeometry(worldPt: Vector3.Vector3, viewport: Viewport): number {
     const { projectionViewMatrix } = this.camera;
 
     // Find the screen point corresponding to the world point for the current camera
-    const screenPt = viewport.transformWorldToViewport(
-      worldPt,
-      projectionViewMatrix
-    );
+    const screenPt = viewport.transformWorldToViewport(worldPt, projectionViewMatrix);
     const scaledPt = viewport.transformPointToFrame(screenPt, this);
 
     // Find the depth of the closest geometry at the same point on the screen
@@ -249,10 +236,7 @@ export class DepthBuffer implements FrameImageLike {
     const distanceToPoint = this.distanceToPoint(worldPt);
 
     // Find the depth of the closest geometry at the same point on the screen
-    const depthOfClosestGeometry = this.depthOfClosestGeometry(
-      worldPt,
-      viewport
-    );
+    const depthOfClosestGeometry = this.depthOfClosestGeometry(worldPt, viewport);
 
     // Allow for a small rounding error
     // Note that if the world point is coincident with the geometry,
@@ -261,8 +245,7 @@ export class DepthBuffer implements FrameImageLike {
     const depthDifference = Math.abs(depthOfClosestGeometry - distanceToPoint);
 
     return (
-      distanceToPoint > depthOfClosestGeometry &&
-      depthDifference > allowableDifference
+      distanceToPoint > depthOfClosestGeometry && depthDifference > allowableDifference
     );
   }
 
@@ -278,26 +261,20 @@ export class DepthBuffer implements FrameImageLike {
     const distanceToPoint = this.distanceToPoint(worldPt);
 
     // Find the depth of the closest geometry at the same point on the screen
-    const depthOfClosestGeometry = this.depthOfClosestGeometry(
-      worldPt,
-      viewport
-    );
+    const depthOfClosestGeometry = this.depthOfClosestGeometry(worldPt, viewport);
 
     // If distanceFromClosestGeometryToPoint is 0, then the point is directly on the surface of the
     // closest geometry and is not detached. This method allows for a small rounding
     // error when the point is slightly closer to the camera than the geometry.
-    const distanceFromClosestGeometryToPoint =
-      depthOfClosestGeometry - distanceToPoint;
+    const distanceFromClosestGeometryToPoint = depthOfClosestGeometry - distanceToPoint;
     const allowableDifferenceToStillBeOnSurface = 0.02 * distanceToPoint;
     const pointIsOnSurface =
-      distanceFromClosestGeometryToPoint <
-      allowableDifferenceToStillBeOnSurface;
+      distanceFromClosestGeometryToPoint < allowableDifferenceToStillBeOnSurface;
 
     // Check to see if the given world point is behind the far plane,
     // or that the depth of the point is greater than the maximum depth of visible geometry
     const maximumDepthOfVisibleGeometry = this.getMaxDepthOfGeometry();
-    const pointIsBehindFarPlane =
-      distanceToPoint > maximumDepthOfVisibleGeometry;
+    const pointIsBehindFarPlane = distanceToPoint > maximumDepthOfVisibleGeometry;
 
     const isDetachedFromGeometry = !pointIsOnSurface || pointIsBehindFarPlane;
     return isDetachedFromGeometry;

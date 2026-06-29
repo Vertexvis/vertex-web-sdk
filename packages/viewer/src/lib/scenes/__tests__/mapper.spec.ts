@@ -32,8 +32,8 @@ describe(buildSceneElementOperationOnItem, () => {
           { type: 'clear-representation' },
           { type: 'clear-override' },
         ],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       sceneItemOperation: {
         queryExpression: { operand: { root: {} } },
@@ -45,8 +45,7 @@ describe(buildSceneElementOperationOnItem, () => {
           { clearRendition: {} },
           {
             viewRepresentation: {
-              predefinedId:
-                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+              predefinedId: RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
             },
           },
           {
@@ -68,18 +67,16 @@ describe(buildSceneElementOperationOnAnnotation, () => {
   const annotationId1 = 'b728aa62-76c0-4b25-9196-8e5445dc1309';
   const annotationId2 = 'a276ce62-12c0-4b25-9106-8e5445ab1394';
 
-  const { msb: annotationId1Msb, lsb: annotationId1Lsb } =
-    UUID.toMsbLsb(annotationId1);
-  const { msb: annotationId2Msb, lsb: annotationId2Lsb } =
-    UUID.toMsbLsb(annotationId2);
+  const { msb: annotationId1Msb, lsb: annotationId1Lsb } = UUID.toMsbLsb(annotationId1);
+  const { msb: annotationId2Msb, lsb: annotationId2Lsb } = UUID.toMsbLsb(annotationId2);
 
   it('maps operations on all annotations', () => {
     expect(
       buildSceneElementOperationOnAnnotation(
         { type: 'all' },
         [{ type: 'hide' }, { type: 'deselect' }],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       pmiAnnotationOperation: {
         queryExpression: { operand: { all: {} } },
@@ -102,8 +99,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
           ],
         },
         [{ type: 'hide' }, { type: 'deselect' }],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       pmiAnnotationOperation: {
         queryExpression: {
@@ -146,8 +143,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
           expressions: [{ type: 'annotation-id', value: annotationId1 }],
         },
         [{ type: 'hide' }, { type: 'deselect' }],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       pmiAnnotationOperation: {
         queryExpression: {
@@ -181,31 +178,24 @@ describe(toPbSceneViewStateFeatures, () => {
         'cross_section',
         'phantom',
         'shading',
-      ])
+      ]),
     ).toMatchObject([
-      vertexvis.protobuf.stream.SceneViewStateFeature
-        .SCENE_VIEW_STATE_FEATURE_CAMERA,
+      vertexvis.protobuf.stream.SceneViewStateFeature.SCENE_VIEW_STATE_FEATURE_CAMERA,
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_MATERIAL_OVERRIDE,
-      vertexvis.protobuf.stream.SceneViewStateFeature
-        .SCENE_VIEW_STATE_FEATURE_SELECTION,
-      vertexvis.protobuf.stream.SceneViewStateFeature
-        .SCENE_VIEW_STATE_FEATURE_VISIBILITY,
-      vertexvis.protobuf.stream.SceneViewStateFeature
-        .SCENE_VIEW_STATE_FEATURE_TRANSFORM,
+      vertexvis.protobuf.stream.SceneViewStateFeature.SCENE_VIEW_STATE_FEATURE_SELECTION,
+      vertexvis.protobuf.stream.SceneViewStateFeature.SCENE_VIEW_STATE_FEATURE_VISIBILITY,
+      vertexvis.protobuf.stream.SceneViewStateFeature.SCENE_VIEW_STATE_FEATURE_TRANSFORM,
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_CROSS_SECTION,
-      vertexvis.protobuf.stream.SceneViewStateFeature
-        .SCENE_VIEW_STATE_FEATURE_PHANTOM,
-      vertexvis.protobuf.stream.SceneViewStateFeature
-        .SCENE_VIEW_STATE_FEATURE_SHADING,
+      vertexvis.protobuf.stream.SceneViewStateFeature.SCENE_VIEW_STATE_FEATURE_PHANTOM,
+      vertexvis.protobuf.stream.SceneViewStateFeature.SCENE_VIEW_STATE_FEATURE_SHADING,
     ]);
   });
 
   it('maps to invalid when unknown feature given', () => {
     expect(toPbSceneViewStateFeatures(['Not a feature'])).toMatchObject([
-      vertexvis.protobuf.stream.SceneViewStateFeature
-        .SCENE_VIEW_STATE_FEATURE_INVALID,
+      vertexvis.protobuf.stream.SceneViewStateFeature.SCENE_VIEW_STATE_FEATURE_INVALID,
     ]);
   });
 });

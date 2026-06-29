@@ -26,7 +26,7 @@ export class MeasurementInteractionHandler implements InteractionHandler {
 
   public constructor(
     controller: MeasurementController,
-    measurableEntityTypes: EntityType[]
+    measurableEntityTypes: EntityType[],
   ) {
     this.controller = controller;
     this.measurableEntityTypes = measurableEntityTypes;
@@ -82,9 +82,7 @@ export class MeasurementInteractionHandler implements InteractionHandler {
     });
   };
 
-  private async isMeasurableEntityUnderPointer(
-    event: PointerEvent
-  ): Promise<boolean> {
+  private async isMeasurableEntityUnderPointer(event: PointerEvent): Promise<boolean> {
     const pt = getMouseClientPosition(event, this.elementRect);
     const type = await this.api?.getEntityTypeAtPoint(pt);
     return type != null && this.measurableEntityTypes.includes(type);
@@ -105,7 +103,7 @@ export class MeasurementInteractionHandler implements InteractionHandler {
   }
 
   protected ifInitialized<R>(
-    f: (data: { element: HTMLElement; api: InteractionApi }) => R
+    f: (data: { element: HTMLElement; api: InteractionApi }) => R,
   ): R {
     if (this.element != null && this.api != null) {
       return f({ element: this.element, api: this.api });
@@ -114,10 +112,7 @@ export class MeasurementInteractionHandler implements InteractionHandler {
     }
   }
 
-  protected ifNoInteraction(
-    event: PointerEvent,
-    f: () => void | Promise<void>
-  ): void {
+  protected ifNoInteraction(event: PointerEvent, f: () => void | Promise<void>): void {
     const startPos = Point.create(event.clientX, event.clientY);
     let didInteract = false;
 

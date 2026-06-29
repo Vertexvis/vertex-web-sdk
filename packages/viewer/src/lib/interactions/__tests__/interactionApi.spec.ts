@@ -46,7 +46,7 @@ describe(InteractionApi, () => {
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
     sceneId,
-    sceneViewId
+    sceneViewId,
   );
   const frameProvider = (): Frame | undefined => frame;
   const sceneProvider = async (): Promise<Scene> => scene;
@@ -57,7 +57,7 @@ describe(InteractionApi, () => {
   let api: InteractionApi;
 
   function createInteractionApi(
-    props: InteractionApiProps = {}
+    props: InteractionApiProps = {},
   ): InteractionApiPerspective {
     return new InteractionApiPerspective(
       props.streamApi ?? streamApi,
@@ -71,7 +71,7 @@ describe(InteractionApi, () => {
       props.longPressEmitter ?? { emit: emitLongPress },
       props.interactionStartedEmitter ?? { emit: emitInteractionStarted },
       props.interactionFinishedEmitter ?? { emit: emitInteractionFinished },
-      props.cameraChangedEmitter ?? { emit: emitCameraChanged }
+      props.cameraChangedEmitter ?? { emit: emitCameraChanged },
     );
   }
 
@@ -200,9 +200,8 @@ describe(InteractionApi, () => {
       }
       await configuredApi.endInteraction();
 
-      const lastCall: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+      const lastCall: PerspectiveFrameCamera = (streamApi.replaceCamera as jest.Mock).mock
+        .lastCall[0].camera.perspective;
 
       expect(lastCall.position.z).toBeCloseTo(0);
     });
@@ -214,9 +213,8 @@ describe(InteractionApi, () => {
       }
       await api.endInteraction();
 
-      const lastCall: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+      const lastCall: PerspectiveFrameCamera = (streamApi.replaceCamera as jest.Mock).mock
+        .lastCall[0].camera.perspective;
 
       expect(lastCall.position.z).not.toBeCloseTo(0);
     });
@@ -241,7 +239,7 @@ describe(InteractionApi, () => {
               },
             },
           },
-        })
+        }),
       );
       const closeFrameY = makePerspectiveFrame(
         copyDrawFramePayloadPerspective(drawFramePayloadPerspective, {
@@ -254,7 +252,7 @@ describe(InteractionApi, () => {
               },
             },
           },
-        })
+        }),
       );
       const closeFrameX = makePerspectiveFrame(
         copyDrawFramePayloadPerspective(drawFramePayloadPerspective, {
@@ -267,7 +265,7 @@ describe(InteractionApi, () => {
               },
             },
           },
-        })
+        }),
       );
       const apiCloseX = createInteractionApi({
         sceneProvider: async () =>
@@ -279,7 +277,7 @@ describe(InteractionApi, () => {
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
-            sceneViewId
+            sceneViewId,
           ),
         frameProvider: () => closeFrameX,
       });
@@ -288,9 +286,8 @@ describe(InteractionApi, () => {
       await apiCloseX.zoomCameraToPoint(Point.create(50, 50), 1);
       await apiCloseX.endInteraction();
 
-      const lastCallX: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+      const lastCallX: PerspectiveFrameCamera = (streamApi.replaceCamera as jest.Mock)
+        .mock.lastCall[0].camera.perspective;
 
       const apiCloseY = createInteractionApi({
         sceneProvider: async () =>
@@ -302,7 +299,7 @@ describe(InteractionApi, () => {
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
-            sceneViewId
+            sceneViewId,
           ),
         frameProvider: () => closeFrameY,
       });
@@ -311,9 +308,8 @@ describe(InteractionApi, () => {
       await apiCloseY.zoomCameraToPoint(Point.create(50, 50), 1);
       await apiCloseY.endInteraction();
 
-      const lastCallY: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+      const lastCallY: PerspectiveFrameCamera = (streamApi.replaceCamera as jest.Mock)
+        .mock.lastCall[0].camera.perspective;
 
       const apiCloseZ = createInteractionApi({
         sceneProvider: async () =>
@@ -325,7 +321,7 @@ describe(InteractionApi, () => {
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
-            sceneViewId
+            sceneViewId,
           ),
         frameProvider: () => closeFrameZ,
       });
@@ -334,9 +330,8 @@ describe(InteractionApi, () => {
       await apiCloseZ.zoomCameraToPoint(Point.create(50, 50), 1);
       await apiCloseZ.endInteraction();
 
-      const lastCallZ: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+      const lastCallZ: PerspectiveFrameCamera = (streamApi.replaceCamera as jest.Mock)
+        .mock.lastCall[0].camera.perspective;
 
       expect(lastCallX.lookAt.x).toBeCloseTo(-7.426);
       expect(lastCallY.lookAt.y).toBeCloseTo(-15.1);
@@ -373,7 +368,7 @@ describe(InteractionApi, () => {
         Angle.toRadians(1),
         frame.scene.camera.lookAt,
         Vector3.left(),
-        frame.scene.camera.position
+        frame.scene.camera.position,
       );
 
       expect(streamApi.replaceCamera).toHaveBeenCalledWith(
@@ -383,7 +378,7 @@ describe(InteractionApi, () => {
               lookAt: expect.objectContaining(expectedLookAt),
             }),
           }),
-        })
+        }),
       );
     });
 
@@ -406,7 +401,7 @@ describe(InteractionApi, () => {
         { emit: emitDoubleTap },
         { emit: emitLongPress },
         { emit: emitInteractionStarted },
-        { emit: emitInteractionFinished }
+        { emit: emitInteractionFinished },
       );
     });
 

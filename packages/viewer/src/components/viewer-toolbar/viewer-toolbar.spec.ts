@@ -58,14 +58,10 @@ describe('<vertex-viewer-toolbar>', () => {
 
     page.root?.setAttribute('direction', 'horizontal');
     await page.waitForChanges();
-    expect(page.root?.shadowRoot?.querySelector('.inner')).toHaveClass(
-      'horizontal'
-    );
+    expect(page.root?.shadowRoot?.querySelector('.inner')).toHaveClass('horizontal');
 
     page.root?.setAttribute('direction', 'vertical');
     await page.waitForChanges();
-    expect(page.root?.shadowRoot?.querySelector('.inner')).toHaveClass(
-      'vertical'
-    );
+    expect(page.root?.shadowRoot?.querySelector('.inner')).toHaveClass('vertical');
   });
 });

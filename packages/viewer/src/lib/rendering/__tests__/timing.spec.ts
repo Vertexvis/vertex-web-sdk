@@ -29,17 +29,15 @@ describe(acknowledgeFrameRequests, () => {
 
   it('sends a result when a draw frame request is received', () => {
     const receivedAt = new Date(localTime.getTime() + 1000);
-    jest
-      .spyOn(global.Date, 'now')
-      .mockImplementation(() => receivedAt.getTime());
+    jest.spyOn(global.Date, 'now').mockImplementation(() => receivedAt.getTime());
 
     mockWs.receiveMessage(
       encode(
         Fixtures.Requests.drawFrame(
           { requestId: 'req-id', payload: { sequenceNumber: 1 } },
-          { sentAtTime: toProtoTimestamp(remoteTime) }
-        )
-      )
+          { sentAtTime: toProtoTimestamp(remoteTime) },
+        ),
+      ),
     );
 
     const frame = mockWs.nextSent((d) => decode(d as Uint8Array));
@@ -62,9 +60,9 @@ describe(acknowledgeFrameRequests, () => {
       encode(
         Fixtures.Requests.drawFrame(
           { payload: { sequenceNumber: 1 } },
-          { sentAtTime: toProtoTimestamp(remoteTime) }
-        )
-      )
+          { sentAtTime: toProtoTimestamp(remoteTime) },
+        ),
+      ),
     );
 
     expect(mockWs.hasNextSent()).toBe(false);

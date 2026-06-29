@@ -36,7 +36,7 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
       if (event.touches[1] != null) {
         this.beginTwoPointTouch(
           this.currentPosition1,
-          Point.create(event.touches[1].screenX, event.touches[1].screenY)
+          Point.create(event.touches[1].screenX, event.touches[1].screenY),
         );
       }
 
@@ -53,14 +53,8 @@ export class TouchInteractionHandler extends MultiTouchInteractionHandler {
     if (event.touches.length === 1) {
       this.handleOnePointTouchMove(event.touches[0]);
     } else if (event.touches.length === 2) {
-      const point1 = Point.create(
-        event.touches[0].clientX,
-        event.touches[0].clientY
-      );
-      const point2 = Point.create(
-        event.touches[1].clientX,
-        event.touches[1].clientY
-      );
+      const point1 = Point.create(event.touches[0].clientX, event.touches[0].clientY);
+      const point2 = Point.create(event.touches[1].clientX, event.touches[1].clientY);
 
       this.handleTwoPointTouchMove(point1, point2);
     }

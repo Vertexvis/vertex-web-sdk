@@ -32,11 +32,7 @@ export class PinsInteractionHandler implements InteractionHandler {
     return this.rectObserver.rect;
   }
 
-  public constructor(
-    controller: PinController,
-    xOffset: number,
-    yOffset: number
-  ) {
+  public constructor(controller: PinController, xOffset: number, yOffset: number) {
     this.controller = controller;
     this.xOffset = xOffset;
     this.yOffset = yOffset;
@@ -64,7 +60,7 @@ export class PinsInteractionHandler implements InteractionHandler {
   }
 
   public async getWorldPositionForPoint(
-    pt: Point.Point
+    pt: Point.Point,
   ): Promise<Vector3.Vector3 | undefined> {
     return this.ifInitialized(async ({ api }) => {
       const vector3 = await api.getWorldPointFromViewport(pt);
@@ -73,10 +69,7 @@ export class PinsInteractionHandler implements InteractionHandler {
     });
   }
 
-  public async handlePlacePin(
-    pt: Point.Point,
-    existingPin?: Pin
-  ): Promise<void> {
+  public async handlePlacePin(pt: Point.Point, existingPin?: Pin): Promise<void> {
     this.ifInitialized(async ({ api }) => {
       const [hit] = await api.hitItems(pt);
 
@@ -117,7 +110,7 @@ export class PinsInteractionHandler implements InteractionHandler {
                 this.elementRect,
                 isNewPin,
                 this.xOffset,
-                this.yOffset
+                this.yOffset,
               );
               this.controller.setPin({
                 type: 'text',
@@ -172,7 +165,7 @@ export class PinsInteractionHandler implements InteractionHandler {
 
   private handleDrag = async (
     draggable: Draggable,
-    event: PointerEvent
+    event: PointerEvent,
   ): Promise<void> => {
     const pt = getMouseClientPosition(event, this.elementRect);
     const worldPosition = await this.getWorldPositionForPoint(pt);
@@ -183,18 +176,16 @@ export class PinsInteractionHandler implements InteractionHandler {
           ...draggable,
           lastPoint: pt,
         },
-        worldPosition
+        worldPosition,
       );
     }
   };
 
-  private handlePointerDown = async (
-    pointerDown: PointerEvent
-  ): Promise<Disposable> => {
+  private handlePointerDown = async (pointerDown: PointerEvent): Promise<Disposable> => {
     const pointerUp = (pointerUp: PointerEvent): void => {
       const distanceBetweenStartAndEndPoint = Point.distance(
         Point.create(pointerDown.clientX, pointerUp.clientY),
-        Point.create(pointerUp.clientX, pointerUp.clientY)
+        Point.create(pointerUp.clientX, pointerUp.clientY),
       );
 
       if (distanceBetweenStartAndEndPoint <= 2 && pointerDown.buttons !== 2) {
@@ -245,7 +236,7 @@ export class PinsInteractionHandler implements InteractionHandler {
               y: hit?.hitPoint.y,
               z: hit?.hitPoint.z,
             },
-            hit?.partId?.hex ?? undefined
+            hit?.partId?.hex ?? undefined,
           );
         }
       });
@@ -265,7 +256,7 @@ export class PinsInteractionHandler implements InteractionHandler {
   }
 
   protected ifInitialized<R>(
-    f: (data: { element: HTMLElement; api: InteractionApi }) => R
+    f: (data: { element: HTMLElement; api: InteractionApi }) => R,
   ): R {
     if (this.element != null && this.api != null) {
       return f({ element: this.element, api: this.api });

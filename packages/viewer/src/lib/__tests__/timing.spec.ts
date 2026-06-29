@@ -49,9 +49,7 @@ describe(TimingMeter, () => {
       const entry1 = createEntry();
       const entry2 = createEntry();
       const entries = [entry1, entry2];
-      jest
-        .spyOn(window.performance, 'getEntriesByName')
-        .mockReturnValueOnce(entries);
+      jest.spyOn(window.performance, 'getEntriesByName').mockReturnValueOnce(entries);
 
       expect(timer.takeMeasurements()).toBe(entries);
     });

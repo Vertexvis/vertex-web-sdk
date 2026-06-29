@@ -46,14 +46,8 @@ export class StencilBufferManager {
    * @param viewer The viewer for this manager.
    */
   public constructor(private viewer: HTMLVertexViewerElement) {
-    viewer.addEventListener(
-      'interactionStarted',
-      this.handleInteractionStarted
-    );
-    viewer.addEventListener(
-      'interactionFinished',
-      this.handleInteractionFinished
-    );
+    viewer.addEventListener('interactionStarted', this.handleInteractionStarted);
+    viewer.addEventListener('interactionFinished', this.handleInteractionFinished);
     viewer.addEventListener('frameReceived', () => {
       this.invalidateStencilBuffer();
     });
@@ -92,7 +86,7 @@ export class StencilBufferManager {
         stencilPng,
         imageAttributes,
         sBytes,
-        DepthBuffer.fromPng(depthPng, camera, imageAttributes)
+        DepthBuffer.fromPng(depthPng, camera, imageAttributes),
       );
     } else return undefined;
   }
@@ -169,7 +163,7 @@ export class StencilBuffer implements FrameImageLike {
     public readonly imageBytes: Uint8Array,
     public readonly pixelBytes: Uint8Array,
     public readonly imageChannels: number,
-    public readonly depthBuffer: DepthBuffer
+    public readonly depthBuffer: DepthBuffer,
   ) {}
 
   /**
@@ -184,7 +178,7 @@ export class StencilBuffer implements FrameImageLike {
     png: Pick<DecodedPng, 'data' | 'channels'>,
     imageAttr: ImageAttributesLike,
     imageBytes: Uint8Array,
-    depthBuffer: DepthBuffer
+    depthBuffer: DepthBuffer,
   ): StencilBuffer {
     if (!(png.data instanceof Uint8Array)) {
       throw new Error('Expected stencil PNG to have depth of 8-bit');
@@ -196,7 +190,7 @@ export class StencilBuffer implements FrameImageLike {
         imageBytes,
         png.data,
         png.channels,
-        depthBuffer
+        depthBuffer,
       );
     }
   }
@@ -251,7 +245,7 @@ export class StencilBuffer implements FrameImageLike {
   public snapToNearestPixel(
     pt: Point.Point,
     radius: number,
-    predicate: (value: number) => boolean = () => true
+    predicate: (value: number) => boolean = () => true,
   ): Point.Point {
     const diameter = radius * 2;
     const topLeft = Point.create(pt.x - radius, pt.y - radius);
@@ -271,9 +265,7 @@ export class StencilBuffer implements FrameImageLike {
       }
     }
 
-    const sorted = pixels.sort(
-      (a, b) => Point.distance(a, pt) - Point.distance(b, pt)
-    );
+    const sorted = pixels.sort((a, b) => Point.distance(a, pt) - Point.distance(b, pt));
     const closest = sorted[0];
     return closest != null
       ? Point.create(Math.floor(closest.x) + 0.5, Math.floor(closest.y) + 0.5)

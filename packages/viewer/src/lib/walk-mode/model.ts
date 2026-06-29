@@ -11,10 +11,7 @@ export interface ViewerWalkModeConfiguration {
   keyboardRepeatIntervalMs: number;
 }
 
-export type ViewerTeleportMode =
-  | 'teleport'
-  | 'teleport-and-align'
-  | 'teleport-toward';
+export type ViewerTeleportMode = 'teleport' | 'teleport-and-align' | 'teleport-toward';
 
 export enum ViewerWalkModeOperation {
   'MOVE_DOWN' = 'MOVE_DOWN',
@@ -29,31 +26,18 @@ export enum ViewerWalkModeOperation {
   'WALK_RIGHT' = 'WALK_RIGHT',
 }
 
-export type ViewerWalkModeKeyBindings = Record<
-  ViewerWalkModeOperation,
-  KeyBinding[]
->;
+export type ViewerWalkModeKeyBindings = Record<ViewerWalkModeOperation, KeyBinding[]>;
 
 export class WalkModeModel {
   private keyBindings: ViewerWalkModeKeyBindings = {
-    [ViewerWalkModeOperation.MOVE_DOWN]: [
-      new KeyBinding('PageDown', '!Shift', '!Alt'),
-    ],
-    [ViewerWalkModeOperation.MOVE_UP]: [
-      new KeyBinding('PageUp', '!Shift', '!Alt'),
-    ],
-    [ViewerWalkModeOperation.PIVOT_DOWN]: [
-      new KeyBinding('ArrowDown', '!Shift', '!Alt'),
-    ],
-    [ViewerWalkModeOperation.PIVOT_LEFT]: [
-      new KeyBinding('ArrowLeft', '!Shift', '!Alt'),
-    ],
+    [ViewerWalkModeOperation.MOVE_DOWN]: [new KeyBinding('PageDown', '!Shift', '!Alt')],
+    [ViewerWalkModeOperation.MOVE_UP]: [new KeyBinding('PageUp', '!Shift', '!Alt')],
+    [ViewerWalkModeOperation.PIVOT_DOWN]: [new KeyBinding('ArrowDown', '!Shift', '!Alt')],
+    [ViewerWalkModeOperation.PIVOT_LEFT]: [new KeyBinding('ArrowLeft', '!Shift', '!Alt')],
     [ViewerWalkModeOperation.PIVOT_RIGHT]: [
       new KeyBinding('ArrowRight', '!Shift', '!Alt'),
     ],
-    [ViewerWalkModeOperation.PIVOT_UP]: [
-      new KeyBinding('ArrowUp', '!Shift', '!Alt'),
-    ],
+    [ViewerWalkModeOperation.PIVOT_UP]: [new KeyBinding('ArrowUp', '!Shift', '!Alt')],
     [ViewerWalkModeOperation.WALK_BACKWARD]: [new KeyBinding('s')],
     [ViewerWalkModeOperation.WALK_FORWARD]: [new KeyBinding('w')],
     [ViewerWalkModeOperation.WALK_LEFT]: [new KeyBinding('a')],
@@ -100,17 +84,14 @@ export class WalkModeModel {
     this.configurationChanged.emit(configuration);
   }
 
-  public addKeyBinding(
-    operation: ViewerWalkModeOperation,
-    keyBinding: KeyBinding
-  ): void {
+  public addKeyBinding(operation: ViewerWalkModeOperation, keyBinding: KeyBinding): void {
     this.keyBindings[operation] = [...this.keyBindings[operation], keyBinding];
     this.keyBindingsChanged.emit(this.keyBindings);
   }
 
   public replaceKeyBinding(
     operation: ViewerWalkModeOperation,
-    keyBinding: KeyBinding
+    keyBinding: KeyBinding,
   ): void {
     this.keyBindings[operation] = [keyBinding];
     this.keyBindingsChanged.emit(this.keyBindings);
@@ -154,11 +135,9 @@ export class WalkModeModel {
 
   public operationMatches(
     operation: ViewerWalkModeOperation,
-    state: Record<string, boolean>
+    state: Record<string, boolean>,
   ): boolean {
-    return this.keyBindings[operation].some((binding) =>
-      binding.matches(state)
-    );
+    return this.keyBindings[operation].some((binding) => binding.matches(state));
   }
 
   public isElementExcluded(el: Element): boolean {
@@ -170,20 +149,18 @@ export class WalkModeModel {
   }
 
   public onTeleportModeChange(
-    listener: Listener<ViewerTeleportMode | undefined>
+    listener: Listener<ViewerTeleportMode | undefined>,
   ): Disposable {
     return this.teleportModeChanged.on(listener);
   }
 
   public onConfigurationChange(
-    listener: Listener<ViewerWalkModeConfiguration>
+    listener: Listener<ViewerWalkModeConfiguration>,
   ): Disposable {
     return this.configurationChanged.on(listener);
   }
 
-  public onKeyBindingsChange(
-    listener: Listener<ViewerWalkModeKeyBindings>
-  ): Disposable {
+  public onKeyBindingsChange(listener: Listener<ViewerWalkModeKeyBindings>): Disposable {
     return this.keyBindingsChanged.on(listener);
   }
 }

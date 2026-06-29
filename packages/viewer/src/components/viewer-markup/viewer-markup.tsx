@@ -22,10 +22,7 @@ import {
   MarkupCenteringBehavior,
   MarkupInteraction,
 } from '../../lib/types/markup';
-import {
-  isVertexViewerArrowMarkup,
-  LineAnchorStyle,
-} from '../viewer-markup-arrow/utils';
+import { isVertexViewerArrowMarkup, LineAnchorStyle } from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
@@ -219,7 +216,7 @@ export class ViewerMarkup {
    */
   @Method()
   public async addMarkup(
-    markup: Markup
+    markup: Markup,
   ): Promise<
     | HTMLVertexViewerMarkupArrowElement
     | HTMLVertexViewerMarkupCircleElement
@@ -271,7 +268,7 @@ export class ViewerMarkup {
    */
   @Method()
   public async removeMarkup(
-    id: string
+    id: string,
   ): Promise<
     | HTMLVertexViewerMarkupArrowElement
     | HTMLVertexViewerMarkupCircleElement
@@ -306,7 +303,7 @@ export class ViewerMarkup {
       (e) =>
         isVertexViewerArrowMarkup(e) ||
         isVertexViewerCircleMarkup(e) ||
-        isVertexViewerFreeformMarkup(e)
+        isVertexViewerFreeformMarkup(e),
     ) as Array<
       | HTMLVertexViewerMarkupArrowElement
       | HTMLVertexViewerMarkupCircleElement
@@ -323,7 +320,7 @@ export class ViewerMarkup {
    */
   @Method()
   public async getMarkupElement(
-    id: string
+    id: string,
   ): Promise<
     | HTMLVertexViewerMarkupArrowElement
     | HTMLVertexViewerMarkupCircleElement
@@ -374,7 +371,7 @@ export class ViewerMarkup {
   @Watch('offset')
   @Watch('scale')
   protected async handleViewerChanged(
-    newViewer: HTMLVertexViewerElement | undefined
+    newViewer: HTMLVertexViewerElement | undefined,
   ): Promise<void> {
     this.updatePropsOnMarkupTool();
     this.updatePropsOnMarkups();
@@ -440,7 +437,7 @@ export class ViewerMarkup {
    */
   @Listen('interactionEnd')
   protected async handleMarkupUpdated(
-    event: CustomEvent<MarkupInteraction>
+    event: CustomEvent<MarkupInteraction>,
   ): Promise<void> {
     const e = event as CustomEvent<MarkupInteraction>;
 
@@ -497,7 +494,7 @@ export class ViewerMarkup {
       this.pointerDownPosition != null &&
       Point.distance(
         this.pointerDownPosition,
-        Point.create(event.clientX, event.clientY)
+        Point.create(event.clientX, event.clientY),
       ) > 2
     ) {
       this.toSelectMarkupId = undefined;
@@ -509,17 +506,13 @@ export class ViewerMarkup {
       const el = event.target as Element;
       const markups = await this.getMarkupElements();
       const markup = markups.find((m) => m === el);
-      if (
-        markup?.id != null &&
-        markup.id !== '' &&
-        markup.id === this.toSelectMarkupId
-      ) {
+      if (markup?.id != null && markup.id !== '' && markup.id === this.toSelectMarkupId) {
         this.selectedMarkupId = el.id;
       } else if (
         this.pointerDownPosition != null &&
         Point.distance(
           this.pointerDownPosition,
-          Point.create(event.clientX, event.clientY)
+          Point.create(event.clientX, event.clientY),
         ) <= 2
       ) {
         this.selectedMarkupId = undefined;
@@ -536,7 +529,7 @@ export class ViewerMarkup {
     el:
       | HTMLVertexViewerMarkupCircleElement
       | HTMLVertexViewerMarkupArrowElement
-      | HTMLVertexViewerMarkupFreeformElement
+      | HTMLVertexViewerMarkupFreeformElement,
   ):
     | HTMLVertexViewerMarkupCircleElement
     | HTMLVertexViewerMarkupArrowElement
@@ -556,12 +549,12 @@ export class ViewerMarkup {
         isVertexViewerArrowMarkup,
         () =>
           console.warn(
-            `Arrow template with ID ${this.arrowTemplateId} not found. Using default arrow element.`
+            `Arrow template with ID ${this.arrowTemplateId} not found. Using default arrow element.`,
           ),
         () =>
           console.warn(
-            `Arrow template does not contain a vertex-viewer-markup-arrow. Using default arrow element.`
-          )
+            `Arrow template does not contain a vertex-viewer-markup-arrow. Using default arrow element.`,
+          ),
       );
 
       if (element != null) {
@@ -580,12 +573,12 @@ export class ViewerMarkup {
         isVertexViewerCircleMarkup,
         () =>
           console.warn(
-            `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`
+            `Circle template with ID ${this.circleTemplateId} not found. Using default circle element.`,
           ),
         () =>
           console.warn(
-            `Circle template does not contain a vertex-viewer-markup-circle. Using default circle element.`
-          )
+            `Circle template does not contain a vertex-viewer-markup-circle. Using default circle element.`,
+          ),
       );
 
       if (element != null) {
@@ -604,12 +597,12 @@ export class ViewerMarkup {
         isVertexViewerFreeformMarkup,
         () =>
           console.warn(
-            `Freeform template with ID ${this.freeformTemplateId} not found. Using default freeform element.`
+            `Freeform template with ID ${this.freeformTemplateId} not found. Using default freeform element.`,
           ),
         () =>
           console.warn(
-            `Freeform template does not contain a vertex-viewer-markup-freeform. Using default freeform element.`
-          )
+            `Freeform template does not contain a vertex-viewer-markup-freeform. Using default freeform element.`,
+          ),
       );
 
       if (element != null) {
@@ -629,7 +622,7 @@ export class ViewerMarkup {
     element:
       | HTMLVertexViewerMarkupArrowElement
       | HTMLVertexViewerMarkupCircleElement
-      | HTMLVertexViewerMarkupFreeformElement
+      | HTMLVertexViewerMarkupFreeformElement,
   ): void {
     element.viewer = this.viewer;
     element.originatingViewport = this.originatingViewport;

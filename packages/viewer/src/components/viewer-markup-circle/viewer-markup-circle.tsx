@@ -15,15 +15,9 @@ import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
-import {
-  MarkupCenteringBehavior,
-  MarkupInteraction,
-} from '../../lib/types/markup';
+import { MarkupCenteringBehavior, MarkupInteraction } from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import {
-  isValidStartEvent,
-  translateRectToScreen,
-} from '../viewer-markup/markup-utils';
+import { isValidStartEvent, translateRectToScreen } from '../viewer-markup/markup-utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { CircleMarkupInteractionHandler } from './interactions';
 import { parseBounds } from './utils';
@@ -156,7 +150,7 @@ export class ViewerMarkupCircle {
       offset: this.offset,
       originatingViewport: this.originatingViewport,
       centeringBehavior: this.centeringBehavior,
-    }
+    },
   );
 
   private registeredHandler?: Disposable;
@@ -205,7 +199,7 @@ export class ViewerMarkupCircle {
 
     if (newViewer != null) {
       this.registeredHandler = await newViewer.registerBasicInteractionHandler(
-        this.interactionHandler
+        this.interactionHandler,
       );
     }
   }
@@ -240,7 +234,7 @@ export class ViewerMarkupCircle {
     writeDOM(() => {
       this.hostEl.style.setProperty(
         '--viewer-markup-circle-scale',
-        this.scale.toString()
+        this.scale.toString(),
       );
     });
   }
@@ -266,7 +260,7 @@ export class ViewerMarkupCircle {
         this.elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        this.scale
+        this.scale,
       );
       const center = Rectangle.center(relativeBounds);
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();
@@ -304,9 +298,7 @@ export class ViewerMarkupCircle {
               onTopRightAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('top-right', e)
               }
-              onTopAnchorPointerDown={(e) =>
-                this.interactionHandler.editAnchor('top', e)
-              }
+              onTopAnchorPointerDown={(e) => this.interactionHandler.editAnchor('top', e)}
               onBottomLeftAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('bottom-left', e)
               }
@@ -328,20 +320,14 @@ export class ViewerMarkupCircle {
             />
           )}
           {this.mode === 'create' && (
-            <div
-              class="create-overlay"
-              onTouchStart={this.handleTouchStart}
-            ></div>
+            <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
           )}
         </Host>
       );
     } else {
       return (
         <Host>
-          <div
-            class="create-overlay"
-            onTouchStart={this.handleTouchStart}
-          ></div>
+          <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
         </Host>
       );
     }

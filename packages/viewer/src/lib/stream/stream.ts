@@ -21,11 +21,7 @@ import deepEqual from 'fast-deep-equal';
 
 import { Color3, StreamAttributes } from '../../interfaces';
 import { Config, parseAndValidateConfig } from '../config';
-import {
-  CustomError,
-  SceneRenderError,
-  WebsocketConnectionError,
-} from '../errors';
+import { CustomError, SceneRenderError, WebsocketConnectionError } from '../errors';
 import {
   fromPbFrameOrThrow,
   fromPbReconnectResponseOrThrow,
@@ -38,26 +34,15 @@ import {
 } from '../mappers';
 import { acknowledgeFrameRequests } from '../rendering';
 import { Token } from '../token';
-import {
-  Frame,
-  LoadableResource,
-  Orientation,
-  SynchronizedClock,
-} from '../types';
+import { Frame, LoadableResource, Orientation, SynchronizedClock } from '../types';
 import { FrameCameraType } from '../types/frameCamera';
 import { Resource, SuppliedIdQueryValue } from '../types/loadableResource';
-import {
-  Connected,
-  Connecting,
-  Reconnecting,
-  ViewerStreamState,
-} from './state';
+import { Connected, Connecting, Reconnecting, ViewerStreamState } from './state';
 import { retryIfNotAborted } from './utils';
 
-type StreamResult = Omit<
-  Connected,
-  'type' | 'frame' | 'connection' | 'clock'
-> & { frame: Frame | undefined };
+type StreamResult = Omit<Connected, 'type' | 'frame' | 'connection' | 'clock'> & {
+  frame: Frame | undefined;
+};
 
 interface FrameStreamOptions {
   /**
@@ -142,10 +127,7 @@ export class ViewerStream extends StreamApi {
   }
 
   public disconnect(): void {
-    if (
-      this.state.type !== 'disconnected' &&
-      this.state.type !== 'connection-failed'
-    ) {
+    if (this.state.type !== 'disconnected' && this.state.type !== 'connection-failed') {
       console.debug('Disconnecting websocket');
       this.state.connection.dispose();
       this.updateState({ type: 'disconnected' });
@@ -157,7 +139,7 @@ export class ViewerStream extends StreamApi {
     clientId: string | undefined,
     deviceId: string | undefined,
     config: Config = parseAndValidateConfig('platprod'),
-    cameraType?: FrameCameraType
+    cameraType?: FrameCameraType,
   ): Promise<ViewerStreamState> {
     this.clientId = clientId;
     this.deviceId = deviceId;
@@ -174,30 +156,25 @@ export class ViewerStream extends StreamApi {
   }
 
   public update(fields: UpdateFields): void {
-    this.frameBgColor = fields.frameBgColor
-      ? fields.frameBgColor
-      : this.frameBgColor;
+    this.frameBgColor = fields.frameBgColor ? fields.frameBgColor : this.frameBgColor;
 
-    if (
-      fields.dimensions != null &&
-      !deepEqual(fields.dimensions, this.dimensions)
-    ) {
+    if (fields.dimensions != null && !deepEqual(fields.dimensions, this.dimensions)) {
       this.dimensions = fields.dimensions;
       this.ifState('connected', () =>
-        this.updateDimensions({ dimensions: this.getDimensions() })
+        this.updateDimensions({ dimensions: this.getDimensions() }),
       );
     }
 
     const streamAttributesAreDifferent = !deepEqual(
       this.streamAttributes,
-      fields.streamAttributes
+      fields.streamAttributes,
     );
     if (fields.streamAttributes != null && streamAttributesAreDifferent) {
       this.streamAttributes = fields.streamAttributes;
       this.ifState('connected', () =>
         this.updateStream({
           streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
-        })
+        }),
       );
     }
 
@@ -218,7 +195,7 @@ export class ViewerStream extends StreamApi {
       this.pausedState = this.state;
 
       console.debug(
-        `Stream paused [stream-id=${this.pausedState.streamId}, scene-id=${this.pausedState.sceneId}, scene-view-id=${this.pausedState.sceneViewId}]`
+        `Stream paused [stream-id=${this.pausedState.streamId}, scene-id=${this.pausedState.sceneId}, scene-view-id=${this.pausedState.sceneViewId}]`,
       );
 
       this.disconnect();
@@ -228,7 +205,7 @@ export class ViewerStream extends StreamApi {
   public async resume(): Promise<void> {
     if (this.pausedState != null) {
       console.debug(
-        `Stream resumed [stream-id=${this.pausedState.streamId}, scene-id=${this.pausedState.sceneId}, scene-view-id=${this.pausedState.sceneViewId}]`
+        `Stream resumed [stream-id=${this.pausedState.streamId}, scene-id=${this.pausedState.sceneId}, scene-view-id=${this.pausedState.sceneViewId}]`,
       );
 
       await this.connectToExistingStream(this.pausedState);
@@ -240,18 +217,14 @@ export class ViewerStream extends StreamApi {
   private async loadIfConnectingOrConnected(
     urn: string,
     state: Connected | Connecting | Reconnecting,
-    cameraType?: FrameCameraType
+    cameraType?: FrameCameraType,
   ): Promise<void> {
     const { resource: pResource, subResource: pSubResource } = state.resource;
     const resource = LoadableResource.fromUrn(urn);
 
     const hasResourceChanged = !Objects.isEqual(pResource, resource.resource);
-    const hasSubResourceChanged = !Objects.isEqual(
-      pSubResource,
-      resource.subResource
-    );
-    const isConnecting =
-      state.type === 'connecting' || state.type === 'reconnecting';
+    const hasSubResourceChanged = !Objects.isEqual(pSubResource, resource.subResource);
+    const isConnecting = state.type === 'connecting' || state.type === 'reconnecting';
     const isConnected = state.type === 'connected';
 
     if (hasResourceChanged || (isConnecting && hasSubResourceChanged)) {
@@ -262,9 +235,9 @@ export class ViewerStream extends StreamApi {
       hasSubResourceChanged &&
       resource.subResource?.type === 'scene-view-state'
     ) {
-      const suppliedIdQuery = resource.queries.find(
-        (q) => q.type === 'supplied-id'
-      ) as SuppliedIdQueryValue | undefined;
+      const suppliedIdQuery = resource.queries.find((q) => q.type === 'supplied-id') as
+        | SuppliedIdQueryValue
+        | undefined;
 
       const payload = {
         ...(resource.subResource.id != null
@@ -273,9 +246,7 @@ export class ViewerStream extends StreamApi {
         ...(suppliedIdQuery != null
           ? { sceneViewStateSuppliedId: { value: suppliedIdQuery.id } }
           : {}),
-        ...(cameraType != null
-          ? { cameraType: toPbCameraTypeOrThrow(cameraType) }
-          : {}),
+        ...(cameraType != null ? { cameraType: toPbCameraTypeOrThrow(cameraType) } : {}),
       };
 
       await this.loadSceneViewState(payload);
@@ -285,13 +256,10 @@ export class ViewerStream extends StreamApi {
 
   private async loadIfDisconnected(
     urn: string,
-    cameraType?: FrameCameraType
+    cameraType?: FrameCameraType,
   ): Promise<void> {
     try {
-      await this.connectWithNewStream(
-        LoadableResource.fromUrn(urn),
-        cameraType
-      );
+      await this.connectWithNewStream(LoadableResource.fromUrn(urn), cameraType);
     } catch (e) {
       if (e instanceof CustomError) {
         this.updateState({
@@ -319,10 +287,10 @@ export class ViewerStream extends StreamApi {
 
   private connectWithNewStream(
     resource: Resource,
-    cameraType?: FrameCameraType
+    cameraType?: FrameCameraType,
   ): Promise<void> {
     return this.openWebsocketStream(resource, 'connecting', () =>
-      this.requestNewStream(resource, cameraType)
+      this.requestNewStream(resource, cameraType),
     );
   }
 
@@ -331,7 +299,7 @@ export class ViewerStream extends StreamApi {
       state.resource,
       'reconnecting',
       () => this.requestReconnectStream(state),
-      { maxRetries: Number.POSITIVE_INFINITY }
+      { maxRetries: Number.POSITIVE_INFINITY },
     );
   }
 
@@ -339,15 +307,10 @@ export class ViewerStream extends StreamApi {
     resource: Resource,
     type: Connecting['type'] | Reconnecting['type'],
     requestStream: () => Promise<StreamResult>,
-    { maxRetries = 3 }: { maxRetries?: number } = {}
+    { maxRetries = 3 }: { maxRetries?: number } = {},
   ): Promise<void> {
     const descriptor = getWebsocketDescriptor(
-      getWebsocketUri(
-        this.config,
-        resource.resource,
-        this.clientId,
-        this.deviceId
-      )
+      getWebsocketUri(this.config, resource.resource, this.clientId, this.deviceId),
     );
     console.debug(`Initiating WS connection [uri=${descriptor.url}]`);
 
@@ -384,21 +347,17 @@ export class ViewerStream extends StreamApi {
         {
           maxRetries,
           delaysInMs: ViewerStream.WS_RECONNECT_DELAYS,
-        }
-      )
+        },
+      ),
     ).catch((e) => {
       throw new WebsocketConnectionError(
         'Websocket connection failed.',
-        e instanceof Error ? e : undefined
+        e instanceof Error ? e : undefined,
       );
     });
 
     if (!connection.aborted) {
-      return this.requestNewOrExistingStream(
-        resource,
-        connection.result,
-        requestStream
-      );
+      return this.requestNewOrExistingStream(resource, connection.result, requestStream);
     } else {
       this.updateState({ type: 'disconnected' });
     }
@@ -407,13 +366,13 @@ export class ViewerStream extends StreamApi {
   private async requestNewOrExistingStream(
     resource: Resource,
     connection: Disposable,
-    requestStream: () => Promise<StreamResult>
+    requestStream: () => Promise<StreamResult>,
   ): Promise<void> {
     const pendingClock = this.requestClock();
 
     const stream = await requestStream();
     console.debug(
-      `Stream connected [stream-id=${stream.streamId}, scene-id=${stream.sceneId}, scene-view-id=${stream.sceneViewId}]`
+      `Stream connected [stream-id=${stream.streamId}, scene-id=${stream.sceneId}, scene-view-id=${stream.sceneViewId}]`,
     );
 
     const onRequest = this.onRequest((msg) => {
@@ -451,12 +410,12 @@ export class ViewerStream extends StreamApi {
       stream.frame == null
         ? await this.waitForFrame(
             stream.worldOrientation,
-            this.options.loadTimeoutInSeconds
+            this.options.loadTimeoutInSeconds,
           )
         : stream.frame;
     const clock = await pendingClock;
     console.debug(
-      `Synchronized clocks [local-time=${clock.knownLocalTime.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`
+      `Synchronized clocks [local-time=${clock.knownLocalTime.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`,
     );
 
     this.updateState({
@@ -485,11 +444,11 @@ export class ViewerStream extends StreamApi {
 
   private async requestNewStream(
     resource: Resource,
-    cameraType?: FrameCameraType
+    cameraType?: FrameCameraType,
   ): Promise<StreamResult> {
-    const suppliedIdQuery = resource.queries.find(
-      (q) => q.type === 'supplied-id'
-    ) as SuppliedIdQueryValue | undefined;
+    const suppliedIdQuery = resource.queries.find((q) => q.type === 'supplied-id') as
+      | SuppliedIdQueryValue
+      | undefined;
 
     const res = fromPbStartStreamResponseOrThrow(
       await this.startStream({
@@ -504,13 +463,11 @@ export class ViewerStream extends StreamApi {
             ? { hex: resource.subResource.id }
             : undefined,
         sceneViewStateSuppliedId:
-          resource.subResource?.type === 'scene-view-state' &&
-          suppliedIdQuery != null
+          resource.subResource?.type === 'scene-view-state' && suppliedIdQuery != null
             ? { value: suppliedIdQuery.id }
             : undefined,
-        cameraType:
-          cameraType != null ? toPbCameraTypeOrThrow(cameraType) : undefined,
-      })
+        cameraType: cameraType != null ? toPbCameraTypeOrThrow(cameraType) : undefined,
+      }),
     );
 
     return {
@@ -526,9 +483,7 @@ export class ViewerStream extends StreamApi {
     };
   }
 
-  private async requestReconnectStream(
-    state: Connected
-  ): Promise<StreamResult> {
+  private async requestReconnectStream(state: Connected): Promise<StreamResult> {
     const res = fromPbReconnectResponseOrThrow(
       await this.reconnect({
         streamId: { hex: state.streamId },
@@ -536,7 +491,7 @@ export class ViewerStream extends StreamApi {
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
         clientSupportsTemporalRefinement: this.enableTemporalRefinement,
-      })
+      }),
     );
     return { ...state, token: res.token };
   }
@@ -545,7 +500,7 @@ export class ViewerStream extends StreamApi {
     const remoteTime = fromPbSyncTimeResponseOrThrow(
       await this.syncTime({
         requestTime: currentDateAsProtoTimestamp(),
-      })
+      }),
     );
 
     return new SynchronizedClock(remoteTime);
@@ -562,7 +517,7 @@ export class ViewerStream extends StreamApi {
       const isReconnectMsg = msg.request.gracefulReconnection != null;
       if (isReconnectMsg && this.state.type === 'connected') {
         console.debug(
-          'Received request for graceful reconnect. Closing connection and attempting reconnect.'
+          'Received request for graceful reconnect. Closing connection and attempting reconnect.',
         );
         this.closeAndReconnect(this.state);
       }
@@ -611,7 +566,7 @@ export class ViewerStream extends StreamApi {
 
       const delayInSec = this.options.offlineThresholdInSeconds;
       console.debug(
-        `Detected that host is offline. Will attempt reconnect in ${delayInSec}s.`
+        `Detected that host is offline. Will attempt reconnect in ${delayInSec}s.`,
       );
 
       timer = window.setTimeout(() => {
@@ -647,7 +602,7 @@ export class ViewerStream extends StreamApi {
 
   private async waitForFrame(
     worldOrientation: Orientation,
-    timeoutInSeconds: number
+    timeoutInSeconds: number,
   ): Promise<Frame> {
     let disposable: Disposable | undefined;
 
@@ -666,12 +621,12 @@ export class ViewerStream extends StreamApi {
               disposable?.dispose();
             }
           });
-        })
+        }),
       );
     } catch (e) {
       throw new SceneRenderError(
         `Frame timed out after ${timeoutInSeconds}s`,
-        e instanceof Error ? e : undefined
+        e instanceof Error ? e : undefined,
       );
     } finally {
       disposable?.dispose();
@@ -681,8 +636,8 @@ export class ViewerStream extends StreamApi {
   private acknowledgeFrameRequests(): Disposable {
     return this.onRequest(
       acknowledgeFrameRequests(this, () =>
-        this.state.type === 'connected' ? this.state.clock : undefined
-      )
+        this.state.type === 'connected' ? this.state.clock : undefined,
+      ),
     );
   }
 
@@ -702,10 +657,7 @@ export class ViewerStream extends StreamApi {
     return this.dimensions;
   }
 
-  private ifState<T>(
-    state: ViewerStreamState['type'],
-    f: () => T
-  ): T | undefined {
+  private ifState<T>(state: ViewerStreamState['type'], f: () => T): T | undefined {
     if (this.state.type === state) {
       return f();
     }
@@ -747,7 +699,7 @@ function getWebsocketUri(
   config: Config,
   resource: LoadableResource.LoadableResource,
   clientId?: string,
-  deviceId?: string
+  deviceId?: string,
 ): Uri.Uri {
   if (clientId != null) {
     return Uri.appendPath(
@@ -755,14 +707,14 @@ function getWebsocketUri(
         Uri.parseAndAddParams('/ws', {
           clientId,
           deviceId,
-        })
+        }),
       ),
-      Uri.parse(config.network.renderingHost)
+      Uri.parse(config.network.renderingHost),
     );
   } else {
     return Uri.appendPath(
       `/stream-keys/${resource.id}/session`,
-      Uri.parse(config.network.renderingHost)
+      Uri.parse(config.network.renderingHost),
     );
   }
 }

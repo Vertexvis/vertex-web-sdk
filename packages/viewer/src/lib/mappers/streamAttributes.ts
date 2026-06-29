@@ -40,7 +40,7 @@ const toPbFrameType: M.Func<
         };
     }
   },
-  (type) => type
+  (type) => type,
 );
 
 const toPbPhantom: M.Func<
@@ -56,9 +56,9 @@ const toPbFeatureLines: M.Func<
 > = M.defineMapper(
   M.read(
     M.ifDefined(M.getProp('width')),
-    M.ifDefined(M.mapProp('color', M.ifDefined(toPbRGBi)))
+    M.ifDefined(M.mapProp('color', M.ifDefined(toPbRGBi))),
   ),
-  ([lineWidth, lineColor]) => ({ lineWidth, lineColor })
+  ([lineWidth, lineColor]) => ({ lineWidth, lineColor }),
 );
 
 const toPbSelectionHighlighting: M.Func<
@@ -68,7 +68,7 @@ const toPbSelectionHighlighting: M.Func<
   M.read(
     M.ifDefined(M.mapProp('color', M.ifDefined(toPbRGBi))),
     M.ifDefined(M.mapProp('opacity', toPbFloatValue)),
-    M.ifDefined(M.getProp('lineWidth'))
+    M.ifDefined(M.getProp('lineWidth')),
   ),
   ([color, opacity, lineWidth]) => {
     if (color || opacity || lineWidth) {
@@ -78,7 +78,7 @@ const toPbSelectionHighlighting: M.Func<
         lineWidth,
       };
     } else return undefined;
-  }
+  },
 );
 
 const toPbFeatureHighlight: M.Func<
@@ -88,25 +88,24 @@ const toPbFeatureHighlight: M.Func<
   M.read(
     M.ifDefined(M.mapProp('highlightColor', M.ifDefined(toPbRGBi))),
     M.ifDefined(M.mapProp('occludedOpacity', toPbFloatValue)),
-    M.ifDefined(M.mapProp('outline', M.ifDefined(toPbFeatureLines)))
+    M.ifDefined(M.mapProp('outline', M.ifDefined(toPbFeatureLines))),
   ),
   ([highlightColor, occludedOpacity, outline]) => ({
     highlightColor,
     occludedOpacity,
     outline,
-  })
+  }),
 );
 
-const toPbNoDefaultLights: M.Func<boolean | undefined, boolean> =
-  M.defineMapper(
-    (noDefaultLights) => !!noDefaultLights,
-    (attr) => attr
-  );
+const toPbNoDefaultLights: M.Func<boolean | undefined, boolean> = M.defineMapper(
+  (noDefaultLights) => !!noDefaultLights,
+  (attr) => attr,
+);
 
 const toPbExperimentalRenderingOptions: M.Func<string | undefined, string> =
   M.defineMapper(
     (experimentalRenderingOptions) => experimentalRenderingOptions ?? '',
-    (attr) => attr
+    (attr) => attr,
   );
 
 const toPbFrameOptions: M.Func<
@@ -114,19 +113,17 @@ const toPbFrameOptions: M.Func<
   vertexvis.protobuf.stream.IFrameAttributes
 > = M.defineMapper(
   M.read(M.ifDefined(M.mapProp('frameBackgroundColor', M.ifDefined(toPbRGBi)))),
-  ([frameBackgroundColor]) => ({ frameBackgroundColor })
+  ([frameBackgroundColor]) => ({ frameBackgroundColor }),
 );
 
 const toPbSceneComparison: M.Func<
   SceneComparisonOptions | undefined,
   vertexvis.protobuf.stream.ISceneComparisonAttributes
 > = M.defineMapper(
-  M.read(
-    M.ifDefined(M.mapProp('streamKeyToCompare', M.ifDefined(toPbStringValue)))
-  ),
+  M.read(M.ifDefined(M.mapProp('streamKeyToCompare', M.ifDefined(toPbStringValue)))),
   ([streamKeyToCompare]) => ({
     streamKeyToCompare,
-  })
+  }),
 );
 
 const toPbCrossSectioning: M.Func<
@@ -135,12 +132,12 @@ const toPbCrossSectioning: M.Func<
 > = M.defineMapper(
   M.read(
     M.ifDefined(M.mapProp('endCapEnabled', (endCapEnabled) => !!endCapEnabled)),
-    M.ifDefined(M.mapProp('endCapColor', M.ifDefined(toPbRGBi)))
+    M.ifDefined(M.mapProp('endCapColor', M.ifDefined(toPbRGBi))),
   ),
   ([endCapEnabled, endCapColor]) => ({
     endCapEnabled,
     endCapColor,
-  })
+  }),
 );
 
 export const toPbStreamAttributes: M.Func<
@@ -158,7 +155,7 @@ export const toPbStreamAttributes: M.Func<
     M.mapProp('selectionHighlighting', toPbSelectionHighlighting),
     M.mapProp('frames', toPbFrameOptions),
     M.mapProp('sceneComparison', toPbSceneComparison),
-    M.mapProp('crossSectioning', toPbCrossSectioning)
+    M.mapProp('crossSectioning', toPbCrossSectioning),
   ),
   ([db, pi, ndl, fl, fh, fm, ero, hs, fa, sc, cs]) => {
     const value = {
@@ -176,5 +173,5 @@ export const toPbStreamAttributes: M.Func<
     };
 
     return value;
-  }
+  },
 );

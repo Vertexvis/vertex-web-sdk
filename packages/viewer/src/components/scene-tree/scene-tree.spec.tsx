@@ -1,6 +1,4 @@
-jest.mock(
-  '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service'
-);
+jest.mock('@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service');
 jest.mock('./lib/dom');
 jest.mock('../scene-tree-table-layout/lib/dom');
 jest.mock('./lib/viewer-ops');
@@ -12,10 +10,7 @@ import { grpc } from '@improbable-eng/grpc-web';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
-import {
-  ColumnKey,
-  Node,
-} from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
+import { ColumnKey, Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import {
   CollapseNodeResponse,
   ExpandNodeResponse,
@@ -45,12 +40,7 @@ import {
   random,
   ResponseStreamMock,
 } from '../../testing';
-import {
-  key1,
-  key2,
-  loadViewerStreamKey,
-  makeViewerStream,
-} from '../../testing/viewer';
+import { key1, key2, loadViewerStreamKey, makeViewerStream } from '../../testing/viewer';
 import { scrollToTop } from '../scene-tree-table-layout/lib/dom';
 import { SceneTreeTableLayout } from '../scene-tree-table-layout/scene-tree-table-layout';
 import { getElementBoundingClientRect } from '../viewer/utils';
@@ -133,14 +123,16 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({ controller, stream });
+      const { tree, viewer, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
 
       expect(
-        tree?.querySelectorAll('vertex-scene-tree-table-cell')?.length
+        tree?.querySelectorAll('vertex-scene-tree-table-cell')?.length,
       ).toBeGreaterThan(0);
     });
 
@@ -152,21 +144,20 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { viewer, page, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({
-          controller,
-          stream,
-          template: () => (
-            <div>
-              <vertex-scene-tree
-                controller={controller}
-                rowData={rowData}
-                viewerSelector="#viewer"
-              ></vertex-scene-tree>
-              <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
-            </div>
-          ),
-        });
+      const { viewer, page, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+        template: () => (
+          <div>
+            <vertex-scene-tree
+              controller={controller}
+              rowData={rowData}
+              viewerSelector="#viewer"
+            ></vertex-scene-tree>
+            <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
+          </div>
+        ),
+      });
 
       const key1 = `urn:vertex:stream-key:${decodeSceneTreeJwt(token).view}`;
       loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
@@ -249,7 +240,7 @@ describe('<vertex-scene-tree>', () => {
       expect(errorMessage).not.toBeNull();
 
       expect(errorMessage?.firstChild?.firstChild?.nodeValue).toEqual(
-        'Could not find reference to the viewer.'
+        'Could not find reference to the viewer.',
       );
     });
 
@@ -261,8 +252,10 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, page, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({ controller, stream });
+      const { tree, viewer, page, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
@@ -296,8 +289,10 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, page, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({ controller, stream });
+      const { tree, viewer, page, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
@@ -319,7 +314,7 @@ describe('<vertex-scene-tree>', () => {
       await page.waitForChanges();
 
       const partialResults = tree.shadowRoot?.querySelector(
-        'vertex-scene-tree-notification-banner'
+        'vertex-scene-tree-notification-banner',
       );
 
       expect(partialResults).not.toBeNull();
@@ -333,8 +328,10 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, page, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({ controller, stream });
+      const { tree, viewer, page, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
@@ -356,7 +353,7 @@ describe('<vertex-scene-tree>', () => {
       await page.waitForChanges();
 
       const partialResults = tree.shadowRoot?.querySelector(
-        'vertex-scene-tree-notification-banner'
+        'vertex-scene-tree-notification-banner',
       );
 
       expect(partialResults).not.toBeNull();
@@ -366,7 +363,7 @@ describe('<vertex-scene-tree>', () => {
 
       await page.waitForChanges();
       const resultsBanner = tree.shadowRoot?.querySelector(
-        'vertex-scene-tree-notification-banner'
+        'vertex-scene-tree-notification-banner',
       );
 
       expect(resultsBanner).toBeNull();
@@ -511,7 +508,7 @@ describe('<vertex-scene-tree>', () => {
         expect.any(String),
         expect.objectContaining({
           transport: webSocketSubscriptionTransportFactory,
-        })
+        }),
       );
     });
 
@@ -532,10 +529,7 @@ describe('<vertex-scene-tree>', () => {
         ),
       });
 
-      expect(SceneTreeAPIClient).toHaveBeenCalledWith(
-        expect.any(String),
-        undefined
-      );
+      expect(SceneTreeAPIClient).toHaveBeenCalledWith(expect.any(String), undefined);
     });
   });
 
@@ -554,21 +548,20 @@ describe('<vertex-scene-tree>', () => {
       const onStateChange = jest.fn();
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, page, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({
-          controller,
-          stream,
-          template: () => (
-            <div>
-              <vertex-scene-tree
-                controller={controller}
-                viewerSelector="#viewer1"
-              ></vertex-scene-tree>
-              <vertex-viewer id="viewer1" stream={stream} clientId={clientId} />
-              <vertex-viewer id="viewer2" stream={stream} clientId={clientId} />
-            </div>
-          ),
-        });
+      const { tree, viewer, page, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+        template: () => (
+          <div>
+            <vertex-scene-tree
+              controller={controller}
+              viewerSelector="#viewer1"
+            ></vertex-scene-tree>
+            <vertex-viewer id="viewer1" stream={stream} clientId={clientId} />
+            <vertex-viewer id="viewer2" stream={stream} clientId={clientId} />
+          </div>
+        ),
+      });
 
       loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
@@ -580,7 +573,7 @@ describe('<vertex-scene-tree>', () => {
       expect(onStateChange).toHaveBeenCalledWith(
         expect.objectContaining({
           connection: expect.objectContaining({ type: 'disconnected' }),
-        })
+        }),
       );
     });
   });
@@ -592,41 +585,34 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, page, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({
-          controller,
-          stream,
-          template: () => (
-            <div>
-              <vertex-scene-tree
-                controller={controller}
-                viewerSelector="#viewer1"
-              ></vertex-scene-tree>
-              <vertex-viewer id="viewer1" stream={stream} clientId={clientId} />
-              <vertex-viewer id="viewer2" stream={stream} clientId={clientId} />
-            </div>
-          ),
-        });
+      const { tree, viewer, page, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+        template: () => (
+          <div>
+            <vertex-scene-tree
+              controller={controller}
+              viewerSelector="#viewer1"
+            ></vertex-scene-tree>
+            <vertex-viewer id="viewer1" stream={stream} clientId={clientId} />
+            <vertex-viewer id="viewer2" stream={stream} clientId={clientId} />
+          </div>
+        ),
+      });
 
       loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
 
       const res = mockGetTree({ client });
       const newJwt = signJwt(random.guid());
-      const newViewer = page.body.querySelector(
-        '#viewer2'
-      ) as HTMLVertexViewerElement;
+      const newViewer = page.body.querySelector('#viewer2') as HTMLVertexViewerElement;
       tree.viewer = newViewer;
       await page.waitForChanges();
-      loadViewerStreamKey(
-        key2,
-        { viewer: newViewer, stream, ws },
-        { token: newJwt }
-      );
+      loadViewerStreamKey(key2, { viewer: newViewer, stream, ws }, { token: newJwt });
       await waitForSceneTreeConnected();
 
       const row = tree.querySelectorAll(
-        'vertex-scene-tree-table-cell'
+        'vertex-scene-tree-table-cell',
       )[0] as HTMLVertexSceneTreeTableCellElement;
       expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
     });
@@ -648,9 +634,7 @@ describe('<vertex-scene-tree>', () => {
         },
       });
 
-      const viewer = page.body.querySelector(
-        'vertex-viewer'
-      ) as HTMLVertexViewerElement;
+      const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
       loadViewerStreamKey(key2, { viewer, stream, ws }, { token });
       controller?.connectToViewer(viewer);
 
@@ -669,7 +653,7 @@ describe('<vertex-scene-tree>', () => {
       await page.waitForChanges();
 
       const row = tree.querySelectorAll(
-        'vertex-scene-tree-table-cell'
+        'vertex-scene-tree-table-cell',
       )[0] as HTMLVertexSceneTreeTableCellElement;
       expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
     });
@@ -684,21 +668,20 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, page, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({
-          controller,
-          stream,
-          template: () => (
-            <div>
-              <vertex-scene-tree
-                controller={controller}
-                rowData={rowData}
-                viewerSelector="#viewer"
-              ></vertex-scene-tree>
-              <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
-            </div>
-          ),
-        });
+      const { tree, viewer, page, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+        template: () => (
+          <div>
+            <vertex-scene-tree
+              controller={controller}
+              rowData={rowData}
+              viewerSelector="#viewer"
+            ></vertex-scene-tree>
+            <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
+          </div>
+        ),
+      });
 
       loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await waitForSceneTreeConnected();
@@ -735,9 +718,7 @@ describe('<vertex-scene-tree>', () => {
       const res = new LocateItemResponse();
       res.setLocatedIndex(index);
 
-      (client.locateItem as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(res)
-      );
+      (client.locateItem as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowForItemId('item-id');
@@ -759,17 +740,11 @@ describe('<vertex-scene-tree>', () => {
       });
 
       const pendingEvent = new Promise<MouseEvent>((resolve) => {
-        const cellEl = page.root?.querySelectorAll(
-          'vertex-scene-tree-table-cell'
-        )[1];
-        cellEl?.addEventListener('click', (event) =>
-          resolve(event as MouseEvent)
-        );
+        const cellEl = page.root?.querySelectorAll('vertex-scene-tree-table-cell')[1];
+        cellEl?.addEventListener('click', (event) => resolve(event as MouseEvent));
       });
 
-      const cellEl = page.root?.querySelectorAll(
-        'vertex-scene-tree-table-cell'
-      )[1];
+      const cellEl = page.root?.querySelectorAll('vertex-scene-tree-table-cell')[1];
       cellEl?.dispatchEvent(new MouseEvent('click', { clientY: 30 }));
 
       const event = await pendingEvent;
@@ -785,9 +760,7 @@ describe('<vertex-scene-tree>', () => {
       (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
-      const row = await tree.getRowForEvent(
-        new MouseEvent('click', { clientY: 30 })
-      );
+      const row = await tree.getRowForEvent(new MouseEvent('click', { clientY: 30 }));
       expect(row).not.toBeDefined();
     });
   });
@@ -825,7 +798,7 @@ describe('<vertex-scene-tree>', () => {
         expect.anything(),
         {
           append: false,
-        }
+        },
       );
     });
 
@@ -849,7 +822,7 @@ describe('<vertex-scene-tree>', () => {
         expect.anything(),
         {
           append: false,
-        }
+        },
       );
     });
   });
@@ -861,7 +834,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client, transform: (node) => node.setExpanded(false) });
 
       (client.expandNode as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(new ExpandNodeResponse())
+        mockGrpcUnaryResult(new ExpandNodeResponse()),
       );
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -887,7 +860,7 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setExpanded(true) });
       (client.collapseNode as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(new CollapseNodeResponse())
+        mockGrpcUnaryResult(new CollapseNodeResponse()),
       );
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -913,7 +886,7 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setExpanded(true) });
       (client.collapseNode as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(new CollapseNodeResponse())
+        mockGrpcUnaryResult(new CollapseNodeResponse()),
       );
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -927,7 +900,7 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client, transform: (node) => node.setExpanded(false) });
       (client.expandNode as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(new ExpandNodeResponse())
+        mockGrpcUnaryResult(new ExpandNodeResponse()),
       );
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -1066,9 +1039,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client, transform: (node) => node.setSelected(false) });
 
       const res = new GetNodeAncestorsResponse();
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(0);
@@ -1083,9 +1054,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client, transform: (node) => node.setSelected(true) });
 
       const res = new GetNodeAncestorsResponse();
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(0);
@@ -1100,9 +1069,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client, transform: (node) => node.setSelected(false) });
 
       const res = new GetNodeAncestorsResponse();
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(0);
@@ -1110,7 +1077,7 @@ describe('<vertex-scene-tree>', () => {
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         row?.node.id?.hex,
-        expect.objectContaining({ append: true })
+        expect.objectContaining({ append: true }),
       );
     });
 
@@ -1132,9 +1099,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(2);
@@ -1145,7 +1110,7 @@ describe('<vertex-scene-tree>', () => {
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         node1.getId()?.getHex(),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -1166,9 +1131,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(2);
@@ -1188,7 +1151,7 @@ describe('<vertex-scene-tree>', () => {
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         node1.getId()?.getHex(),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -1210,9 +1173,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(2);
@@ -1222,7 +1183,7 @@ describe('<vertex-scene-tree>', () => {
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         node3.getId()?.getHex(),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -1245,9 +1206,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(2);
@@ -1258,7 +1217,7 @@ describe('<vertex-scene-tree>', () => {
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
         node3.getId()?.getHex(),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -1270,7 +1229,7 @@ describe('<vertex-scene-tree>', () => {
       locateItemResponse.setLocatedIndex(index);
 
       (client.locateItem as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(locateItemResponse)
+        mockGrpcUnaryResult(locateItemResponse),
       );
       const controller = new SceneTreeController(client, 100);
 
@@ -1288,9 +1247,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
-      );
+      (client.getNodeAncestors as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(0);
@@ -1304,7 +1261,7 @@ describe('<vertex-scene-tree>', () => {
         expect.anything(),
         2,
         2,
-        expect.anything()
+        expect.anything(),
       );
     });
   });
@@ -1361,11 +1318,7 @@ describe('<vertex-scene-tree>', () => {
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       await tree.scrollToIndex(1, { position: 'start' });
-      expect(scrollToTop).toHaveBeenCalledWith(
-        expect.anything(),
-        24,
-        expect.anything()
-      );
+      expect(scrollToTop).toHaveBeenCalledWith(expect.anything(), 24, expect.anything());
     });
 
     it('positions item in viewport middle', async () => {
@@ -1379,7 +1332,7 @@ describe('<vertex-scene-tree>', () => {
       expect(scrollToTop).toHaveBeenCalledWith(
         expect.anything(),
         1092,
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -1394,7 +1347,7 @@ describe('<vertex-scene-tree>', () => {
       expect(scrollToTop).toHaveBeenCalledWith(
         expect.anything(),
         2160,
-        expect.anything()
+        expect.anything(),
       );
     });
   });
@@ -1411,9 +1364,7 @@ describe('<vertex-scene-tree>', () => {
       const res = new LocateItemResponse();
       res.setLocatedIndex(index);
 
-      (client.locateItem as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(res)
-      );
+      (client.locateItem as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(res));
 
       const { page } = await newConnectedSceneTreeSpec({ controller, token });
       const tree = page.rootInstance as SceneTree;
@@ -1437,7 +1388,7 @@ describe('<vertex-scene-tree>', () => {
 
       mockGetTree({ client });
       (client.getAvailableColumns as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(res)
+        mockGrpcUnaryResult(res),
       );
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -1458,8 +1409,10 @@ describe('<vertex-scene-tree>', () => {
       });
 
       const { stream, ws } = makeViewerStream();
-      const { tree, viewer, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({ controller, stream });
+      const { tree, viewer, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
 
       tree.rowData = rowData;
       tree.metadataKeys = ['key1', 'key2'];
@@ -1469,7 +1422,7 @@ describe('<vertex-scene-tree>', () => {
       expect(rowData).toHaveBeenCalledWith(
         expect.objectContaining({
           metadata: { key1: 'val1', key2: 'val2' },
-        })
+        }),
       );
     });
 
@@ -1502,7 +1455,7 @@ describe('<vertex-scene-tree>', () => {
       expect(rowData).toHaveBeenCalledWith(
         expect.objectContaining({
           metadata: { key1: 'val1', key2: 'val2' },
-        })
+        }),
       );
     });
   });
@@ -1595,8 +1548,10 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const { tree, viewer, waitForSceneTreeConnected } =
-        await newSceneTreeSpec({ controller, stream });
+      const { tree, viewer, waitForSceneTreeConnected } = await newSceneTreeSpec({
+        controller,
+        stream,
+      });
 
       tree.addEventListener('firstRowRendered', firstRowRendered);
 
@@ -1604,7 +1559,7 @@ describe('<vertex-scene-tree>', () => {
       await waitForSceneTreeConnected();
 
       const row = tree.querySelectorAll(
-        'vertex-scene-tree-table-cell'
+        'vertex-scene-tree-table-cell',
       )[0] as HTMLVertexSceneTreeTableCellElement;
 
       row.dispatchEvent(new CustomEvent('cellLoaded', { bubbles: true }));
@@ -1640,23 +1595,15 @@ async function newSceneTreeSpec(data: {
               controller={data.controller}
               viewerSelector={data.viewerSelector || '#viewer'}
             />
-            <vertex-viewer
-              id="viewer"
-              clientId={random.guid()}
-              stream={data.stream}
-            />
+            <vertex-viewer id="viewer" clientId={random.guid()} stream={data.stream} />
           </div>
         )
       );
     },
   });
 
-  const tree = page.body.querySelector(
-    'vertex-scene-tree'
-  ) as HTMLVertexSceneTreeElement;
-  const viewer = page.body.querySelector(
-    'vertex-viewer'
-  ) as HTMLVertexViewerElement;
+  const tree = page.body.querySelector('vertex-scene-tree') as HTMLVertexSceneTreeElement;
+  const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
 
   return {
     tree,
@@ -1680,8 +1627,10 @@ async function newConnectedSceneTreeSpec(data: {
   token: string;
 }): Promise<{ tree: HTMLVertexSceneTreeElement; page: SpecPage }> {
   const { stream, ws } = makeViewerStream();
-  const { page, tree, viewer, waitForSceneTreeConnected } =
-    await newSceneTreeSpec({ controller: data.controller, stream });
+  const { page, tree, viewer, waitForSceneTreeConnected } = await newSceneTreeSpec({
+    controller: data.controller,
+    stream,
+  });
   loadViewerStreamKey(key1, { viewer, stream, ws }, { token: data.token });
   await waitForSceneTreeConnected();
   return { page, tree };
@@ -1695,7 +1644,7 @@ interface MockGetTreeOptions {
 }
 
 function mockSceneTreeClient(
-  subscriptionMock = new ResponseStreamMock()
+  subscriptionMock = new ResponseStreamMock(),
 ): SceneTreeAPIClient {
   const client = new SceneTreeAPIClient('https://example.com');
   (client.subscribe as jest.Mock).mockReturnValue(subscriptionMock);
@@ -1719,15 +1668,13 @@ function mockGetTreeError(client: SceneTreeAPIClient, code: grpc.Code): void {
     message: 'Scene tree test error',
     metadata: new grpc.Metadata({}),
   };
-  (client.getTree as jest.Mock).mockImplementationOnce(
-    mockGrpcUnaryError(error)
-  );
+  (client.getTree as jest.Mock).mockImplementationOnce(mockGrpcUnaryError(error));
 }
 
 function mockFilterTree(
   client: SceneTreeAPIClient,
   resultCount = 10,
-  partialResults = false
+  partialResults = false,
 ): void {
   const res = createFilterTreeResponse(resultCount, partialResults);
   (client.filter as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(res));
@@ -1744,6 +1691,6 @@ function signJwt(viewId: string): string {
       view: viewId,
       exp: 1618269553,
     },
-    'secret'
+    'secret',
   );
 }

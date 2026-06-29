@@ -24,11 +24,9 @@ function buildListSceneItemMetadataResponse(): ListSceneItemMetadataResponse {
           new PropertyKeyBuilder()
             .withName(random.string())
             .withCategory(PropertyCategory.PROPERTY_CATEGORY_USER)
-            .build()
+            .build(),
         )
-        .withValue(
-          new PropertyValueBuilder().withString(random.string()).build()
-        )
+        .withValue(new PropertyValueBuilder().withString(random.string()).build())
         .build(),
     ])
     .build();
@@ -46,12 +44,12 @@ describe(SceneItemController, () => {
   const controller = new SceneItemController(
     api as unknown as SceneViewAPIClient,
     () => jwt,
-    () => deviceId
+    () => deviceId,
   );
 
   it('listSceneItemMetadata', async () => {
     expect(await controller.listSceneItemMetadata(UUID.create(), {})).toEqual(
-      mapListSceneItemMetadataResponseOrThrow(res.toObject())
+      mapListSceneItemMetadataResponseOrThrow(res.toObject()),
     );
   });
 });

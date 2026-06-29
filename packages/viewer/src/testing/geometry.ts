@@ -1,7 +1,4 @@
-import {
-  Vector2d,
-  Vector3f,
-} from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
+import { Vector2d, Vector3f } from '@vertexvis/scene-view-protos/core/protos/geometry_pb';
 
 import { random } from './random';
 

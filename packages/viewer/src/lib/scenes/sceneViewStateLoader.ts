@@ -7,10 +7,7 @@ import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import { SceneViewStateIdentifier } from '../types';
 import { ApplySceneViewStateOptions, SceneViewStateFeature } from '.';
 import { CameraRenderResult } from './cameraRenderResult';
-import {
-  buildSceneViewStateIdentifier,
-  toPbSceneViewStateFeatures,
-} from './mapper';
+import { buildSceneViewStateIdentifier, toPbSceneViewStateFeatures } from './mapper';
 
 export class SceneViewStateLoader {
   public constructor(
@@ -18,14 +15,12 @@ export class SceneViewStateLoader {
     private decodeFrame: FrameDecoder,
     private encodeCameraType: CameraTypeEncoder,
     public readonly sceneId: UUID.UUID,
-    public readonly sceneViewId: UUID.UUID
+    public readonly sceneViewId: UUID.UUID,
   ) {}
 
   public async applySceneViewState(
-    sceneViewStateId:
-      | UUID.UUID
-      | SceneViewStateIdentifier.SceneViewStateIdentifier,
-    opts: ApplySceneViewStateOptions = {}
+    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
+    opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
 
@@ -41,16 +36,14 @@ export class SceneViewStateLoader {
           ? this.encodeCameraType(opts.cameraTypeOverride)
           : undefined,
       },
-      true
+      true,
     );
   }
 
   public async applyPartialSceneViewState(
-    sceneViewStateId:
-      | UUID.UUID
-      | SceneViewStateIdentifier.SceneViewStateIdentifier,
+    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
-    opts: ApplySceneViewStateOptions = {}
+    opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
     const pbFeatures = toPbSceneViewStateFeatures(featuresToApply);
@@ -70,21 +63,18 @@ export class SceneViewStateLoader {
           ? this.encodeCameraType(opts.cameraTypeOverride)
           : undefined,
       },
-      true
+      true,
     );
   }
 
   private async animateToSceneViewState(
     identifier:
-      | Pick<
-          vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
-          'sceneViewStateId'
-        >
+      | Pick<vertexvis.protobuf.stream.ILoadSceneViewStatePayload, 'sceneViewStateId'>
       | Pick<
           vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
           'sceneViewStateSuppliedId'
         >,
-    opts: ApplySceneViewStateOptions
+    opts: ApplySceneViewStateOptions,
   ): Promise<void> {
     if (opts.animation != null) {
       const corrId = UUID.create();
@@ -99,7 +89,7 @@ export class SceneViewStateLoader {
             value: corrId,
           },
         },
-        true
+        true,
       );
 
       if (opts.waitForAnimation == null || opts.waitForAnimation) {
@@ -110,7 +100,7 @@ export class SceneViewStateLoader {
             animationId: flyToResult.flyTo?.animationId?.hex ?? undefined,
             correlationId: corrId,
           },
-          opts.animation.milliseconds + DEFAULT_TIMEOUT_IN_MS
+          opts.animation.milliseconds + DEFAULT_TIMEOUT_IN_MS,
         );
 
         await renderResult.onAnimationCompleted.once();

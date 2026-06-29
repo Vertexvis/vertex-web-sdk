@@ -8,7 +8,7 @@ export function testDrawable(
   drawable: Drawable,
   frame: Frame,
   viewport: Viewport,
-  point: Point.Point
+  point: Point.Point,
 ): boolean {
   if (drawable instanceof TriangleMesh) {
     return testTriangleMesh(drawable, frame, viewport, point);
@@ -20,20 +20,20 @@ export function testTriangleMesh(
   mesh: TriangleMesh,
   frame: Frame,
   viewport: Viewport,
-  point: Point.Point
+  point: Point.Point,
 ): boolean {
   return (
     testTriangle(
       [mesh.points.worldLeft, mesh.points.worldRight, mesh.points.worldTip],
       frame,
       viewport,
-      point
+      point,
     ) ||
     testTriangle(
       [mesh.points.worldLeft, mesh.points.worldRight, mesh.points.worldBase],
       frame,
       viewport,
-      point
+      point,
     )
   );
 }
@@ -45,21 +45,17 @@ export function testTriangle(
   points: Vector3.Vector3[],
   frame: Frame,
   viewport: Viewport,
-  point: Point.Point
+  point: Point.Point,
 ): boolean {
   if (points.length === 3) {
-    const ray = viewport.transformPointToRay(
-      point,
-      frame.image,
-      frame.scene.camera
-    );
+    const ray = viewport.transformPointToRay(point, frame.image, frame.scene.camera);
 
     const edge1 = Vector3.subtract(points[1], points[0]);
     const edge2 = Vector3.subtract(points[2], points[0]);
 
     const epsilon = BoundingBox.epsilon(
       BoundingBox.fromVectors([ray.direction, ray.origin, edge1, edge2]) ??
-        BoundingBox.create(edge1, edge2)
+        BoundingBox.create(edge1, edge2),
     );
 
     const p = Vector3.cross(ray.direction, edge2);

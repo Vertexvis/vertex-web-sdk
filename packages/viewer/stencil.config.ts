@@ -17,12 +17,7 @@ export const config: Config = {
   preamble: copyright(),
   plugins: [
     workers({
-      plugins: [
-        commonjs(),
-        resolve({ browser: true }),
-        workerTypescript(),
-        terser(),
-      ],
+      plugins: [commonjs(), resolve({ browser: true }), workerTypescript(), terser()],
     }),
   ],
   globalScript: 'src/polyfill/resize-observer.ts',

@@ -22,34 +22,26 @@ export const MeasurementOverlayView: FunctionalComponent<
   MeasurementOverlayViewProps<MeasurementOverlay>
 > = ({ overlay, viewport, camera }) => {
   if (overlay.type === 'line') {
-    return (
-      <LineOverlayView overlay={overlay} viewport={viewport} camera={camera} />
-    );
+    return <LineOverlayView overlay={overlay} viewport={viewport} camera={camera} />;
   } else {
     return (
-      <DistanceVectorOverlayView
-        overlay={overlay}
-        viewport={viewport}
-        camera={camera}
-      />
+      <DistanceVectorOverlayView overlay={overlay} viewport={viewport} camera={camera} />
     );
   }
 };
 
-const LineOverlayView: FunctionalComponent<
-  MeasurementOverlayViewProps<LineOverlay>
-> = ({ overlay, camera, viewport }) => {
+const LineOverlayView: FunctionalComponent<MeasurementOverlayViewProps<LineOverlay>> = ({
+  overlay,
+  camera,
+  viewport,
+}) => {
   const { start, end } = translateWorldLineToViewport(overlay, {
     camera,
     viewport,
   });
 
   return (
-    <vertex-viewer-measurement-line
-      class="measurement-line"
-      start={start}
-      end={end}
-    />
+    <vertex-viewer-measurement-line class="measurement-line" start={start} end={end} />
   );
 };
 

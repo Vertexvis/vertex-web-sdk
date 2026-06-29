@@ -1,6 +1,4 @@
-jest.mock(
-  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
-);
+jest.mock('@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service');
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 
@@ -19,19 +17,17 @@ describe(PmiController, () => {
       const expected = makeListPmiAnnotationsResponse();
 
       (client.listPmiAnnotations as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(expected)
+        mockGrpcUnaryResult(expected),
       );
 
       const res = await controller.listAnnotations();
-      expect(res).toEqual(
-        mapListPmiAnnotationsResponseOrThrow(expected.toObject())
-      );
+      expect(res).toEqual(mapListPmiAnnotationsResponseOrThrow(expected.toObject()));
     });
   });
 
   function makePmiController(
     jwt: string,
-    deviceId: string
+    deviceId: string,
   ): {
     controller: PmiController;
     client: SceneViewAPIClient;
@@ -42,7 +38,7 @@ describe(PmiController, () => {
       controller: new PmiController(
         client,
         () => jwt,
-        () => deviceId
+        () => deviceId,
       ),
     };
   }

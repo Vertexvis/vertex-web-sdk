@@ -1,11 +1,4 @@
-import {
-  Dimensions,
-  Matrix4,
-  Point,
-  Ray,
-  Rectangle,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Dimensions, Matrix4, Point, Ray, Rectangle, Vector3 } from '@vertexvis/geometry';
 
 import { DepthBuffer } from './depthBuffer';
 import type { FrameCameraBase, FrameImageLike } from './frame';
@@ -35,7 +28,7 @@ export class Viewport implements Dimensions.Dimensions {
     /**
      * The height of the viewport.
      */
-    public readonly height: number
+    public readonly height: number,
   ) {
     this.center = Dimensions.center(this.dimensions);
   }
@@ -59,7 +52,7 @@ export class Viewport implements Dimensions.Dimensions {
   public transformNdcPointToViewport(ndc: Point.Point): Point.Point {
     return Point.create(
       ndc.x * this.center.x + this.center.x,
-      -ndc.y * this.center.y + this.center.y
+      -ndc.y * this.center.y + this.center.y,
     );
   }
 
@@ -83,16 +76,13 @@ export class Viewport implements Dimensions.Dimensions {
    */
   public transformWorldToViewport(
     worldPt: Vector3.Vector3,
-    projectionViewMatrix: Matrix4.Matrix4
+    projectionViewMatrix: Matrix4.Matrix4,
   ): Point.Point {
     const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
     return this.transformVectorToViewport(ndc);
   }
 
-  public transformPointToViewport(
-    pt: Point.Point,
-    image: FrameImageLike
-  ): Point.Point {
+  public transformPointToViewport(pt: Point.Point, image: FrameImageLike): Point.Point {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
     return Point.scale(pt, 1 * scaleX, 1 * scaleY);
   }
@@ -105,10 +95,7 @@ export class Viewport implements Dimensions.Dimensions {
    * @param image An image of a frame.
    * @returns A point in the coordinate space of the frame.
    */
-  public transformPointToFrame(
-    pt: Point.Point,
-    image: FrameImageLike
-  ): Point.Point {
+  public transformPointToFrame(pt: Point.Point, image: FrameImageLike): Point.Point {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
     return Point.scale(pt, 1 / scaleX, 1 / scaleY);
   }
@@ -127,7 +114,7 @@ export class Viewport implements Dimensions.Dimensions {
   public transformPointToWorldSpace(
     pt: Point.Point,
     depthBuffer: DepthBuffer,
-    fallbackNormalizedDepth?: number
+    fallbackNormalizedDepth?: number,
   ): Vector3.Vector3 {
     const depthPt = this.transformPointToFrame(pt, depthBuffer);
     const ray = this.transformPointToRay(pt, depthBuffer, depthBuffer.camera);
@@ -154,7 +141,7 @@ export class Viewport implements Dimensions.Dimensions {
   public transformPointToRay(
     pt: Point.Point,
     image: FrameImageLike,
-    camera: FrameCameraBase
+    camera: FrameCameraBase,
   ): Ray.Ray {
     const ndc = this.transformScreenPointToNdc(pt, image);
 
@@ -164,17 +151,15 @@ export class Viewport implements Dimensions.Dimensions {
       const lookAtPoint = Vector3.transformNdcToWorldSpace(
         Vector3.create(ndc.x, ndc.y, 0.5),
         camera.worldMatrix,
-        camera.projectionMatrixInverse
+        camera.projectionMatrixInverse,
       );
-      const direction = Vector3.normalize(
-        Vector3.subtract(lookAtPoint, origin)
-      );
+      const direction = Vector3.normalize(Vector3.subtract(lookAtPoint, origin));
       return Ray.create({ origin, direction });
     } else {
       const origin = Vector3.transformNdcToWorldSpace(
         Vector3.create(ndc.x, ndc.y, 0),
         camera.worldMatrix,
-        camera.projectionMatrixInverse
+        camera.projectionMatrixInverse,
       );
       return Ray.create({
         origin,
@@ -191,12 +176,12 @@ export class Viewport implements Dimensions.Dimensions {
    */
   public transformScreenPointToNdc(
     screenPt: Point.Point,
-    image: FrameImageLike
+    image: FrameImageLike,
   ): Point.Point {
     const framePt = this.transformPointToFrame(screenPt, image);
     return Point.create(
       (framePt.x / image.imageAttr.frameDimensions.width) * 2 - 1,
-      -(framePt.y / image.imageAttr.frameDimensions.height) * 2 + 1
+      -(framePt.y / image.imageAttr.frameDimensions.height) * 2 + 1,
     );
   }
 

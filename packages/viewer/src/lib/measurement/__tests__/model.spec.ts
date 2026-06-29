@@ -102,9 +102,7 @@ describe('MeasurementModel', () => {
       model.onEntitiesChanged(onChange);
 
       model.addEntity(measureEntity);
-      expect(model.setEntities(new Set([measureEntity2, measureEntity3]))).toBe(
-        true
-      );
+      expect(model.setEntities(new Set([measureEntity2, measureEntity3]))).toBe(true);
       expect(model.getEntities()).toEqual([measureEntity2, measureEntity3]);
       expect(onChange).toHaveBeenCalledWith([measureEntity2, measureEntity3]);
     });
@@ -115,15 +113,7 @@ function createMinimumDistanceResult(): MinimumDistanceMeasurementResult {
   return {
     type: 'minimum-distance',
     distance: random.floating(),
-    point1: Vector3.create(
-      random.floating(),
-      random.floating(),
-      random.floating()
-    ),
-    point2: Vector3.create(
-      random.floating(),
-      random.floating(),
-      random.floating()
-    ),
+    point1: Vector3.create(random.floating(), random.floating(), random.floating()),
+    point2: Vector3.create(random.floating(), random.floating(), random.floating()),
   };
 }

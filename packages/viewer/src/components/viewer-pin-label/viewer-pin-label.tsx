@@ -17,12 +17,7 @@ import classNames from 'classnames';
 
 import { getMouseClientPosition } from '../../lib/dom';
 import { PinController } from '../../lib/pins/controller';
-import {
-  getPinColors,
-  isTextPin,
-  PinModel,
-  TextPin,
-} from '../../lib/pins/model';
+import { getPinColors, isTextPin, PinModel, TextPin } from '../../lib/pins/model';
 import { readDOM } from '../../lib/stencil';
 import {
   translatePointToRelative,
@@ -228,10 +223,7 @@ export class VertexPinLabel {
           {/* This corrects for a behavior in Firefox where setting the `disabled` attribute to true */}
           {/* prevents any events from propagating. */}
           {!this.focused && (
-            <div
-              class="pin-input-drag-target"
-              onPointerDown={this.handlePointerDown}
-            />
+            <div class="pin-input-drag-target" onPointerDown={this.handlePointerDown} />
           )}
         </div>
         <div
@@ -257,7 +249,7 @@ export class VertexPinLabel {
           .split('\n')
           .reduce(
             (res, str) => [...res, str, <br />],
-            [] as Array<string | HTMLBRElement>
+            [] as Array<string | HTMLBRElement>,
           )
       : [this.value];
   }
@@ -298,9 +290,7 @@ export class VertexPinLabel {
 
   private computeScreenPosition(): void {
     this.computedScreenPosition =
-      isTextPin(this.pin) &&
-      this.elementBounds != null &&
-      this.pin.label.point != null
+      isTextPin(this.pin) && this.elementBounds != null && this.pin.label.point != null
         ? translatePointToScreen(this.pin.label.point, this.elementBounds)
         : undefined;
   }
@@ -315,8 +305,8 @@ export class VertexPinLabel {
           Math.ceil(
             (parseFloat(computedStyles.getPropertyValue('height')) -
               parseFloat(computedStyles.getPropertyValue('borderWidth')) * 2) /
-              parseFloat(computedStyles.getPropertyValue('lineHeight'))
-          )
+              parseFloat(computedStyles.getPropertyValue('lineHeight')),
+          ),
         );
       }
     });
@@ -324,10 +314,7 @@ export class VertexPinLabel {
 
   private handleInputKeyDown = (event: KeyboardEvent): void => {
     event.stopPropagation();
-    if (
-      event.key === 'Enter' &&
-      (event.ctrlKey || event.metaKey || event.shiftKey)
-    ) {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey || event.shiftKey)) {
       this.textareaRows += 1;
       this.value += '\n';
     } else if (event.key === 'Enter') {
@@ -345,7 +332,7 @@ export class VertexPinLabel {
         }
         this.relativePointerDownPosition = translatePointToRelative(
           getMouseClientPosition(event, this.elementBounds),
-          this.elementBounds
+          this.elementBounds,
         );
         this.pinPointerDownPosition = this.pin?.label.point;
 
@@ -368,10 +355,7 @@ export class VertexPinLabel {
       const point = getMouseClientPosition(event, this.elementBounds);
       const relative = translatePointToRelative(point, this.elementBounds);
 
-      const relativeDelta = Point.subtract(
-        relative,
-        this.relativePointerDownPosition
-      );
+      const relativeDelta = Point.subtract(relative, this.relativePointerDownPosition);
 
       const myUpdatedPin =
         this.pin != null
@@ -399,11 +383,11 @@ export class VertexPinLabel {
     ) {
       const pointerDownScreen = translatePointToScreen(
         this.relativePointerDownPosition,
-        this.elementBounds
+        this.elementBounds,
       );
       const distanceBetweenStartAndEndPoint = Point.distance(
         pointerDownScreen,
-        getMouseClientPosition(event, this.elementBounds)
+        getMouseClientPosition(event, this.elementBounds),
       );
 
       if (distanceBetweenStartAndEndPoint <= 2) {

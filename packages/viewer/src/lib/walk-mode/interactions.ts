@@ -36,14 +36,12 @@ export class WalkInteractionHandler implements InteractionHandler {
       [ViewerWalkModeOperation.WALK_RIGHT]: this.walkRight.bind(this),
     };
 
-    this.enabledChangeDisposable = this.model.onEnabledChange(
-      this.handleEnabledChange
-    );
+    this.enabledChangeDisposable = this.model.onEnabledChange(this.handleEnabledChange);
     this.keyBindingsChangeDisposable = this.model.onKeyBindingsChange(
-      this.restartInteraction
+      this.restartInteraction,
     );
     this.configurationChangeDisposable = this.model.onConfigurationChange(
-      this.restartInteraction
+      this.restartInteraction,
     );
   }
 
@@ -79,8 +77,7 @@ export class WalkInteractionHandler implements InteractionHandler {
     const key = event.key.toLowerCase();
 
     const exclude =
-      targetIsElement(event.target) &&
-      this.model.isElementExcluded(event.target);
+      targetIsElement(event.target) && this.model.isElementExcluded(event.target);
 
     if (!event.repeat && !exclude) {
       this.pressed = { ...this.pressed, [key]: true };
@@ -128,7 +125,7 @@ export class WalkInteractionHandler implements InteractionHandler {
     if (this.interval == null) {
       this.interval = setInterval(
         this.updateCamera,
-        this.model.getKeyboardRepeatInterval()
+        this.model.getKeyboardRepeatInterval(),
       );
     }
   }
@@ -157,7 +154,7 @@ export class WalkInteractionHandler implements InteractionHandler {
 
   private someOperationMatches(): boolean {
     return Object.keys(this.handlers).some((op) =>
-      this.model.operationMatches(op as ViewerWalkModeOperation, this.pressed)
+      this.model.operationMatches(op as ViewerWalkModeOperation, this.pressed),
     );
   }
 

@@ -16,8 +16,7 @@ const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
 const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
 const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
-const RotatePointInteractionMock =
-  RotateInteraction as jest.Mock<RotatePointInteraction>;
+const RotatePointInteractionMock = RotateInteraction as jest.Mock<RotatePointInteraction>;
 const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
 describe(MouseInteractionHandler, () => {
   const rotateInteraction = new RotateInteractionMock();
@@ -82,7 +81,7 @@ describe(MouseInteractionHandler, () => {
     rotatePointInteraction,
     zoomInteraction,
     panInteraction,
-    twistInteraction
+    twistInteraction,
   );
 
   beforeEach(() => {
@@ -275,27 +274,21 @@ describe(MouseInteractionHandler, () => {
     });
   });
 
-  async function simulatePrimaryInteractions(
-    interactionDelay?: number
-  ): Promise<void> {
+  async function simulatePrimaryInteractions(interactionDelay?: number): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMovePrimaryButton);
     await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
 
-  async function simulateSecondaryInteractions(
-    interactionDelay?: number
-  ): Promise<void> {
+  async function simulateSecondaryInteractions(interactionDelay?: number): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveSecondaryButton);
     await delay(interactionDelay || 0);
     window.dispatchEvent(mouseUp);
   }
 
-  async function simulateAuxiliaryInteractions(
-    interactionDelay?: number
-  ): Promise<void> {
+  async function simulateAuxiliaryInteractions(interactionDelay?: number): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveAuxiliaryButton);
     await delay(interactionDelay || 0);
@@ -311,7 +304,7 @@ describe(MouseInteractionHandler, () => {
 
   async function simulateCustomMouseEvent(
     mouseEvent: MouseEvent,
-    interactionDelay?: number
+    interactionDelay?: number,
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseEvent);

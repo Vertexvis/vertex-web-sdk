@@ -165,7 +165,7 @@ describe(createCanvasRenderer, () => {
       0,
       0,
       image2.image.width,
-      image2.image.height
+      image2.image.height,
     );
   });
 
@@ -188,7 +188,7 @@ describe(createCanvasRenderer, () => {
 
     expect(firstResult).toBeUndefined();
     expect(secondResult?.correlationIds).toMatchObject(
-      expect.arrayContaining(['corr-id-2', 'corr-id-1'])
+      expect.arrayContaining(['corr-id-2', 'corr-id-1']),
     );
   });
 
@@ -210,7 +210,7 @@ describe(createCanvasRenderer, () => {
 
     expect(firstResult).toBeUndefined();
     expect(secondResult?.correlationIds).toMatchObject(
-      expect.arrayContaining(['corr-id-2', 'corr-id-1'])
+      expect.arrayContaining(['corr-id-2', 'corr-id-1']),
     );
   });
 
@@ -224,8 +224,7 @@ describe(createCanvasRenderer, () => {
 describe(measureCanvasRenderer, () => {
   const reportIntervalInMs = 10;
 
-  const renderer: CanvasRenderer = () =>
-    Promise.resolve(Fixtures.makePerspectiveFrame());
+  const renderer: CanvasRenderer = () => Promise.resolve(Fixtures.makePerspectiveFrame());
   const meter = new TimingMeter('timer');
   const measurement = { startTime: 0, duration: 1000 };
 
@@ -248,15 +247,13 @@ describe(measureCanvasRenderer, () => {
       renderer,
       false,
       callback,
-      reportIntervalInMs
+      reportIntervalInMs,
     );
 
     render(drawFrame1);
     jest.advanceTimersByTime(reportIntervalInMs);
 
-    expect(callback).toHaveBeenCalledWith(
-      expect.arrayContaining([measurement])
-    );
+    expect(callback).toHaveBeenCalledWith(expect.arrayContaining([measurement]));
   });
 
   it('stops reporting timer after last render', async () => {
@@ -268,7 +265,7 @@ describe(measureCanvasRenderer, () => {
       renderer,
       false,
       callback,
-      reportIntervalInMs
+      reportIntervalInMs,
     );
 
     render(drawFrame1);

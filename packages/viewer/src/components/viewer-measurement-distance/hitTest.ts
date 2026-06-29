@@ -1,18 +1,13 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
 
-import {
-  DepthBuffer,
-  FrameCameraBase,
-  StencilBuffer,
-  Viewport,
-} from '../../lib/types';
+import { DepthBuffer, FrameCameraBase, StencilBuffer, Viewport } from '../../lib/types';
 
 export class PointToPointHitTester {
   public constructor(
     private stencil: StencilBuffer | undefined,
     private depthBuffer: DepthBuffer,
     private viewport: Viewport,
-    private camera?: FrameCameraBase
+    private camera?: FrameCameraBase,
   ) {}
 
   public hitTest(pt: Point.Point): boolean {
@@ -37,7 +32,7 @@ export class PointToPointHitTester {
 
   public transformPointToWorld(
     pt: Point.Point,
-    { ignoreHitTest = false }: { ignoreHitTest?: boolean } = {}
+    { ignoreHitTest = false }: { ignoreHitTest?: boolean } = {},
   ): Vector3.Vector3 | undefined {
     const buffer = this.pickDepthBuffer(pt);
 

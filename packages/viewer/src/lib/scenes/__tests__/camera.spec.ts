@@ -2,12 +2,7 @@ const realApi = jest.requireActual('@vertexvis/stream-api');
 jest.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import {
-  Angle,
-  BoundingBox,
-  BoundingSphere,
-  Vector3,
-} from '@vertexvis/geometry';
+import { Angle, BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
@@ -20,7 +15,7 @@ import {
 import { OrthographicCamera, PerspectiveCamera } from '../camera';
 
 function boundingBoxToProto(
-  box: BoundingBox.BoundingBox
+  box: BoundingBox.BoundingBox,
 ): vertexvis.protobuf.core.IBoundingBox3f {
   return {
     xmin: box.min.x,
@@ -52,17 +47,8 @@ describe(PerspectiveCamera, () => {
 
   describe(PerspectiveCamera.prototype.fitToBoundingBox, () => {
     it('calls flyTo', async () => {
-      const updatedBoundingBox = BoundingBox.create(
-        Vector3.down(),
-        Vector3.up()
-      );
-      const camera = new PerspectiveCamera(
-        stream,
-        0.5,
-        data,
-        boundingBox,
-        jest.fn()
-      );
+      const updatedBoundingBox = BoundingBox.create(Vector3.down(), Vector3.up());
+      const camera = new PerspectiveCamera(stream, 0.5, data, boundingBox, jest.fn());
 
       await camera.fitToBoundingBox(updatedBoundingBox).render();
 
@@ -71,54 +57,38 @@ describe(PerspectiveCamera, () => {
           animation: undefined,
           boundingBox: boundingBoxToProto(updatedBoundingBox),
         }),
-        true
+        true,
       );
     });
   });
 
-  describe(
-    PerspectiveCamera.prototype.signedDistanceToBoundingBoxCenter,
-    () => {
-      const forward = FrameCamera.createPerspective({
-        position: { x: 0, y: 0, z: 5 },
+  describe(PerspectiveCamera.prototype.signedDistanceToBoundingBoxCenter, () => {
+    const forward = FrameCamera.createPerspective({
+      position: { x: 0, y: 0, z: 5 },
+    });
+    const camera = new PerspectiveCamera(stream, 0.5, forward, boundingBox, jest.fn());
+
+    it('computes the distance to the center of the provided bounding box', () => {
+      const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
+
+      expect(distance).toBeCloseTo(5);
+
+      const flipped = camera.update({
+        ...camera,
+        lookAt: { x: 0, y: 0, z: 10 },
       });
-      const camera = new PerspectiveCamera(
-        stream,
-        0.5,
-        forward,
-        boundingBox,
-        jest.fn()
-      );
 
-      it('computes the distance to the center of the provided bounding box', () => {
-        const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
+      const flippedDistance = flipped.signedDistanceToBoundingBoxCenter(boundingBox);
 
-        expect(distance).toBeCloseTo(5);
-
-        const flipped = camera.update({
-          ...camera,
-          lookAt: { x: 0, y: 0, z: 10 },
-        });
-
-        const flippedDistance =
-          flipped.signedDistanceToBoundingBoxCenter(boundingBox);
-
-        expect(flippedDistance).toBeCloseTo(-5);
-      });
-    }
-  );
+      expect(flippedDistance).toBeCloseTo(-5);
+    });
+  });
 
   describe(PerspectiveCamera.prototype.update, () => {
     const forward = FrameCamera.createPerspective({
       position: { x: 0, y: 0, z: 5 },
     });
-    const camera = new PerspectiveCamera(
-      stream,
-      0.5,
-      forward,
-      boundingBox,
-      jest.fn()
-    );
+    const camera = new PerspectiveCamera(stream, 0.5, forward, boundingBox, jest.fn());
 
     it('supports setting the fovY', () => {
       const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
@@ -143,7 +113,7 @@ describe(PerspectiveCamera, () => {
         position: Vector3.back(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('returns camera with position rotated around axis', () => {
@@ -166,18 +136,14 @@ describe(PerspectiveCamera, () => {
         position: Vector3.back(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('returns camera with position rotated around axis', () => {
       const degrees = Angle.toRadians(90);
       const axis = Vector3.up();
 
-      const result = camera.rotateAroundAxisAtPoint(
-        degrees,
-        Vector3.origin(),
-        axis
-      );
+      const result = camera.rotateAroundAxisAtPoint(degrees, Vector3.origin(), axis);
       expect(result.position.x).toBeCloseTo(1, 5);
       expect(result.position.y).toBeCloseTo(0, 5);
       expect(result.position.z).toBeCloseTo(0, 5);
@@ -193,7 +159,7 @@ describe(PerspectiveCamera, () => {
         position: Vector3.origin(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('shifts the position and lookat by the given delta', () => {
@@ -215,7 +181,7 @@ describe(PerspectiveCamera, () => {
         position: Vector3.origin(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('positions the camera based on the standard view', () => {
@@ -240,7 +206,7 @@ describe(PerspectiveCamera, () => {
         lookAt: Vector3.create(100, 0, 0),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('positions the camera based on the standard view and maintains the lookAt', () => {
@@ -248,10 +214,7 @@ describe(PerspectiveCamera, () => {
       const result = camera.standardViewFixedLookAt(standardView);
       const expectedPosition = Vector3.add(
         camera.lookAt,
-        Vector3.scale(
-          Vector3.magnitude(camera.viewVector),
-          standardView.position
-        )
+        Vector3.scale(Vector3.magnitude(camera.viewVector), standardView.position),
       );
 
       expect(result).toMatchObject({
@@ -272,7 +235,7 @@ describe(PerspectiveCamera, () => {
         position: Vector3.forward(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('returns the vector between the position and lookat', () => {
@@ -290,7 +253,7 @@ describe(PerspectiveCamera, () => {
         position: Vector3.forward(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('should render using camera', async () => {
@@ -302,7 +265,7 @@ describe(PerspectiveCamera, () => {
               position: Vector3.forward(),
             }),
           }),
-        })
+        }),
       );
     });
   });
@@ -316,7 +279,7 @@ describe(PerspectiveCamera, () => {
         position: Vector3.forward(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('should render using camera with animations', async () => {
@@ -337,7 +300,7 @@ describe(PerspectiveCamera, () => {
             duration: { nanos: 500000000, seconds: 0 },
           },
         }),
-        true
+        true,
       );
     });
 
@@ -360,7 +323,7 @@ describe(PerspectiveCamera, () => {
             duration: { nanos: 500000000, seconds: 0 },
           },
         }),
-        true
+        true,
       );
     });
 
@@ -380,7 +343,7 @@ describe(PerspectiveCamera, () => {
             duration: { nanos: 500000000, seconds: 0 },
           },
         }),
-        true
+        true,
       );
     });
 
@@ -393,14 +356,14 @@ describe(PerspectiveCamera, () => {
             hex: 'item-id',
           },
         }),
-        true
+        true,
       );
     });
 
     it('renders with fly to bounding box param', async () => {
       const boundingBox = BoundingBox.create(
         Vector3.create(-1, -1, -1),
-        Vector3.create(1, 1, 1)
+        Vector3.create(1, 1, 1),
       );
       await camera.flyTo({ boundingBox }).render();
 
@@ -415,7 +378,7 @@ describe(PerspectiveCamera, () => {
             zmax: boundingBox.max.z,
           },
         }),
-        true
+        true,
       );
     });
 
@@ -427,14 +390,14 @@ describe(PerspectiveCamera, () => {
         expect.objectContaining({
           camera: FrameCamera.toProtobuf(data),
         }),
-        true
+        true,
       );
     });
 
     it('should go to the visible bounding box on a viewAll', async () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(1, 1, 1),
-        Vector3.create(2, 2, 2)
+        Vector3.create(2, 2, 2),
       );
       const newCamera = new PerspectiveCamera(
         stream,
@@ -445,7 +408,7 @@ describe(PerspectiveCamera, () => {
           position: Vector3.back(),
         },
         newBoundingBox,
-        jest.fn()
+        jest.fn(),
       );
 
       await newCamera.viewAll().render();
@@ -454,14 +417,14 @@ describe(PerspectiveCamera, () => {
         expect.objectContaining({
           boundingBox: boundingBoxToProto(newBoundingBox),
         }),
-        true
+        true,
       );
     });
 
     it('viewAll should support animations', async () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(1, 1, 1),
-        Vector3.create(2, 2, 2)
+        Vector3.create(2, 2, 2),
       );
       const newCamera = new PerspectiveCamera(
         stream,
@@ -472,7 +435,7 @@ describe(PerspectiveCamera, () => {
           position: Vector3.back(),
         },
         newBoundingBox,
-        jest.fn()
+        jest.fn(),
       );
 
       await newCamera.viewAll().render({
@@ -488,14 +451,14 @@ describe(PerspectiveCamera, () => {
           },
           boundingBox: boundingBoxToProto(newBoundingBox),
         }),
-        true
+        true,
       );
     });
 
     it('should compute near and far clipping planes correctly', () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(-1, -1, -1),
-        Vector3.create(1, 1, 1)
+        Vector3.create(1, 1, 1),
       );
 
       const newCamera = new PerspectiveCamera(
@@ -508,12 +471,12 @@ describe(PerspectiveCamera, () => {
           lookAt: Vector3.origin(),
         },
         newBoundingBox,
-        jest.fn()
+        jest.fn(),
       );
 
       const { near, far } = fromBoundingBoxAndPerspectiveCamera(
         newBoundingBox,
-        newCamera
+        newCamera,
       );
 
       expect(newCamera.far).toBe(far);
@@ -533,7 +496,7 @@ describe(PerspectiveCamera, () => {
           lookAt: Vector3.origin(),
         },
         boundingBox,
-        jest.fn()
+        jest.fn(),
       );
 
       const aligned = newCamera.alignTo(position, normal);
@@ -553,7 +516,7 @@ describe(OrthographicCamera, () => {
   });
   const boundingBox = BoundingBox.create(
     Vector3.create(-1, -1, -1),
-    Vector3.create(1, 1, 1)
+    Vector3.create(1, 1, 1),
   );
 
   beforeAll(() => {
@@ -569,17 +532,8 @@ describe(OrthographicCamera, () => {
 
   describe(OrthographicCamera.prototype.fitToBoundingBox, () => {
     it('calls flyTo', async () => {
-      const updatedBoundingBox = BoundingBox.create(
-        Vector3.down(),
-        Vector3.up()
-      );
-      const camera = new OrthographicCamera(
-        stream,
-        0.5,
-        data,
-        boundingBox,
-        jest.fn()
-      );
+      const updatedBoundingBox = BoundingBox.create(Vector3.down(), Vector3.up());
+      const camera = new OrthographicCamera(stream, 0.5, data, boundingBox, jest.fn());
 
       await camera.fitToBoundingBox(updatedBoundingBox).render();
 
@@ -588,43 +542,33 @@ describe(OrthographicCamera, () => {
           animation: undefined,
           boundingBox: boundingBoxToProto(updatedBoundingBox),
         }),
-        true
+        true,
       );
     });
   });
 
-  describe(
-    OrthographicCamera.prototype.signedDistanceToBoundingBoxCenter,
-    () => {
-      const forward = FrameCamera.createOrthographic({
-        viewVector: { x: 0, y: 0, z: -5 },
+  describe(OrthographicCamera.prototype.signedDistanceToBoundingBoxCenter, () => {
+    const forward = FrameCamera.createOrthographic({
+      viewVector: { x: 0, y: 0, z: -5 },
+    });
+    const camera = new OrthographicCamera(stream, 0.5, forward, boundingBox, jest.fn());
+
+    it('computes the distance to the center of the provided bounding box', () => {
+      const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
+
+      expect(distance).toBeCloseTo(5);
+
+      const flipped = camera.update({
+        ...camera,
+        viewVector: Vector3.negate(camera.viewVector),
+        lookAt: { x: 0, y: 0, z: 10 },
       });
-      const camera = new OrthographicCamera(
-        stream,
-        0.5,
-        forward,
-        boundingBox,
-        jest.fn()
-      );
 
-      it('computes the distance to the center of the provided bounding box', () => {
-        const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
+      const flippedDistance = flipped.signedDistanceToBoundingBoxCenter(boundingBox);
 
-        expect(distance).toBeCloseTo(5);
-
-        const flipped = camera.update({
-          ...camera,
-          viewVector: Vector3.negate(camera.viewVector),
-          lookAt: { x: 0, y: 0, z: 10 },
-        });
-
-        const flippedDistance =
-          flipped.signedDistanceToBoundingBoxCenter(boundingBox);
-
-        expect(flippedDistance).toBeCloseTo(-5);
-      });
-    }
-  );
+      expect(flippedDistance).toBeCloseTo(-5);
+    });
+  });
 
   describe(OrthographicCamera.prototype.rotateAroundAxis, () => {
     const camera = new OrthographicCamera(
@@ -635,7 +579,7 @@ describe(OrthographicCamera, () => {
         viewVector: Vector3.back(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('returns camera with position rotated around axis', () => {
@@ -645,7 +589,7 @@ describe(OrthographicCamera, () => {
       const result = camera.rotateAroundAxis(degrees, axis);
       const expected = Vector3.subtract(
         camera.lookAt,
-        constrainViewVector(Vector3.right(), BoundingSphere.create(boundingBox))
+        constrainViewVector(Vector3.right(), BoundingSphere.create(boundingBox)),
       );
       expect(result.position.x).toBeCloseTo(expected.x, 5);
       expect(result.position.y).toBeCloseTo(expected.y, 5);
@@ -662,21 +606,17 @@ describe(OrthographicCamera, () => {
         viewVector: Vector3.back(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('returns camera with position rotated around axis', () => {
       const degrees = Angle.toRadians(90);
       const axis = Vector3.up();
 
-      const result = camera.rotateAroundAxisAtPoint(
-        degrees,
-        Vector3.origin(),
-        axis
-      );
+      const result = camera.rotateAroundAxisAtPoint(degrees, Vector3.origin(), axis);
       const expected = Vector3.subtract(
         camera.lookAt,
-        constrainViewVector(Vector3.right(), BoundingSphere.create(boundingBox))
+        constrainViewVector(Vector3.right(), BoundingSphere.create(boundingBox)),
       );
       expect(result.position.x).toBeCloseTo(expected.x, 5);
       expect(result.position.y).toBeCloseTo(expected.y, 5);
@@ -693,7 +633,7 @@ describe(OrthographicCamera, () => {
         viewVector: Vector3.origin(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('shifts the position and lookat by the given delta', () => {
@@ -713,7 +653,7 @@ describe(OrthographicCamera, () => {
         viewVector: Vector3.forward(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('returns the position vector described by the lookAt and viewVector', () => {
@@ -735,8 +675,8 @@ describe(OrthographicCamera, () => {
             fovHeight: 90,
           },
           boundingBox,
-          jest.fn()
-        ).toFrameCamera()
+          jest.fn(),
+        ).toFrameCamera(),
       ).toMatchObject(
         expect.objectContaining({
           left: -45,
@@ -746,7 +686,7 @@ describe(OrthographicCamera, () => {
           up: Vector3.up(),
           lookAt: Vector3.origin(),
           fovHeight: 90,
-        })
+        }),
       );
     });
   });
@@ -760,7 +700,7 @@ describe(OrthographicCamera, () => {
         viewVector: Vector3.forward(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('should render using camera', async () => {
@@ -772,7 +712,7 @@ describe(OrthographicCamera, () => {
               viewVector: Vector3.forward(),
             }),
           }),
-        })
+        }),
       );
     });
   });
@@ -786,7 +726,7 @@ describe(OrthographicCamera, () => {
         viewVector: Vector3.forward(),
       },
       boundingBox,
-      jest.fn()
+      jest.fn(),
     );
 
     it('should render using camera with animations', async () => {
@@ -807,7 +747,7 @@ describe(OrthographicCamera, () => {
             duration: { nanos: 500000000, seconds: 0 },
           },
         }),
-        true
+        true,
       );
     });
 
@@ -830,7 +770,7 @@ describe(OrthographicCamera, () => {
             duration: { nanos: 500000000, seconds: 0 },
           },
         }),
-        true
+        true,
       );
     });
 
@@ -850,7 +790,7 @@ describe(OrthographicCamera, () => {
             duration: { nanos: 500000000, seconds: 0 },
           },
         }),
-        true
+        true,
       );
     });
 
@@ -863,14 +803,14 @@ describe(OrthographicCamera, () => {
             hex: 'item-id',
           },
         }),
-        true
+        true,
       );
     });
 
     it('renders with fly to bounding box param', async () => {
       const boundingBox = BoundingBox.create(
         Vector3.create(-1, -1, -1),
-        Vector3.create(1, 1, 1)
+        Vector3.create(1, 1, 1),
       );
       await camera.flyTo({ boundingBox }).render();
 
@@ -885,7 +825,7 @@ describe(OrthographicCamera, () => {
             zmax: boundingBox.max.z,
           },
         }),
-        true
+        true,
       );
     });
 
@@ -897,14 +837,14 @@ describe(OrthographicCamera, () => {
         expect.objectContaining({
           camera: FrameCamera.toProtobuf(data),
         }),
-        true
+        true,
       );
     });
 
     it('should go to the visible bounding box on a viewAll', async () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(1, 1, 1),
-        Vector3.create(2, 2, 2)
+        Vector3.create(2, 2, 2),
       );
       const newCamera = new OrthographicCamera(
         stream,
@@ -915,7 +855,7 @@ describe(OrthographicCamera, () => {
           viewVector: Vector3.forward(),
         },
         newBoundingBox,
-        jest.fn()
+        jest.fn(),
       );
 
       await newCamera.viewAll().render();
@@ -924,14 +864,14 @@ describe(OrthographicCamera, () => {
         expect.objectContaining({
           boundingBox: boundingBoxToProto(newBoundingBox),
         }),
-        true
+        true,
       );
     });
 
     it('viewAll should support animations', async () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(1, 1, 1),
-        Vector3.create(2, 2, 2)
+        Vector3.create(2, 2, 2),
       );
       const newCamera = new OrthographicCamera(
         stream,
@@ -941,7 +881,7 @@ describe(OrthographicCamera, () => {
           viewVector: Vector3.forward(),
         },
         newBoundingBox,
-        jest.fn()
+        jest.fn(),
       );
 
       await newCamera.viewAll().render({
@@ -957,14 +897,14 @@ describe(OrthographicCamera, () => {
           },
           boundingBox: boundingBoxToProto(newBoundingBox),
         }),
-        true
+        true,
       );
     });
 
     it('should compute near and far clipping planes correctly', () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(-1, -1, -1),
-        Vector3.create(1, 1, 1)
+        Vector3.create(1, 1, 1),
       );
 
       const newCamera = new OrthographicCamera(
@@ -977,12 +917,12 @@ describe(OrthographicCamera, () => {
           lookAt: Vector3.origin(),
         },
         newBoundingBox,
-        jest.fn()
+        jest.fn(),
       );
 
       const { near, far } = fromBoundingBoxAndOrthographicCamera(
         newBoundingBox,
-        newCamera
+        newCamera,
       );
 
       expect(newCamera.far).toBe(far);

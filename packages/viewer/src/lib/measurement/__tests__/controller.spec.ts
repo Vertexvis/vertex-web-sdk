@@ -1,6 +1,4 @@
-jest.mock(
-  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
-);
+jest.mock('@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service');
 
 import { Vector3 } from '@vertexvis/geometry';
 import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
@@ -20,26 +18,21 @@ describe('MeasurementController', () => {
   const model = new MeasurementModel();
   const entity1 = new MeasurementEntity(
     Vector3.create(),
-    new ModelEntity().serializeBinary()
+    new ModelEntity().serializeBinary(),
   );
   const entity2 = new MeasurementEntity(
     Vector3.create(),
-    new ModelEntity().serializeBinary()
+    new ModelEntity().serializeBinary(),
   );
   const entity3 = new MeasurementEntity(
     Vector3.create(),
-    new ModelEntity().serializeBinary()
+    new ModelEntity().serializeBinary(),
   );
 
   const client = new SceneViewAPIClient(random.url());
   const jwtProvider = (): string => random.string();
   const deviceId = random.string();
-  const controller = new MeasurementController(
-    model,
-    client,
-    jwtProvider,
-    deviceId
-  );
+  const controller = new MeasurementController(model, client, jwtProvider, deviceId);
 
   beforeEach(() => {
     model.clearOutcome();
@@ -50,7 +43,7 @@ describe('MeasurementController', () => {
   describe(MeasurementController.prototype.addEntity, () => {
     it('returns measurement results if entity unregistered', async () => {
       (client.measure as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult()))
+        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
       await controller.addEntity(entity1);
@@ -63,7 +56,7 @@ describe('MeasurementController', () => {
 
     it('returns cached results', async () => {
       (client.measure as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult()))
+        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
       controller.addEntity(entity1);
@@ -80,7 +73,7 @@ describe('MeasurementController', () => {
   describe(MeasurementController.prototype.clearEntities, () => {
     it('clears entities and results', async () => {
       (client.measure as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult()))
+        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
       controller.addEntity(entity1);
@@ -95,14 +88,14 @@ describe('MeasurementController', () => {
   describe(MeasurementController.prototype.removeEntity, () => {
     it('returns measurement results if entity registered', async () => {
       (client.measure as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult()))
+        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
       await controller.addEntity(entity1);
       await controller.addEntity(entity2);
 
       (client.measure as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(makeMeasureResponse())
+        mockGrpcUnaryResult(makeMeasureResponse()),
       );
 
       const outcome = await controller.removeEntity(entity2);
@@ -113,7 +106,7 @@ describe('MeasurementController', () => {
   describe(MeasurementController.prototype.setEntities, () => {
     it('replaces entities and returns measurement results', async () => {
       (client.measure as jest.Mock).mockImplementation(
-        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult()))
+        mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
       await controller.addEntity(entity1);

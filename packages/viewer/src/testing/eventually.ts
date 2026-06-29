@@ -13,7 +13,7 @@ import { Async } from '@vertexvis/utils';
  */
 export async function eventually(
   assertions: () => void | Promise<void>,
-  { attempts = 50, delay = 20 }: { attempts?: number; delay?: number } = {}
+  { attempts = 50, delay = 20 }: { attempts?: number; delay?: number } = {},
 ): Promise<void> {
   let error: unknown | undefined = undefined;
 

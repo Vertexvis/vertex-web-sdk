@@ -29,14 +29,12 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     public outlineColor: string,
     public fillColor?: string,
     public shapeProps: Partial<ShapeProps> = {},
-    public disabled: boolean = false
+    public disabled: boolean = false,
   ) {
     const pointsAsArray = points.toArray();
 
     this.pointsArray = new Float64Array(pointsAsArray.length * 2 + 4);
-    flattenPointArray(pointsAsArray).forEach(
-      (v, i) => (this.pointsArray[i] = v)
-    );
+    flattenPointArray(pointsAsArray).forEach((v, i) => (this.pointsArray[i] = v));
 
     this.initialFillColor = fillColor;
 
@@ -50,32 +48,23 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     });
   }
 
-  public updateFillColor(
-    color?: Color.Color | string,
-    isInitialColor = false
-  ): void {
+  public updateFillColor(color?: Color.Color | string, isInitialColor = false): void {
     if (color != null) {
-      this.fillColor =
-        typeof color === 'string' ? color : Color.toHexString(color);
-      this.initialFillColor = isInitialColor
-        ? this.fillColor
-        : this.initialFillColor;
+      this.fillColor = typeof color === 'string' ? color : Color.toHexString(color);
+      this.initialFillColor = isInitialColor ? this.fillColor : this.initialFillColor;
     }
   }
 
   public updateOutlineColor(color?: Color.Color | string): void {
     if (color != null) {
-      this.outlineColor =
-        typeof color === 'string' ? color : Color.toHexString(color);
+      this.outlineColor = typeof color === 'string' ? color : Color.toHexString(color);
     }
   }
 
   public updatePoints(points?: T): void {
     if (points != null) {
       this.points = points;
-      flattenPointArray(points.toArray()).forEach(
-        (v, i) => (this.pointsArray[i] = v)
-      );
+      flattenPointArray(points.toArray()).forEach((v, i) => (this.pointsArray[i] = v));
     }
   }
 }

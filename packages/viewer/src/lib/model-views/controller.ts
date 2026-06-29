@@ -10,10 +10,7 @@ import { BoolValue } from 'google-protobuf/google/protobuf/wrappers_pb';
 
 import { createMetadata, JwtProvider, requestUnary } from '../grpc';
 import { toUuid2l } from '../mappers/uuid';
-import {
-  mapItemModelViewOrThrow,
-  mapListItemModelViewsResponseOrThrow,
-} from './mapper';
+import { mapItemModelViewOrThrow, mapListItemModelViewsResponseOrThrow } from './mapper';
 import { ModelViewListResponse } from './types';
 
 export interface ListByItemOptions {
@@ -30,7 +27,7 @@ export class ModelViewController {
     private client: SceneViewAPIClient,
     private stream: StreamApi,
     private jwtProvider: JwtProvider,
-    private deviceIdProvider: () => string | undefined
+    private deviceIdProvider: () => string | undefined,
   ) {}
 
   /**
@@ -43,33 +40,31 @@ export class ModelViewController {
    */
   public async listByItem(
     itemId: UUID.UUID,
-    { hasAnnotations, cursor, size = 50 }: ListByItemOptions = {}
+    { hasAnnotations, cursor, size = 50 }: ListByItemOptions = {},
   ): Promise<ModelViewListResponse> {
-    const res: ListItemModelViewsResponse = await requestUnary(
-      async (handler) => {
-        const deviceId = this.deviceIdProvider();
-        const meta = await createMetadata(this.jwtProvider, deviceId);
-        const req = new ListItemModelViewsRequest();
+    const res: ListItemModelViewsResponse = await requestUnary(async (handler) => {
+      const deviceId = this.deviceIdProvider();
+      const meta = await createMetadata(this.jwtProvider, deviceId);
+      const req = new ListItemModelViewsRequest();
 
-        const itemId2l = toUuid2l(itemId);
-        req.setItemId(itemId2l);
+      const itemId2l = toUuid2l(itemId);
+      req.setItemId(itemId2l);
 
-        if (hasAnnotations != null) {
-          const hasAnnotationsVal = new BoolValue();
-          hasAnnotationsVal.setValue(hasAnnotations);
-          req.setHasAnnotations(hasAnnotationsVal);
-        }
-
-        const page = new Pager();
-        page.setLimit(size);
-        if (cursor != null) {
-          page.setCursor(cursor);
-        }
-        req.setPage(page);
-
-        this.client.listItemModelViews(req, meta, handler);
+      if (hasAnnotations != null) {
+        const hasAnnotationsVal = new BoolValue();
+        hasAnnotationsVal.setValue(hasAnnotations);
+        req.setHasAnnotations(hasAnnotationsVal);
       }
-    );
+
+      const page = new Pager();
+      page.setLimit(size);
+      if (cursor != null) {
+        page.setCursor(cursor);
+      }
+      req.setPage(page);
+
+      this.client.listItemModelViews(req, meta, handler);
+    });
 
     return mapListItemModelViewsResponseOrThrow(res.toObject());
   }
@@ -80,10 +75,7 @@ export class ModelViewController {
    * @param sceneItemId The ID of the scene item this model view is being loaded for.
    * @param modelViewId The ID of the model view to load.
    */
-  public async load(
-    sceneItemId: UUID.UUID,
-    modelViewId: UUID.UUID
-  ): Promise<void> {
+  public async load(sceneItemId: UUID.UUID, modelViewId: UUID.UUID): Promise<void> {
     const itemModelView = mapItemModelViewOrThrow({ modelViewId, sceneItemId });
     this.stream.updateModelView({ itemModelView }, true);
   }

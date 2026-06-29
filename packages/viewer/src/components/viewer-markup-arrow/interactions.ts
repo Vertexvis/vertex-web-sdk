@@ -23,15 +23,12 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
     private readonly markupEl: HTMLVertexViewerMarkupArrowElement,
     private readonly interactionBegin: EventEmitter<void>,
     private readonly interactionEnd: EventEmitter<MarkupInteraction>,
-    scalingOptions?: MarkupInteractionHandlerScalingOptions
+    scalingOptions?: MarkupInteractionHandlerScalingOptions,
   ) {
     super(scalingOptions);
   }
 
-  public editAnchor(
-    anchor: ViewerMarkupArrowEditAnchor,
-    event: PointerEvent
-  ): void {
+  public editAnchor(anchor: ViewerMarkupArrowEditAnchor, event: PointerEvent): void {
     if (this.markupEl.mode === 'edit') {
       this.anchor = anchor;
       this.startInteraction(event);
@@ -61,7 +58,7 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
           this.scalingOptions.originatingViewport,
           this.scalingOptions.centeringBehavior,
           this.scalingOptions.scale,
-          this.scalingOptions.offset
+          this.scalingOptions.offset,
         );
 
       this.interactionBegin.emit();
@@ -77,7 +74,7 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
         this.scalingOptions.originatingViewport,
         this.scalingOptions.centeringBehavior,
         this.scalingOptions.scale,
-        this.scalingOptions.offset
+        this.scalingOptions.offset,
       );
       if (this.anchor === 'start') {
         this.markupEl.start = position;
@@ -86,18 +83,18 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
       } else if (this.markupEl.start != null && this.markupEl.end != null) {
         const center = Point.create(
           (this.markupEl.start.x + this.markupEl.end.x) / 2,
-          (this.markupEl.start.y + this.markupEl.end.y) / 2
+          (this.markupEl.start.y + this.markupEl.end.y) / 2,
         );
         const xDifference = center.x - position.x;
         const yDifference = center.y - position.y;
 
         this.markupEl.start = Point.create(
           this.markupEl.start.x - xDifference,
-          this.markupEl.start.y - yDifference
+          this.markupEl.start.y - yDifference,
         );
         this.markupEl.end = Point.create(
           this.markupEl.end.x - xDifference,
-          this.markupEl.end.y - yDifference
+          this.markupEl.end.y - yDifference,
         );
       }
     }

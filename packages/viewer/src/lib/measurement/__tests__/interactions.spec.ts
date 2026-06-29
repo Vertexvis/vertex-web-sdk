@@ -1,6 +1,4 @@
-jest.mock(
-  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
-);
+jest.mock('@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service');
 jest.mock('@vertexvis/stream-api');
 
 import { Vector3 } from '@vertexvis/geometry';
@@ -28,12 +26,7 @@ describe(MeasurementInteractionHandler, () => {
   const deviceId = random.guid();
   const model = new MeasurementModel();
   const client = new SceneViewAPIClient(random.url());
-  const controller = new MeasurementController(
-    model,
-    client,
-    () => 'token',
-    deviceId
-  );
+  const controller = new MeasurementController(model, client, () => 'token', deviceId);
   const handler = new MeasurementInteractionHandler(controller, [
     EntityType.PRECISE_SURFACE,
     EntityType.IMPRECISE_SURFACE,
@@ -51,7 +44,7 @@ describe(MeasurementInteractionHandler, () => {
     { emit: jest.fn() },
     { emit: jest.fn() },
     { emit: jest.fn() },
-    { emit: jest.fn() }
+    { emit: jest.fn() },
   );
 
   beforeEach(() => {
@@ -177,9 +170,7 @@ describe(MeasurementInteractionHandler, () => {
     jest.spyOn(api, 'hitItems').mockResolvedValue([]);
   }
 
-  function mockMeasurableEntityAtPoint(
-    type = EntityType.PRECISE_SURFACE
-  ): void {
+  function mockMeasurableEntityAtPoint(type = EntityType.PRECISE_SURFACE): void {
     const getEntityTypeAtPoint = jest.spyOn(api, 'getEntityTypeAtPoint');
     getEntityTypeAtPoint.mockResolvedValue(type);
   }
@@ -190,18 +181,18 @@ describe(MeasurementInteractionHandler, () => {
   }
 
   function mockMeasureResponse(
-    result: MeasurementResult = makeMinimumDistanceResult()
+    result: MeasurementResult = makeMinimumDistanceResult(),
   ): void {
     (client.measure as jest.Mock).mockImplementation(
-      mockGrpcUnaryResult(makeMeasureResponse(result))
+      mockGrpcUnaryResult(makeMeasureResponse(result)),
     );
   }
 
   async function tap(
-    assertion?: (outcome: MeasurementOutcome | undefined) => void
+    assertion?: (outcome: MeasurementOutcome | undefined) => void,
   ): Promise<void> {
-    const onOutcomeChanged = new Promise<MeasurementOutcome | undefined>(
-      (resolve) => model.onOutcomeChanged(resolve)
+    const onOutcomeChanged = new Promise<MeasurementOutcome | undefined>((resolve) =>
+      model.onOutcomeChanged(resolve),
     );
 
     element.dispatchEvent(new MouseEvent('pointerdown'));

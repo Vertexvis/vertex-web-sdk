@@ -23,10 +23,10 @@ export function update2d(
   parentWorldMatrix: Matrix4.Matrix4,
   viewport: Viewport,
   camera: FrameCameraBase,
-  depthBuffer: DepthBuffer | undefined
+  depthBuffer: DepthBuffer | undefined,
 ): void {
   const elements = getElementDepths(hostEl, parentWorldMatrix, camera).sort(
-    (a, b) => a.distanceToCamera - b.distanceToCamera
+    (a, b) => a.distanceToCamera - b.distanceToCamera,
   );
 
   for (let i = 0; i < elements.length; i++) {
@@ -35,16 +35,14 @@ export function update2d(
     const depthBufferIsNull = depthBuffer == null;
     const occluded =
       depthBufferIsNull ||
-      (!element.occlusionOff &&
-        depthBuffer?.isOccluded(worldPosition, viewport));
+      (!element.occlusionOff && depthBuffer?.isOccluded(worldPosition, viewport));
     const detached =
       depthBufferIsNull ||
-      (!element.detachedOff &&
-        depthBuffer?.isDetached(worldPosition, viewport));
+      (!element.detachedOff && depthBuffer?.isDetached(worldPosition, viewport));
     const screenPt = getScreenPosition(
       worldPosition,
       camera.projectionViewMatrix,
-      viewport
+      viewport,
     );
 
     updateTransform(element, screenPt);
@@ -60,7 +58,7 @@ export function update2d(
 function getElementDepths(
   element: HTMLElement,
   parentWorldMatrix: Matrix4.Matrix4,
-  camera: FrameCameraBase
+  camera: FrameCameraBase,
 ): ElementData[] {
   const results = [] as ElementData[];
 
@@ -73,10 +71,7 @@ function getElementDepths(
     } else if (isVertexViewerDomElement(child)) {
       const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
       const worldPosition = Vector3.fromMatrixPosition(worldMatrix);
-      const distanceToCamera = Vector3.distanceSquared(
-        camera.position,
-        worldPosition
-      );
+      const distanceToCamera = Vector3.distanceSquared(camera.position, worldPosition);
       results.push({
         element: child,
         worldMatrix,
@@ -93,7 +88,7 @@ function getElementDepths(
 
 function updateTransform(
   element: HTMLVertexViewerDomElementElement,
-  relativePt: Point.Point
+  relativePt: Point.Point,
 ): void {
   element.style.transform = [
     `translate(-50%, -50%)`,
@@ -104,7 +99,7 @@ function updateTransform(
 function updateDepth(
   element: HTMLVertexViewerDomElementElement,
   index: number,
-  elementCount: number
+  elementCount: number,
 ): void {
   element.style.zIndex = `${elementCount - index}`;
 }
@@ -112,7 +107,7 @@ function updateDepth(
 function getScreenPosition(
   pt: Vector3.Vector3,
   projectionViewMatrix: Matrix4.Matrix4,
-  viewport: Viewport
+  viewport: Viewport,
 ): Point.Point {
   const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
   return viewport.transformVectorToViewport(ndcPt);

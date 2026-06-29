@@ -19,7 +19,7 @@ export class FeatureMap implements FrameImageLike {
    */
   public constructor(
     private readonly pixels: Uint8Array,
-    public readonly imageAttr: ImageAttributesLike
+    public readonly imageAttr: ImageAttributesLike,
   ) {}
 
   /**
@@ -31,11 +31,11 @@ export class FeatureMap implements FrameImageLike {
    */
   public static fromPng(
     png: Pick<DecodedPng, 'data' | 'width' | 'height' | 'channels'>,
-    imageAttr: ImageAttributesLike
+    imageAttr: ImageAttributesLike,
   ): FeatureMap {
     if (!(png.data instanceof Uint8Array)) {
       throw new Error(
-        'Cannot create FeatureMap. Expected decoded PNG to be a Uint8Array.'
+        'Cannot create FeatureMap. Expected decoded PNG to be a Uint8Array.',
       );
     } else if (png.channels !== 4) {
       throw new Error('Cannot create FeatureMap. Missing alpha channel.');

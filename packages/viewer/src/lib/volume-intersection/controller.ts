@@ -11,10 +11,10 @@ import { SceneElementQueryExecutor } from '../scenes/queries';
 import { VolumeIntersectionQueryModel } from './model';
 
 export type OperationTransform = (
-  builder: SceneItemOperationsBuilder
+  builder: SceneItemOperationsBuilder,
 ) => TerminalItemOperationBuilder;
 export type AdditionalTransform = (
-  executor: SceneElementQueryExecutor
+  executor: SceneElementQueryExecutor,
 ) => TerminalItemOperationBuilder;
 
 export interface CompleteExecutionDetails {
@@ -34,11 +34,9 @@ export class VolumeIntersectionQueryController {
 
   public constructor(
     private model: VolumeIntersectionQueryModel,
-    private viewer: HTMLVertexViewerElement
+    private viewer: HTMLVertexViewerElement,
   ) {
-    this.additionalTransforms = [
-      (op) => op.items.where((q) => q.all()).deselect(),
-    ];
+    this.additionalTransforms = [(op) => op.items.where((q) => q.all()).deselect()];
     this.operationTransform = (builder) => builder.select();
   }
 
@@ -70,9 +68,7 @@ export class VolumeIntersectionQueryController {
    * Defaults to `[(op) => op.items.where((q) => q.all()).deselect()]`, which will
    * clear any prior selection before the default selection.
    */
-  public setAdditionalTransforms(
-    additionalTransforms: AdditionalTransform[]
-  ): void {
+  public setAdditionalTransforms(additionalTransforms: AdditionalTransform[]): void {
     this.additionalTransforms = additionalTransforms;
   }
 
@@ -80,9 +76,7 @@ export class VolumeIntersectionQueryController {
     return this.executeStarted.on(listener);
   }
 
-  public onExecuteComplete(
-    listener: Listener<CompleteExecutionDetails>
-  ): Disposable {
+  public onExecuteComplete(listener: Listener<CompleteExecutionDetails>): Disposable {
     return this.executeComplete.on(listener);
   }
 
@@ -102,26 +96,23 @@ export class VolumeIntersectionQueryController {
         this.executeStarted.emit();
 
         const additionalTransforms = (
-          op: SceneElementQueryExecutor
+          op: SceneElementQueryExecutor,
         ): Array<SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder> =>
           this.additionalTransforms.map((t) => t(op)).flat();
         const operationTransforms = (
-          op: SceneElementQueryExecutor
+          op: SceneElementQueryExecutor,
         ): Array<SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder> =>
           [
             this.operationTransform(
               op.items.where((q) =>
-                q.withVolumeIntersection(screenBounds, type === 'exclusive')
-              )
+                q.withVolumeIntersection(screenBounds, type === 'exclusive'),
+              ),
             ),
           ].flat();
 
         const scene = await this.viewer.scene();
         await scene
-          .elements((op) => [
-            ...additionalTransforms(op),
-            ...operationTransforms(op),
-          ])
+          .elements((op) => [...additionalTransforms(op), ...operationTransforms(op)])
           .execute({
             skipAwaitCorrelatedFrame: true,
           });
@@ -149,7 +140,7 @@ export class VolumeIntersectionQueryController {
       this.model.cancel();
 
       throw new Error(
-        `Unable to perform volume intersection query as there is already one in-flight.`
+        `Unable to perform volume intersection query as there is already one in-flight.`,
       );
     } else {
       this.model.cancel();

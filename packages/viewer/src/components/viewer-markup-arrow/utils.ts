@@ -2,12 +2,7 @@ import { Angle } from '@vertexvis/geometry';
 
 import * as Point from '../../../../geometry/src/point';
 
-export type LineAnchorStyle =
-  | 'arrow-triangle'
-  | 'arrow-line'
-  | 'dot'
-  | 'hash'
-  | 'none';
+export type LineAnchorStyle = 'arrow-triangle' | 'arrow-line' | 'dot' | 'hash' | 'none';
 
 export interface LineAnchorStylePoints {
   tip: Point.Point;
@@ -40,7 +35,7 @@ export function createArrowheadPoints(
   start: Point.Point,
   end: Point.Point,
   arrowSideLength: number,
-  arrowHeadTheta: number
+  arrowHeadTheta: number,
 ): ArrowheadPoints {
   const arrowOrthogonalVector = Point.orthogonalVector(start, end);
   const normalizedDirection = Point.normalDirectionVector(start, end);
@@ -50,26 +45,26 @@ export function createArrowheadPoints(
     Point.add(
       Point.scaleProportional(
         normalizedDirection,
-        arrowSideLength * Math.cos(arrowHeadTheta)
+        arrowSideLength * Math.cos(arrowHeadTheta),
       ),
       Point.scaleProportional(
         arrowOrthogonalVector,
-        arrowSideLength * Math.sin(arrowHeadTheta)
-      )
-    )
+        arrowSideLength * Math.sin(arrowHeadTheta),
+      ),
+    ),
   );
   const arrowRight = Point.subtract(
     end,
     Point.subtract(
       Point.scaleProportional(
         normalizedDirection,
-        arrowSideLength * Math.cos(arrowHeadTheta)
+        arrowSideLength * Math.cos(arrowHeadTheta),
       ),
       Point.scaleProportional(
         arrowOrthogonalVector,
-        arrowSideLength * Math.sin(arrowHeadTheta)
-      )
-    )
+        arrowSideLength * Math.sin(arrowHeadTheta),
+      ),
+    ),
   );
 
   return {
@@ -82,7 +77,7 @@ export function createLineAnchorStylePoints(
   start: Point.Point,
   end: Point.Point,
   triangleArrowAngle = 65,
-  lineArrowAngle = 85
+  lineArrowAngle = 85,
 ): LineAnchorStylePoints {
   // Adjust the size of the end style to the distance between the start and end points
   const distance = Point.distance(start, end);
@@ -94,16 +89,15 @@ export function createLineAnchorStylePoints(
   const triangleArrowRelativeHeight = arrowHeadHeight / distance;
   const triangleArrowBasePosition = Point.add(
     Point.scaleProportional(end, 1 - triangleArrowRelativeHeight),
-    Point.scaleProportional(start, triangleArrowRelativeHeight)
+    Point.scaleProportional(start, triangleArrowRelativeHeight),
   );
   const triangleArrowTheta = Angle.toRadians(triangleArrowAngle / 2);
-  const triangleArrowSideLength =
-    arrowHeadHeight / Math.cos(triangleArrowTheta);
+  const triangleArrowSideLength = arrowHeadHeight / Math.cos(triangleArrowTheta);
   const triangleArrow = createArrowheadPoints(
     start,
     end,
     triangleArrowSideLength,
-    triangleArrowTheta
+    triangleArrowTheta,
   );
 
   // Line arrow position
@@ -113,7 +107,7 @@ export function createLineAnchorStylePoints(
     start,
     end,
     lineArrowSideLength,
-    lineArrowTheta
+    lineArrowTheta,
   );
 
   // Hash position
@@ -134,17 +128,17 @@ export function createLineAnchorStylePoints(
 
 export function arrowheadPointsToPolygonPoints(
   points: LineAnchorStylePoints,
-  scale = 1
+  scale = 1,
 ): string {
   const scaledRight = scalePointProportional(
     points.tip,
     points.arrowTriangle.rightPoint,
-    scale
+    scale,
   );
   const scaledLeft = scalePointProportional(
     points.tip,
     points.arrowTriangle.leftPoint,
-    scale
+    scale,
   );
   const scaledBase = scalePointProportional(points.tip, points.base, scale);
 
@@ -155,17 +149,17 @@ export function arrowheadPointsToPolygonPoints(
 
 export function arrowheadPointsToPathPoints(
   points: LineAnchorStylePoints,
-  scale = 1
+  scale = 1,
 ): string {
   const scaledRight = scalePointProportional(
     points.tip,
     points.arrowLine.rightPoint,
-    scale
+    scale,
   );
   const scaledLeft = scalePointProportional(
     points.tip,
     points.arrowLine.leftPoint,
-    scale
+    scale,
   );
 
   return `M${scaledRight.x} ${scaledRight.y} L${points.tip.x} ${points.tip.y} L${scaledLeft.x} ${scaledLeft.y} L${points.tip.x} ${points.tip.y} Z`;
@@ -173,18 +167,10 @@ export function arrowheadPointsToPathPoints(
 
 export function arrowheadPointsToHashPoints(
   points: LineAnchorStylePoints,
-  scale = 1
+  scale = 1,
 ): LinePoints {
-  const scaledRight = scalePointProportional(
-    points.tip,
-    points.hash.rightPoint,
-    scale
-  );
-  const scaledLeft = scalePointProportional(
-    points.tip,
-    points.hash.leftPoint,
-    scale
-  );
+  const scaledRight = scalePointProportional(points.tip, points.hash.rightPoint, scale);
+  const scaledLeft = scalePointProportional(points.tip, points.hash.leftPoint, scale);
 
   return {
     x1: scaledRight.x,
@@ -196,7 +182,7 @@ export function arrowheadPointsToHashPoints(
 
 export function arrowheadPointsToCirclePoints(
   points: LineAnchorStylePoints,
-  scale = 1
+  scale = 1,
 ): CirclePoints {
   return {
     cx: points.tip.x,
@@ -206,15 +192,13 @@ export function arrowheadPointsToCirclePoints(
 }
 
 export function isVertexViewerArrowMarkup(
-  el: unknown
+  el: unknown,
 ): el is HTMLVertexViewerMarkupArrowElement {
-  return (
-    el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MARKUP-ARROW'
-  );
+  return el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MARKUP-ARROW';
 }
 
 export function parsePoint(
-  value: string | Point.Point | undefined
+  value: string | Point.Point | undefined,
 ): Point.Point | undefined {
   return typeof value === 'string' ? Point.fromJson(value) : value;
 }
@@ -222,10 +206,10 @@ export function parsePoint(
 export function scalePointProportional(
   basePoint: Point.Point,
   scaledPoint: Point.Point,
-  scale: number
+  scale: number,
 ): Point.Point {
   return Point.add(
     basePoint,
-    Point.scaleProportional(Point.subtract(scaledPoint, basePoint), scale)
+    Point.scaleProportional(Point.subtract(scaledPoint, basePoint), scale),
   );
 }
