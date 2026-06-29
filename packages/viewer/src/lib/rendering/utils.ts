@@ -13,7 +13,9 @@ export function ifRequestId(
 }
 
 export function ifDrawFrame(
-  f: (frame: vertexvis.protobuf.stream.IDrawFramePayload) => RequestMessageHandler,
+  f: (
+    frame: vertexvis.protobuf.stream.IDrawFramePayload,
+  ) => RequestMessageHandler,
 ): RequestMessageHandler {
   return (req) => {
     const { drawFrame } = req.request;

@@ -34,11 +34,13 @@ import {
   SceneViewItemOverride,
 } from './types';
 
-const mapPropertyKey: M.Func<PropertyKey.AsObject, DomainPropertyKey | null | undefined> =
-  M.defineMapper(
-    M.read(M.requiredProp('name'), M.requiredProp('category')),
-    ([name, category]) => ({ name, category }),
-  );
+const mapPropertyKey: M.Func<
+  PropertyKey.AsObject,
+  DomainPropertyKey | null | undefined
+> = M.defineMapper(
+  M.read(M.requiredProp('name'), M.requiredProp('category')),
+  ([name, category]) => ({ name, category }),
+);
 
 const mapGetStringValue: M.Func<StringValue.AsObject, DomainPropertyValue> =
   M.defineMapper(M.read(M.getProp('value')), ([value]) => ({
@@ -62,22 +64,26 @@ const mapLongValue: M.Func<
   DomainPropertyValue | null | undefined
 > = M.mapProp('pb_long', M.ifDefined(mapGetLongValue));
 
-const mapGetDoubleValue: M.Func<PropertyValueDouble.AsObject, DomainPropertyValue> =
-  M.defineMapper(M.read(M.getProp('value')), ([value]) => ({
-    type: 'double',
-    value,
-  }));
+const mapGetDoubleValue: M.Func<
+  PropertyValueDouble.AsObject,
+  DomainPropertyValue
+> = M.defineMapper(M.read(M.getProp('value')), ([value]) => ({
+  type: 'double',
+  value,
+}));
 
 const mapDoubleValue: M.Func<
   PropertyValue.AsObject,
   DomainPropertyValue | null | undefined
 > = M.mapProp('pb_double', M.ifDefined(mapGetDoubleValue));
 
-const mapGetTimestampValue: M.Func<PropertyValueDate.AsObject, DomainPropertyValue> =
-  M.defineMapper(M.read(M.requiredProp('value')), ([value]) => ({
-    type: 'timestamp',
-    value: value,
-  }));
+const mapGetTimestampValue: M.Func<
+  PropertyValueDate.AsObject,
+  DomainPropertyValue
+> = M.defineMapper(M.read(M.requiredProp('value')), ([value]) => ({
+  type: 'timestamp',
+  value: value,
+}));
 
 const mapTimestampValue: M.Func<
   PropertyValue.AsObject,

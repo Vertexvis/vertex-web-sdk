@@ -2,7 +2,12 @@ const realApi = jest.requireActual('@vertexvis/stream-api');
 jest.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Angle, BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  BoundingBox,
+  BoundingSphere,
+  Vector3,
+} from '@vertexvis/geometry';
 import { StreamApi, toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 
@@ -47,8 +52,17 @@ describe(PerspectiveCamera, () => {
 
   describe(PerspectiveCamera.prototype.fitToBoundingBox, () => {
     it('calls flyTo', async () => {
-      const updatedBoundingBox = BoundingBox.create(Vector3.down(), Vector3.up());
-      const camera = new PerspectiveCamera(stream, 0.5, data, boundingBox, jest.fn());
+      const updatedBoundingBox = BoundingBox.create(
+        Vector3.down(),
+        Vector3.up(),
+      );
+      const camera = new PerspectiveCamera(
+        stream,
+        0.5,
+        data,
+        boundingBox,
+        jest.fn(),
+      );
 
       await camera.fitToBoundingBox(updatedBoundingBox).render();
 
@@ -62,33 +76,49 @@ describe(PerspectiveCamera, () => {
     });
   });
 
-  describe(PerspectiveCamera.prototype.signedDistanceToBoundingBoxCenter, () => {
-    const forward = FrameCamera.createPerspective({
-      position: { x: 0, y: 0, z: 5 },
-    });
-    const camera = new PerspectiveCamera(stream, 0.5, forward, boundingBox, jest.fn());
-
-    it('computes the distance to the center of the provided bounding box', () => {
-      const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
-
-      expect(distance).toBeCloseTo(5);
-
-      const flipped = camera.update({
-        ...camera,
-        lookAt: { x: 0, y: 0, z: 10 },
+  describe(
+    PerspectiveCamera.prototype.signedDistanceToBoundingBoxCenter,
+    () => {
+      const forward = FrameCamera.createPerspective({
+        position: { x: 0, y: 0, z: 5 },
       });
+      const camera = new PerspectiveCamera(
+        stream,
+        0.5,
+        forward,
+        boundingBox,
+        jest.fn(),
+      );
 
-      const flippedDistance = flipped.signedDistanceToBoundingBoxCenter(boundingBox);
+      it('computes the distance to the center of the provided bounding box', () => {
+        const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
 
-      expect(flippedDistance).toBeCloseTo(-5);
-    });
-  });
+        expect(distance).toBeCloseTo(5);
+
+        const flipped = camera.update({
+          ...camera,
+          lookAt: { x: 0, y: 0, z: 10 },
+        });
+
+        const flippedDistance =
+          flipped.signedDistanceToBoundingBoxCenter(boundingBox);
+
+        expect(flippedDistance).toBeCloseTo(-5);
+      });
+    },
+  );
 
   describe(PerspectiveCamera.prototype.update, () => {
     const forward = FrameCamera.createPerspective({
       position: { x: 0, y: 0, z: 5 },
     });
-    const camera = new PerspectiveCamera(stream, 0.5, forward, boundingBox, jest.fn());
+    const camera = new PerspectiveCamera(
+      stream,
+      0.5,
+      forward,
+      boundingBox,
+      jest.fn(),
+    );
 
     it('supports setting the fovY', () => {
       const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
@@ -143,7 +173,11 @@ describe(PerspectiveCamera, () => {
       const degrees = Angle.toRadians(90);
       const axis = Vector3.up();
 
-      const result = camera.rotateAroundAxisAtPoint(degrees, Vector3.origin(), axis);
+      const result = camera.rotateAroundAxisAtPoint(
+        degrees,
+        Vector3.origin(),
+        axis,
+      );
       expect(result.position.x).toBeCloseTo(1, 5);
       expect(result.position.y).toBeCloseTo(0, 5);
       expect(result.position.z).toBeCloseTo(0, 5);
@@ -214,7 +248,10 @@ describe(PerspectiveCamera, () => {
       const result = camera.standardViewFixedLookAt(standardView);
       const expectedPosition = Vector3.add(
         camera.lookAt,
-        Vector3.scale(Vector3.magnitude(camera.viewVector), standardView.position),
+        Vector3.scale(
+          Vector3.magnitude(camera.viewVector),
+          standardView.position,
+        ),
       );
 
       expect(result).toMatchObject({
@@ -532,8 +569,17 @@ describe(OrthographicCamera, () => {
 
   describe(OrthographicCamera.prototype.fitToBoundingBox, () => {
     it('calls flyTo', async () => {
-      const updatedBoundingBox = BoundingBox.create(Vector3.down(), Vector3.up());
-      const camera = new OrthographicCamera(stream, 0.5, data, boundingBox, jest.fn());
+      const updatedBoundingBox = BoundingBox.create(
+        Vector3.down(),
+        Vector3.up(),
+      );
+      const camera = new OrthographicCamera(
+        stream,
+        0.5,
+        data,
+        boundingBox,
+        jest.fn(),
+      );
 
       await camera.fitToBoundingBox(updatedBoundingBox).render();
 
@@ -547,28 +593,38 @@ describe(OrthographicCamera, () => {
     });
   });
 
-  describe(OrthographicCamera.prototype.signedDistanceToBoundingBoxCenter, () => {
-    const forward = FrameCamera.createOrthographic({
-      viewVector: { x: 0, y: 0, z: -5 },
-    });
-    const camera = new OrthographicCamera(stream, 0.5, forward, boundingBox, jest.fn());
-
-    it('computes the distance to the center of the provided bounding box', () => {
-      const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
-
-      expect(distance).toBeCloseTo(5);
-
-      const flipped = camera.update({
-        ...camera,
-        viewVector: Vector3.negate(camera.viewVector),
-        lookAt: { x: 0, y: 0, z: 10 },
+  describe(
+    OrthographicCamera.prototype.signedDistanceToBoundingBoxCenter,
+    () => {
+      const forward = FrameCamera.createOrthographic({
+        viewVector: { x: 0, y: 0, z: -5 },
       });
+      const camera = new OrthographicCamera(
+        stream,
+        0.5,
+        forward,
+        boundingBox,
+        jest.fn(),
+      );
 
-      const flippedDistance = flipped.signedDistanceToBoundingBoxCenter(boundingBox);
+      it('computes the distance to the center of the provided bounding box', () => {
+        const distance = camera.signedDistanceToBoundingBoxCenter(boundingBox);
 
-      expect(flippedDistance).toBeCloseTo(-5);
-    });
-  });
+        expect(distance).toBeCloseTo(5);
+
+        const flipped = camera.update({
+          ...camera,
+          viewVector: Vector3.negate(camera.viewVector),
+          lookAt: { x: 0, y: 0, z: 10 },
+        });
+
+        const flippedDistance =
+          flipped.signedDistanceToBoundingBoxCenter(boundingBox);
+
+        expect(flippedDistance).toBeCloseTo(-5);
+      });
+    },
+  );
 
   describe(OrthographicCamera.prototype.rotateAroundAxis, () => {
     const camera = new OrthographicCamera(
@@ -589,7 +645,10 @@ describe(OrthographicCamera, () => {
       const result = camera.rotateAroundAxis(degrees, axis);
       const expected = Vector3.subtract(
         camera.lookAt,
-        constrainViewVector(Vector3.right(), BoundingSphere.create(boundingBox)),
+        constrainViewVector(
+          Vector3.right(),
+          BoundingSphere.create(boundingBox),
+        ),
       );
       expect(result.position.x).toBeCloseTo(expected.x, 5);
       expect(result.position.y).toBeCloseTo(expected.y, 5);
@@ -613,10 +672,17 @@ describe(OrthographicCamera, () => {
       const degrees = Angle.toRadians(90);
       const axis = Vector3.up();
 
-      const result = camera.rotateAroundAxisAtPoint(degrees, Vector3.origin(), axis);
+      const result = camera.rotateAroundAxisAtPoint(
+        degrees,
+        Vector3.origin(),
+        axis,
+      );
       const expected = Vector3.subtract(
         camera.lookAt,
-        constrainViewVector(Vector3.right(), BoundingSphere.create(boundingBox)),
+        constrainViewVector(
+          Vector3.right(),
+          BoundingSphere.create(boundingBox),
+        ),
       );
       expect(result.position.x).toBeCloseTo(expected.x, 5);
       expect(result.position.y).toBeCloseTo(expected.y, 5);

@@ -56,7 +56,9 @@ export async function loadViewerStreamKey(
     .spyOn(stream, 'syncTime')
     .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
 
-  const connecting = stream.stateChanged.onceWhen((s) => s.type === 'connecting');
+  const connecting = stream.stateChanged.onceWhen(
+    (s) => s.type === 'connecting',
+  );
   const loaded = viewer.load(urn);
 
   // Emit frame drawn on next event loop
@@ -88,7 +90,9 @@ export async function gracefulReconnect<T = void>(
     .spyOn(stream, 'syncTime')
     .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
 
-  const connecting = stream.stateChanged.onceWhen((s) => s.type === 'reconnecting');
+  const connecting = stream.stateChanged.onceWhen(
+    (s) => s.type === 'reconnecting',
+  );
 
   ws.receiveMessage(encode(StreamFixtures.Requests.gracefulReconnect()));
   const result = await beforeReconnect?.();

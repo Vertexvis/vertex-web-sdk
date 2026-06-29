@@ -32,7 +32,11 @@ export class PinsInteractionHandler implements InteractionHandler {
     return this.rectObserver.rect;
   }
 
-  public constructor(controller: PinController, xOffset: number, yOffset: number) {
+  public constructor(
+    controller: PinController,
+    xOffset: number,
+    yOffset: number,
+  ) {
     this.controller = controller;
     this.xOffset = xOffset;
     this.yOffset = yOffset;
@@ -69,7 +73,10 @@ export class PinsInteractionHandler implements InteractionHandler {
     });
   }
 
-  public async handlePlacePin(pt: Point.Point, existingPin?: Pin): Promise<void> {
+  public async handlePlacePin(
+    pt: Point.Point,
+    existingPin?: Pin,
+  ): Promise<void> {
     this.ifInitialized(async ({ api }) => {
       const [hit] = await api.hitItems(pt);
 
@@ -181,7 +188,9 @@ export class PinsInteractionHandler implements InteractionHandler {
     }
   };
 
-  private handlePointerDown = async (pointerDown: PointerEvent): Promise<Disposable> => {
+  private handlePointerDown = async (
+    pointerDown: PointerEvent,
+  ): Promise<Disposable> => {
     const pointerUp = (pointerUp: PointerEvent): void => {
       const distanceBetweenStartAndEndPoint = Point.distance(
         Point.create(pointerDown.clientX, pointerUp.clientY),

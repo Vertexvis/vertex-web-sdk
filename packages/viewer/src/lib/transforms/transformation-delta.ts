@@ -8,7 +8,9 @@ export const ALMOST_ONE = 0.9999;
  * @param normal
  * @returns
  */
-export function calculateOrthogonalCoordinate(norm: Vector3.Vector3): Vector3.Vector3 {
+export function calculateOrthogonalCoordinate(
+  norm: Vector3.Vector3,
+): Vector3.Vector3 {
   const orthogonalCandidate0 = Vector3.create(0, norm.z, -norm.y);
   const orthogonalCandidate1 = Vector3.create(-norm.z, 0, norm.x);
 
@@ -51,7 +53,9 @@ export function computeRotationMatrix(
   else {
     const angle = Vector3.angleTo(normal2, normal1);
     const axisDirection = Vector3.normalize(Vector3.cross(normal1, normal2));
-    return Matrix4.makeRotation(Quaternion.fromAxisAngle(axisDirection, angle + Math.PI));
+    return Matrix4.makeRotation(
+      Quaternion.fromAxisAngle(axisDirection, angle + Math.PI),
+    );
   }
 }
 

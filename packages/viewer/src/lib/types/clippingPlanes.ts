@@ -39,7 +39,9 @@ export function fromBoundingBoxAndPerspectiveCamera(
   const bRadius = Math.max(boundingSphere.radius, minRange);
 
   let newFar =
-    bRadius + signedDistToEye < minRange ? bRadius * 3.0 : bRadius + signedDistToEye;
+    bRadius + signedDistToEye < minRange
+      ? bRadius * 3.0
+      : bRadius + signedDistToEye;
 
   let newNear =
     newFar - bRadius * 2.0 < minRange

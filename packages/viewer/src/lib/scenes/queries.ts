@@ -1,6 +1,9 @@
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { PmiAnnotationOperationsBuilder, SceneItemOperationsBuilder } from './scene';
+import {
+  PmiAnnotationOperationsBuilder,
+  SceneItemOperationsBuilder,
+} from './scene';
 
 interface AllQueryExpression {
   type: 'all';
@@ -218,7 +221,10 @@ export class RootQuery implements ItemQuery<SingleSceneItemQuery> {
    * ```
    */
   public withItemId(id: string): SingleSceneItemQuery {
-    return new SingleSceneItemQuery({ type: 'item-id', value: id }, this.inverted);
+    return new SingleSceneItemQuery(
+      { type: 'item-id', value: id },
+      this.inverted,
+    );
   }
 
   /**
@@ -236,7 +242,10 @@ export class RootQuery implements ItemQuery<SingleSceneItemQuery> {
    * ```
    */
   public withSuppliedId(id: string): SingleSceneItemQuery {
-    return new SingleSceneItemQuery({ type: 'supplied-id', value: id }, this.inverted);
+    return new SingleSceneItemQuery(
+      { type: 'supplied-id', value: id },
+      this.inverted,
+    );
   }
 
   /**
@@ -291,7 +300,13 @@ export class RootQuery implements ItemQuery<SingleSceneItemQuery> {
     exactMatch: boolean,
     removeHiddenItems?: boolean,
   ): MetadataQuery {
-    return new MetadataQuery(filter, keys, exactMatch, this.inverted, removeHiddenItems);
+    return new MetadataQuery(
+      filter,
+      keys,
+      exactMatch,
+      this.inverted,
+      removeHiddenItems,
+    );
   }
 
   /**
@@ -466,7 +481,10 @@ export class PmiAnnotationRootQuery implements AnnotationQuery<SingleAnnotationQ
    * ```
    */
   public withAnnotationId(id: string): SingleAnnotationQuery {
-    return new SingleAnnotationQuery({ type: 'annotation-id', value: id }, this.inverted);
+    return new SingleAnnotationQuery(
+      { type: 'annotation-id', value: id },
+      this.inverted,
+    );
   }
 }
 
@@ -693,7 +711,10 @@ export class AndSceneItemQuery
   }
 }
 
-class SingleAnnotationQuery extends TerminalQuery implements BooleanAnnotationQuery {
+class SingleAnnotationQuery
+  extends TerminalQuery
+  implements BooleanAnnotationQuery
+{
   public constructor(
     private query: QueryExpression,
     inverted: boolean,
@@ -782,13 +803,17 @@ export class PmiAnnotationsQueryExecutor {
   public where(
     query: (q: PmiAnnotationRootQuery) => TerminalQuery,
   ): PmiAnnotationOperationsBuilder {
-    const expression: QueryExpression = query(new PmiAnnotationRootQuery()).build();
+    const expression: QueryExpression = query(
+      new PmiAnnotationRootQuery(),
+    ).build();
     return new PmiAnnotationOperationsBuilder(expression);
   }
 }
 
 export class SceneItemQueryExecutor {
-  public where(query: (q: RootQuery) => TerminalQuery): SceneItemOperationsBuilder {
+  public where(
+    query: (q: RootQuery) => TerminalQuery,
+  ): SceneItemOperationsBuilder {
     const expression: QueryExpression = query(new RootQuery()).build();
 
     return new SceneItemOperationsBuilder(expression);

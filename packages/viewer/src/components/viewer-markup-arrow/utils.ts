@@ -2,7 +2,12 @@ import { Angle } from '@vertexvis/geometry';
 
 import * as Point from '../../../../geometry/src/point';
 
-export type LineAnchorStyle = 'arrow-triangle' | 'arrow-line' | 'dot' | 'hash' | 'none';
+export type LineAnchorStyle =
+  | 'arrow-triangle'
+  | 'arrow-line'
+  | 'dot'
+  | 'hash'
+  | 'none';
 
 export interface LineAnchorStylePoints {
   tip: Point.Point;
@@ -92,7 +97,8 @@ export function createLineAnchorStylePoints(
     Point.scaleProportional(start, triangleArrowRelativeHeight),
   );
   const triangleArrowTheta = Angle.toRadians(triangleArrowAngle / 2);
-  const triangleArrowSideLength = arrowHeadHeight / Math.cos(triangleArrowTheta);
+  const triangleArrowSideLength =
+    arrowHeadHeight / Math.cos(triangleArrowTheta);
   const triangleArrow = createArrowheadPoints(
     start,
     end,
@@ -169,8 +175,16 @@ export function arrowheadPointsToHashPoints(
   points: LineAnchorStylePoints,
   scale = 1,
 ): LinePoints {
-  const scaledRight = scalePointProportional(points.tip, points.hash.rightPoint, scale);
-  const scaledLeft = scalePointProportional(points.tip, points.hash.leftPoint, scale);
+  const scaledRight = scalePointProportional(
+    points.tip,
+    points.hash.rightPoint,
+    scale,
+  );
+  const scaledLeft = scalePointProportional(
+    points.tip,
+    points.hash.leftPoint,
+    scale,
+  );
 
   return {
     x1: scaledRight.x,
@@ -194,7 +208,9 @@ export function arrowheadPointsToCirclePoints(
 export function isVertexViewerArrowMarkup(
   el: unknown,
 ): el is HTMLVertexViewerMarkupArrowElement {
-  return el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MARKUP-ARROW';
+  return (
+    el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MARKUP-ARROW'
+  );
 }
 
 export function parsePoint(

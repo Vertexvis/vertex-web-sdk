@@ -83,7 +83,10 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
     });
   }
 
-  public async zoomCameraToPoint(point: Point.Point, delta: number): Promise<void> {
+  public async zoomCameraToPoint(
+    point: Point.Point,
+    delta: number,
+  ): Promise<void> {
     return this.transformCamera(
       ({ camera, viewport, frame, depthBuffer, boundingBox }) => {
         const cam = frame.scene.camera;
@@ -93,7 +96,10 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
         const ray = viewport.transformPointToRay(point, frame.image, frameCam);
 
         if (this.zoomData == null) {
-          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(dir, cam.lookAt);
+          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+            dir,
+            cam.lookAt,
+          );
           const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
           if (fallbackPt == null) {
             console.warn(
@@ -158,9 +164,18 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
       const localX = Vector3.cross(normalizedUp, normalizedViewVector);
       const localZ = Vector3.cross(localX, normalizedUp);
 
-      const translationX = Vector3.scale(scaledDelta.x, Vector3.normalize(localX));
-      const translationY = Vector3.scale(scaledDelta.y, Vector3.normalize(normalizedUp));
-      const translationZ = Vector3.scale(scaledDelta.z, Vector3.normalize(localZ));
+      const translationX = Vector3.scale(
+        scaledDelta.x,
+        Vector3.normalize(localX),
+      );
+      const translationY = Vector3.scale(
+        scaledDelta.y,
+        Vector3.normalize(normalizedUp),
+      );
+      const translationZ = Vector3.scale(
+        scaledDelta.z,
+        Vector3.normalize(localZ),
+      );
       const translation = Vector3.negate(
         Vector3.add(translationX, translationY, translationZ),
       );
@@ -195,9 +210,15 @@ export class InteractionApiPerspective extends InteractionApi<PerspectiveCamera>
       origin: expectedPosition,
       direction: Vector3.normalize(camera.viewVector),
     });
-    const expectedIntersection = Ray.intersectPlane(expectedViewVector, hitPlane);
+    const expectedIntersection = Ray.intersectPlane(
+      expectedViewVector,
+      hitPlane,
+    );
 
-    if (expectedIntersection == null && config.useMinimumPerspectiveZoomDistance) {
+    if (
+      expectedIntersection == null &&
+      config.useMinimumPerspectiveZoomDistance
+    ) {
       const minDistanceEpsilon = (6 * minDistance * delta) / viewport.height;
       const position = Ray.at(pointRay, minDistanceEpsilon);
 

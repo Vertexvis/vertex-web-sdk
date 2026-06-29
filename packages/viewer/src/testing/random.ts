@@ -8,7 +8,11 @@ export function randomPoint(): Point.Point {
 }
 
 export function randomVector3(): Vector3.Vector3 {
-  return Vector3.create(random.floating(), random.floating(), random.floating());
+  return Vector3.create(
+    random.floating(),
+    random.floating(),
+    random.floating(),
+  );
 }
 
 export function randomNormalVector3(): Vector3.Vector3 {

@@ -3,7 +3,12 @@ import { ModelView as PBModelView } from '@vertexvis/scene-view-protos/core/prot
 import { ListItemModelViewsResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Mapper as M, UUID } from '@vertexvis/utils';
 
-import { fromPbCamera, fromPbUuid2l, mapCursor, toPbJsUuid2l } from '../mappers';
+import {
+  fromPbCamera,
+  fromPbUuid2l,
+  mapCursor,
+  toPbJsUuid2l,
+} from '../mappers';
 import { ModelView, ModelViewListResponse } from './types';
 
 const mapModelView: M.Func<PBModelView.AsObject, ModelView> = M.defineMapper(
@@ -40,7 +45,10 @@ const mapItemModelView: M.Func<
   { modelViewId: UUID.UUID; sceneItemId: UUID.UUID },
   vertexvis.protobuf.core.IItemModelView
 > = M.defineMapper(
-  M.read(M.mapProp('modelViewId', toPbJsUuid2l), M.mapProp('sceneItemId', toPbJsUuid2l)),
+  M.read(
+    M.mapProp('modelViewId', toPbJsUuid2l),
+    M.mapProp('sceneItemId', toPbJsUuid2l),
+  ),
   ([modelViewId, sceneItemId]) => ({ modelViewId, sceneItemId }),
 );
 

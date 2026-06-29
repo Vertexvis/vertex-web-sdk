@@ -211,7 +211,9 @@ export class SceneTreeController {
    * @param listener The listener to add.
    * @returns A disposable that can be used to remove the listener.
    */
-  public stateChanged(listener: Listener<SceneTreeState | undefined>): Disposable {
+  public stateChanged(
+    listener: Listener<SceneTreeState | undefined>,
+  ): Disposable {
     return this.onStateChange.on(listener);
   }
 
@@ -281,7 +283,9 @@ export class SceneTreeController {
     const jwt = jwtProvider();
 
     if (jwt == null) {
-      throw new SceneTreeUnauthorizedError('Cannot connect scene tree. JWT is undefined');
+      throw new SceneTreeUnauthorizedError(
+        'Cannot connect scene tree. JWT is undefined',
+      );
     }
 
     const { view: sceneViewId } = decodeSceneTreeJwt(jwt);
@@ -350,7 +354,10 @@ export class SceneTreeController {
     }
   }
 
-  private restartHandshakeTimer(jwtProvider: JwtProvider, sceneViewId: string): void {
+  private restartHandshakeTimer(
+    jwtProvider: JwtProvider,
+    sceneViewId: string,
+  ): void {
     this.clearHandshakeTimer();
 
     if (!this.state.handshakeReceived) {
@@ -395,7 +402,9 @@ export class SceneTreeController {
   public connectToViewer(viewer: HTMLVertexViewerElement): Disposable {
     const connectWithViewerJwt = async (): Promise<void> => {
       if (viewer.token != null) {
-        this.log('Scene tree controller found viewer JWT. Attempting connection.');
+        this.log(
+          'Scene tree controller found viewer JWT. Attempting connection.',
+        );
 
         try {
           await this.connect(() => viewer.token);
@@ -453,7 +462,9 @@ export class SceneTreeController {
       rows: reset ? [] : this.state.rows,
       filterTerm: reset ? undefined : this.state.filterTerm,
       totalFilteredRows: reset ? undefined : this.state.totalFilteredRows,
-      shouldShowEmptyResults: reset ? undefined : this.state.shouldShowEmptyResults,
+      shouldShowEmptyResults: reset
+        ? undefined
+        : this.state.shouldShowEmptyResults,
       handshakeReceived: reset ? undefined : this.state.handshakeReceived,
       firstFetchComplete: reset ? undefined : this.state.firstFetchComplete,
     });
@@ -562,8 +573,9 @@ export class SceneTreeController {
       const req = new LocateItemRequest();
       req.setNodeId(nodeId);
 
-      const res = await this.requestUnary<LocateItemResponse>(jwt, (metadata, handler) =>
-        this.client.locateItem(req, metadata, handler),
+      const res = await this.requestUnary<LocateItemResponse>(
+        jwt,
+        (metadata, handler) => this.client.locateItem(req, metadata, handler),
       );
       const { requiresReload, locatedIndex } = res.toObject();
 
@@ -591,7 +603,8 @@ export class SceneTreeController {
 
       const res = await this.requestUnary<GetNodeAncestorsResponse>(
         jwt,
-        (metadata, handler) => this.client.getNodeAncestors(req, metadata, handler),
+        (metadata, handler) =>
+          this.client.getNodeAncestors(req, metadata, handler),
       );
 
       return res.toObject().itemsList;
@@ -649,10 +662,16 @@ export class SceneTreeController {
    * @param startOffset A start offset, inclusive.
    * @param endOffset The end offset, inclusive.
    */
-  public async fetchRange(startOffset: number, endOffset: number): Promise<void> {
+  public async fetchRange(
+    startOffset: number,
+    endOffset: number,
+  ): Promise<void> {
     const startPage = Math.floor(startOffset / this.rowLimit);
     const endPage = Math.floor(endOffset / this.rowLimit);
-    const [boundedStart, boundedEnd] = this.constrainPageRange(startPage, endPage);
+    const [boundedStart, boundedEnd] = this.constrainPageRange(
+      startPage,
+      endPage,
+    );
     const pageCount = boundedEnd - boundedStart + 1;
     await Promise.all(
       Array.from({ length: pageCount }).map((_, page) => this.fetchPage(page)),
@@ -675,7 +694,8 @@ export class SceneTreeController {
       const indexingStatus = res.getIndexingStatus();
       this.updateState({
         ...this.state,
-        isPartialKeysResponse: indexingStatus === IndexingStatus.INDEXING_STATUS_INDEXING,
+        isPartialKeysResponse:
+          indexingStatus === IndexingStatus.INDEXING_STATUS_INDEXING,
       });
 
       return res.getKeysList().map((value) => value.getValue());
@@ -697,7 +717,10 @@ export class SceneTreeController {
    * @param term The filter term.
    * @param options The options to apply to the filter.
    */
-  public async filter(term: string, options: FilterTreeOptions = {}): Promise<void> {
+  public async filter(
+    term: string,
+    options: FilterTreeOptions = {},
+  ): Promise<void> {
     return this.ifConnectionHasJwt(async (jwt) => {
       this.updateState({
         ...this.state,
@@ -724,7 +747,11 @@ export class SceneTreeController {
               req.setRemoveHiddenItems(!!options.removeHiddenItems);
               if (options.columns) req.setColumnsKeysList(options.columns);
 
-              this.pendingFilterGrpcRes = this.client.filter(req, metadata, handler);
+              this.pendingFilterGrpcRes = this.client.filter(
+                req,
+                metadata,
+                handler,
+              );
             },
           );
 
@@ -809,11 +836,15 @@ export class SceneTreeController {
     endPage: number,
     threshold = 0,
   ): void {
-    const [boundedStart, boundedEnd] = this.constrainPageRange(startPage, endPage);
+    const [boundedStart, boundedEnd] = this.constrainPageRange(
+      startPage,
+      endPage,
+    );
     const boundedThreshold = Math.max(boundedEnd - boundedStart, threshold);
     if (this.fetchedPageCount > boundedThreshold) {
       const pages = Array.from(this.pages.keys()).map((index) => {
-        const distance = index < boundedStart ? boundedStart - index : index - boundedEnd;
+        const distance =
+          index < boundedStart ? boundedStart - index : index - boundedEnd;
         return { index, distance };
       });
       const sortedDesc = pages.sort((a, b) => b.distance - a.distance);
@@ -914,7 +945,10 @@ export class SceneTreeController {
         } = change?.ranges || {};
 
         if (partiallyVisibleList.length > 0) {
-          this.log('Received partial visibility list change', partiallyVisibleList);
+          this.log(
+            'Received partial visibility list change',
+            partiallyVisibleList,
+          );
 
           partiallyVisibleList.forEach(({ start, end }) =>
             this.patchNodesInRange(start, end, () => ({
@@ -1028,12 +1062,22 @@ export class SceneTreeController {
 
         const totalRows = cursor?.getTotal() ?? 0;
         const offset = page.index * this.rowLimit;
-        const fetchedRows = fromNodeProto(offset, itemsList, currentPage.metadataKeys);
+        const fetchedRows = fromNodeProto(
+          offset,
+          itemsList,
+          currentPage.metadataKeys,
+        );
 
         const start = this.state.rows.slice(0, offset);
-        const end = this.state.rows.slice(start.length + fetchedRows.length, totalRows);
+        const end = this.state.rows.slice(
+          start.length + fetchedRows.length,
+          totalRows,
+        );
         const fill = new Array(
-          Math.max(0, totalRows - start.length - fetchedRows.length - end.length),
+          Math.max(
+            0,
+            totalRows - start.length - fetchedRows.length - end.length,
+          ),
         );
         const rows = [...start, ...fetchedRows, ...end, ...fill];
 
@@ -1053,7 +1097,8 @@ export class SceneTreeController {
             ...this.state,
             totalRows: totalRows,
             rows: rows,
-            shouldShowLoading: rows.length === 0 && this.state.shouldShowLoading,
+            shouldShowLoading:
+              rows.length === 0 && this.state.shouldShowLoading,
             shouldShowEmptyResults:
               this.state.filterTerm != null &&
               (rows.length === 0 || this.state.totalFilteredRows === 0),
@@ -1154,7 +1199,9 @@ export class SceneTreeController {
 
     this.state = {
       ...newState,
-      shouldShowLoading: didClearLoadingTimer ? false : newState.shouldShowLoading,
+      shouldShowLoading: didClearLoadingTimer
+        ? false
+        : newState.shouldShowLoading,
     };
 
     this.onStateChange.emit(this.state);
@@ -1206,7 +1253,11 @@ export class SceneTreeController {
         } else if (res != null) {
           resolve(res);
         } else {
-          reject(new SceneTreeError('Invalid response. Both error and result are null'));
+          reject(
+            new SceneTreeError(
+              'Invalid response. Both error and result are null',
+            ),
+          );
         }
       });
     });
@@ -1253,7 +1304,9 @@ export class SceneTreeController {
     }
   }
 
-  private getConnectionError(e: ServiceError | Error | unknown): SceneTreeErrorDetails {
+  private getConnectionError(
+    e: ServiceError | Error | unknown,
+  ): SceneTreeErrorDetails {
     if (isGrpcServiceError(e)) {
       if (e.code === grpc.Code.FailedPrecondition) {
         return new SceneTreeErrorDetails(
@@ -1261,14 +1314,20 @@ export class SceneTreeController {
           SceneTreeErrorCode.SCENE_TREE_DISABLED,
         );
       } else if (e.code === grpc.Code.Unauthenticated) {
-        return new SceneTreeErrorDetails('UNAUTHORIZED', SceneTreeErrorCode.UNAUTHORIZED);
+        return new SceneTreeErrorDetails(
+          'UNAUTHORIZED',
+          SceneTreeErrorCode.UNAUTHORIZED,
+        );
       } else if (e.code === grpc.Code.Aborted) {
         return new SceneTreeErrorDetails('ABORTED', SceneTreeErrorCode.ABORTED);
       } else {
         return new SceneTreeErrorDetails('UNKNOWN', SceneTreeErrorCode.UNKNOWN);
       }
     } else if (e instanceof SceneTreeUnauthorizedError) {
-      return new SceneTreeErrorDetails('UNAUTHORIZED', SceneTreeErrorCode.UNAUTHORIZED);
+      return new SceneTreeErrorDetails(
+        'UNAUTHORIZED',
+        SceneTreeErrorCode.UNAUTHORIZED,
+      );
     } else {
       return new SceneTreeErrorDetails('UNKNOWN', SceneTreeErrorCode.UNKNOWN);
     }
@@ -1301,7 +1360,9 @@ export class SceneTreeController {
     }
   }
 
-  private isConnectedState(connection: ConnectionState): connection is ConnectedState {
+  private isConnectedState(
+    connection: ConnectionState,
+  ): connection is ConnectedState {
     return connection.type === 'connected';
   }
 }

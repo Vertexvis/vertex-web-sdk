@@ -154,18 +154,26 @@ export class ItemOperationBuilder implements SceneItemOperations<ItemOperationBu
   }
 
   public select(): ItemOperationBuilder {
-    return new ItemOperationBuilder(this.operations.concat([{ type: 'select' }]));
+    return new ItemOperationBuilder(
+      this.operations.concat([{ type: 'select' }]),
+    );
   }
 
   public deselect(): ItemOperationBuilder {
-    return new ItemOperationBuilder(this.operations.concat([{ type: 'deselect' }]));
+    return new ItemOperationBuilder(
+      this.operations.concat([{ type: 'deselect' }]),
+    );
   }
 
   public clearMaterialOverrides(): ItemOperationBuilder {
-    return new ItemOperationBuilder(this.operations.concat([{ type: 'clear-override' }]));
+    return new ItemOperationBuilder(
+      this.operations.concat([{ type: 'clear-override' }]),
+    );
   }
 
-  public transform(matrix: vertexvis.protobuf.core.IMatrix4x4f): ItemOperationBuilder {
+  public transform(
+    matrix: vertexvis.protobuf.core.IMatrix4x4f,
+  ): ItemOperationBuilder {
     return new ItemOperationBuilder(
       this.operations.concat([{ type: 'change-transform', transform: matrix }]),
     );
@@ -184,7 +192,9 @@ export class ItemOperationBuilder implements SceneItemOperations<ItemOperationBu
   }
 
   public clearPhantom(): ItemOperationBuilder {
-    return new ItemOperationBuilder(this.operations.concat([{ type: 'clear-phantom' }]));
+    return new ItemOperationBuilder(
+      this.operations.concat([{ type: 'clear-phantom' }]),
+    );
   }
 
   public setEndItem(endItemState?: boolean): ItemOperationBuilder {
@@ -194,7 +204,9 @@ export class ItemOperationBuilder implements SceneItemOperations<ItemOperationBu
   }
 
   public clearEndItem(): ItemOperationBuilder {
-    return new ItemOperationBuilder(this.operations.concat([{ type: 'clear-end-item' }]));
+    return new ItemOperationBuilder(
+      this.operations.concat([{ type: 'clear-end-item' }]),
+    );
   }
 
   public viewRenditionById(id: UUID.UUID): ItemOperationBuilder {
@@ -205,7 +217,9 @@ export class ItemOperationBuilder implements SceneItemOperations<ItemOperationBu
 
   public viewRenditionBySuppliedId(suppliedId: string): ItemOperationBuilder {
     return new ItemOperationBuilder(
-      this.operations.concat([{ type: 'view-rendition-by-supplied-id', suppliedId }]),
+      this.operations.concat([
+        { type: 'view-rendition-by-supplied-id', suppliedId },
+      ]),
     );
   }
 
@@ -261,11 +275,15 @@ export class PmiAnnotationOperationBuilder implements PmiAnnotationOperations<Pm
   }
 
   public show(): PmiAnnotationOperationBuilder {
-    return new PmiAnnotationOperationBuilder(this.operations.concat([{ type: 'show' }]));
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'show' }]),
+    );
   }
 
   public hide(): PmiAnnotationOperationBuilder {
-    return new PmiAnnotationOperationBuilder(this.operations.concat([{ type: 'hide' }]));
+    return new PmiAnnotationOperationBuilder(
+      this.operations.concat([{ type: 'hide' }]),
+    );
   }
 
   public select(): PmiAnnotationOperationBuilder {

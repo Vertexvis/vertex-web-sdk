@@ -21,7 +21,10 @@ describe(DepthBuffer, () => {
       up: Vector3.up(),
       fovY: 45,
     },
-    BoundingBox.create(Vector3.create(-100, -100, -100), Vector3.create(100, 100, 100)),
+    BoundingBox.create(
+      Vector3.create(-100, -100, -100),
+      Vector3.create(100, 100, 100),
+    ),
     1,
   );
 
@@ -89,7 +92,10 @@ describe(DepthBuffer, () => {
     });
 
     it('returns fallback depth', () => {
-      const depth = depthBuffer.getNormalizedDepthAtPoint(Point.create(-1, -1), 0.5);
+      const depth = depthBuffer.getNormalizedDepthAtPoint(
+        Point.create(-1, -1),
+        0.5,
+      );
       expect(depth).toBe(0.5);
     });
   });
@@ -125,7 +131,10 @@ describe(DepthBuffer, () => {
       );
 
       it('returns correct world position for near plane', () => {
-        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(perspectiveCamera, 0);
+        const { ray, depthBuffer, pt } = createDepthBufferWithDepth(
+          perspectiveCamera,
+          0,
+        );
         const pos = depthBuffer.getWorldPoint(pt, ray);
         expect(pos.z).toBe(4);
       });

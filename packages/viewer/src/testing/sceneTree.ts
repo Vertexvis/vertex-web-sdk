@@ -99,7 +99,9 @@ export function createFilterTreeResponse(
   return res;
 }
 
-export function createSubscribeResponse(change: TreeChangeType): SubscribeResponse {
+export function createSubscribeResponse(
+  change: TreeChangeType,
+): SubscribeResponse {
   const res = new SubscribeResponse();
   res.setChange(change);
 

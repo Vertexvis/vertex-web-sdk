@@ -2,7 +2,8 @@
 import { EventEmitter, readTask, writeTask } from '@stencil/core';
 import { Disposable } from '@vertexvis/utils';
 
-export interface EventEmitterDisposable<E> extends EventEmitter<E>, Disposable {}
+export interface EventEmitterDisposable<E>
+  extends EventEmitter<E>, Disposable {}
 
 export function readDOM(task: () => void): void {
   readTask(task);

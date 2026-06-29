@@ -26,7 +26,9 @@ function buildListSceneItemMetadataResponse(): ListSceneItemMetadataResponse {
             .withCategory(PropertyCategory.PROPERTY_CATEGORY_USER)
             .build(),
         )
-        .withValue(new PropertyValueBuilder().withString(random.string()).build())
+        .withValue(
+          new PropertyValueBuilder().withString(random.string()).build(),
+        )
         .build(),
     ])
     .build();

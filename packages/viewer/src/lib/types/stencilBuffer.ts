@@ -46,8 +46,14 @@ export class StencilBufferManager {
    * @param viewer The viewer for this manager.
    */
   public constructor(private viewer: HTMLVertexViewerElement) {
-    viewer.addEventListener('interactionStarted', this.handleInteractionStarted);
-    viewer.addEventListener('interactionFinished', this.handleInteractionFinished);
+    viewer.addEventListener(
+      'interactionStarted',
+      this.handleInteractionStarted,
+    );
+    viewer.addEventListener(
+      'interactionFinished',
+      this.handleInteractionFinished,
+    );
     viewer.addEventListener('frameReceived', () => {
       this.invalidateStencilBuffer();
     });
@@ -265,7 +271,9 @@ export class StencilBuffer implements FrameImageLike {
       }
     }
 
-    const sorted = pixels.sort((a, b) => Point.distance(a, pt) - Point.distance(b, pt));
+    const sorted = pixels.sort(
+      (a, b) => Point.distance(a, pt) - Point.distance(b, pt),
+    );
     const closest = sorted[0];
     return closest != null
       ? Point.create(Math.floor(closest.x) + 0.5, Math.floor(closest.y) + 0.5)

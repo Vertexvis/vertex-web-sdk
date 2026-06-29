@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { Component, Event, EventEmitter, h, Host, Prop, Watch } from '@stencil/core';
+import {
+  Component,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+  Watch,
+} from '@stencil/core';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
 import { Objects } from '@vertexvis/utils';
 
@@ -197,13 +205,19 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
 
   private syncQuaternionWithRotation(): void {
     this.quaternion =
-      this.rotation != null ? Quaternion.fromEuler(this.rotation) : this.quaternion;
+      this.rotation != null
+        ? Quaternion.fromEuler(this.rotation)
+        : this.quaternion;
   }
 
   private syncQuaternion(): void {
     this.quaternion =
       this.quaternionJson.length > 0
-        ? this.parseJson('quaternionJson', this.quaternionJson, Quaternion.fromJson)
+        ? this.parseJson(
+            'quaternionJson',
+            this.quaternionJson,
+            Quaternion.fromJson,
+          )
         : this.quaternion;
   }
 
@@ -218,7 +232,11 @@ export class ViewerDomGroup implements HTMLDomRendererPositionableElement {
     this.matrix = Matrix4.makeTRS(this.position, this.quaternion, this.scale);
   }
 
-  private parseJson<T>(propName: string, value: string, parse: (str: string) => T): T {
+  private parseJson<T>(
+    propName: string,
+    value: string,
+    parse: (str: string) => T,
+  ): T {
     try {
       return parse(value);
     } catch (e) {

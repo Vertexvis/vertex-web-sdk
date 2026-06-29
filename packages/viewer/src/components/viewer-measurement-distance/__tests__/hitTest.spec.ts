@@ -15,7 +15,11 @@ describe(PointToPointHitTester, () => {
     const viewport = new Viewport(100, 100);
     const depthBuffer = makeDepthBuffer(100, 100, undefined, camera);
     const depth = camera.far - camera.near;
-    const ray = viewport.transformPointToRay(Point.create(10, 10), depthBuffer, camera);
+    const ray = viewport.transformPointToRay(
+      Point.create(10, 10),
+      depthBuffer,
+      camera,
+    );
 
     it('transforms points to world coordinates for orthographic cameras with hit test', () => {
       const hitTester = new PointToPointHitTester(
@@ -25,9 +29,9 @@ describe(PointToPointHitTester, () => {
         camera,
       );
 
-      expect(hitTester.transformPointToWorld(Point.create(10, 10))).toMatchObject(
-        Ray.at(ray, depth),
-      );
+      expect(
+        hitTester.transformPointToWorld(Point.create(10, 10)),
+      ).toMatchObject(Ray.at(ray, depth));
     });
 
     it('transforms points to world coordinates for orthographic cameras with hit test', () => {

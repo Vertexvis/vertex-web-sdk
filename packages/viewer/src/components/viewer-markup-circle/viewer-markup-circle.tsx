@@ -15,9 +15,15 @@ import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
-import { MarkupCenteringBehavior, MarkupInteraction } from '../../lib/types/markup';
+import {
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import { isValidStartEvent, translateRectToScreen } from '../viewer-markup/markup-utils';
+import {
+  isValidStartEvent,
+  translateRectToScreen,
+} from '../viewer-markup/markup-utils';
 import { SvgShadow } from '../viewer-markup/viewer-markup-components';
 import { CircleMarkupInteractionHandler } from './interactions';
 import { parseBounds } from './utils';
@@ -298,7 +304,9 @@ export class ViewerMarkupCircle {
               onTopRightAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('top-right', e)
               }
-              onTopAnchorPointerDown={(e) => this.interactionHandler.editAnchor('top', e)}
+              onTopAnchorPointerDown={(e) =>
+                this.interactionHandler.editAnchor('top', e)
+              }
               onBottomLeftAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('bottom-left', e)
               }
@@ -320,14 +328,20 @@ export class ViewerMarkupCircle {
             />
           )}
           {this.mode === 'create' && (
-            <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
+            <div
+              class="create-overlay"
+              onTouchStart={this.handleTouchStart}
+            ></div>
           )}
         </Host>
       );
     } else {
       return (
         <Host>
-          <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
+          <div
+            class="create-overlay"
+            onTouchStart={this.handleTouchStart}
+          ></div>
         </Host>
       );
     }

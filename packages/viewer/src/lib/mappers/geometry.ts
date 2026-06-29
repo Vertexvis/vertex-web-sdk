@@ -11,10 +11,12 @@ import {
 } from '@vertexvis/geometry';
 import { Mapper as M } from '@vertexvis/utils';
 
-export const fromPbVector2d: M.Func<vertexvis.protobuf.core.IVector2d, Point.Point> =
-  M.defineMapper(M.read(M.requiredProp('x'), M.requiredProp('y')), ([x, y]) =>
-    Point.create(x, y),
-  );
+export const fromPbVector2d: M.Func<
+  vertexvis.protobuf.core.IVector2d,
+  Point.Point
+> = M.defineMapper(M.read(M.requiredProp('x'), M.requiredProp('y')), ([x, y]) =>
+  Point.create(x, y),
+);
 
 export const fromPbDim: M.Func<
   vertexvis.protobuf.stream.IDimensions,
@@ -37,11 +39,13 @@ export const fromPbRect: M.Func<
   ([x, y, width, height]) => Rectangle.create(x, y, width, height),
 );
 
-export const fromPbVector3f: M.Func<vertexvis.protobuf.core.IVector3f, Vector3.Vector3> =
-  M.defineMapper(
-    M.read(M.requiredProp('x'), M.requiredProp('y'), M.requiredProp('z')),
-    ([x, y, z]) => Vector3.create(x, y, z),
-  );
+export const fromPbVector3f: M.Func<
+  vertexvis.protobuf.core.IVector3f,
+  Vector3.Vector3
+> = M.defineMapper(
+  M.read(M.requiredProp('x'), M.requiredProp('y'), M.requiredProp('z')),
+  ([x, y, z]) => Vector3.create(x, y, z),
+);
 
 export const fromPbBoundingBox3f: M.Func<
   vertexvis.protobuf.core.IBoundingBox3f,
@@ -68,16 +72,18 @@ export const fromPbPlane: M.Func<vertexvis.protobuf.core.IPlane, Plane.Plane> =
     ([constant, normal]) => Plane.create({ normal, constant }),
   );
 
-export const fromPbVector4f: M.Func<vertexvis.protobuf.core.IVector4f, Vector4.Vector4> =
-  M.defineMapper(
-    M.read(
-      M.requiredProp('x'),
-      M.requiredProp('y'),
-      M.requiredProp('z'),
-      M.requiredProp('w'),
-    ),
-    ([x, y, z, w]) => Vector4.create({ x, y, z, w }),
-  );
+export const fromPbVector4f: M.Func<
+  vertexvis.protobuf.core.IVector4f,
+  Vector4.Vector4
+> = M.defineMapper(
+  M.read(
+    M.requiredProp('x'),
+    M.requiredProp('y'),
+    M.requiredProp('z'),
+    M.requiredProp('w'),
+  ),
+  ([x, y, z, w]) => Vector4.create({ x, y, z, w }),
+);
 
 export const fromPbMatrix4f: M.Func<
   vertexvis.protobuf.core.IMatrix4x4f,

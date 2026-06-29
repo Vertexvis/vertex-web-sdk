@@ -46,7 +46,9 @@ export class CrossSectioner {
    */
   public async update(
     crossSectioning: CrossSectioning.CrossSectioning,
-  ): Promise<vertexvis.protobuf.stream.IUpdateCrossSectioningResult | undefined> {
+  ): Promise<
+    vertexvis.protobuf.stream.IUpdateCrossSectioningResult | undefined
+  > {
     const res = await this.stream.updateCrossSectioning(
       {
         crossSectioning: {

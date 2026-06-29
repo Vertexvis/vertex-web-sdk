@@ -15,7 +15,12 @@ import {
 import { GetCanvasResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { Mapper as M } from '@vertexvis/utils';
 
-import { fromPbRGBAi, fromPbUuid2l, fromPbVector2d, fromPbVector3f } from '../mappers';
+import {
+  fromPbRGBAi,
+  fromPbUuid2l,
+  fromPbVector2d,
+  fromPbVector3f,
+} from '../mappers';
 import {
   ArrowEndShape,
   CalloutItem,
@@ -30,10 +35,11 @@ import {
   StrokeStyle,
 } from './types';
 
-const mapStrokeStyle: M.Func<PBStrokeStyle.AsObject, StrokeStyle> = M.defineMapper(
-  M.read(M.mapRequiredProp('color', fromPbRGBAi), M.getProp('thickness')),
-  ([color, thickness]) => ({ color, thickness }),
-);
+const mapStrokeStyle: M.Func<PBStrokeStyle.AsObject, StrokeStyle> =
+  M.defineMapper(
+    M.read(M.mapRequiredProp('color', fromPbRGBAi), M.getProp('thickness')),
+    ([color, thickness]) => ({ color, thickness }),
+  );
 
 const mapFillStyle: M.Func<PBFillStyle.AsObject, FillStyle> = M.defineMapper(
   M.read(M.mapRequiredProp('color', fromPbRGBAi)),
@@ -72,7 +78,14 @@ const mapLineItem2d: M.Func<PBLineItem2d.AsObject, LineItem2d> = M.defineMapper(
     M.mapProp('startShape', M.ifDefined(mapEndShape)),
     M.mapProp('endShape', M.ifDefined(mapEndShape)),
   ),
-  ([startPosition, endPosition, strokeStyle, fillStyle, startShape, endShape]) => ({
+  ([
+    startPosition,
+    endPosition,
+    strokeStyle,
+    fillStyle,
+    startShape,
+    endShape,
+  ]) => ({
     type: 'line-2d',
     startPosition,
     endPosition,
@@ -130,25 +143,33 @@ const mapPinItem2d: M.Func<PBPin2d.AsObject, PinItem2d> = M.defineMapper(
   }),
 );
 
-const mapCalloutItem: M.Func<PBCalloutItem.AsObject, CalloutItem> = M.defineMapper(
-  M.read(
-    M.mapRequiredProp('primaryColor', fromPbRGBAi),
-    M.mapRequiredProp('accentColor', fromPbRGBAi),
-    M.mapRequiredProp('anchorPosition', fromPbVector3f),
-    M.mapRequiredProp('textPosition', fromPbVector2d),
-    M.getProp('text'),
-    M.mapProp('sceneItemId', M.ifDefined(fromPbUuid2l)),
-  ),
-  ([primaryColor, accentColor, anchorPosition, textPosition, text, sceneItemId]) => ({
-    type: 'callout',
-    primaryColor,
-    accentColor,
-    anchorPosition,
-    textPosition,
-    text,
-    sceneItemId: sceneItemId ?? undefined,
-  }),
-);
+const mapCalloutItem: M.Func<PBCalloutItem.AsObject, CalloutItem> =
+  M.defineMapper(
+    M.read(
+      M.mapRequiredProp('primaryColor', fromPbRGBAi),
+      M.mapRequiredProp('accentColor', fromPbRGBAi),
+      M.mapRequiredProp('anchorPosition', fromPbVector3f),
+      M.mapRequiredProp('textPosition', fromPbVector2d),
+      M.getProp('text'),
+      M.mapProp('sceneItemId', M.ifDefined(fromPbUuid2l)),
+    ),
+    ([
+      primaryColor,
+      accentColor,
+      anchorPosition,
+      textPosition,
+      text,
+      sceneItemId,
+    ]) => ({
+      type: 'callout',
+      primaryColor,
+      accentColor,
+      anchorPosition,
+      textPosition,
+      text,
+      sceneItemId: sceneItemId ?? undefined,
+    }),
+  );
 
 /**
  * @internal
@@ -183,10 +204,14 @@ const mapGetCanvasResponse: M.Func<GetCanvasResponse.AsObject, CanvasDocument> =
     M.read(
       M.mapRequiredProp(
         'canvas',
-        M.mapRequiredProp('document', M.mapRequiredProp('v1', mapCanvasDocument)),
+        M.mapRequiredProp(
+          'document',
+          M.mapRequiredProp('v1', mapCanvasDocument),
+        ),
       ),
     ),
     ([doc]) => doc,
   );
 
-export const mapGetCanvasResponseOrThrow = M.ifInvalidThrow(mapGetCanvasResponse);
+export const mapGetCanvasResponseOrThrow =
+  M.ifInvalidThrow(mapGetCanvasResponse);

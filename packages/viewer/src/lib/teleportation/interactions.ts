@@ -3,7 +3,11 @@ import { Disposable } from '@vertexvis/utils';
 
 import { getMouseClientPosition } from '../dom';
 import { ElementRectObserver } from '../elementRectObserver';
-import { CameraTransform, InteractionApi, InteractionHandler } from '../interactions';
+import {
+  CameraTransform,
+  InteractionApi,
+  InteractionHandler,
+} from '../interactions';
 import { Camera, CameraRenderOptions } from '../scenes';
 import { ViewerTeleportMode, WalkModeModel } from '../walk-mode/model';
 
@@ -33,7 +37,9 @@ export class TeleportInteractionHandler implements InteractionHandler {
     this.handleEnabledChange = this.handleEnabledChange.bind(this);
     this.handleTeleportModeChange = this.handleTeleportModeChange.bind(this);
 
-    this.enabledChangeDisposable = this.model.onEnabledChange(this.handleEnabledChange);
+    this.enabledChangeDisposable = this.model.onEnabledChange(
+      this.handleEnabledChange,
+    );
   }
 
   public dispose(): void {
@@ -89,7 +95,8 @@ export class TeleportInteractionHandler implements InteractionHandler {
     const threshold = this.api?.pixelThreshold() ?? 2;
     const point = getMouseClientPosition(event, this.rectObserver.rect);
     const isRightClick = this.downButtons === 2;
-    const hasModifier = event.shiftKey || event.altKey || event.metaKey || event.ctrlKey;
+    const hasModifier =
+      event.shiftKey || event.altKey || event.metaKey || event.ctrlKey;
 
     if (
       mode != null &&
@@ -196,8 +203,14 @@ export class TeleportInteractionHandler implements InteractionHandler {
         const shortestBoundingBoxLength = this.shortestLength(boundingBox);
         const heightScalar = this.model.getTeleportHeightPercentage() / 100;
 
-        const cameraPlane = Plane.fromNormalAndCoplanarPoint(camera.up, camera.position);
-        const projectedHitPosition = Plane.projectPoint(cameraPlane, worldPoint);
+        const cameraPlane = Plane.fromNormalAndCoplanarPoint(
+          camera.up,
+          camera.position,
+        );
+        const projectedHitPosition = Plane.projectPoint(
+          cameraPlane,
+          worldPoint,
+        );
 
         const rayToHitPosition = Ray.create({
           origin: camera.position,
@@ -209,7 +222,10 @@ export class TeleportInteractionHandler implements InteractionHandler {
           camera.position,
           projectedHitPosition,
         );
-        const distanceToLookAt = Vector3.distance(camera.position, camera.lookAt);
+        const distanceToLookAt = Vector3.distance(
+          camera.position,
+          camera.lookAt,
+        );
 
         const newPosition = Ray.at(
           rayToHitPosition,
@@ -265,7 +281,9 @@ export class TeleportInteractionHandler implements InteractionHandler {
       const hits = await this.api?.hitItems(point);
       const hit = hits != null ? hits[0] : undefined;
 
-      return hit?.hitPoint != null ? (hit.hitPoint as Vector3.Vector3) : worldPoint;
+      return hit?.hitPoint != null
+        ? (hit.hitPoint as Vector3.Vector3)
+        : worldPoint;
     }
     return worldPoint;
   }

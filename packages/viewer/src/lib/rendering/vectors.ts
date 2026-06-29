@@ -15,7 +15,10 @@ export function updateLookAtRelativeToBoundingBoxCenter(
   viewVector: Vector3.Vector3,
   boundingSphereCenter: Vector3.Vector3,
 ): Vector3.Vector3 {
-  const updatedCenterPoint = Vector3.subtract(boundingSphereCenter, originalLookAt);
+  const updatedCenterPoint = Vector3.subtract(
+    boundingSphereCenter,
+    originalLookAt,
+  );
   const orthogonalOffset = Vector3.dot(viewVector, updatedCenterPoint);
   const viewVectorMagnitudeSquared = Vector3.magnitudeSquared(viewVector);
   const offset = orthogonalOffset / viewVectorMagnitudeSquared;

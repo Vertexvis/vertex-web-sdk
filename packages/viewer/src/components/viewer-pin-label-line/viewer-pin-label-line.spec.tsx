@@ -12,7 +12,9 @@ describe('vertex-ViewerPinLabelLine-pin', () => {
 
     const page = await newSpecPage({
       components: [VertexPinLabelLine],
-      template: () => <vertex-viewer-pin-label-line pinPoint={start} labelPoint={end} />,
+      template: () => (
+        <vertex-viewer-pin-label-line pinPoint={start} labelPoint={end} />
+      ),
     });
 
     const el = page.root as HTMLVertexViewerPinLabelLineElement;

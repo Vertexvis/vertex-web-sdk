@@ -45,7 +45,10 @@ describe(RootQuery, () => {
   });
 
   it('should support nested not queries and remove redundancies', () => {
-    const notWithSelectedQuery = new RootQuery().not().not().withSuppliedId(suppliedId);
+    const notWithSelectedQuery = new RootQuery()
+      .not()
+      .not()
+      .withSuppliedId(suppliedId);
 
     expect(notWithSelectedQuery.build()).toEqual({
       type: 'supplied-id',
@@ -172,9 +175,8 @@ describe(PmiAnnotationRootQuery, () => {
   const annotationId2 = UUID.create().toString();
 
   it('should support single withAnnotationId selections', () => {
-    const annotationQueryBuilder = new PmiAnnotationRootQuery().withAnnotationId(
-      annotationId,
-    );
+    const annotationQueryBuilder =
+      new PmiAnnotationRootQuery().withAnnotationId(annotationId);
 
     expect(annotationQueryBuilder.build()).toEqual({
       type: 'annotation-id',
@@ -273,10 +275,11 @@ describe(PmiAnnotationRootQuery, () => {
   });
 
   it('should support bulk queries', () => {
-    const annotationQueryBuilder = new PmiAnnotationRootQuery().withAnnotationIds([
-      annotationId,
-      annotationId2,
-    ]);
+    const annotationQueryBuilder =
+      new PmiAnnotationRootQuery().withAnnotationIds([
+        annotationId,
+        annotationId2,
+      ]);
 
     expect(annotationQueryBuilder.build()).toEqual({
       type: 'or',

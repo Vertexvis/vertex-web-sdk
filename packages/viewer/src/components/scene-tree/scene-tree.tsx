@@ -17,11 +17,19 @@ import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Disposable } from '@vertexvis/utils';
 
-import { Config, parseAndValidateConfig, PartialConfig } from '../../lib/config';
+import {
+  Config,
+  parseAndValidateConfig,
+  PartialConfig,
+} from '../../lib/config';
 import { Environment } from '../../lib/environment';
 import { isSceneTreeTableCellElement } from '../scene-tree-table-cell/utils';
 import { SceneTreeError } from './errors';
-import { FilterTreeOptions, SceneTreeController, SceneTreeState } from './lib/controller';
+import {
+  FilterTreeOptions,
+  SceneTreeController,
+  SceneTreeState,
+} from './lib/controller';
 import { getSceneTreeContainsElement } from './lib/dom';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from './lib/errors';
 import { webSocketSubscriptionTransportFactory } from './lib/grpc';
@@ -476,9 +484,8 @@ export class SceneTree {
         }
       } else if (options.range && this.lastSelectedItemId != null) {
         const currentRowIndex = await this.controller?.expandParentNodes(id);
-        const previouslySelectedIndex = await this.controller?.expandParentNodes(
-          this.lastSelectedItemId,
-        );
+        const previouslySelectedIndex =
+          await this.controller?.expandParentNodes(this.lastSelectedItemId);
 
         if (previouslySelectedIndex && currentRowIndex) {
           const start = Math.min(previouslySelectedIndex, currentRowIndex);
@@ -490,7 +497,10 @@ export class SceneTree {
         this.lastSelectedItemId = id;
       }
 
-      this.stateMap.selectionPath = [...ancestors.map(({ id }) => id?.hex || ''), id];
+      this.stateMap.selectionPath = [
+        ...ancestors.map(({ id }) => id?.hex || ''),
+        id,
+      ];
     });
   }
 
@@ -605,7 +615,10 @@ export class SceneTree {
    *  the result of this filter when the promise completes.
    */
   @Method()
-  public async filterItems(term: string, options: FilterTreeOptions = {}): Promise<void> {
+  public async filterItems(
+    term: string,
+    options: FilterTreeOptions = {},
+  ): Promise<void> {
     const optionsAsFilterOptions: FilterOptions = {
       ...options,
       metadataSearchKeys: options.columns,
@@ -637,7 +650,9 @@ export class SceneTree {
         metadataSearchKeys.length > 0 ? metadataSearchKeys : this.metadataKeys;
 
       const columnsToSearch =
-        definedMetadataKeys.length > 0 ? definedMetadataKeys : ['VERTEX_SCENE_ITEM_NAME'];
+        definedMetadataKeys.length > 0
+          ? definedMetadataKeys
+          : ['VERTEX_SCENE_ITEM_NAME'];
 
       const shouldSearchExactMatch =
         this.searchOptions?.exactMatch ?? this.metadataSearchExactMatch;
@@ -705,8 +720,8 @@ export class SceneTree {
       this.controller?.setMetadataKeys(this.metadataKeys);
     }
 
-    this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on((state) =>
-      this.handleControllerStateChange(state),
+    this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(
+      (state) => this.handleControllerStateChange(state),
     );
 
     this.connectToViewer();
@@ -843,8 +858,8 @@ export class SceneTree {
 
     this.stateMap.onStateChangeDisposable?.dispose();
 
-    this.stateMap.onStateChangeDisposable = newController.onStateChange.on((state) =>
-      this.handleControllerStateChange(state),
+    this.stateMap.onStateChangeDisposable = newController.onStateChange.on(
+      (state) => this.handleControllerStateChange(state),
     );
 
     newController.setMetadataKeys(this.metadataKeys);
@@ -884,9 +899,12 @@ export class SceneTree {
       };
 
       this.viewer.addEventListener('sceneReady', handleSceneReady);
-      this.stateMap.viewerDisposable = this.controller?.connectToViewer(this.viewer);
+      this.stateMap.viewerDisposable = this.controller?.connectToViewer(
+        this.viewer,
+      );
       this.stateMap.viewerSceneReadyDisposable = {
-        dispose: () => this.viewer?.removeEventListener('sceneReady', handleSceneReady),
+        dispose: () =>
+          this.viewer?.removeEventListener('sceneReady', handleSceneReady),
       };
     } else {
       this.attemptingRetry = false;
@@ -955,13 +973,19 @@ export class SceneTree {
       this.errorDetails = undefined;
     }
 
-    if (state.connection.type === 'connected' || state.connection.type === 'failure') {
+    if (
+      state.connection.type === 'connected' ||
+      state.connection.type === 'failure'
+    ) {
       this.attemptingRetry = false;
     }
   }
 
-  private getNodeFromRowOrIndex(rowOrIndex: number | Row | Node.AsObject): Node.AsObject {
-    const row = typeof rowOrIndex === 'number' ? this.rows[rowOrIndex] : rowOrIndex;
+  private getNodeFromRowOrIndex(
+    rowOrIndex: number | Row | Node.AsObject,
+  ): Node.AsObject {
+    const row =
+      typeof rowOrIndex === 'number' ? this.rows[rowOrIndex] : rowOrIndex;
 
     if (row == null) {
       throw new Error(`Cannot perform scene tree operation. Row not found.`);
@@ -995,7 +1019,8 @@ export class SceneTree {
 
     const shouldSearchExactMatch =
       this.searchOptions?.exactMatch ?? this.metadataSearchExactMatch;
-    const shouldSearchRemoveHiddenItems = this.searchOptions?.removeHiddenItems ?? false;
+    const shouldSearchRemoveHiddenItems =
+      this.searchOptions?.removeHiddenItems ?? false;
 
     try {
       await this.filterItems(event.detail, {
@@ -1066,7 +1091,9 @@ export class SceneTree {
       layout.controller = this.controller;
       layout.rowData = this.rowData;
     } else if (!this.stateMap.componentLoaded && this.totalRows > 0) {
-      console.debug('Scene tree has rows, but the component has not yet rendered');
+      console.debug(
+        'Scene tree has rows, but the component has not yet rendered',
+      );
     }
   }
 
@@ -1079,8 +1106,10 @@ export class SceneTree {
   }
 
   private getMetadataSearchKeys(options: FilterOptions): string[] | undefined {
-    const metadataSearchKeys = options?.metadataSearchKeys ?? this.metadataSearchKeys;
-    const shouldSearchExactMatch = options?.exactMatch ?? this.metadataSearchExactMatch;
+    const metadataSearchKeys =
+      options?.metadataSearchKeys ?? this.metadataSearchKeys;
+    const shouldSearchExactMatch =
+      options?.exactMatch ?? this.metadataSearchExactMatch;
 
     if (shouldSearchExactMatch) {
       // If we're performing an exact match search, we want to include the searched

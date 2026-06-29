@@ -1,4 +1,6 @@
-jest.mock('@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service');
+jest.mock(
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
+);
 
 import { Vector3 } from '@vertexvis/geometry';
 import { ModelEntity } from '@vertexvis/scene-view-protos/core/protos/model_entity_pb';
@@ -32,7 +34,12 @@ describe('MeasurementController', () => {
   const client = new SceneViewAPIClient(random.url());
   const jwtProvider = (): string => random.string();
   const deviceId = random.string();
-  const controller = new MeasurementController(model, client, jwtProvider, deviceId);
+  const controller = new MeasurementController(
+    model,
+    client,
+    jwtProvider,
+    deviceId,
+  );
 
   beforeEach(() => {
     model.clearOutcome();

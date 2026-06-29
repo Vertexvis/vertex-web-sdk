@@ -51,7 +51,10 @@ describe('vertex-viewer-pin-tool', () => {
 
     await page.waitForChanges();
 
-    expect(addEventListener).toHaveBeenCalledWith('frameDrawn', expect.any(Function));
+    expect(addEventListener).toHaveBeenCalledWith(
+      'frameDrawn',
+      expect.any(Function),
+    );
 
     expect(toolEl.shadowRoot).toEqualHtml(`
       <vertex-viewer-dom-renderer drawmode="2d">
@@ -100,10 +103,14 @@ describe('vertex-viewer-pin-tool', () => {
 
     await page.waitForChanges();
 
-    expect(addEventListener).toHaveBeenCalledWith('frameDrawn', expect.any(Function));
+    expect(addEventListener).toHaveBeenCalledWith(
+      'frameDrawn',
+      expect.any(Function),
+    );
 
     expect(
-      toolEl.shadowRoot?.querySelector('vertex-viewer-pin-group')?.projectionViewMatrix,
+      toolEl.shadowRoot?.querySelector('vertex-viewer-pin-group')
+        ?.projectionViewMatrix,
     ).toMatchObject(matrix);
   });
 

@@ -3,7 +3,9 @@ import { Rectangle } from '@vertexvis/geometry';
 export function isVertexViewerCircleMarkup(
   el: unknown,
 ): el is HTMLVertexViewerMarkupCircleElement {
-  return el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MARKUP-CIRCLE';
+  return (
+    el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MARKUP-CIRCLE'
+  );
 }
 
 export function parseBounds(

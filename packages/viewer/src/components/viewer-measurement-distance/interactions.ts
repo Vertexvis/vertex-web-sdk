@@ -106,7 +106,10 @@ export class PointToPointInteractionController {
    * @param hits A provider to perform hits.
    * @returns `true` if the indicator is over geometry.
    */
-  public moveIndicator(pt: Point.Point, hits: PointToPointHitProvider): boolean {
+  public moveIndicator(
+    pt: Point.Point,
+    hits: PointToPointHitProvider,
+  ): boolean {
     const worldPt = hits.hitTester().transformPointToWorld(pt);
     this.model.setIndicator(worldPt);
     return worldPt != null;
@@ -145,7 +148,9 @@ export class PointToPointInteractionModel {
    *
    * @param measurement The new measurement.
    */
-  public setMeasurement(measurement: PointToPointMeasurementResult | undefined): void {
+  public setMeasurement(
+    measurement: PointToPointMeasurementResult | undefined,
+  ): void {
     if (this.measurement !== measurement) {
       this.measurement = measurement;
       this.measurementChanged.emit(measurement);
@@ -211,7 +216,9 @@ export class PointToPointInteractionModel {
    * @param listener The callback to register.
    * @returns A `Disposable` to remove the event listener.
    */
-  public onIndicatorChanged(listener: Listener<Vector3.Vector3 | undefined>): Disposable {
+  public onIndicatorChanged(
+    listener: Listener<Vector3.Vector3 | undefined>,
+  ): Disposable {
     return this.indicatorChanged.on(listener);
   }
 }
@@ -289,12 +296,16 @@ class NewMeasurementInteraction implements PointToPointInteraction {
     if (!this.preventUpdate) {
       this.fetchStartIfMissing(hits);
 
-      const end = hits.hitTester().transformPointToWorld(pt, { ignoreHitTest: true });
+      const end = hits
+        .hitTester()
+        .transformPointToWorld(pt, { ignoreHitTest: true });
       const isHit = hits.hitTester().hitTest(pt);
       const start = this.hitWorld ?? this.world;
 
       if (end == null) {
-        throw new Error('Cannot update new measurement interaction. End point is empty.');
+        throw new Error(
+          'Cannot update new measurement interaction. End point is empty.',
+        );
       } else if (!this.hitWorldValid || !isHit) {
         this.model.setIndicator(end);
         this.setMeasurement(invalidMeasurement(start, end));
@@ -322,7 +333,9 @@ class NewMeasurementInteraction implements PointToPointInteraction {
     this.preventUpdate = false;
 
     if (hitPt == null) {
-      const end = hits.hitTester().transformPointToWorld(pt, { ignoreHitTest: true });
+      const end = hits
+        .hitTester()
+        .transformPointToWorld(pt, { ignoreHitTest: true });
       if (end == null) {
         throw new Error(
           'Cannot complete new measurement interaction. End point is empty.',
@@ -357,11 +370,15 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
   ) {}
 
   public update(pt: Point.Point, context: PointToPointHitProvider): void {
-    const world = context.hitTester().transformPointToWorld(pt, { ignoreHitTest: true });
+    const world = context
+      .hitTester()
+      .transformPointToWorld(pt, { ignoreHitTest: true });
     const isHit = context.hitTester().hitTest(pt);
 
     if (world == null) {
-      throw new Error('Cannot update new measurement interaction. End point is empty.');
+      throw new Error(
+        'Cannot update new measurement interaction. End point is empty.',
+      );
     } else if (!isHit) {
       this.model.setIndicator(world);
       this.setMeasurement(this.getInvalidMeasurement(world));
@@ -381,7 +398,9 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
     this.model.setIndicator(undefined);
 
     if (hitPt == null) {
-      const end = hits.hitTester().transformPointToWorld(pt, { ignoreHitTest: true });
+      const end = hits
+        .hitTester()
+        .transformPointToWorld(pt, { ignoreHitTest: true });
       if (end == null) {
         throw new Error(
           'Cannot complete edit measurement interaction. End point is empty.',
@@ -426,7 +445,9 @@ class EditStartAnchorInteraction
     return invalidMeasurement(startPt, this.measurement.end);
   }
 
-  protected getValidMeasurement(startPt: Vector3.Vector3): PointToPointMeasurementResult {
+  protected getValidMeasurement(
+    startPt: Vector3.Vector3,
+  ): PointToPointMeasurementResult {
     return validMeasurement(startPt, this.measurement.end);
   }
 }
@@ -442,11 +463,15 @@ class EditEndAnchorInteraction
     super(measurement, model);
   }
 
-  protected getInvalidMeasurement(endPt: Vector3.Vector3): PointToPointMeasurementResult {
+  protected getInvalidMeasurement(
+    endPt: Vector3.Vector3,
+  ): PointToPointMeasurementResult {
     return invalidMeasurement(this.measurement.start, endPt);
   }
 
-  protected getValidMeasurement(endPt: Vector3.Vector3): PointToPointMeasurementResult {
+  protected getValidMeasurement(
+    endPt: Vector3.Vector3,
+  ): PointToPointMeasurementResult {
     return validMeasurement(this.measurement.start, endPt);
   }
 }

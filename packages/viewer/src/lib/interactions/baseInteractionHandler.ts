@@ -114,7 +114,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     if (this.draggingInteraction) {
       const point = this.draggingInteraction.getPosition();
-      this.draggingInteraction = this.currentInteraction || this.primaryInteraction;
+      this.draggingInteraction =
+        this.currentInteraction || this.primaryInteraction;
       this.interactionApi?.resetLastAngle();
       this.draggingInteraction.setPosition(point);
     }
@@ -220,7 +221,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
   protected async handleDoubleClick(event: BaseEvent): Promise<void> {
     // event.detail is the number of clicks that have happened recently. If the number is 2, then the user double clicked.
-    if (event.detail === 2 && event.buttons === 4 && this.interactionApi != null) {
+    if (
+      event.detail === 2 &&
+      event.buttons === 4 &&
+      this.interactionApi != null
+    ) {
       await this.interactionApi.viewAll();
     }
   }
@@ -239,7 +244,8 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     }
 
     if (event.buttons === 1) {
-      this.draggingInteraction = this.currentInteraction || this.primaryInteraction;
+      this.draggingInteraction =
+        this.currentInteraction || this.primaryInteraction;
     } else if (event.buttons === 2) {
       this.draggingInteraction = this.panInteraction;
     } else if (event.buttons === 4) {
@@ -272,14 +278,19 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       this.currentInteraction = undefined;
     }
     this.draggingInteraction =
-      this.currentInteraction || this.draggingInteraction || this.primaryInteraction;
+      this.currentInteraction ||
+      this.draggingInteraction ||
+      this.primaryInteraction;
     if (this.draggingInteraction != null && this.interactionApi != null) {
       this.draggingInteraction.drag(event, this.interactionApi);
     }
   }
 
   protected endDrag(event: BaseEvent): void {
-    if (this.keyboardControls && this.currentInteraction === this.twistInteraction) {
+    if (
+      this.keyboardControls &&
+      this.currentInteraction === this.twistInteraction
+    ) {
       this.currentInteraction = undefined;
     }
 
@@ -292,15 +303,24 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected handleMouseWheel(event: WheelEvent): void {
     event.preventDefault();
 
-    if (this.element != null && this.interactionApi != null && event.buttons !== 4) {
-      const delta = -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
+    if (
+      this.element != null &&
+      this.interactionApi != null &&
+      event.buttons !== 4
+    ) {
+      const delta =
+        -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
       const rect = this.element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
       const scrollSize = Math.abs(event.deltaY);
 
       if (scrollSize < 12) {
         // For small wheel movements, send a single zoom event.
-        void this.zoomInteraction.zoomToPoint(point, delta, this.interactionApi);
+        void this.zoomInteraction.zoomToPoint(
+          point,
+          delta,
+          this.interactionApi,
+        );
       } else {
         const divisions = Math.min(10, Math.ceil(scrollSize / 12));
         const zoomDelta = delta / divisions;
@@ -340,8 +360,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
       // deltaMode 1 corresponds to DOM_DELTA_LINE, which computes deltas in lines
       return this.computedBodyStyle.getPropertyValue('lineHeight') != null &&
         this.computedBodyStyle.getPropertyValue('lineHeight') !== '' &&
-        !isNaN(parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight')))
-        ? deltaY * parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight'))
+        !isNaN(
+          parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight')),
+        )
+        ? deltaY *
+            parseFloat(this.computedBodyStyle.getPropertyValue('lineHeight'))
         : deltaY * defaultLineHeight;
     } else if (deltaMode === 2) {
       // deltaMode 2 corresponds to DOM_DELTA_PAGE, which computes deltas in pages

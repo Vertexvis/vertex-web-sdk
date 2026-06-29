@@ -6,7 +6,11 @@ import { h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
 
-import { key1, loadViewerStreamKey, makeViewerStream } from '../../testing/viewer';
+import {
+  key1,
+  loadViewerStreamKey,
+  makeViewerStream,
+} from '../../testing/viewer';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
 import { ViewerBoxQueryTool } from './viewer-box-query-tool';

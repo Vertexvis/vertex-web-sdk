@@ -24,11 +24,19 @@ export type ReportTimingsCallback = (timing: Timing[]) => void;
 function drawImage(image: HtmlImage, data: DrawFrame): void {
   const rect = data.viewport.calculateDrawRect(data.frame.image);
 
-  data.canvas.clearRect(0, 0, data.canvasDimensions.width, data.canvasDimensions.height);
+  data.canvas.clearRect(
+    0,
+    0,
+    data.canvasDimensions.width,
+    data.canvasDimensions.height,
+  );
   data.canvas.drawImage(image.image, rect.x, rect.y, rect.width, rect.height);
 }
 
-function reportTimings(meter: TimingMeter, callback: ReportTimingsCallback): void {
+function reportTimings(
+  meter: TimingMeter,
+  callback: ReportTimingsCallback,
+): void {
   const timings = meter.takeMeasurements();
 
   if (timings.length > 0) {
@@ -82,7 +90,8 @@ export function measureCanvasRenderer(
           fpsHistory.push(fpsFrameCount);
         }
 
-        const avgFps = fpsHistory.reduce((res, num) => res + num) / fpsHistory.length;
+        const avgFps =
+          fpsHistory.reduce((res, num) => res + num) / fpsHistory.length;
         console.debug(`Paint rate: ${fpsFrameCount}fps`);
         console.debug(`Paint rate (avg): ${avgFps}`);
         fpsFrameCount = undefined;
@@ -110,7 +119,9 @@ export function createCanvasRenderer(): CanvasRenderer {
       const frameWithCorrelationIds = frame.copy({
         correlationIds: [
           ...frame.correlationIds,
-          ...accumulatedCorrelationIds.filter((id) => !frame.correlationIds.includes(id)),
+          ...accumulatedCorrelationIds.filter(
+            (id) => !frame.correlationIds.includes(id),
+          ),
         ],
       });
       accumulatedCorrelationIds = [];
@@ -140,7 +151,10 @@ export function createCanvasRenderer(): CanvasRenderer {
   ) => Promise<Frame | undefined> {
     let lastDrawnFrameNumber = -1;
 
-    return async (data: DrawFrame, image?: HtmlImage): Promise<Frame | undefined> => {
+    return async (
+      data: DrawFrame,
+      image?: HtmlImage,
+    ): Promise<Frame | undefined> => {
       if (image != null && data.frame.sequenceNumber > lastDrawnFrameNumber) {
         lastDrawnFrameNumber = data.frame.sequenceNumber;
 
@@ -166,7 +180,9 @@ export function createCanvasRenderer(): CanvasRenderer {
     ];
 
     if (predicatePassing) {
-      return load(data).then((image) => draw(data, image).then(addCorrelationIds));
+      return load(data).then((image) =>
+        draw(data, image).then(addCorrelationIds),
+      );
     }
   };
 }

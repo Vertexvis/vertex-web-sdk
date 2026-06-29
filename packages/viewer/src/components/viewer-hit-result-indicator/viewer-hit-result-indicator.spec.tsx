@@ -14,7 +14,11 @@ import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { Viewport } from '../../lib/types';
 import { makePerspectiveFrame } from '../../testing/fixtures';
-import { key1, loadViewerStreamKey, makeViewerStream } from '../../testing/viewer';
+import {
+  key1,
+  loadViewerStreamKey,
+  makeViewerStream,
+} from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { HitIndicator } from './lib/indicator';
@@ -61,7 +65,9 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
       ),
     });
 
-    const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
+    const viewer = page.body.querySelector(
+      'vertex-viewer',
+    ) as HTMLVertexViewerElement;
     const indicator = page.body.querySelector(
       'vertex-viewer-hit-result-indicator',
     ) as HTMLVertexViewerHitResultIndicatorElement;
@@ -95,7 +101,9 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
       ),
     });
 
-    const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
+    const viewer = page.body.querySelector(
+      'vertex-viewer',
+    ) as HTMLVertexViewerElement;
     const indicator = page.body.querySelector(
       'vertex-viewer-hit-result-indicator',
     ) as HTMLVertexViewerHitResultIndicatorElement;

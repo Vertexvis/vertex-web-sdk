@@ -97,10 +97,11 @@ const toPbFeatureHighlight: M.Func<
   }),
 );
 
-const toPbNoDefaultLights: M.Func<boolean | undefined, boolean> = M.defineMapper(
-  (noDefaultLights) => !!noDefaultLights,
-  (attr) => attr,
-);
+const toPbNoDefaultLights: M.Func<boolean | undefined, boolean> =
+  M.defineMapper(
+    (noDefaultLights) => !!noDefaultLights,
+    (attr) => attr,
+  );
 
 const toPbExperimentalRenderingOptions: M.Func<string | undefined, string> =
   M.defineMapper(
@@ -120,7 +121,9 @@ const toPbSceneComparison: M.Func<
   SceneComparisonOptions | undefined,
   vertexvis.protobuf.stream.ISceneComparisonAttributes
 > = M.defineMapper(
-  M.read(M.ifDefined(M.mapProp('streamKeyToCompare', M.ifDefined(toPbStringValue)))),
+  M.read(
+    M.ifDefined(M.mapProp('streamKeyToCompare', M.ifDefined(toPbStringValue))),
+  ),
   ([streamKeyToCompare]) => ({
     streamKeyToCompare,
   }),

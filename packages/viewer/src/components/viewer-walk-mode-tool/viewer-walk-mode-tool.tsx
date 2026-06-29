@@ -215,17 +215,17 @@ export class ViewerWalkModeTool {
     if (this.interactionHandler == null) {
       this.interactionHandler = new WalkInteractionHandler(this.model);
 
-      this.interactionHandlerDisposable = await this.viewer?.registerInteractionHandler(
-        this.interactionHandler,
-      );
+      this.interactionHandlerDisposable =
+        await this.viewer?.registerInteractionHandler(this.interactionHandler);
     }
   }
 
   private async ensureTeleportToolConfigured(): Promise<void> {
     if (this.hostEl != null) {
       const slotted: Element | undefined =
-        this.hostEl?.querySelector('vertex-viewer-teleport-tool[slot="teleport-tool"]') ??
-        undefined;
+        this.hostEl?.querySelector(
+          'vertex-viewer-teleport-tool[slot="teleport-tool"]',
+        ) ?? undefined;
       const slottedTeleportTool =
         slotted?.tagName === 'VERTEX-VIEWER-TELEPORT-TOOL'
           ? (slotted as HTMLVertexViewerTeleportToolElement)
@@ -262,10 +262,12 @@ export class ViewerWalkModeTool {
   }
 
   private async setPivotInteractionMode(): Promise<void> {
-    const baseInteractionHandler = await this.viewer?.getBaseInteractionHandler();
+    const baseInteractionHandler =
+      await this.viewer?.getBaseInteractionHandler();
 
     if (this.enabled && baseInteractionHandler != null) {
-      const interactionType = baseInteractionHandler.getPrimaryInteractionType();
+      const interactionType =
+        baseInteractionHandler.getPrimaryInteractionType();
       this.stateMap.previousPrimaryInteractionType =
         interactionType === 'pivot'
           ? this.stateMap.previousPrimaryInteractionType
@@ -275,7 +277,8 @@ export class ViewerWalkModeTool {
   }
 
   private async resetInteractionMode(): Promise<void> {
-    const baseInteractionHandler = await this.viewer?.getBaseInteractionHandler();
+    const baseInteractionHandler =
+      await this.viewer?.getBaseInteractionHandler();
 
     if (
       baseInteractionHandler != null &&

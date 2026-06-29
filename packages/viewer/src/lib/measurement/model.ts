@@ -1,4 +1,9 @@
-import { Disposable, EventDispatcher, Listener, Objects } from '@vertexvis/utils';
+import {
+  Disposable,
+  EventDispatcher,
+  Listener,
+  Objects,
+} from '@vertexvis/utils';
 
 import { MeasurementEntity } from './entities';
 import { MeasurementOutcome } from './outcomes';
@@ -21,7 +26,9 @@ export class MeasurementModel {
 
   private entitiesChanged = new EventDispatcher<MeasurementEntity[]>();
 
-  private outcomeChanged = new EventDispatcher<MeasurementOutcome | undefined>();
+  private outcomeChanged = new EventDispatcher<
+    MeasurementOutcome | undefined
+  >();
 
   /**
    * Registers an entity to be measured with the model.
@@ -137,7 +144,9 @@ export class MeasurementModel {
    * @param listener The listener to add.
    * @returns A disposable that can be used to remove the listener.
    */
-  public onEntitiesChanged(listener: Listener<MeasurementEntity[]>): Disposable {
+  public onEntitiesChanged(
+    listener: Listener<MeasurementEntity[]>,
+  ): Disposable {
     return this.entitiesChanged.on(listener);
   }
 }

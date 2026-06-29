@@ -1,7 +1,10 @@
 import { Dimensions, Point } from '@vertexvis/geometry';
 import { Range } from '@vertexvis/utils';
 
-export function constrainRelativePoint(pt: Point.Point, range: Range.Range): Point.Point {
+export function constrainRelativePoint(
+  pt: Point.Point,
+  range: Range.Range,
+): Point.Point {
   const constrainedX = Math.max(range.start, Math.min(range.end, pt.x));
   const constrainedY = Math.max(range.start, Math.min(range.end, pt.y));
 
@@ -52,10 +55,14 @@ export function translatePointToRelative(
     // The given point corresponds to the upper left corner of the label, so increase the offset
     // when placing it to the left or above to ensure that part of the label line is visible
     const centerIsToTheRightInXDirection = canvasCenterPoint.x > pt.x;
-    const xOffsetCalculated = centerIsToTheRightInXDirection ? offset.x : -3 * offset.x;
+    const xOffsetCalculated = centerIsToTheRightInXDirection
+      ? offset.x
+      : -3 * offset.x;
 
     const centerIsBelowInYDirection = canvasCenterPoint.y > pt.y;
-    const yOffsetCalculated = centerIsBelowInYDirection ? offset.y : -3 * offset.y;
+    const yOffsetCalculated = centerIsBelowInYDirection
+      ? offset.y
+      : -3 * offset.y;
 
     const offsetPoint = Point.add(
       point,

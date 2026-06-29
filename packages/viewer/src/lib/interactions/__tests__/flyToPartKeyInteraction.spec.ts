@@ -30,9 +30,9 @@ describe(FlyToPartKeyInteraction, () => {
         altKey: false,
       } as TapEventDetails),
     ).toBe(false);
-    expect(flyToPartKeyInteraction.predicate({ altKey: true } as TapEventDetails)).toBe(
-      true,
-    );
+    expect(
+      flyToPartKeyInteraction.predicate({ altKey: true } as TapEventDetails),
+    ).toBe(true);
   });
 
   it('returns false for its predicate with Shift pressed', () => {

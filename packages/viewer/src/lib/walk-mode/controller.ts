@@ -82,7 +82,9 @@ export class WalkModeController {
    * lower numbers will result in faster movement and vice-versa. Defaults to `25`.
    *
    */
-  public updateConfiguration(configuration: Partial<ViewerWalkModeConfiguration>): void {
+  public updateConfiguration(
+    configuration: Partial<ViewerWalkModeConfiguration>,
+  ): void {
     const existing = this.model.getConfiguration();
 
     this.model.setConfiguration({
@@ -96,7 +98,10 @@ export class WalkModeController {
    * existing set of keybindings to allow for multiple keybindings for a specific
    * operation. To replace the defaults, see `replaceKeyBinding`.
    */
-  public addKeyBinding(operation: ViewerWalkModeOperation, ...keys: string[]): void {
+  public addKeyBinding(
+    operation: ViewerWalkModeOperation,
+    ...keys: string[]
+  ): void {
     this.model.addKeyBinding(operation, new KeyBinding(...keys));
   }
 
@@ -115,7 +120,10 @@ export class WalkModeController {
    * walkModeTool.controller.replaceKeyBinding('WALK_FORWARD', 'ArrowUp');
    * ```
    */
-  public replaceKeyBinding(operation: ViewerWalkModeOperation, ...keys: string[]): void {
+  public replaceKeyBinding(
+    operation: ViewerWalkModeOperation,
+    ...keys: string[]
+  ): void {
     this.model.replaceKeyBinding(operation, new KeyBinding(...keys));
   }
 
@@ -145,7 +153,9 @@ export class WalkModeController {
 
       return {
         dispose: () => {
-          this.excludeTagNames = this.excludeTagNames.filter((tn) => tn !== args[0]);
+          this.excludeTagNames = this.excludeTagNames.filter(
+            (tn) => tn !== args[0],
+          );
         },
       };
     } else {
@@ -155,7 +165,9 @@ export class WalkModeController {
 
       return {
         dispose: () => {
-          this.excludePredicates = this.excludePredicates.filter((tn) => tn !== args[0]);
+          this.excludePredicates = this.excludePredicates.filter(
+            (tn) => tn !== args[0],
+          );
         },
       };
     }

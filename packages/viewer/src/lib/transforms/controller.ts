@@ -80,7 +80,9 @@ export class TransformController {
     this.endTransform();
   }
 
-  public async EXPERIMENTAL_undoTransform(): Promise<Matrix4.Matrix4 | undefined> {
+  public async EXPERIMENTAL_undoTransform(): Promise<
+    Matrix4.Matrix4 | undefined
+  > {
     if (this.previousDelta != null) {
       const undoDelta = Matrix4.invert(this.previousDelta);
 

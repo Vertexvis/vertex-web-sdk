@@ -107,7 +107,11 @@ export function translateDimensionsToScreen(
     dimensions,
   );
 
-  return Dimensions.scale(effectiveScalar, effectiveScalar, contentRelativeDimensions);
+  return Dimensions.scale(
+    effectiveScalar,
+    effectiveScalar,
+    contentRelativeDimensions,
+  );
 }
 
 /**
@@ -171,7 +175,11 @@ export function translatePointToRelative(
 
   const pointWithoutOffset = Point.subtract(
     pt,
-    Point.scale(offset, 1 / getWindowDevicePixelRatio(), 1 / getWindowDevicePixelRatio()),
+    Point.scale(
+      offset,
+      1 / getWindowDevicePixelRatio(),
+      1 / getWindowDevicePixelRatio(),
+    ),
   );
   const centeredContentPoint = Point.create(
     (pointWithoutOffset.x - centerOffsetX) / effectiveScalar,
@@ -232,7 +240,12 @@ export function createRectangle(
         ? currentPoint.y
         : initialPoint.y - fitBoundsSize
       : initialPoint.y;
-    return Rectangle.create(fitBoundsX, fitBoundsY, fitBoundsSize, fitBoundsSize);
+    return Rectangle.create(
+      fitBoundsX,
+      fitBoundsY,
+      fitBoundsSize,
+      fitBoundsSize,
+    );
   } else {
     return bounds;
   }

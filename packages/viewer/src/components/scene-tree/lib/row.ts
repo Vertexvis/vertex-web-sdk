@@ -14,7 +14,11 @@ export interface LoadedRow {
 export type Row = LoadedRow | undefined;
 
 /* eslint-disable padding-line-between-statements */
-export function fromNodeProto(index: number, node: Node, columns: MetadataKey[]): Row;
+export function fromNodeProto(
+  index: number,
+  node: Node,
+  columns: MetadataKey[],
+): Row;
 export function fromNodeProto(
   index: number,
   nodes: Node[],

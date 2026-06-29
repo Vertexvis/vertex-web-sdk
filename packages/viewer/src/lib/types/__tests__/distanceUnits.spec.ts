@@ -28,7 +28,9 @@ describe(DistanceUnits, () => {
     it('translates a world value to real value', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new DistanceUnits(unitType);
-        expect(measurementUnit.convertWorldValueToReal(worldUnit)).toEqual(realUnit);
+        expect(measurementUnit.convertWorldValueToReal(worldUnit)).toEqual(
+          realUnit,
+        );
       }
     });
   });
@@ -37,7 +39,9 @@ describe(DistanceUnits, () => {
     it('translates a real value to world value', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new DistanceUnits(unitType);
-        expect(measurementUnit.convertRealValueToWorld(realUnit)).toEqual(worldUnit);
+        expect(measurementUnit.convertRealValueToWorld(realUnit)).toEqual(
+          worldUnit,
+        );
       }
     });
   });
@@ -48,7 +52,9 @@ describe(DistanceUnits, () => {
         const measurementUnit = new DistanceUnits(unitType);
         const worldPt = Vector3.create(worldUnit, worldUnit, worldUnit);
         const realPt = Vector3.create(realUnit, realUnit, realUnit);
-        expect(measurementUnit.convertWorldPointToReal(worldPt)).toEqual(realPt);
+        expect(measurementUnit.convertWorldPointToReal(worldPt)).toEqual(
+          realPt,
+        );
       }
     });
   });
@@ -59,7 +65,9 @@ describe(DistanceUnits, () => {
         const measurementUnit = new DistanceUnits(unitType);
         const worldPt = Vector3.create(worldUnit, worldUnit, worldUnit);
         const realPt = Vector3.create(realUnit, realUnit, realUnit);
-        expect(measurementUnit.convertRealPointToWorld(realPt)).toEqual(worldPt);
+        expect(measurementUnit.convertRealPointToWorld(realPt)).toEqual(
+          worldPt,
+        );
       }
     });
   });
@@ -83,7 +91,9 @@ describe(AreaUnits, () => {
     it('translates a world value to real value', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new AreaUnits(unitType);
-        expect(measurementUnit.convertWorldValueToReal(worldUnit)).toEqual(realUnit);
+        expect(measurementUnit.convertWorldValueToReal(worldUnit)).toEqual(
+          realUnit,
+        );
       }
     });
   });
@@ -92,7 +102,9 @@ describe(AreaUnits, () => {
     it('translates a real value to world value', () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new AreaUnits(unitType);
-        expect(measurementUnit.convertRealValueToWorld(realUnit)).toEqual(worldUnit);
+        expect(measurementUnit.convertRealValueToWorld(realUnit)).toEqual(
+          worldUnit,
+        );
       }
     });
   });

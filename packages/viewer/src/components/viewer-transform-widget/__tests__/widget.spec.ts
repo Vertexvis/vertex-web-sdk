@@ -128,7 +128,10 @@ function createMeshes(
   };
 }
 
-function updateFrameCameraPosition(baseFrame: Frame, position: Vector3.Vector3): Frame {
+function updateFrameCameraPosition(
+  baseFrame: Frame,
+  position: Vector3.Vector3,
+): Frame {
   return new Frame(
     baseFrame.correlationIds,
     baseFrame.temporalRefinementCorrelationId,
@@ -308,9 +311,18 @@ describe(TransformWidget, () => {
   it('sorts the meshes', async () => {
     const widget = new TransformWidget(canvas);
     const baseFrame = makePerspectiveFrame();
-    const xFrame = updateFrameCameraPosition(baseFrame, Vector3.create(100, 10, 0));
-    const yFrame = updateFrameCameraPosition(baseFrame, Vector3.create(0, 100, 10));
-    const zFrame = updateFrameCameraPosition(baseFrame, Vector3.create(10, 0, 100));
+    const xFrame = updateFrameCameraPosition(
+      baseFrame,
+      Vector3.create(100, 10, 0),
+    );
+    const yFrame = updateFrameCameraPosition(
+      baseFrame,
+      Vector3.create(0, 100, 10),
+    );
+    const zFrame = updateFrameCameraPosition(
+      baseFrame,
+      Vector3.create(10, 0, 100),
+    );
 
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
@@ -402,7 +414,9 @@ describe(TransformWidget, () => {
     const meshes = createMeshes(positionTransform, frame, canvas);
     const hoveredListener = jest.fn();
 
-    (testDrawable as jest.Mock).mockImplementation((m) => m.identifier === 'x-translate');
+    (testDrawable as jest.Mock).mockImplementation(
+      (m) => m.identifier === 'x-translate',
+    );
 
     widget.onHoveredChanged(hoveredListener);
     widget.updateFrame(frame);
@@ -427,7 +441,9 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    widget.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
+    widget.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)),
+    );
     widget.updateTransform(positionTransform);
 
     widget.updateColors({
@@ -436,15 +452,15 @@ describe(TransformWidget, () => {
       zArrow: undefined,
     });
 
-    expect(widget.getDrawableElements().some((e) => e.fillColor === '#333333')).toBe(
-      true,
-    );
-    expect(widget.getDrawableElements().some((e) => e.fillColor === '#444444')).toBe(
-      true,
-    );
-    expect(widget.getDrawableElements().some((e) => e.fillColor === '#555555')).toBe(
-      true,
-    );
+    expect(
+      widget.getDrawableElements().some((e) => e.fillColor === '#333333'),
+    ).toBe(true);
+    expect(
+      widget.getDrawableElements().some((e) => e.fillColor === '#444444'),
+    ).toBe(true);
+    expect(
+      widget.getDrawableElements().some((e) => e.fillColor === '#555555'),
+    ).toBe(true);
 
     widget.updateColors({
       xArrow: undefined,
@@ -452,15 +468,15 @@ describe(TransformWidget, () => {
       zArrow: '#111111',
     });
 
-    expect(widget.getDrawableElements().some((e) => e.fillColor === '#333333')).toBe(
-      true,
-    );
-    expect(widget.getDrawableElements().some((e) => e.fillColor === '#444444')).toBe(
-      true,
-    );
-    expect(widget.getDrawableElements().some((e) => e.fillColor === '#111111')).toBe(
-      true,
-    );
+    expect(
+      widget.getDrawableElements().some((e) => e.fillColor === '#333333'),
+    ).toBe(true);
+    expect(
+      widget.getDrawableElements().some((e) => e.fillColor === '#444444'),
+    ).toBe(true);
+    expect(
+      widget.getDrawableElements().some((e) => e.fillColor === '#111111'),
+    ).toBe(true);
   });
 
   it('uses an opacity if the specific axis are disabled', async () => {
@@ -480,7 +496,9 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    widget.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
+    widget.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)),
+    );
     widget.updateTransform(positionTransform);
 
     // the rotation meshes should all have the disabled fill color
@@ -494,20 +512,26 @@ describe(TransformWidget, () => {
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.fillColor === '#777777' && e.identifier.includes('translate'))
-        .length,
+        .filter(
+          (e) =>
+            e.fillColor === '#777777' && e.identifier.includes('translate'),
+        ).length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.fillColor === '#888888' && e.identifier.includes('translate'))
-        .length,
+        .filter(
+          (e) =>
+            e.fillColor === '#888888' && e.identifier.includes('translate'),
+        ).length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.fillColor === '#999999' && e.identifier.includes('translate'))
-        .length,
+        .filter(
+          (e) =>
+            e.fillColor === '#999999' && e.identifier.includes('translate'),
+        ).length,
     ).toBe(1);
 
     // re-enabling the rotation axis should draw the client given color
@@ -528,20 +552,23 @@ describe(TransformWidget, () => {
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.fillColor === '#777777' && e.identifier.includes('rotate'))
-        .length,
+        .filter(
+          (e) => e.fillColor === '#777777' && e.identifier.includes('rotate'),
+        ).length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.fillColor === '#888888' && e.identifier.includes('rotate'))
-        .length,
+        .filter(
+          (e) => e.fillColor === '#888888' && e.identifier.includes('rotate'),
+        ).length,
     ).toBe(1);
     expect(
       widget
         .getDrawableElements()
-        .filter((e) => e.fillColor === '#999999' && e.identifier.includes('rotate'))
-        .length,
+        .filter(
+          (e) => e.fillColor === '#999999' && e.identifier.includes('rotate'),
+        ).length,
     ).toBe(1);
   });
 
@@ -563,7 +590,9 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    widget.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
+    widget.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)),
+    );
     widget.updateTransform(positionTransform);
 
     expect(
@@ -593,9 +622,13 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
 
-    unscaled.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
+    unscaled.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)),
+    );
     unscaled.updateTransform(positionTransform);
-    scaled.updateFrame(updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)));
+    scaled.updateFrame(
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)),
+    );
     scaled.updateTransform(positionTransform);
 
     const unscaledDrawableElements = unscaled.getDrawableElements();

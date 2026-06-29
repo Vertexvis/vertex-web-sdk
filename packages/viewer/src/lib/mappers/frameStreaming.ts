@@ -17,7 +17,12 @@ import {
   SceneViewSummary,
 } from '../types';
 import { fromPbJsUuid, fromPbJsUuid2l } from './corePbJs';
-import { fromPbBoundingBox3f, fromPbDim, fromPbRect, fromPbVector3f } from './geometry';
+import {
+  fromPbBoundingBox3f,
+  fromPbDim,
+  fromPbRect,
+  fromPbVector3f,
+} from './geometry';
 import { fromPbRGBi } from './material';
 import { fromPbBoolValue, fromPbBytesValue } from './scalar';
 
@@ -46,7 +51,10 @@ export const fromPbOrthographicCamera: M.Func<
   FrameCamera.OrthographicFrameCamera
 > = M.defineMapper(
   M.read(
-    M.mapProp('viewVector', M.compose(M.required('viewVector'), fromPbVector3f)),
+    M.mapProp(
+      'viewVector',
+      M.compose(M.required('viewVector'), fromPbVector3f),
+    ),
     M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
     M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
     M.mapProp('fovHeight', M.required('fovHeight')),
@@ -99,7 +107,10 @@ const fromPbImageAttributes: M.Func<
   ImageAttributesLike
 > = M.defineMapper(
   M.read(
-    M.mapProp('frameDimensions', M.compose(M.required('frameDimensions'), fromPbDim)),
+    M.mapProp(
+      'frameDimensions',
+      M.compose(M.required('frameDimensions'), fromPbDim),
+    ),
     M.mapProp('imageRect', M.compose(M.required('imageRect'), fromPbRect)),
     M.mapProp('scaleFactor', M.required('scaleFactor')),
   ),
@@ -185,11 +196,13 @@ const fromPbFrameImageAttributes: M.Func<
   ([imageAttr]) => imageAttr,
 );
 
-const fromPbFrameImage: M.Func<vertexvis.protobuf.stream.IDrawFramePayload, FrameImage> =
-  M.defineMapper(
-    M.read(fromPbFrameImageAttributes, M.mapProp('image', M.required('image'))),
-    ([imageAttr, image]) => new FrameImage(imageAttr, image),
-  );
+const fromPbFrameImage: M.Func<
+  vertexvis.protobuf.stream.IDrawFramePayload,
+  FrameImage
+> = M.defineMapper(
+  M.read(fromPbFrameImageAttributes, M.mapProp('image', M.required('image'))),
+  ([imageAttr, image]) => new FrameImage(imageAttr, image),
+);
 
 const fromPbSceneAttributes: M.Func<
   vertexvis.protobuf.stream.ISceneAttributes,
@@ -311,7 +324,9 @@ export type FrameDecoder = M.ThrowIfInvalidFunc<
   Frame
 >;
 
-export function fromPbFrameOrThrow(worldOrientation: Orientation): FrameDecoder {
+export function fromPbFrameOrThrow(
+  worldOrientation: Orientation,
+): FrameDecoder {
   return M.ifInvalidThrow(fromPbFrame(worldOrientation));
 }
 
@@ -392,8 +407,14 @@ export const fromPbStartStreamResponse: M.Func<
   }
 > = M.defineMapper(
   M.read(
-    M.compose(M.requiredProp('startStream'), M.mapRequiredProp('streamId', fromPbJsUuid)),
-    M.compose(M.requiredProp('startStream'), M.mapRequiredProp('sceneId', fromPbJsUuid)),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('streamId', fromPbJsUuid),
+    ),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('sceneId', fromPbJsUuid),
+    ),
     M.compose(
       M.requiredProp('startStream'),
       M.mapRequiredProp('sceneViewId', fromPbJsUuid),
@@ -406,7 +427,10 @@ export const fromPbStartStreamResponse: M.Func<
       M.requiredProp('startStream'),
       M.mapRequiredProp('worldOrientation', fromPbWorldOrientation),
     ),
-    M.compose(M.requiredProp('startStream'), M.mapRequiredProp('token', fromPbToken)),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.mapRequiredProp('token', fromPbToken),
+    ),
   ),
   ([streamId, sceneId, sceneViewId, sessionId, worldOrientation, token]) => ({
     streamId,
@@ -426,17 +450,28 @@ export const fromPbReconnectResponse: M.Func<
   vertexvis.protobuf.stream.IStreamResponse,
   { token: Token }
 > = M.defineMapper(
-  M.read(M.compose(M.requiredProp('reconnect'), M.mapRequiredProp('token', fromPbToken))),
+  M.read(
+    M.compose(
+      M.requiredProp('reconnect'),
+      M.mapRequiredProp('token', fromPbToken),
+    ),
+  ),
   ([token]) => ({ token }),
 );
 
-export const fromPbReconnectResponseOrThrow = M.ifInvalidThrow(fromPbReconnectResponse);
+export const fromPbReconnectResponseOrThrow = M.ifInvalidThrow(
+  fromPbReconnectResponse,
+);
 
 export const fromPbRefreshTokenResponse: M.Func<
   vertexvis.protobuf.stream.IStreamResponse,
   Token
 > = M.defineMapper(
-  M.compose(M.requiredProp('refreshToken'), M.requiredProp('token'), fromPbToken),
+  M.compose(
+    M.requiredProp('refreshToken'),
+    M.requiredProp('token'),
+    fromPbToken,
+  ),
   (token) => token,
 );
 
@@ -456,4 +491,6 @@ export const fromPbSyncTimeResponse: M.Func<
   ([seconds, nanos]) => protoToDate({ seconds, nanos }),
 );
 
-export const fromPbSyncTimeResponseOrThrow = M.ifInvalidThrow(fromPbSyncTimeResponse);
+export const fromPbSyncTimeResponseOrThrow = M.ifInvalidThrow(
+  fromPbSyncTimeResponse,
+);

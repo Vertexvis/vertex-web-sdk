@@ -13,7 +13,12 @@ import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import { Async } from '@vertexvis/utils';
 
 import { delay } from '../../testing/utils';
-import { createMetadata, JwtProvider, requestPaged, requestUnary } from '../grpc';
+import {
+  createMetadata,
+  JwtProvider,
+  requestPaged,
+  requestUnary,
+} from '../grpc';
 import {
   fromPbAnnotationOrThrow,
   fromPbAnnotationSetOrThrow,

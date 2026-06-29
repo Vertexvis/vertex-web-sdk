@@ -1,12 +1,24 @@
 import { EventEmitter } from '@stencil/core';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Angle, BoundingBox, Plane, Point, Ray, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  BoundingBox,
+  Plane,
+  Point,
+  Ray,
+  Vector3,
+} from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 import { Disposable } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
-import { Camera, CameraRenderOptions, OrthographicCamera, Scene } from '../scenes';
+import {
+  Camera,
+  CameraRenderOptions,
+  OrthographicCamera,
+  Scene,
+} from '../scenes';
 import {
   DepthBuffer,
   EntityType,
@@ -140,7 +152,11 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     const frame = this.getFrame();
 
     if (frame != null) {
-      return viewport.transformPointToRay(point, frame.image, frame.scene.camera);
+      return viewport.transformPointToRay(
+        point,
+        frame.image,
+        frame.scene.camera,
+      );
     } else throw new Error('Cannot get camera. Frame is undefined.');
   }
 
@@ -165,7 +181,12 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     keyDetails: Partial<TapEventKeys> = {},
     buttons = 0,
   ): Promise<void> {
-    this.emitTapEvent(this.doubleTapEmitter.emit, position, keyDetails, buttons);
+    this.emitTapEvent(
+      this.doubleTapEmitter.emit,
+      position,
+      keyDetails,
+      buttons,
+    );
   }
 
   public async longPress(
@@ -173,7 +194,12 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     keyDetails: Partial<TapEventKeys> = {},
     buttons = 0,
   ): Promise<void> {
-    this.emitTapEvent(this.longPressEmitter.emit, position, keyDetails, buttons);
+    this.emitTapEvent(
+      this.longPressEmitter.emit,
+      position,
+      keyDetails,
+      buttons,
+    );
   }
 
   /**
@@ -242,7 +268,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
   public async twistCamera(delta: Point.Point): Promise<void>;
   public async twistCamera(...args: any[]): Promise<void> {
     return this.transformCamera(({ camera, viewport }) => {
-      const axis = Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position));
+      const axis = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position),
+      );
 
       if (args.length === 1 && typeof args[0] === 'number') {
         const angleInRadians = Angle.toRadians(-args[0]);
@@ -250,10 +278,13 @@ export abstract class InteractionApi<T extends Camera = Camera> {
       } else if (args.length === 1) {
         const center = Point.create(viewport.width / 2, viewport.height / 2);
         const currentAngle = Angle.toDegrees(Angle.fromPoints(center, args[0]));
-        const angleDelta = this.lastAngle != null ? currentAngle - this.lastAngle : 0;
+        const angleDelta =
+          this.lastAngle != null ? currentAngle - this.lastAngle : 0;
 
         this.lastAngle = currentAngle;
-        const axis = Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position));
+        const axis = Vector3.normalize(
+          Vector3.subtract(camera.lookAt, camera.position),
+        );
         const angleInRadians = Angle.toRadians(-angleDelta);
         return camera.rotateAroundAxis(angleInRadians, axis);
       }
@@ -278,8 +309,15 @@ export abstract class InteractionApi<T extends Camera = Camera> {
         const startingCamera = camera.toFrameCamera();
         const direction = startingCamera.direction;
 
-        const ray = viewport.transformPointToRay(screenPt, frame.image, startingCamera);
-        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(direction, camera.lookAt);
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera,
+        );
+        const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+          direction,
+          camera.lookAt,
+        );
         const fallback = Ray.intersectPlane(ray, fallbackPlane);
         if (fallback == null) {
           console.warn(
@@ -305,7 +343,11 @@ export abstract class InteractionApi<T extends Camera = Camera> {
 
         // Use a ray that originates at the screen and intersects with the hit
         // plane to determine the move distance.
-        const ray = viewport.transformPointToRay(screenPt, frame.image, startingCamera);
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera,
+        );
         const movePt = Ray.intersectPlane(ray, hitPlane);
 
         if (movePt != null) {
@@ -371,7 +413,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
       }
 
       const upVector = Vector3.normalize(camera.up);
-      const vv = Vector3.normalize(Vector3.subtract(camera.lookAt, camera.position));
+      const vv = Vector3.normalize(
+        Vector3.subtract(camera.lookAt, camera.position),
+      );
 
       const crossX = Vector3.cross(upVector, vv);
       const crossY = Vector3.cross(vv, crossX);
@@ -431,11 +475,15 @@ export abstract class InteractionApi<T extends Camera = Camera> {
           // Note that delta and viewport.height both have units of pixels. Further, the
           // 3 multiplier was chosen to match the desired zoom speed.
           const distance = Vector3.magnitude(vv);
-          const relativeDeltaToViewportHeight = 3 * distance * (delta / viewport.height);
+          const relativeDeltaToViewportHeight =
+            3 * distance * (delta / viewport.height);
 
           // Scale the current viewVector by the scalar calculated above to determine how to adjust the camera position
           const v = Vector3.normalize(vv);
-          const positionChange = Vector3.scale(relativeDeltaToViewportHeight, v);
+          const positionChange = Vector3.scale(
+            relativeDeltaToViewportHeight,
+            v,
+          );
 
           // Calculate the new camera position
           const position = Vector3.add(camera.position, positionChange);
@@ -477,7 +525,10 @@ export abstract class InteractionApi<T extends Camera = Camera> {
             dir,
             frameCam.lookAt,
           );
-          const pointToZoomRelativeTo = Ray.intersectPlane(ray, planeToZoomRelativeTo);
+          const pointToZoomRelativeTo = Ray.intersectPlane(
+            ray,
+            planeToZoomRelativeTo,
+          );
 
           if (pointToZoomRelativeTo != null) {
             // Project the current look at point onto the zoom plane
@@ -528,7 +579,10 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * @param degreesLocalX The angle to rotate the lookAt point around the local x-axis
    * @param degreesLocalY The angle to rotate the lookAt point around the local y-axis
    */
-  public async pivotCamera(degreesLocalX: number, degreesLocalY: number): Promise<void> {
+  public async pivotCamera(
+    degreesLocalX: number,
+    degreesLocalY: number,
+  ): Promise<void> {
     return this.transformCamera(({ camera }) => {
       const { position, up, lookAt } = camera;
       const normalizedUp = Vector3.normalize(up);
@@ -610,7 +664,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * @param pt A point, in viewport coordinates.
    * @returns A promise that resolves with the list of hit results.
    */
-  public async hitItems(pt: Point.Point): Promise<vertexvis.protobuf.stream.IHit[]> {
+  public async hitItems(
+    pt: Point.Point,
+  ): Promise<vertexvis.protobuf.stream.IHit[]> {
     const res = await (await this.getScene()).raycaster().hitItems(pt);
     return res?.hits ?? [];
   }
@@ -663,5 +719,8 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    */
   public abstract panCameraByDelta(delta: Point.Point): Promise<void>;
 
-  public abstract zoomCameraToPoint(point: Point.Point, delta: number): Promise<void>;
+  public abstract zoomCameraToPoint(
+    point: Point.Point,
+    delta: number,
+  ): Promise<void>;
 }

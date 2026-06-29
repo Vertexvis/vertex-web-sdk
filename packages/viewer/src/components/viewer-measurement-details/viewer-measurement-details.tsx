@@ -174,7 +174,9 @@ export class ViewerMeasurementDetails {
       return this.resultTypes?.includes(result.type) ?? true;
     };
 
-    const results = (this.measurementOutcome?.results ?? []).filter(isFilteredResultType);
+    const results = (this.measurementOutcome?.results ?? []).filter(
+      isFilteredResultType,
+    );
 
     return (
       <Host>
@@ -221,7 +223,9 @@ export class ViewerMeasurementDetails {
     );
   }
 
-  private handleShowOverlay = (overlay: MeasurementOverlay | undefined): void => {
+  private handleShowOverlay = (
+    overlay: MeasurementOverlay | undefined,
+  ): void => {
     this.overlay = overlay;
   };
 

@@ -21,7 +21,10 @@ export interface Config {
   events: Events.EventConfig;
   animation: Animation.AnimationConfig;
   interactions: Interactions.InteractionConfig;
-  EXPERIMENTAL_frameDelivery: Omit<FrameDeliverySettings, 'rateLimitingEnabled'>;
+  EXPERIMENTAL_frameDelivery: Omit<
+    FrameDeliverySettings,
+    'rateLimitingEnabled'
+  >;
   EXPERIMENTAL_adaptiveRendering: Omit<AdaptiveRenderingSettings, 'enabled'>;
   EXPERIMENTAL_qualityOfService: QualityOfServiceSettings;
   EXPERIMENTAL_annotationPollingIntervalInMs: number | undefined;

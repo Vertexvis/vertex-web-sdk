@@ -1,4 +1,6 @@
-export function stampTemplate<E extends Element>(template: HTMLTemplateElement): E {
+export function stampTemplate<E extends Element>(
+  template: HTMLTemplateElement,
+): E {
   const fragment = template.content.cloneNode(true) as HTMLElement;
   const element = fragment.firstElementChild;
   return element as E;
@@ -26,7 +28,11 @@ export function stampTemplateWithId<E extends Element>(
 ): E | undefined {
   const template = getTemplateWithId(parent, id, templateNotFoundErrorMsg);
   if (template != null) {
-    return stampTemplateWithValidation(template, validation, validationErrorMsg);
+    return stampTemplateWithValidation(
+      template,
+      validation,
+      validationErrorMsg,
+    );
   }
 }
 

@@ -21,7 +21,10 @@ import {
   Markup,
   MarkupCenteringBehavior,
 } from '../../lib/types/markup';
-import { isVertexViewerArrowMarkup, LineAnchorStyle } from '../viewer-markup-arrow/utils';
+import {
+  isVertexViewerArrowMarkup,
+  LineAnchorStyle,
+} from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 
@@ -234,7 +237,11 @@ export class ViewerMarkupTool {
    */
   protected render(): h.JSX.IntrinsicElements {
     if (!this.disabled) {
-      if (this.tool === 'arrow' || this.tool === 'circle' || this.tool === 'freeform') {
+      if (
+        this.tool === 'arrow' ||
+        this.tool === 'circle' ||
+        this.tool === 'freeform'
+      ) {
         return (
           <Host>
             <slot />
@@ -355,10 +362,12 @@ export class ViewerMarkupTool {
       this.hostEl.append(newMarkupElement);
 
       if (this.tool === 'arrow') {
-        (newMarkupElement as HTMLVertexViewerMarkupArrowElement).startLineAnchorStyle =
-          this.startLineAnchorStyle;
-        (newMarkupElement as HTMLVertexViewerMarkupArrowElement).endLineAnchorStyle =
-          this.endLineAnchorStyle;
+        (
+          newMarkupElement as HTMLVertexViewerMarkupArrowElement
+        ).startLineAnchorStyle = this.startLineAnchorStyle;
+        (
+          newMarkupElement as HTMLVertexViewerMarkupArrowElement
+        ).endLineAnchorStyle = this.endLineAnchorStyle;
       }
 
       newMarkupElement.mode = 'create';

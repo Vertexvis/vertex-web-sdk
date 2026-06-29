@@ -15,7 +15,10 @@ import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
-import { MarkupCenteringBehavior, MarkupInteraction } from '../../lib/types/markup';
+import {
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidPointData,
@@ -243,9 +246,10 @@ export class ViewerMarkupArrow {
     this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.registeredInteraction = await newViewer.registerBasicInteractionHandler(
-        this.interactionHandler,
-      );
+      this.registeredInteraction =
+        await newViewer.registerBasicInteractionHandler(
+          this.interactionHandler,
+        );
     }
   }
 
@@ -320,11 +324,17 @@ export class ViewerMarkupArrow {
         />
       );
     } else if (anchorStyle === 'hash') {
-      const hashPoints = arrowheadPointsToHashPoints(arrowheadPoints, this.scale);
+      const hashPoints = arrowheadPointsToHashPoints(
+        arrowheadPoints,
+        this.scale,
+      );
 
       return <line id="line-anchor-hash" class="head" {...hashPoints} />;
     } else if (anchorStyle === 'dot') {
-      const circlePoints = arrowheadPointsToCirclePoints(arrowheadPoints, this.scale);
+      const circlePoints = arrowheadPointsToCirclePoints(
+        arrowheadPoints,
+        this.scale,
+      );
 
       return <circle id="line-anchor-circle" class="head" {...circlePoints} />;
     } else {
@@ -359,8 +369,14 @@ export class ViewerMarkupArrow {
       );
 
       if (isValidPointData(screenStart, screenEnd)) {
-        const arrowheadStartPoints = createLineAnchorStylePoints(screenEnd, screenStart);
-        const arrowheadEndPoints = createLineAnchorStylePoints(screenStart, screenEnd);
+        const arrowheadStartPoints = createLineAnchorStylePoints(
+          screenEnd,
+          screenStart,
+        );
+        const arrowheadEndPoints = createLineAnchorStylePoints(
+          screenStart,
+          screenEnd,
+        );
 
         return (
           <Host>
@@ -384,7 +400,10 @@ export class ViewerMarkupArrow {
                   x2={arrowheadStartPoints.tip.x}
                   y2={arrowheadStartPoints.tip.y}
                 />
-                {this.renderLineAnchorStyle(this.endLineAnchorStyle, arrowheadEndPoints)}
+                {this.renderLineAnchorStyle(
+                  this.endLineAnchorStyle,
+                  arrowheadEndPoints,
+                )}
               </g>
               {this.mode === 'edit' && (
                 <g transform={`translate(${offsetX} ${offsetY})`}>
@@ -416,7 +435,10 @@ export class ViewerMarkupArrow {
               />
             )}
             {this.mode === 'create' && (
-              <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
+              <div
+                class="create-overlay"
+                onTouchStart={this.handleTouchStart}
+              ></div>
             )}
           </Host>
         );
@@ -426,7 +448,10 @@ export class ViewerMarkupArrow {
     } else {
       return (
         <Host>
-          <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
+          <div
+            class="create-overlay"
+            onTouchStart={this.handleTouchStart}
+          ></div>
         </Host>
       );
     }

@@ -28,7 +28,10 @@ export class ArrowMarkupInteractionHandler extends MarkupInteractionHandler {
     super(scalingOptions);
   }
 
-  public editAnchor(anchor: ViewerMarkupArrowEditAnchor, event: PointerEvent): void {
+  public editAnchor(
+    anchor: ViewerMarkupArrowEditAnchor,
+    event: PointerEvent,
+  ): void {
     if (this.markupEl.mode === 'edit') {
       this.anchor = anchor;
       this.startInteraction(event);

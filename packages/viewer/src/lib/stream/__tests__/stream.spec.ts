@@ -9,7 +9,10 @@ import { Async, Color } from '@vertexvis/utils';
 
 import { random } from '../../../testing';
 import { parseConfig } from '../../config';
-import { InvalidResourceUrnError, WebsocketConnectionError } from '../../errors';
+import {
+  InvalidResourceUrnError,
+  WebsocketConnectionError,
+} from '../../errors';
 import { ViewerStream } from '../stream';
 
 describe(ViewerStream, () => {
@@ -46,7 +49,9 @@ describe(ViewerStream, () => {
       await expect(connecting).resolves.toBeDefined();
 
       await simulateFrame(ws);
-      const connected = stream.stateChanged.onceWhen((s) => s.type === 'connected');
+      const connected = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected',
+      );
       await expect(connected).resolves.toBeDefined();
     });
 
@@ -202,13 +207,17 @@ describe(ViewerStream, () => {
       const connect = jest.spyOn(ws, 'connect');
       const startStream = jest.spyOn(stream, 'startStream');
 
-      let failure = stream.stateChanged.onceWhen((s) => s.type === 'connection-failed');
+      let failure = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connection-failed',
+      );
       let load = stream.load(urnMalformed, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(InvalidResourceUrnError);
       await expect(failure).resolves.toBeDefined();
 
       connect.mockRejectedValue(new Error('WS connection failed'));
-      failure = stream.stateChanged.onceWhen((s) => s.type === 'connection-failed');
+      failure = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connection-failed',
+      );
       load = stream.load(urn123, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(WebsocketConnectionError);
       await expect(failure).resolves.toBeDefined();
@@ -241,7 +250,9 @@ describe(ViewerStream, () => {
       await expect(connecting).resolves.toBeDefined();
 
       await simulateFrame(ws);
-      const connected = stream.stateChanged.onceWhen((s) => s.type === 'connected');
+      const connected = stream.stateChanged.onceWhen(
+        (s) => s.type === 'connected',
+      );
       await expect(connected).resolves.toBeDefined();
 
       expect(startSpy).toHaveBeenCalledWith(
@@ -307,7 +318,9 @@ describe(ViewerStream, () => {
       await simulateFrame(ws);
       await connected;
 
-      const reconnecting = stream.stateChanged.onceWhen((s) => s.type === 'reconnecting');
+      const reconnecting = stream.stateChanged.onceWhen(
+        (s) => s.type === 'reconnecting',
+      );
       const reconnected = stream.stateChanged.onceWhen((s) => {
         return s.type === 'connected' && s.resource.resource.id === '123';
       });
@@ -683,7 +696,10 @@ describe(ViewerStream, () => {
     return { stream, ws };
   }
 
-  async function simulateFrame(ws: WebSocketClientMock, latency = 10): Promise<void> {
+  async function simulateFrame(
+    ws: WebSocketClientMock,
+    latency = 10,
+  ): Promise<void> {
     await Async.delay(latency);
     ws.receiveMessage(encode(Fixtures.Requests.drawFrame()));
   }

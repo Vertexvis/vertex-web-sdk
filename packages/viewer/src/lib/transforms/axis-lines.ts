@@ -26,8 +26,14 @@ export function rotationAxisPositions(
   triangleSize = 3,
 ): RotationLinePoints | undefined {
   if (rotationMesh != null && towardPoint != null) {
-    const baseDistance = Vector3.distance(rotationMesh.points.worldBase, towardPoint);
-    const tipDistance = Vector3.distance(rotationMesh.points.worldTip, towardPoint);
+    const baseDistance = Vector3.distance(
+      rotationMesh.points.worldBase,
+      towardPoint,
+    );
+    const tipDistance = Vector3.distance(
+      rotationMesh.points.worldTip,
+      towardPoint,
+    );
 
     const origin =
       baseDistance < tipDistance
@@ -38,7 +44,10 @@ export function rotationAxisPositions(
     const centerPointRay = Ray.create({
       origin: middle,
       direction: Vector3.normalize(
-        Vector3.subtract(rotationMesh.points.worldRight, rotationMesh.points.worldLeft),
+        Vector3.subtract(
+          rotationMesh.points.worldRight,
+          rotationMesh.points.worldLeft,
+        ),
       ),
     });
 
@@ -54,7 +63,9 @@ export function rotationAxisPositions(
     return new RotationLinePoints(
       rotationMesh.points.valid,
       worldPoints,
-      worldPoints.map((p) => Vector3.transformMatrix(p, camera.projectionViewMatrix)),
+      worldPoints.map((p) =>
+        Vector3.transformMatrix(p, camera.projectionViewMatrix),
+      ),
     );
   }
   return undefined;

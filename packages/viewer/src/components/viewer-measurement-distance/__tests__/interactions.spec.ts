@@ -4,7 +4,11 @@ jest.mock('../../../lib/scenes');
 import { Vector3 } from '@vertexvis/geometry';
 import { Async } from '@vertexvis/utils';
 
-import { makeHitProvider, makeHitTester, makeRaycaster } from '../../../testing/fixtures';
+import {
+  makeHitProvider,
+  makeHitTester,
+  makeRaycaster,
+} from '../../../testing/fixtures';
 import { randomPoint, randomVector3 } from '../../../testing/random';
 import {
   PointToPointInteractionController,
@@ -134,7 +138,9 @@ describe(PointToPointInteractionController, () => {
         const hits = makeHitProvider({ hitTester, raycaster });
 
         (hitTester.hitTest as jest.Mock).mockReturnValue(true);
-        (hitTester.transformPointToWorld as jest.Mock).mockReturnValueOnce(start);
+        (hitTester.transformPointToWorld as jest.Mock).mockReturnValueOnce(
+          start,
+        );
 
         const interaction = controller.editMeasurement('start');
 
@@ -334,26 +340,29 @@ describe(PointToPointInteractionModel, () => {
     });
   });
 
-  describe(PointToPointInteractionModel.prototype.setMeasurementFromValues, () => {
-    it('sets measurement if start and end defined', () => {
-      const handleMeasurementChanged = jest.fn();
+  describe(
+    PointToPointInteractionModel.prototype.setMeasurementFromValues,
+    () => {
+      it('sets measurement if start and end defined', () => {
+        const handleMeasurementChanged = jest.fn();
 
-      model.onMeasurementChanged(handleMeasurementChanged);
-      model.setMeasurementFromValues(start, end, true);
+        model.onMeasurementChanged(handleMeasurementChanged);
+        model.setMeasurementFromValues(start, end, true);
 
-      expect(model.getMeasurement()).toEqual(measurement);
-      expect(handleMeasurementChanged).toHaveBeenCalled();
-    });
+        expect(model.getMeasurement()).toEqual(measurement);
+        expect(handleMeasurementChanged).toHaveBeenCalled();
+      });
 
-    it('does not set measurement if start or end undefined', () => {
-      const handleMeasurementChanged = jest.fn();
+      it('does not set measurement if start or end undefined', () => {
+        const handleMeasurementChanged = jest.fn();
 
-      model.onMeasurementChanged(handleMeasurementChanged);
-      model.setMeasurementFromValues(undefined, end, true);
-      model.setMeasurementFromValues(start, undefined, true);
+        model.onMeasurementChanged(handleMeasurementChanged);
+        model.setMeasurementFromValues(undefined, end, true);
+        model.setMeasurementFromValues(start, undefined, true);
 
-      expect(model.getMeasurement()).toBeUndefined();
-      expect(handleMeasurementChanged).not.toHaveBeenCalled();
-    });
-  });
+        expect(model.getMeasurement()).toBeUndefined();
+        expect(handleMeasurementChanged).not.toHaveBeenCalled();
+      });
+    },
+  );
 });

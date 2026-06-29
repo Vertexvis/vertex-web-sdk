@@ -36,7 +36,9 @@ export class VolumeIntersectionQueryController {
     private model: VolumeIntersectionQueryModel,
     private viewer: HTMLVertexViewerElement,
   ) {
-    this.additionalTransforms = [(op) => op.items.where((q) => q.all()).deselect()];
+    this.additionalTransforms = [
+      (op) => op.items.where((q) => q.all()).deselect(),
+    ];
     this.operationTransform = (builder) => builder.select();
   }
 
@@ -68,7 +70,9 @@ export class VolumeIntersectionQueryController {
    * Defaults to `[(op) => op.items.where((q) => q.all()).deselect()]`, which will
    * clear any prior selection before the default selection.
    */
-  public setAdditionalTransforms(additionalTransforms: AdditionalTransform[]): void {
+  public setAdditionalTransforms(
+    additionalTransforms: AdditionalTransform[],
+  ): void {
     this.additionalTransforms = additionalTransforms;
   }
 
@@ -76,7 +80,9 @@ export class VolumeIntersectionQueryController {
     return this.executeStarted.on(listener);
   }
 
-  public onExecuteComplete(listener: Listener<CompleteExecutionDetails>): Disposable {
+  public onExecuteComplete(
+    listener: Listener<CompleteExecutionDetails>,
+  ): Disposable {
     return this.executeComplete.on(listener);
   }
 
@@ -112,7 +118,10 @@ export class VolumeIntersectionQueryController {
 
         const scene = await this.viewer.scene();
         await scene
-          .elements((op) => [...additionalTransforms(op), ...operationTransforms(op)])
+          .elements((op) => [
+            ...additionalTransforms(op),
+            ...operationTransforms(op),
+          ])
           .execute({
             skipAwaitCorrelatedFrame: true,
           });

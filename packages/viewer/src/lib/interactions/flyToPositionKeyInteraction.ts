@@ -46,8 +46,16 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
         hit.hitPoint.y != null &&
         hit.hitPoint.z != null
       ) {
-        const hitPoint = Vector3.create(hit.hitPoint.x, hit.hitPoint.y, hit.hitPoint.z);
-        const newLookAt = await this.getLookAtPoint(scene, hitPoint, camera.viewVector);
+        const hitPoint = Vector3.create(
+          hit.hitPoint.x,
+          hit.hitPoint.y,
+          hit.hitPoint.z,
+        );
+        const newLookAt = await this.getLookAtPoint(
+          scene,
+          hitPoint,
+          camera.viewVector,
+        );
 
         await this.stream.flyTo({
           camera: FrameCamera.toProtobuf(
@@ -59,7 +67,9 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
               .toFrameCamera(),
           ),
           animation: {
-            duration: toProtoDuration(this.configProvider().animation.durationMs),
+            duration: toProtoDuration(
+              this.configProvider().animation.durationMs,
+            ),
           },
         });
       } else {

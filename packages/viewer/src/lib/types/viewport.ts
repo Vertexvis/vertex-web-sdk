@@ -1,4 +1,11 @@
-import { Dimensions, Matrix4, Point, Ray, Rectangle, Vector3 } from '@vertexvis/geometry';
+import {
+  Dimensions,
+  Matrix4,
+  Point,
+  Ray,
+  Rectangle,
+  Vector3,
+} from '@vertexvis/geometry';
 
 import { DepthBuffer } from './depthBuffer';
 import type { FrameCameraBase, FrameImageLike } from './frame';
@@ -82,7 +89,10 @@ export class Viewport implements Dimensions.Dimensions {
     return this.transformVectorToViewport(ndc);
   }
 
-  public transformPointToViewport(pt: Point.Point, image: FrameImageLike): Point.Point {
+  public transformPointToViewport(
+    pt: Point.Point,
+    image: FrameImageLike,
+  ): Point.Point {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
     return Point.scale(pt, 1 * scaleX, 1 * scaleY);
   }
@@ -95,7 +105,10 @@ export class Viewport implements Dimensions.Dimensions {
    * @param image An image of a frame.
    * @returns A point in the coordinate space of the frame.
    */
-  public transformPointToFrame(pt: Point.Point, image: FrameImageLike): Point.Point {
+  public transformPointToFrame(
+    pt: Point.Point,
+    image: FrameImageLike,
+  ): Point.Point {
     const { x: scaleX, y: scaleY } = this.calculateFrameScale(image);
     return Point.scale(pt, 1 / scaleX, 1 / scaleY);
   }
@@ -153,7 +166,9 @@ export class Viewport implements Dimensions.Dimensions {
         camera.worldMatrix,
         camera.projectionMatrixInverse,
       );
-      const direction = Vector3.normalize(Vector3.subtract(lookAtPoint, origin));
+      const direction = Vector3.normalize(
+        Vector3.subtract(lookAtPoint, origin),
+      );
       return Ray.create({ origin, direction });
     } else {
       const origin = Vector3.transformNdcToWorldSpace(

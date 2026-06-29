@@ -33,7 +33,10 @@ import { SceneTreeCellHoverController } from './lib/hover-controller';
 import { restartTimeout } from './lib/window';
 
 interface StateMap {
-  columnElementPools?: WeakMap<HTMLVertexSceneTreeTableColumnElement, ElementPool>;
+  columnElementPools?: WeakMap<
+    HTMLVertexSceneTreeTableColumnElement,
+    ElementPool
+  >;
   headerInstances?: Array<InstancedTemplate<HTMLElement>>;
   headerDividerInstances?: Array<InstancedTemplate<HTMLElement>>;
   headerDividerListeners?: Array<(event: PointerEvent) => void>;
@@ -364,7 +367,9 @@ export class SceneTreeTableLayout {
   private computeViewportRows(): void {
     const viewportHeight = this.getLayoutHeight();
     const canComputeIndices =
-      viewportHeight != null && viewportHeight > 0 && !this.isComputingCellHeight;
+      viewportHeight != null &&
+      viewportHeight > 0 &&
+      !this.isComputingCellHeight;
 
     if (canComputeIndices) {
       const viewportCount = Math.ceil(viewportHeight / this.rowHeight);
@@ -426,7 +431,9 @@ export class SceneTreeTableLayout {
       col.style.minHeight = `${this.rowHeight * this.totalRows}px`;
 
       const cellPaddingLeft =
-        colIndex === 0 ? (depth: number) => `calc(${depth} * 0.5rem)` : () => `0`;
+        colIndex === 0
+          ? (depth: number) => `calc(${depth} * 0.5rem)`
+          : () => `0`;
 
       pool.iterateElements((el, binding, rowIndex) => {
         const row = this.stateMap.viewportRows[rowIndex];
@@ -474,7 +481,8 @@ export class SceneTreeTableLayout {
     const layoutWidth = this.getLayoutWidth();
     if (
       layoutWidth != null &&
-      this.stateMap.columnWidths.length === this.stateMap.columnWidthPercentages.length
+      this.stateMap.columnWidths.length ===
+        this.stateMap.columnWidthPercentages.length
     ) {
       this.stateMap.columnWidths = this.stateMap.columnWidthPercentages.map(
         (w) => w * layoutWidth,
@@ -488,7 +496,8 @@ export class SceneTreeTableLayout {
     const layoutWidth = this.getLayoutWidth();
     if (
       layoutWidth != null &&
-      this.stateMap.columnWidths.length === this.stateMap.columnWidthPercentages.length
+      this.stateMap.columnWidths.length ===
+        this.stateMap.columnWidthPercentages.length
     ) {
       this.stateMap.columnWidthPercentages = this.stateMap.columnWidths.map(
         (w) => w / layoutWidth,
@@ -497,7 +506,9 @@ export class SceneTreeTableLayout {
   };
 
   private computeInitialColumnWidths = (): void => {
-    this.stateMap.columnWidths = this.columnElements.map((c) => c.initialWidth ?? 100);
+    this.stateMap.columnWidths = this.columnElements.map(
+      (c) => c.initialWidth ?? 100,
+    );
 
     const layoutWidth = this.getLayoutWidth();
     if (layoutWidth != null) {
@@ -526,7 +537,10 @@ export class SceneTreeTableLayout {
     if (this.stateMap.columnElementPools == null) {
       this.stateMap.columnElementPools = this.columnElements.reduce(
         (map, c) =>
-          map.set(c, new ElementPool(c, () => this.createColumnCellInstance(c))),
+          map.set(
+            c,
+            new ElementPool(c, () => this.createColumnCellInstance(c)),
+          ),
         new WeakMap(),
       );
     }
@@ -636,7 +650,9 @@ export class SceneTreeTableLayout {
         metadata: {},
         data: {},
       };
-      const { bindings, element } = this.createColumnCellInstance(this.columnElements[0]);
+      const { bindings, element } = this.createColumnCellInstance(
+        this.columnElements[0],
+      );
       bindings.bind(dummyData);
       element.style.visibility = 'hidden';
 
@@ -663,14 +679,20 @@ export class SceneTreeTableLayout {
 
   private computeHeaderHeight = (): void => {
     if (this.stateMap.headerHeight == null) {
-      this.stateMap.headerHeight = this.headerElement?.getBoundingClientRect().height;
-      this.hostEl.style.setProperty('--header-height', `${this.stateMap.headerHeight}px`);
+      this.stateMap.headerHeight =
+        this.headerElement?.getBoundingClientRect().height;
+      this.hostEl.style.setProperty(
+        '--header-height',
+        `${this.stateMap.headerHeight}px`,
+      );
     }
   };
 
   private computeColumnGridLayout = (): void => {
     if (this.stateMap.columnWidths.length === 0) {
-      this.stateMap.columnWidths = this.columnElements.map((c) => c.initialWidth ?? 100);
+      this.stateMap.columnWidths = this.columnElements.map(
+        (c) => c.initialWidth ?? 100,
+      );
     }
 
     const layoutWidth = this.getLayoutWidth();
@@ -754,15 +776,14 @@ export class SceneTreeTableLayout {
   };
 
   private addDividerDragListeners(): void {
-    this.stateMap.headerDividerListeners = this.stateMap.headerDividerInstances?.map(
-      (d, i) => {
+    this.stateMap.headerDividerListeners =
+      this.stateMap.headerDividerInstances?.map((d, i) => {
         const listener = this.createDividerPointerDownHandler(i);
 
         d.element.addEventListener('pointerdown', listener);
 
         return listener;
-      },
-    );
+      });
   }
 
   private removeDividerDragListeners(): void {
@@ -791,7 +812,9 @@ export class SceneTreeTableLayout {
         Math.floor(event.clientY),
       );
       this.resizingColumnIndex = index;
-      this.stateMap.headerDividerInstances?.[index]?.element.classList.add('dragging');
+      this.stateMap.headerDividerInstances?.[index]?.element.classList.add(
+        'dragging',
+      );
 
       window.addEventListener('pointermove', this.handleDividerPointerMove);
       window.addEventListener('pointerup', this.handleDividerPointerUp);
@@ -799,9 +822,15 @@ export class SceneTreeTableLayout {
   };
 
   private handleDividerPointerMove = (event: PointerEvent): void => {
-    const current = Point.create(Math.floor(event.clientX), Math.floor(event.clientY));
+    const current = Point.create(
+      Math.floor(event.clientX),
+      Math.floor(event.clientY),
+    );
 
-    if (this.lastDividerPointerPosition != null && this.resizingColumnIndex != null) {
+    if (
+      this.lastDividerPointerPosition != null &&
+      this.resizingColumnIndex != null
+    ) {
       const resizingIndex = this.resizingColumnIndex;
       const diff = Point.subtract(this.lastDividerPointerPosition, current);
 
@@ -849,7 +878,8 @@ export class SceneTreeTableLayout {
     const nextMaxWidth = nextColumn.maxWidth ?? Number.MAX_SAFE_INTEGER;
 
     const currentIsValid =
-      currentWidth - diff.x > currentMinWidth && currentWidth - diff.x < currentMaxWidth;
+      currentWidth - diff.x > currentMinWidth &&
+      currentWidth - diff.x < currentMaxWidth;
     const nextIsValid =
       nextColumn != null
         ? nextWidth + diff.x > nextMinWidth && nextWidth + diff.x < nextMaxWidth

@@ -50,7 +50,10 @@ describe(Config.parseAndValidateConfig, () => {
     };
 
     expect(() =>
-      Config.parseAndValidateConfig('platdev', JSON.stringify(invalidApiHostConfig)),
+      Config.parseAndValidateConfig(
+        'platdev',
+        JSON.stringify(invalidApiHostConfig),
+      ),
     ).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
@@ -186,7 +189,9 @@ describe(Config.validateConfig, () => {
 
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
-        message: expect.stringContaining(`Invalid apiHost "${invalidHost}" specified.`),
+        message: expect.stringContaining(
+          `Invalid apiHost "${invalidHost}" specified.`,
+        ),
       }),
     );
   });

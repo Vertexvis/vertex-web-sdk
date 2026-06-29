@@ -126,7 +126,12 @@ export class HitIndicator extends ReglComponent {
     this.arrow = new TriangleMesh(
       createShape,
       'hit-normal-arrow',
-      computeArrowNdcValues(transform, frame.scene.camera, normal, triangleSize),
+      computeArrowNdcValues(
+        transform,
+        frame.scene.camera,
+        normal,
+        triangleSize,
+      ),
       this.outlineColor,
       this.arrowFillColor,
     );
@@ -185,9 +190,16 @@ export class HitIndicator extends ReglComponent {
 
     if (this.arrow != null) {
       this.arrow.updatePoints(
-        computeArrowNdcValues(transform, frame.scene.camera, normal, triangleSize),
+        computeArrowNdcValues(
+          transform,
+          frame.scene.camera,
+          normal,
+          triangleSize,
+        ),
       );
-      this.axis?.updatePoints(axisPositions(transform, frame.scene.camera, this.arrow));
+      this.axis?.updatePoints(
+        axisPositions(transform, frame.scene.camera, this.arrow),
+      );
     }
     if (this.plane != null) {
       this.plane.updatePoints(

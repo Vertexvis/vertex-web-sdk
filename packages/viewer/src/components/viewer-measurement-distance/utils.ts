@@ -84,7 +84,8 @@ export function isVertexViewerDistanceMeasurement(
   el: unknown,
 ): el is HTMLVertexViewerMeasurementDistanceElement {
   return (
-    el instanceof HTMLElement && el.nodeName === 'VERTEX-VIEWER-MEASUREMENT-DISTANCE'
+    el instanceof HTMLElement &&
+    el.nodeName === 'VERTEX-VIEWER-MEASUREMENT-DISTANCE'
   );
 }
 

@@ -18,7 +18,9 @@ describe('viewer-annotation-callout', () => {
   it('renders callout with border, fill and icon', async () => {
     const page = await newSpecPage({
       components: [ViewerAnnotationCallout],
-      template: () => <vertex-viewer-annotation-callout data={callout} iconSize="md" />,
+      template: () => (
+        <vertex-viewer-annotation-callout data={callout} iconSize="md" />
+      ),
     });
 
     expect(page.root).toEqualHtml(`

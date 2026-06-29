@@ -224,7 +224,8 @@ describe(createCanvasRenderer, () => {
 describe(measureCanvasRenderer, () => {
   const reportIntervalInMs = 10;
 
-  const renderer: CanvasRenderer = () => Promise.resolve(Fixtures.makePerspectiveFrame());
+  const renderer: CanvasRenderer = () =>
+    Promise.resolve(Fixtures.makePerspectiveFrame());
   const meter = new TimingMeter('timer');
   const measurement = { startTime: 0, duration: 1000 };
 
@@ -253,7 +254,9 @@ describe(measureCanvasRenderer, () => {
     render(drawFrame1);
     jest.advanceTimersByTime(reportIntervalInMs);
 
-    expect(callback).toHaveBeenCalledWith(expect.arrayContaining([measurement]));
+    expect(callback).toHaveBeenCalledWith(
+      expect.arrayContaining([measurement]),
+    );
   });
 
   it('stops reporting timer after last render', async () => {

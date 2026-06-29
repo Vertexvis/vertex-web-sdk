@@ -15,7 +15,10 @@ import { BasicViewer, Disposable } from '@vertexvis/utils';
 
 import { getWindowDevicePixelRatio } from '../../lib/dom';
 import { writeDOM } from '../../lib/stencil';
-import { MarkupCenteringBehavior, MarkupInteraction } from '../../lib/types/markup';
+import {
+  MarkupCenteringBehavior,
+  MarkupInteraction,
+} from '../../lib/types/markup';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
 import {
   isValidStartEvent,
@@ -226,9 +229,10 @@ export class ViewerMarkupFreeform {
     this.registeredInteraction = undefined;
 
     if (newViewer != null) {
-      this.registeredInteraction = await newViewer.registerBasicInteractionHandler(
-        this.interactionHandler,
-      );
+      this.registeredInteraction =
+        await newViewer.registerBasicInteractionHandler(
+          this.interactionHandler,
+        );
     }
   }
 
@@ -329,7 +333,9 @@ export class ViewerMarkupFreeform {
               onTopRightAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('top-right', e)
               }
-              onTopAnchorPointerDown={(e) => this.interactionHandler.editAnchor('top', e)}
+              onTopAnchorPointerDown={(e) =>
+                this.interactionHandler.editAnchor('top', e)
+              }
               onBottomLeftAnchorPointerDown={(e) =>
                 this.interactionHandler.editAnchor('bottom-left', e)
               }
@@ -351,14 +357,20 @@ export class ViewerMarkupFreeform {
             />
           )}
           {this.mode === 'create' && (
-            <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
+            <div
+              class="create-overlay"
+              onTouchStart={this.handleTouchStart}
+            ></div>
           )}
         </Host>
       );
     } else {
       return (
         <Host>
-          <div class="create-overlay" onTouchStart={this.handleTouchStart}></div>
+          <div
+            class="create-overlay"
+            onTouchStart={this.handleTouchStart}
+          ></div>
         </Host>
       );
     }

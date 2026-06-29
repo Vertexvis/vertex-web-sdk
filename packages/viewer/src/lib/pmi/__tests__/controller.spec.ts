@@ -1,4 +1,6 @@
-jest.mock('@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service');
+jest.mock(
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
+);
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 
@@ -21,7 +23,9 @@ describe(PmiController, () => {
       );
 
       const res = await controller.listAnnotations();
-      expect(res).toEqual(mapListPmiAnnotationsResponseOrThrow(expected.toObject()));
+      expect(res).toEqual(
+        mapListPmiAnnotationsResponseOrThrow(expected.toObject()),
+      );
     });
   });
 

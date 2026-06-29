@@ -26,7 +26,10 @@ export class FlyToPartKeyInteraction implements KeyInteraction<TapEventDetails> 
       true,
     );
 
-    if (hitResult.hitItems?.hits != null && hitResult.hitItems.hits.length > 0) {
+    if (
+      hitResult.hitItems?.hits != null &&
+      hitResult.hitItems.hits.length > 0
+    ) {
       await this.stream.flyTo({
         itemId: hitResult.hitItems.hits[0].itemId,
         animation: {

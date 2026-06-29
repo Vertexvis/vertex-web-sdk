@@ -1,4 +1,9 @@
-import { encode, Fixtures, StreamApi, WebSocketClientMock } from '@vertexvis/stream-api';
+import {
+  encode,
+  Fixtures,
+  StreamApi,
+  WebSocketClientMock,
+} from '@vertexvis/stream-api';
 
 import { fromPbFrameOrThrow } from '../../mappers';
 import { Orientation } from '../../types';
@@ -33,7 +38,9 @@ describe(CameraRenderResult, () => {
     result.onAnimationCompleted.on(listener);
     const res = result.onAnimationCompleted.once();
 
-    mockWs.receiveMessage(encode(Fixtures.Events.animationCompleted(animationId)));
+    mockWs.receiveMessage(
+      encode(Fixtures.Events.animationCompleted(animationId)),
+    );
 
     expect(await res).toBe(animationId);
     expect(listener).toHaveBeenCalledWith(animationId);

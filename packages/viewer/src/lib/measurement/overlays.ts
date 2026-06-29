@@ -24,7 +24,9 @@ export class MeasurementOverlayManager {
   private overlays = new Map<string, MeasurementOverlay>();
   private overlaysChanged = new EventDispatcher<MeasurementOverlay[]>();
 
-  public addLineFromResult(result: MinimumDistanceMeasurementResult): LineOverlay {
+  public addLineFromResult(
+    result: MinimumDistanceMeasurementResult,
+  ): LineOverlay {
     return this.addLine(result.point1, result.point2);
   }
 
@@ -96,7 +98,9 @@ export class MeasurementOverlayManager {
     }
   }
 
-  public onOverlaysChanged(listener: Listener<MeasurementOverlay[]>): Disposable {
+  public onOverlaysChanged(
+    listener: Listener<MeasurementOverlay[]>,
+  ): Disposable {
     return this.overlaysChanged.on(listener);
   }
 }

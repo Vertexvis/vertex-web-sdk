@@ -13,7 +13,9 @@ export interface SceneViewStateSuppliedId {
  * object containing the ID generated on creation, or an object containing
  * a supplied id provided during creation.
  */
-export type SceneViewStateIdentifier = SceneViewStateId | SceneViewStateSuppliedId;
+export type SceneViewStateIdentifier =
+  | SceneViewStateId
+  | SceneViewStateSuppliedId;
 
 export function isSceneViewStateId(
   identifier: SceneViewStateIdentifier,

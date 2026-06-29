@@ -53,18 +53,23 @@ describe(TapInteractionHandler, () => {
   } as any);
 
   const config = parseConfig('platdev');
-  const handler = new TapInteractionHandler('mousedown', 'mouseup', 'mousemove', () => ({
-    ...config,
-    events: {
-      ...config.events,
-      doubleTapThreshold: 15,
-      longPressThreshold: 15,
-    },
-    interactions: {
-      ...config.interactions,
-      interactionDelay: 10,
-    },
-  }));
+  const handler = new TapInteractionHandler(
+    'mousedown',
+    'mouseup',
+    'mousemove',
+    () => ({
+      ...config,
+      events: {
+        ...config.events,
+        doubleTapThreshold: 15,
+        longPressThreshold: 15,
+      },
+      interactions: {
+        ...config.interactions,
+        interactionDelay: 10,
+      },
+    }),
+  );
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -100,7 +105,11 @@ describe(TapInteractionHandler, () => {
     await delay(5);
     window.dispatchEvent(mouseUp2);
 
-    expect(api.tap).not.toHaveBeenCalledWith(Point.create(15, 15), keyDetails, 0);
+    expect(api.tap).not.toHaveBeenCalledWith(
+      Point.create(15, 15),
+      keyDetails,
+      0,
+    );
   });
 
   it('should emit a double tap if two taps occur within the configured time period of one another', () => {
@@ -128,7 +137,11 @@ describe(TapInteractionHandler, () => {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.doubleTap).toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.doubleTap).toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   it('should not emit a double tap if the second click occurs after the time period', async () => {
@@ -138,7 +151,11 @@ describe(TapInteractionHandler, () => {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.doubleTap).not.toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.doubleTap).not.toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   it('should not emit a double tap if a touch move has occurred >= 2 pixels away from the touch start and the interaction has begun', async () => {
@@ -180,7 +197,11 @@ describe(TapInteractionHandler, () => {
     window.dispatchEvent(mouseMove1);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.doubleTap).not.toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.doubleTap).not.toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   it('should emit a double tap if a mouse move has occurred < 2 pixels away from the mouse down', async () => {
@@ -190,7 +211,11 @@ describe(TapInteractionHandler, () => {
     window.dispatchEvent(mouseMove2);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.doubleTap).toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.doubleTap).toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   it('should emit a long press if a touch start occurs and a touch end does not occur within the configured time threshold', async () => {
@@ -214,7 +239,11 @@ describe(TapInteractionHandler, () => {
     await delay(50);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.longPress).toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.longPress).toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   it('should not emit a long press if a mouse down occurs and a mouse up occurs within the configured time threshold', async () => {
@@ -222,7 +251,11 @@ describe(TapInteractionHandler, () => {
     await delay(5);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.longPress).not.toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.longPress).not.toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   it('should not emit a long press if a touch move has occurred >= 2 pixels away from the touch start and the interaction has begun', async () => {
@@ -250,7 +283,11 @@ describe(TapInteractionHandler, () => {
     window.dispatchEvent(mouseMove1);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.longPress).not.toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.longPress).not.toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   it('should emit a long press if a mouse move has occurred < 2 pixels away from the mouse down', async () => {
@@ -259,7 +296,11 @@ describe(TapInteractionHandler, () => {
     window.dispatchEvent(mouseMove2);
     window.dispatchEvent(mouseUp1);
 
-    expect(api.longPress).toHaveBeenCalledWith(Point.create(10, 10), keyDetails, 0);
+    expect(api.longPress).toHaveBeenCalledWith(
+      Point.create(10, 10),
+      keyDetails,
+      0,
+    );
   });
 
   function delay(milliseconds: number): Promise<void> {

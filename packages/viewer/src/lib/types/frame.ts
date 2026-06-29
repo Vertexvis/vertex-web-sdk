@@ -379,7 +379,11 @@ export class FramePerspectiveCamera extends FrameCameraBase {
 
   protected override computeCameraMatrices(): FrameCameraMatrices {
     if (this.cameraMatrices == null) {
-      const viewMatrix = Matrix4.makeLookAtView(this.position, this.lookAt, this.up);
+      const viewMatrix = Matrix4.makeLookAtView(
+        this.position,
+        this.lookAt,
+        this.up,
+      );
       const worldMatrix = Matrix4.invert(viewMatrix);
       const projectionMatrix = Matrix4.makePerspective(
         this.near,
@@ -388,7 +392,10 @@ export class FramePerspectiveCamera extends FrameCameraBase {
         this.aspectRatio,
       );
       const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
-      const projectionViewMatrix = Matrix4.multiply(projectionMatrix, viewMatrix);
+      const projectionViewMatrix = Matrix4.multiply(
+        projectionMatrix,
+        viewMatrix,
+      );
 
       return super.updateCameraMatrices({
         viewMatrix,
@@ -467,7 +474,11 @@ export class FrameOrthographicCamera extends FrameCameraBase {
 
   protected override computeCameraMatrices(): FrameCameraMatrices {
     if (this.cameraMatrices == null) {
-      const viewMatrix = Matrix4.makeLookAtView(this.position, this.lookAt, this.up);
+      const viewMatrix = Matrix4.makeLookAtView(
+        this.position,
+        this.lookAt,
+        this.up,
+      );
       const worldMatrix = Matrix4.invert(viewMatrix);
       const projectionMatrix = Matrix4.makeOrthographic(
         this.left,
@@ -478,7 +489,10 @@ export class FrameOrthographicCamera extends FrameCameraBase {
         this.far,
       );
       const projectionMatrixInverse = Matrix4.invert(projectionMatrix);
-      const projectionViewMatrix = Matrix4.multiply(projectionMatrix, viewMatrix);
+      const projectionViewMatrix = Matrix4.multiply(
+        projectionMatrix,
+        viewMatrix,
+      );
 
       return super.updateCameraMatrices({
         viewMatrix,

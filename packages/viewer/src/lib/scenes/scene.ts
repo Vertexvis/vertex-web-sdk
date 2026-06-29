@@ -8,7 +8,12 @@ import { InvalidArgumentError, InvalidCameraError } from '../errors';
 import { CameraTypeEncoder, FrameDecoder } from '../mappers';
 import { SceneViewStateIdentifier } from '../types';
 import { Frame } from '../types/frame';
-import { Camera, CameraRenderOptions, OrthographicCamera, PerspectiveCamera } from '.';
+import {
+  Camera,
+  CameraRenderOptions,
+  OrthographicCamera,
+  PerspectiveCamera,
+} from '.';
 import { ColorMaterial, fromHex } from './colorMaterial';
 import { CrossSectioner } from './crossSectioner';
 import {
@@ -121,7 +126,9 @@ export class SceneItemOperationsBuilder
    * ]).execute();
    * ```
    */
-  public materialOverride(color: ColorMaterial | string): SceneItemOperationsBuilder {
+  public materialOverride(
+    color: ColorMaterial | string,
+  ): SceneItemOperationsBuilder {
     if (typeof color === 'string') {
       return new SceneItemOperationsBuilder(
         this.query,
@@ -288,7 +295,10 @@ export class SceneItemOperationsBuilder
         }),
       );
     } else {
-      return new SceneItemOperationsBuilder(this.query, this.builder.transform(matrix));
+      return new SceneItemOperationsBuilder(
+        this.query,
+        this.builder.transform(matrix),
+      );
     }
   }
 
@@ -367,7 +377,10 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public clearPhantom(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.clearPhantom());
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearPhantom(),
+    );
   }
 
   /**
@@ -420,7 +433,10 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public clearEndItem(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.clearEndItem());
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearEndItem(),
+    );
   }
 
   /**
@@ -440,7 +456,10 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public viewRenditionById(id: UUID.UUID): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.viewRenditionById(id));
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.viewRenditionById(id),
+    );
   }
 
   /**
@@ -460,7 +479,9 @@ export class SceneItemOperationsBuilder
    * ]);
    * ```
    */
-  public viewRenditionBySuppliedId(suppliedId: string): SceneItemOperationsBuilder {
+  public viewRenditionBySuppliedId(
+    suppliedId: string,
+  ): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
       this.builder.viewRenditionBySuppliedId(suppliedId),
@@ -506,7 +527,10 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public clearRendition(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.clearRendition());
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearRendition(),
+    );
   }
 
   /**
@@ -547,7 +571,10 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public clearRepresentation(): SceneItemOperationsBuilder {
-    return new SceneItemOperationsBuilder(this.query, this.builder.clearRepresentation());
+    return new SceneItemOperationsBuilder(
+      this.query,
+      this.builder.clearRepresentation(),
+    );
   }
 
   /**
@@ -659,7 +686,10 @@ export class PmiAnnotationOperationsBuilder
    * ```
    */
   public select(): PmiAnnotationOperationsBuilder {
-    return new PmiAnnotationOperationsBuilder(this.query, this.builder.select());
+    return new PmiAnnotationOperationsBuilder(
+      this.query,
+      this.builder.select(),
+    );
   }
 
   /**
@@ -682,7 +712,10 @@ export class PmiAnnotationOperationsBuilder
    * ```
    */
   public deselect(): PmiAnnotationOperationsBuilder {
-    return new PmiAnnotationOperationsBuilder(this.query, this.builder.deselect());
+    return new PmiAnnotationOperationsBuilder(
+      this.query,
+      this.builder.deselect(),
+    );
   }
 
   /**
@@ -722,13 +755,15 @@ export class OperationExecutor<T extends SceneExecutionOptions> {
         dimensions: this.dimensions,
       }),
     );
-    const pbPmiAnnotationOperations = this.pmiAnnotationQueryOperations.map((op) =>
-      buildSceneElementOperationOnAnnotation(op.query, op.operations, {
-        dimensions: this.dimensions,
-      }),
+    const pbPmiAnnotationOperations = this.pmiAnnotationQueryOperations.map(
+      (op) =>
+        buildSceneElementOperationOnAnnotation(op.query, op.operations, {
+          dimensions: this.dimensions,
+        }),
     );
 
-    const requestCorrelationId = executionOptions?.suppliedCorrelationId ?? UUID.create();
+    const requestCorrelationId =
+      executionOptions?.suppliedCorrelationId ?? UUID.create();
 
     const request = {
       sceneViewId: {
@@ -745,9 +780,12 @@ export class OperationExecutor<T extends SceneExecutionOptions> {
 }
 
 export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExecutionOptions> {
-  public async execute(executionOptions?: SceneItemsExecutionOptions): Promise<void> {
+  public async execute(
+    executionOptions?: SceneItemsExecutionOptions,
+  ): Promise<void> {
     if (executionOptions?.awaitCorrelatedFrame) {
-      const correlationId = executionOptions.suppliedCorrelationId ?? UUID.create();
+      const correlationId =
+        executionOptions.suppliedCorrelationId ?? UUID.create();
       const executeResult = new SceneOperationExecuteResult(
         this.stream,
         this.decodeFrame,
@@ -766,11 +804,14 @@ export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExe
 }
 
 export class SceneElementsOperationExecutor extends OperationExecutor<SceneElementsExecutionOptions> {
-  public async execute(executionOptions?: SceneElementsExecutionOptions): Promise<void> {
+  public async execute(
+    executionOptions?: SceneElementsExecutionOptions,
+  ): Promise<void> {
     if (executionOptions?.skipAwaitCorrelatedFrame) {
       await super.execute(executionOptions);
     } else {
-      const correlationId = executionOptions?.suppliedCorrelationId ?? UUID.create();
+      const correlationId =
+        executionOptions?.suppliedCorrelationId ?? UUID.create();
       const executeResult = new SceneOperationExecuteResult(
         this.stream,
         this.decodeFrame,
@@ -838,17 +879,24 @@ export class Scene {
    * Applies the provided scene view state to the scene.
    */
   public async applySceneViewState(
-    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
-    return await this.sceneViewStateLoader.applySceneViewState(sceneViewStateId, opts);
+    return await this.sceneViewStateLoader.applySceneViewState(
+      sceneViewStateId,
+      opts,
+    );
   }
 
   /**
    * Applies the specified features of the provided scene view state to the scene.
    */
   public async applyPartialSceneViewState(
-    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
     opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
@@ -906,8 +954,9 @@ export class Scene {
   ): SceneItemsOperationExecutor {
     const sceneOperations = operations(new SceneItemQueryExecutor());
 
-    const ops: Array<SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder> =
-      Array.isArray(sceneOperations) ? sceneOperations : [sceneOperations];
+    const ops: Array<
+      SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder
+    > = Array.isArray(sceneOperations) ? sceneOperations : [sceneOperations];
     const itemOps = ops.filter((op) =>
       op.isItemBuilder(),
     ) as Array<SceneItemOperationsBuilder>;
@@ -974,7 +1023,8 @@ export class Scene {
       op.isAnnotationBuilder(),
     ) as Array<PmiAnnotationOperationsBuilder>;
     const pmiAnnotationOperationList = pmiAnnotationOps.reduce(
-      (acc, builder: PmiAnnotationOperationsBuilder) => acc.concat(builder.build()),
+      (acc, builder: PmiAnnotationOperationsBuilder) =>
+        acc.concat(builder.build()),
       [] as QueryAnnotationOperation[],
     );
 

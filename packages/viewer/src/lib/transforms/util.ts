@@ -1,4 +1,11 @@
-import { Angle, Euler, Matrix4, Point, Quaternion, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  Euler,
+  Matrix4,
+  Point,
+  Quaternion,
+  Vector3,
+} from '@vertexvis/geometry';
 
 /**
  * A type that wraps the local and world transforms for an item.

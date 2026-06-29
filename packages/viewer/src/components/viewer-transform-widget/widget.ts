@@ -4,7 +4,10 @@ import { Color, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 import regl from 'regl';
 import shapeBuilder from 'regl-shape';
 
-import { axisPositions, rotationAxisPositions } from '../../lib/transforms/axis-lines';
+import {
+  axisPositions,
+  rotationAxisPositions,
+} from '../../lib/transforms/axis-lines';
 import {
   xAxisRotationPositions,
   yAxisRotationPositions,
@@ -18,7 +21,10 @@ import {
   yzAxisTranslationPositions,
   zAxisArrowPositions,
 } from '../../lib/transforms/axis-translation';
-import { computeDrawable2dBounds, Drawable } from '../../lib/transforms/drawable';
+import {
+  computeDrawable2dBounds,
+  Drawable,
+} from '../../lib/transforms/drawable';
 import { testDrawable } from '../../lib/transforms/hits';
 import { AxisLine, RotationLine } from '../../lib/transforms/line';
 import { TriangleMesh } from '../../lib/transforms/mesh';
@@ -140,9 +146,12 @@ export class TransformWidget extends ReglComponent {
     this.disabledAxis.xTranslation = initialDisabledAxes.xTranslation ?? false;
     this.disabledAxis.yTranslation = initialDisabledAxes.yTranslation ?? false;
     this.disabledAxis.zTranslation = initialDisabledAxes.zTranslation ?? false;
-    this.disabledAxis.xyTranslation = initialDisabledAxes.xyTranslation ?? false;
-    this.disabledAxis.xzTranslation = initialDisabledAxes.xzTranslation ?? false;
-    this.disabledAxis.yzTranslation = initialDisabledAxes.yzTranslation ?? false;
+    this.disabledAxis.xyTranslation =
+      initialDisabledAxes.xyTranslation ?? false;
+    this.disabledAxis.xzTranslation =
+      initialDisabledAxes.xzTranslation ?? false;
+    this.disabledAxis.yzTranslation =
+      initialDisabledAxes.yzTranslation ?? false;
     this.disabledAxis.xRotation = initialDisabledAxes.xRotation ?? false;
     this.disabledAxis.yRotation = initialDisabledAxes.yRotation ?? false;
     this.disabledAxis.zRotation = initialDisabledAxes.zRotation ?? false;
@@ -205,7 +214,8 @@ export class TransformWidget extends ReglComponent {
     this.xArrowFillColor = colors.xArrow ?? this.xArrowFillColor;
     this.yArrowFillColor = colors.yArrow ?? this.yArrowFillColor;
     this.zArrowFillColor = colors.zArrow ?? this.zArrowFillColor;
-    this.twoAxesSquareFillColor = colors.twoAxesSquare ?? this.twoAxesSquareFillColor;
+    this.twoAxesSquareFillColor =
+      colors.twoAxesSquare ?? this.twoAxesSquareFillColor;
     this.hoveredArrowFillColor = colors.hovered ?? this.hoveredArrowFillColor;
     this.outlineColor = colors.outline ?? this.outlineColor;
 
@@ -215,9 +225,18 @@ export class TransformWidget extends ReglComponent {
     this.xRotation?.updateFillColor(this.getXRotationColor(), true);
     this.yRotation?.updateFillColor(this.getYRotationColor(), true);
     this.zRotation?.updateFillColor(this.getZRotationColor(), true);
-    this.xyTranslation?.updateFillColor(this.getTwoAxesTranslationColor(), true);
-    this.xzTranslation?.updateFillColor(this.getTwoAxesTranslationColor(), true);
-    this.yzTranslation?.updateFillColor(this.getTwoAxesTranslationColor(), true);
+    this.xyTranslation?.updateFillColor(
+      this.getTwoAxesTranslationColor(),
+      true,
+    );
+    this.xzTranslation?.updateFillColor(
+      this.getTwoAxesTranslationColor(),
+      true,
+    );
+    this.yzTranslation?.updateFillColor(
+      this.getTwoAxesTranslationColor(),
+      true,
+    );
 
     this.hoveredElement?.updateFillColor(this.hoveredArrowFillColor);
   }
@@ -233,7 +252,9 @@ export class TransformWidget extends ReglComponent {
     }
   }
 
-  public onHoveredChanged(listener: Listener<Drawable | undefined>): Disposable {
+  public onHoveredChanged(
+    listener: Listener<Drawable | undefined>,
+  ): Disposable {
     return this.hoveredChanged.on(listener);
   }
 
@@ -667,7 +688,9 @@ export class TransformWidget extends ReglComponent {
           this.customization.scalars?.xTranslation,
         ),
       );
-      this.xAxis?.updatePoints(axisPositions(transform, frame.scene.camera, this.xArrow));
+      this.xAxis?.updatePoints(
+        axisPositions(transform, frame.scene.camera, this.xArrow),
+      );
     }
     this.xRotation?.updatePoints(
       xAxisRotationPositions(
@@ -688,7 +711,9 @@ export class TransformWidget extends ReglComponent {
           this.customization.scalars?.yTranslation,
         ),
       );
-      this.yAxis?.updatePoints(axisPositions(transform, frame.scene.camera, this.yArrow));
+      this.yAxis?.updatePoints(
+        axisPositions(transform, frame.scene.camera, this.yArrow),
+      );
     }
     this.yRotation?.updatePoints(
       yAxisRotationPositions(
@@ -709,7 +734,9 @@ export class TransformWidget extends ReglComponent {
           this.customization.scalars?.zTranslation,
         ),
       );
-      this.zAxis?.updatePoints(axisPositions(transform, frame.scene.camera, this.zArrow));
+      this.zAxis?.updatePoints(
+        axisPositions(transform, frame.scene.camera, this.zArrow),
+      );
     }
     this.zRotation?.updatePoints(
       zAxisRotationPositions(

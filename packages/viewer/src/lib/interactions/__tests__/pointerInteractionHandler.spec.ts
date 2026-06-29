@@ -16,7 +16,8 @@ const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
 const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
 const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
 const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
-const RotatePointInteractionMock = RotateInteraction as jest.Mock<RotatePointInteraction>;
+const RotatePointInteractionMock =
+  RotateInteraction as jest.Mock<RotatePointInteraction>;
 const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
 
 describe(PointerInteractionHandler, () => {
@@ -121,7 +122,9 @@ describe(PointerInteractionHandler, () => {
     expect(zoomInteraction.zoomToPoint).not.toHaveBeenCalled();
   });
 
-  async function simulatePrimaryInteractions(interactionDelay?: number): Promise<void> {
+  async function simulatePrimaryInteractions(
+    interactionDelay?: number,
+  ): Promise<void> {
     div.dispatchEvent(pointerDown);
     window.dispatchEvent(pointerMove);
     await delay(interactionDelay || 0);

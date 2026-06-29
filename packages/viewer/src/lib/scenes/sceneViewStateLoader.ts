@@ -7,7 +7,10 @@ import { DEFAULT_TIMEOUT_IN_MS } from '../stream/dispatcher';
 import { SceneViewStateIdentifier } from '../types';
 import { ApplySceneViewStateOptions, SceneViewStateFeature } from '.';
 import { CameraRenderResult } from './cameraRenderResult';
-import { buildSceneViewStateIdentifier, toPbSceneViewStateFeatures } from './mapper';
+import {
+  buildSceneViewStateIdentifier,
+  toPbSceneViewStateFeatures,
+} from './mapper';
 
 export class SceneViewStateLoader {
   public constructor(
@@ -19,7 +22,9 @@ export class SceneViewStateLoader {
   ) {}
 
   public async applySceneViewState(
-    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     const pbIdField = buildSceneViewStateIdentifier(sceneViewStateId);
@@ -41,7 +46,9 @@ export class SceneViewStateLoader {
   }
 
   public async applyPartialSceneViewState(
-    sceneViewStateId: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
+    sceneViewStateId:
+      | UUID.UUID
+      | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
     opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
@@ -69,7 +76,10 @@ export class SceneViewStateLoader {
 
   private async animateToSceneViewState(
     identifier:
-      | Pick<vertexvis.protobuf.stream.ILoadSceneViewStatePayload, 'sceneViewStateId'>
+      | Pick<
+          vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
+          'sceneViewStateId'
+        >
       | Pick<
           vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
           'sceneViewStateSuppliedId'

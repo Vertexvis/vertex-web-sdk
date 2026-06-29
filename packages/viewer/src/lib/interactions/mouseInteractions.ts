@@ -114,7 +114,9 @@ export class ZoomInteraction extends MouseInteraction {
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
-  public constructor(private interactionConfigProvider: InteractionConfigProvider) {
+  public constructor(
+    private interactionConfigProvider: InteractionConfigProvider,
+  ) {
     super();
   }
 
@@ -187,13 +189,18 @@ export class ZoomInteraction extends MouseInteraction {
     await api.endInteraction();
   }
 
-  private resetInteractionTimer(api: InteractionApi, extraDelayMs?: number): void {
+  private resetInteractionTimer(
+    api: InteractionApi,
+    extraDelayMs?: number,
+  ): void {
     this.stopInteractionTimer();
     this.startInteractionTimer(api, extraDelayMs);
   }
 
   private getDirectionalDelta(delta: number): number {
-    return this.interactionConfigProvider().reverseMouseWheelDirection ? -delta : delta;
+    return this.interactionConfigProvider().reverseMouseWheelDirection
+      ? -delta
+      : delta;
   }
 
   /**

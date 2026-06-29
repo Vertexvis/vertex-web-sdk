@@ -1,4 +1,6 @@
-jest.mock('@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service');
+jest.mock(
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
+);
 jest.mock('@vertexvis/stream-api');
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
@@ -9,7 +11,10 @@ import { mockGrpcUnaryResult } from '../../../testing';
 import { makeListItemModelViewsResponse } from '../../../testing/modelViews';
 import { random } from '../../../testing/random';
 import { ModelViewController } from '../controller';
-import { mapItemModelViewOrThrow, mapListItemModelViewsResponseOrThrow } from '../mapper';
+import {
+  mapItemModelViewOrThrow,
+  mapListItemModelViewsResponseOrThrow,
+} from '../mapper';
 
 describe(ModelViewController, () => {
   const jwt = random.string();
@@ -29,7 +34,9 @@ describe(ModelViewController, () => {
       );
 
       const res = await controller.listByItem(sceneItemId);
-      expect(res).toEqual(mapListItemModelViewsResponseOrThrow(expected.toObject()));
+      expect(res).toEqual(
+        mapListItemModelViewsResponseOrThrow(expected.toObject()),
+      );
     });
   });
 

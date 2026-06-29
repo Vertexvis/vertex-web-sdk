@@ -24,7 +24,10 @@ const mapPlanePair: M.Func<
   PbPlanePair.AsObject,
   { start: Plane.Plane; end: Plane.Plane }
 > = M.defineMapper(
-  M.read(M.mapRequiredProp('start', fromPbPlane), M.mapRequiredProp('end', fromPbPlane)),
+  M.read(
+    M.mapRequiredProp('start', fromPbPlane),
+    M.mapRequiredProp('end', fromPbPlane),
+  ),
   ([start, end]) => ({ start, end }),
 );
 
@@ -34,7 +37,10 @@ const mapPlanarDistance: M.Func<
 > = M.defineMapper(
   M.read(
     M.getProp('distance'),
-    M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('start'))),
+    M.mapRequiredProp(
+      'planes',
+      M.compose(mapPlanePair, M.requiredProp('start')),
+    ),
     M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('end'))),
   ),
   ([distance, plane1, plane2]) => ({
@@ -45,20 +51,25 @@ const mapPlanarDistance: M.Func<
   }),
 );
 
-const mapPlanarAngle: M.Func<PbPlanarAngleResult.AsObject, PlanarAngleMeasurementResult> =
-  M.defineMapper(
-    M.read(
-      M.getProp('angleInRadians'),
-      M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('start'))),
-      M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('end'))),
+const mapPlanarAngle: M.Func<
+  PbPlanarAngleResult.AsObject,
+  PlanarAngleMeasurementResult
+> = M.defineMapper(
+  M.read(
+    M.getProp('angleInRadians'),
+    M.mapRequiredProp(
+      'planes',
+      M.compose(mapPlanePair, M.requiredProp('start')),
     ),
-    ([angle, plane1, plane2]) => ({
-      type: 'planar-angle',
-      angle,
-      plane1,
-      plane2,
-    }),
-  );
+    M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('end'))),
+  ),
+  ([angle, plane1, plane2]) => ({
+    type: 'planar-angle',
+    angle,
+    plane1,
+    plane2,
+  }),
+);
 
 const mapMinimumDistance: M.Func<
   PbMinimumDistanceResult.AsObject,
@@ -77,11 +88,13 @@ const mapMinimumDistance: M.Func<
   }),
 );
 
-const mapSurfaceArea: M.Func<PbSurfaceAreaResult.AsObject, SurfaceAreaMeasurementResult> =
-  M.defineMapper(M.read(M.getProp('area')), ([area]) => ({
-    type: 'surface-area',
-    area,
-  }));
+const mapSurfaceArea: M.Func<
+  PbSurfaceAreaResult.AsObject,
+  SurfaceAreaMeasurementResult
+> = M.defineMapper(M.read(M.getProp('area')), ([area]) => ({
+  type: 'surface-area',
+  area,
+}));
 
 const mapPlanarDistanceFromResult: M.Func<
   PbMeasurementResult.AsObject,
@@ -103,27 +116,31 @@ const mapSurfaceAreaFromResult: M.Func<
   SurfaceAreaMeasurementResult | undefined | null
 > = M.mapProp('totalSurfaceArea', M.ifDefined(mapSurfaceArea));
 
-const mapMeasurementResult: M.Func<PbMeasurementResult.AsObject, MeasurementResult> =
-  M.compose(
-    M.pickFirst(
-      mapPlanarDistanceFromResult,
-      mapPlanarAngleFromResult,
-      mapMinimumDistanceFromResult,
-      mapSurfaceAreaFromResult,
-    ),
-    M.required('Result field'),
-  );
+const mapMeasurementResult: M.Func<
+  PbMeasurementResult.AsObject,
+  MeasurementResult
+> = M.compose(
+  M.pickFirst(
+    mapPlanarDistanceFromResult,
+    mapPlanarAngleFromResult,
+    mapMinimumDistanceFromResult,
+    mapSurfaceAreaFromResult,
+  ),
+  M.required('Result field'),
+);
 
-export const mapMeasureResponse: M.Func<PbMeasureResponse.AsObject, MeasurementOutcome> =
-  M.defineMapper(
-    M.read(
-      M.mapRequiredProp(
-        'outcome',
-        M.mapRequiredProp('resultsList', M.mapArray(mapMeasurementResult)),
-      ),
-      M.mapRequiredProp('outcome', M.getProp('isApproximate')),
+export const mapMeasureResponse: M.Func<
+  PbMeasureResponse.AsObject,
+  MeasurementOutcome
+> = M.defineMapper(
+  M.read(
+    M.mapRequiredProp(
+      'outcome',
+      M.mapRequiredProp('resultsList', M.mapArray(mapMeasurementResult)),
     ),
-    ([results, isApproximate]) => ({ results, isApproximate }),
-  );
+    M.mapRequiredProp('outcome', M.getProp('isApproximate')),
+  ),
+  ([results, isApproximate]) => ({ results, isApproximate }),
+);
 
 export const mapMeasureResponseOrThrow = M.ifInvalidThrow(mapMeasureResponse);

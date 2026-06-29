@@ -4,7 +4,10 @@
 /* istanbul ignore file */
 export * from './camera';
 export * from './crossSectioner';
-export { ItemOperationBuilder, PmiAnnotationOperationBuilder } from './operations';
+export {
+  ItemOperationBuilder,
+  PmiAnnotationOperationBuilder,
+} from './operations';
 export {
   AllQuery,
   AllSelectedQuery,

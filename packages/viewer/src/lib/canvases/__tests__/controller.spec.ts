@@ -1,4 +1,6 @@
-jest.mock('@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service');
+jest.mock(
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
+);
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { Color, UUID } from '@vertexvis/utils';
@@ -15,7 +17,13 @@ import {
 } from '../../../testing/canvases';
 import { CanvasController } from '../controller';
 import { mapCanvasItem, mapGetCanvasResponseOrThrow } from '../mapper';
-import { CalloutItem, FreeformItem2d, LineItem2d, OvalItem2d, PinItem2d } from '../types';
+import {
+  CalloutItem,
+  FreeformItem2d,
+  LineItem2d,
+  OvalItem2d,
+  PinItem2d,
+} from '../types';
 
 describe(CanvasController, () => {
   const jwt = random.string();

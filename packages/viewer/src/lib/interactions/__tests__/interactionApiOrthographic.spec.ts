@@ -1,7 +1,14 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock('../../../workers/png-decoder-pool');
 
-import { Angle, BoundingBox, Dimensions, Point, Ray, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  BoundingBox,
+  Dimensions,
+  Point,
+  Ray,
+  Vector3,
+} from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 import { random } from '../../../testing';
@@ -72,22 +79,25 @@ describe(InteractionApiOrthographic, () => {
     );
   });
 
-  describe(InteractionApiOrthographic.prototype.getWorldPointFromViewport, () => {
-    it('uses an orthographic ray to determine a world point', async () => {
-      const depthBuffer = (await frame.depthBuffer()) as DepthBuffer;
-      jest.spyOn(depthBuffer, 'getDepthAtPoint').mockImplementation(() => 0);
+  describe(
+    InteractionApiOrthographic.prototype.getWorldPointFromViewport,
+    () => {
+      it('uses an orthographic ray to determine a world point', async () => {
+        const depthBuffer = (await frame.depthBuffer()) as DepthBuffer;
+        jest.spyOn(depthBuffer, 'getDepthAtPoint').mockImplementation(() => 0);
 
-      const expectedRay = viewport.transformPointToRay(
-        Point.create(1, 1),
-        frame.image,
-        frame.scene.camera,
-      );
+        const expectedRay = viewport.transformPointToRay(
+          Point.create(1, 1),
+          frame.image,
+          frame.scene.camera,
+        );
 
-      expect(await api.getWorldPointFromViewport(Point.create(1, 1))).toMatchObject(
-        Ray.at(expectedRay, 0),
-      );
-    });
-  });
+        expect(
+          await api.getWorldPointFromViewport(Point.create(1, 1)),
+        ).toMatchObject(Ray.at(expectedRay, 0));
+      });
+    },
+  );
 
   describe(InteractionApiOrthographic.prototype.panCameraByDelta, () => {
     it('uses the view vector of the orthographic camera', async () => {
@@ -101,7 +111,9 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest.spyOn(scene, 'camera').mockImplementation(() => mockOrthographicCamera);
+      jest
+        .spyOn(scene, 'camera')
+        .mockImplementation(() => mockOrthographicCamera);
       const moveBy = jest.spyOn(mockOrthographicCamera, 'moveBy');
 
       await api.beginInteraction();
@@ -124,7 +136,9 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest.spyOn(scene, 'camera').mockImplementation(() => mockOrthographicCamera);
+      jest
+        .spyOn(scene, 'camera')
+        .mockImplementation(() => mockOrthographicCamera);
       const update = jest
         .spyOn(mockOrthographicCamera, 'update')
         .mockImplementation(() => mockOrthographicCamera);
@@ -155,7 +169,9 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest.spyOn(scene, 'camera').mockImplementation(() => mockOrthographicCamera);
+      jest
+        .spyOn(scene, 'camera')
+        .mockImplementation(() => mockOrthographicCamera);
       const update = jest.spyOn(mockOrthographicCamera, 'update');
 
       await api.beginInteraction();
@@ -169,7 +185,8 @@ describe(InteractionApiOrthographic, () => {
       expect(update.mock.calls[0][0].lookAt?.y).toBeCloseTo(-2);
       expect(update.mock.calls[0][0].lookAt?.z).toBe(0);
       expect(
-        (update.mock.calls[0][0] as FrameCamera.OrthographicFrameCamera).fovHeight,
+        (update.mock.calls[0][0] as FrameCamera.OrthographicFrameCamera)
+          .fovHeight,
       ).toBe(5);
     });
   });
@@ -184,7 +201,9 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 100)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest.spyOn(scene, 'camera').mockImplementation(() => mockOrthographicCamera);
+      jest
+        .spyOn(scene, 'camera')
+        .mockImplementation(() => mockOrthographicCamera);
       const update = jest.spyOn(mockOrthographicCamera, 'update');
 
       await api.beginInteraction();

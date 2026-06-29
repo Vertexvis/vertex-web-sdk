@@ -5,7 +5,12 @@ import { toProtoDuration } from '@vertexvis/stream-api';
 import { UUID } from '@vertexvis/utils';
 import Long from 'long';
 
-import { Animation, FlyTo, FrameCamera, SceneViewStateIdentifier } from '../types';
+import {
+  Animation,
+  FlyTo,
+  FrameCamera,
+  SceneViewStateIdentifier,
+} from '../types';
 import { isValidFrameCamera } from '../types/frameCamera';
 import { ItemOperation, PmiAnnotationOperation } from './operations';
 import { AnnotationQueryExpression, QueryExpression } from './queries';
@@ -18,7 +23,10 @@ export interface BuildSceneOperationContext {
 export function buildSceneViewStateIdentifier(
   identifier: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
 ):
-  | Pick<vertexvis.protobuf.stream.ILoadSceneViewStatePayload, 'sceneViewStateId'>
+  | Pick<
+      vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
+      'sceneViewStateId'
+    >
   | Pick<
       vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
       'sceneViewStateSuppliedId'
@@ -409,7 +417,8 @@ function buildOperationTypes(
         if (op.id === 'empty') {
           return {
             viewRepresentation: {
-              predefinedId: RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
+              predefinedId:
+                RepresentationPredefinedId.REPRESENTATION_PREDEFINED_ID_EMPTY,
             },
           };
         } else if (op.id === 'entire-part') {

@@ -18,7 +18,9 @@ describe('ListSceneItemMetadataResponse', () => {
   it('paging next cursor', () => {
     expect(
       validate(
-        new ListSceneItemMetadataResponseBuilder().withCursor(CURSOR_VALUE).build(),
+        new ListSceneItemMetadataResponseBuilder()
+          .withCursor(CURSOR_VALUE)
+          .build(),
       ),
     ).toEqual({
       paging: {
@@ -31,7 +33,9 @@ describe('ListSceneItemMetadataResponse', () => {
   it('paging cursor undefined', () => {
     expect(
       validate(
-        new ListSceneItemMetadataResponseBuilder().withCursor(UNDEFINED_CURSOR).build(),
+        new ListSceneItemMetadataResponseBuilder()
+          .withCursor(UNDEFINED_CURSOR)
+          .build(),
       ),
     ).toEqual({
       paging: {
@@ -45,7 +49,9 @@ describe('ListSceneItemMetadataResponse', () => {
     expect(
       validate(
         new ListSceneItemMetadataResponseBuilder()
-          .withProperties([new PropertyEntryBuilder().withId('random-id').build()])
+          .withProperties([
+            new PropertyEntryBuilder().withId('random-id').build(),
+          ])
           .build(),
       ),
     ).toEqual({
@@ -64,7 +70,9 @@ describe('ListSceneItemMetadataResponse', () => {
     expect(
       validate(
         new ListSceneItemMetadataResponseBuilder()
-          .withProperties([new PropertyEntryBuilder().withId('random-id').build()])
+          .withProperties([
+            new PropertyEntryBuilder().withId('random-id').build(),
+          ])
           .build(),
       ),
     ).toEqual({
@@ -120,7 +128,10 @@ describe('ListSceneItemMetadataResponse', () => {
             new PropertyEntryBuilder()
               .withId('random-id')
               .withKey(
-                new PropertyKeyBuilder().withName('name').withCategory(category).build(),
+                new PropertyKeyBuilder()
+                  .withName('name')
+                  .withCategory(category)
+                  .build(),
               )
               .build(),
           ])
@@ -149,7 +160,9 @@ describe('ListSceneItemMetadataResponse', () => {
           .withProperties([
             new PropertyEntryBuilder()
               .withId('random-id')
-              .withValue(new PropertyValueBuilder().withString('string-value').build())
+              .withValue(
+                new PropertyValueBuilder().withString('string-value').build(),
+              )
               .build(),
           ])
           .build(),
@@ -261,6 +274,8 @@ describe('ListSceneItemMetadataResponse', () => {
   });
 });
 
-const validate = (response: ListSceneItemMetadataResponse): SceneItemMetadataResponse => {
+const validate = (
+  response: ListSceneItemMetadataResponse,
+): SceneItemMetadataResponse => {
   return mapListSceneItemMetadataResponseOrThrow(response.toObject());
 };

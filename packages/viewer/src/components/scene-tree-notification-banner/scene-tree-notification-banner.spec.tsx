@@ -20,7 +20,9 @@ describe('<vertex-scene-tree-notification-banner>', () => {
     });
 
     banner.addEventListener('action', onActionMock);
-    const actionButton = banner.shadowRoot?.querySelector('.notification-banner-button');
+    const actionButton = banner.shadowRoot?.querySelector(
+      '.notification-banner-button',
+    );
     actionButton?.dispatchEvent(new MouseEvent('click'));
 
     expect(onActionMock).toHaveBeenCalled();
@@ -31,7 +33,9 @@ describe('<vertex-scene-tree-notification-banner>', () => {
       html: `<vertex-scene-tree-notification-banner></vertex-scene-tree-notification-banner>`,
     });
 
-    expect(banner.shadowRoot?.querySelector('.notification-banner-button')).toBeNull();
+    expect(
+      banner.shadowRoot?.querySelector('.notification-banner-button'),
+    ).toBeNull();
   });
 });
 

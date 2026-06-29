@@ -22,7 +22,9 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
   onCenterAnchorPointerDown,
   onEndAnchorPointerDown,
 }) => {
-  const angle = Angle.normalize(Angle.toDegrees(Angle.fromPoints(start, end)) - 270);
+  const angle = Angle.normalize(
+    Angle.toDegrees(Angle.fromPoints(start, end)) - 270,
+  );
   const center = Point.create((start.x + end.x) / 2, (start.y + end.y) / 2);
   const transform =
     offset != null ? `translate(${offset.x}px, ${offset.y}px)` : undefined;
@@ -56,7 +58,9 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
         point={center}
         onPointerDown={onCenterAnchorPointerDown}
       >
-        <div class={classNames('bounds-default-anchor', 'bounds-center-anchor')} />
+        <div
+          class={classNames('bounds-default-anchor', 'bounds-center-anchor')}
+        />
       </RelativeAnchor>
     </div>
   );

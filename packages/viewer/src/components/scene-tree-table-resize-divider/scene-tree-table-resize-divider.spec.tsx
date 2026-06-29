@@ -22,7 +22,9 @@ describe('<vertex-scene-tree-table-resize-divider>', () => {
       `,
     });
 
-    expect(divider.getAttribute('style')).toContain('height: var(--header-height)');
+    expect(divider.getAttribute('style')).toContain(
+      'height: var(--header-height)',
+    );
     expect(divider.getAttribute('style')).toContain(
       'padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2)',
     );
@@ -40,7 +42,9 @@ describe('<vertex-scene-tree-table-resize-divider>', () => {
 
     await page.waitForChanges();
 
-    expect(divider.getAttribute('style')).toContain('height: var(--header-height)');
+    expect(divider.getAttribute('style')).toContain(
+      'height: var(--header-height)',
+    );
     expect(divider.getAttribute('style')).toContain(
       'padding: calc(var(--header-height) / 8) calc(var(--scene-tree-table-column-gap) / 2)',
     );

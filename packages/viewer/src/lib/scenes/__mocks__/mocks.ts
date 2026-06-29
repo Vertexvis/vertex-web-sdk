@@ -4,7 +4,8 @@ import { Scene } from '../scene';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const SceneMocks = jest.createMockFromModule('../../scenes') as any;
 
-export const cameraMock = new SceneMocks.PerspectiveCamera() as PerspectiveCamera;
+export const cameraMock =
+  new SceneMocks.PerspectiveCamera() as PerspectiveCamera;
 
 (cameraMock.fitToBoundingBox as jest.Mock).mockReturnValue(cameraMock);
 (cameraMock.flyTo as jest.Mock).mockReturnValue(cameraMock);

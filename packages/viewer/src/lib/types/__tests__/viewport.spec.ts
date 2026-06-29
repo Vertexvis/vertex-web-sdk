@@ -79,14 +79,19 @@ describe('viewport utilities', () => {
       const depth =
         desiredDepthPercentageToTest * (perspective.far - perspective.near) +
         perspective.near;
-      const ray = viewport.transformPointToRay(Point.create(10, 10), buffer, perspective);
+      const ray = viewport.transformPointToRay(
+        Point.create(10, 10),
+        buffer,
+        perspective,
+      );
 
       const worldPt = Ray.at(ray, perspective.far);
       const eyeToWorldPt = Vector3.subtract(worldPt, perspective.position);
 
       const angle =
         Vector3.dot(perspective.viewVector, eyeToWorldPt) /
-        (Vector3.magnitude(perspective.viewVector) * Vector3.magnitude(eyeToWorldPt));
+        (Vector3.magnitude(perspective.viewVector) *
+          Vector3.magnitude(eyeToWorldPt));
 
       expect(
         viewport.transformPointToWorldSpace(
@@ -102,7 +107,8 @@ describe('viewport utilities', () => {
       const desiredDepthPercentageToTest = 0.5;
 
       const buffer = makeDepthBuffer(100, 100, undefined, orthographic);
-      const depth = desiredDepthPercentageToTest * (orthographic.far - orthographic.near);
+      const depth =
+        desiredDepthPercentageToTest * (orthographic.far - orthographic.near);
       const ray = viewport.transformPointToRay(
         Point.create(10, 10),
         buffer,

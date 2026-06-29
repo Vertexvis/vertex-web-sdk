@@ -313,9 +313,9 @@ describe(getClosestCenterToPoint, () => {
       x: boxPoint.x + dimensions.width / 2,
       y: boxPoint.y,
     };
-    expect(getClosestCenterToPoint(boxPoint, rightAboveBox, dimensions)).toEqual(
-      expectedTopPoint,
-    );
+    expect(
+      getClosestCenterToPoint(boxPoint, rightAboveBox, dimensions),
+    ).toEqual(expectedTopPoint);
   });
 
   it('should return the point to the left of the box', async () => {

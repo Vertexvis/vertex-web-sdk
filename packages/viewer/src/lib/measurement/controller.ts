@@ -37,9 +37,13 @@ export class MeasurementController {
    * @returns A promise that resolves with the results after registering this
    * entity.
    */
-  public addEntity(entity: MeasurementEntity): Promise<MeasurementOutcome | undefined> {
+  public addEntity(
+    entity: MeasurementEntity,
+  ): Promise<MeasurementOutcome | undefined> {
     if (this.debugLogs) {
-      const deserializedEntity = ModelEntity.deserializeBinary(entity.modelEntity);
+      const deserializedEntity = ModelEntity.deserializeBinary(
+        entity.modelEntity,
+      );
 
       this.log(
         `Adding ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`,
@@ -75,7 +79,9 @@ export class MeasurementController {
     entity: MeasurementEntity,
   ): Promise<MeasurementOutcome | undefined> {
     if (this.debugLogs) {
-      const deserializedEntity = ModelEntity.deserializeBinary(entity.modelEntity);
+      const deserializedEntity = ModelEntity.deserializeBinary(
+        entity.modelEntity,
+      );
 
       this.log(
         `Removing ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`,

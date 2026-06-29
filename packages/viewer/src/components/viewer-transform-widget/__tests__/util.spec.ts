@@ -19,7 +19,10 @@ import {
   convertPointToCanvas,
 } from '../util';
 
-function expectMatrixCloseTo(actual: Matrix4.Matrix4, expected: Matrix4.Matrix4): void {
+function expectMatrixCloseTo(
+  actual: Matrix4.Matrix4,
+  expected: Matrix4.Matrix4,
+): void {
   actual.forEach((ev, i) => {
     expect(ev).toBeCloseTo(expected[i]);
   });

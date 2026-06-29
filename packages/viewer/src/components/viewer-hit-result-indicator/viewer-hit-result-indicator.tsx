@@ -105,9 +105,15 @@ export class ViewerHitResultIndicator {
     oldViewer?: HTMLVertexViewerElement,
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    oldViewer?.removeEventListener('dimensionschange', this.handleViewerDimensionsChange);
+    oldViewer?.removeEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChange,
+    );
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    newViewer?.addEventListener('dimensionschange', this.handleViewerDimensionsChange);
+    newViewer?.addEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChange,
+    );
   }
 
   /**

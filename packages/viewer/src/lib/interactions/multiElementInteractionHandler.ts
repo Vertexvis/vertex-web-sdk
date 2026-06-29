@@ -19,7 +19,9 @@ export abstract class MultiElementInteractionHandler extends BaseInteractionHand
     externalElement.dispose();
 
     this.registeredExternalElements = Object.fromEntries(
-      Object.entries(this.registeredExternalElements).filter(([key]) => key !== id),
+      Object.entries(this.registeredExternalElements).filter(
+        ([key]) => key !== id,
+      ),
     );
   }
 

@@ -10,7 +10,11 @@ import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { Point, Rectangle } from '@vertexvis/geometry';
 
-import { ArrowMarkup, CircleMarkup, FreeformMarkup } from '../../lib/types/markup';
+import {
+  ArrowMarkup,
+  CircleMarkup,
+  FreeformMarkup,
+} from '../../lib/types/markup';
 import { Viewer } from '../viewer/viewer';
 import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
 import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
@@ -231,7 +235,10 @@ describe('vertex-viewer-markup', () => {
       const page = await newSpecPage({
         components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
         template: () => (
-          <vertex-viewer-markup onMarkupAdded={onMarkupAdded} select-new={false} />
+          <vertex-viewer-markup
+            onMarkupAdded={onMarkupAdded}
+            select-new={false}
+          />
         ),
       });
 
@@ -293,7 +300,9 @@ describe('vertex-viewer-markup', () => {
         'vertex-viewer-markup-arrow',
       ) as HTMLVertexViewerMarkupArrowElement;
       arrow.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 100, clientY: 0 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 100, clientY: 0 }),
+      );
       await page.waitForChanges();
 
       expect(arrow.start).toBeDefined();
@@ -312,7 +321,9 @@ describe('vertex-viewer-markup', () => {
         'vertex-viewer-markup-circle',
       ) as HTMLVertexViewerMarkupCircleElement;
       circle.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 100, clientY: 100 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 100, clientY: 100 }),
+      );
       await page.waitForChanges();
 
       expect(circle.bounds).toBeDefined();
@@ -329,8 +340,12 @@ describe('vertex-viewer-markup', () => {
         'vertex-viewer-markup-freeform',
       ) as HTMLVertexViewerMarkupFreeformElement;
       freeform.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 100, clientY: 0 }));
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 100, clientY: 100 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 100, clientY: 0 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 100, clientY: 100 }),
+      );
       await page.waitForChanges();
 
       expect(freeform.bounds).toBeDefined();
@@ -362,7 +377,9 @@ describe('vertex-viewer-markup', () => {
       const onMarkupRemoved = jest.fn();
       const page = await newSpecPage({
         components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        template: () => <vertex-viewer-markup onMarkupRemoved={onMarkupRemoved} />,
+        template: () => (
+          <vertex-viewer-markup onMarkupRemoved={onMarkupRemoved} />
+        ),
       });
 
       const el = page.root as HTMLVertexViewerMarkupElement;
@@ -408,14 +425,18 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
 
       [arrow, circle, freeform].forEach((el) => {
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe('-20%');
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe('-20%');
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('width')).toBe(
-          '240%',
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe(
+          '-20%',
         );
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('height')).toBe(
-          '240%',
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe(
+          '-20%',
         );
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('width'),
+        ).toBe('240%');
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('height'),
+        ).toBe('240%');
       });
     });
 
@@ -449,14 +470,18 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
 
       [arrow, circle, freeform].forEach((el) => {
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe('-10%');
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe('-10%');
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('width')).toBe(
-          '120%',
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe(
+          '-10%',
         );
-        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('height')).toBe(
-          '120%',
+        expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe(
+          '-10%',
         );
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('width'),
+        ).toBe('120%');
+        expect(
+          el.shadowRoot?.querySelector('filter')?.getAttribute('height'),
+        ).toBe('120%');
       });
     });
   });
@@ -604,7 +629,11 @@ describe('vertex-viewer-markup', () => {
         }),
       );
       markup?.dispatchEvent(
-        new MouseEvent('pointerup', { bubbles: true, clientX: 50, clientY: 50 }),
+        new MouseEvent('pointerup', {
+          bubbles: true,
+          clientX: 50,
+          clientY: 50,
+        }),
       );
       await page.waitForChanges();
 

@@ -14,7 +14,11 @@ import {
   Viewport,
 } from '../../lib/types';
 import { drawFramePayloadPerspective } from '../../testing/fixtures';
-import { key1, loadViewerStreamKey, makeViewerStream } from '../../testing/viewer';
+import {
+  key1,
+  loadViewerStreamKey,
+  makeViewerStream,
+} from '../../testing/viewer';
 import { Viewer } from '../viewer/viewer';
 import { ViewerTeleportTool } from './viewer-teleport-tool';
 
@@ -43,11 +47,15 @@ describe('vertex-viewer-teleport-tool', () => {
 
   function mockViewport(viewer: HTMLVertexViewerElement, hit = mockHit): void {
     const viewport = new Viewport(
-      drawFramePayloadPerspective.imageAttributes?.frameDimensions?.width as number,
-      drawFramePayloadPerspective.imageAttributes?.frameDimensions?.height as number,
+      drawFramePayloadPerspective.imageAttributes?.frameDimensions
+        ?.width as number,
+      drawFramePayloadPerspective.imageAttributes?.frameDimensions
+        ?.height as number,
     );
 
-    jest.spyOn(viewport, 'transformPointToWorldSpace').mockReturnValue(hit.hitPoint);
+    jest
+      .spyOn(viewport, 'transformPointToWorldSpace')
+      .mockReturnValue(hit.hitPoint);
 
     viewer.viewport = viewport;
   }
@@ -74,12 +82,18 @@ describe('vertex-viewer-teleport-tool', () => {
 
     mockViewport(viewer);
 
-    const camera = viewer.frame?.scene.camera as FrameCamera.PerspectiveFrameCamera;
+    const camera = viewer.frame?.scene
+      .camera as FrameCamera.PerspectiveFrameCamera;
     const viewVectorDistance = Vector3.distance(camera.position, camera.lookAt);
-    const boundingBox = viewer.frame?.scene.boundingBox as BoundingBox.BoundingBox;
-    const minLength = Math.min(...Vector3.toArray(BoundingBox.lengths(boundingBox)));
+    const boundingBox = viewer.frame?.scene
+      .boundingBox as BoundingBox.BoundingBox;
+    const minLength = Math.min(
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
+    );
 
-    const canvas = viewer.shadowRoot?.querySelector('canvas') as HTMLCanvasElement;
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
       'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
@@ -133,12 +147,18 @@ describe('vertex-viewer-teleport-tool', () => {
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
-    const camera = viewer.frame?.scene.camera as FrameCamera.PerspectiveFrameCamera;
+    const camera = viewer.frame?.scene
+      .camera as FrameCamera.PerspectiveFrameCamera;
     const viewVectorDistance = Vector3.distance(camera.position, camera.lookAt);
-    const boundingBox = viewer.frame?.scene.boundingBox as BoundingBox.BoundingBox;
-    const minLength = Math.min(...Vector3.toArray(BoundingBox.lengths(boundingBox)));
+    const boundingBox = viewer.frame?.scene
+      .boundingBox as BoundingBox.BoundingBox;
+    const minLength = Math.min(
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
+    );
 
-    const canvas = viewer.shadowRoot?.querySelector('canvas') as HTMLCanvasElement;
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
       'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
@@ -194,11 +214,17 @@ describe('vertex-viewer-teleport-tool', () => {
 
     mockViewport(viewer);
 
-    const camera = viewer.frame?.scene.camera as FrameCamera.PerspectiveFrameCamera;
-    const boundingBox = viewer.frame?.scene.boundingBox as BoundingBox.BoundingBox;
-    const maxLength = Math.max(...Vector3.toArray(BoundingBox.lengths(boundingBox)));
+    const camera = viewer.frame?.scene
+      .camera as FrameCamera.PerspectiveFrameCamera;
+    const boundingBox = viewer.frame?.scene
+      .boundingBox as BoundingBox.BoundingBox;
+    const maxLength = Math.max(
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
+    );
 
-    const canvas = viewer.shadowRoot?.querySelector('canvas') as HTMLCanvasElement;
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
       'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
@@ -207,8 +233,12 @@ describe('vertex-viewer-teleport-tool', () => {
 
     await page.waitForChanges();
 
-    canvas.dispatchEvent(new MouseEvent('pointerdown', { clientX: 50, clientY: 25 }));
-    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 50, clientY: 25 }));
+    canvas.dispatchEvent(
+      new MouseEvent('pointerdown', { clientX: 50, clientY: 25 }),
+    );
+    window.dispatchEvent(
+      new MouseEvent('pointerup', { clientX: 50, clientY: 25 }),
+    );
 
     await page.waitForChanges();
 
@@ -255,10 +285,15 @@ describe('vertex-viewer-teleport-tool', () => {
     mockViewport(viewer);
 
     const camera = viewer.frame?.scene.camera as FramePerspectiveCamera;
-    const boundingBox = viewer.frame?.scene.boundingBox as BoundingBox.BoundingBox;
-    const maxLength = Math.max(...Vector3.toArray(BoundingBox.lengths(boundingBox)));
+    const boundingBox = viewer.frame?.scene
+      .boundingBox as BoundingBox.BoundingBox;
+    const maxLength = Math.max(
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
+    );
 
-    const canvas = viewer.shadowRoot?.querySelector('canvas') as HTMLCanvasElement;
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
       'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
@@ -267,8 +302,12 @@ describe('vertex-viewer-teleport-tool', () => {
 
     await page.waitForChanges();
 
-    canvas.dispatchEvent(new MouseEvent('pointerdown', { clientX: 75, clientY: 25 }));
-    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 75, clientY: 25 }));
+    canvas.dispatchEvent(
+      new MouseEvent('pointerdown', { clientX: 75, clientY: 25 }),
+    );
+    window.dispatchEvent(
+      new MouseEvent('pointerup', { clientX: 75, clientY: 25 }),
+    );
 
     await page.waitForChanges();
 
@@ -317,7 +356,9 @@ describe('vertex-viewer-teleport-tool', () => {
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const camera = viewer.frame?.scene.camera as FramePerspectiveCamera;
-    const canvas = viewer.shadowRoot?.querySelector('canvas') as HTMLCanvasElement;
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
       'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
@@ -327,7 +368,11 @@ describe('vertex-viewer-teleport-tool', () => {
       teleportCollisionDistance: collisionDistance,
     });
 
-    const hitPoint = Vector3.create(0, 0, camera.position.z - collisionDistance * 1.5);
+    const hitPoint = Vector3.create(
+      0,
+      0,
+      camera.position.z - collisionDistance * 1.5,
+    );
     mockViewport(viewer, {
       ...mockHit,
       hitPoint,
@@ -335,8 +380,12 @@ describe('vertex-viewer-teleport-tool', () => {
 
     await page.waitForChanges();
 
-    canvas.dispatchEvent(new MouseEvent('pointerdown', { clientX: 50, clientY: 25 }));
-    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 50, clientY: 25 }));
+    canvas.dispatchEvent(
+      new MouseEvent('pointerdown', { clientX: 50, clientY: 25 }),
+    );
+    window.dispatchEvent(
+      new MouseEvent('pointerup', { clientX: 50, clientY: 25 }),
+    );
 
     await page.waitForChanges();
 
@@ -351,7 +400,9 @@ describe('vertex-viewer-teleport-tool', () => {
           lookAt: {
             x: 0,
             y: 0,
-            z: camera.lookAt.z + (hitPoint.z + collisionDistance - camera.position.z),
+            z:
+              camera.lookAt.z +
+              (hitPoint.z + collisionDistance - camera.position.z),
           },
         }),
       }),
@@ -377,12 +428,18 @@ describe('vertex-viewer-teleport-tool', () => {
 
     mockViewport(viewer);
 
-    const camera = viewer.frame?.scene.camera as FrameCamera.PerspectiveFrameCamera;
+    const camera = viewer.frame?.scene
+      .camera as FrameCamera.PerspectiveFrameCamera;
     const viewVectorDistance = Vector3.distance(camera.position, camera.lookAt);
-    const boundingBox = viewer.frame?.scene.boundingBox as BoundingBox.BoundingBox;
-    const minLength = Math.min(...Vector3.toArray(BoundingBox.lengths(boundingBox)));
+    const boundingBox = viewer.frame?.scene
+      .boundingBox as BoundingBox.BoundingBox;
+    const minLength = Math.min(
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
+    );
 
-    const canvas = viewer.shadowRoot?.querySelector('canvas') as HTMLCanvasElement;
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
       'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
@@ -436,12 +493,18 @@ describe('vertex-viewer-teleport-tool', () => {
 
     mockViewport(viewer);
 
-    const camera = viewer.frame?.scene.camera as FrameCamera.PerspectiveFrameCamera;
+    const camera = viewer.frame?.scene
+      .camera as FrameCamera.PerspectiveFrameCamera;
     const viewVectorDistance = Vector3.distance(camera.position, camera.lookAt);
-    const boundingBox = viewer.frame?.scene.boundingBox as BoundingBox.BoundingBox;
-    const minLength = Math.min(...Vector3.toArray(BoundingBox.lengths(boundingBox)));
+    const boundingBox = viewer.frame?.scene
+      .boundingBox as BoundingBox.BoundingBox;
+    const minLength = Math.min(
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
+    );
 
-    const canvas = viewer.shadowRoot?.querySelector('canvas') as HTMLCanvasElement;
+    const canvas = viewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
       'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;

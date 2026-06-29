@@ -203,7 +203,9 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    expect(cell.shadowRoot?.querySelector('vertex-icon.icon-locate')).toBeDefined();
+    expect(
+      cell.shadowRoot?.querySelector('vertex-icon.icon-locate'),
+    ).toBeDefined();
   });
 
   it('renders with depth-based background color variables', async () => {
@@ -211,7 +213,9 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const nodeDepthOne = createNode({ depth: 1, expanded: false });
     const { page, cell } = await newComponentSpec({
       template: () => (
-        <vertex-scene-tree-table-cell expand-toggle></vertex-scene-tree-table-cell>
+        <vertex-scene-tree-table-cell
+          expand-toggle
+        ></vertex-scene-tree-table-cell>
       ),
       node: nodeDepthZero,
     });
@@ -233,7 +237,9 @@ describe('<vertex-scene-tree-table-cell>', () => {
     const node = createNode({ expanded: false, selected: true });
     const { cell } = await newComponentSpec({
       template: () => (
-        <vertex-scene-tree-table-cell expand-toggle></vertex-scene-tree-table-cell>
+        <vertex-scene-tree-table-cell
+          expand-toggle
+        ></vertex-scene-tree-table-cell>
       ),
       node,
     });
@@ -506,7 +512,9 @@ describe('<vertex-scene-tree-table-cell>', () => {
     (cell as any).tree = tree;
 
     cell.dispatchEvent(pointerDownEvent);
-    cell.dispatchEvent(new MouseEvent('pointerup', { button: 0, ctrlKey: true }));
+    cell.dispatchEvent(
+      new MouseEvent('pointerup', { button: 0, ctrlKey: true }),
+    );
 
     expect(tree.selectItem).toHaveBeenCalledWith(
       expect.anything(),
@@ -551,7 +559,9 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
     cell.dispatchEvent(pointerDownEvent);
 
-    cell.dispatchEvent(new MouseEvent('pointerup', { button: 0, metaKey: true }));
+    cell.dispatchEvent(
+      new MouseEvent('pointerup', { button: 0, metaKey: true }),
+    );
 
     expect(tree.deselectItem).toHaveBeenCalled();
   });

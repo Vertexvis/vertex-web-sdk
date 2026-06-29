@@ -4,7 +4,11 @@ jest.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions, Point } from '@vertexvis/geometry';
-import { RequestMessage, RequestMessageHandler, StreamApi } from '@vertexvis/stream-api';
+import {
+  RequestMessage,
+  RequestMessageHandler,
+  StreamApi,
+} from '@vertexvis/stream-api';
 import { Disposable, UUID } from '@vertexvis/utils';
 
 import { random } from '../../../testing';
@@ -96,7 +100,9 @@ describe(Scene, () => {
     it('should execute commands and query by itemId', () => {
       const itemId = random.guid();
 
-      scene.items((op) => op.where((q) => q.withItemId(itemId)).hide()).execute();
+      scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).hide())
+        .execute();
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
           hex: sceneViewId,
@@ -249,7 +255,9 @@ describe(Scene, () => {
     it('should support passing metadata queries', () => {
       scene
         .items((op) =>
-          op.where((q) => q.withMetadata('foo', ['bar', 'baz'], false)).select(),
+          op
+            .where((q) => q.withMetadata('foo', ['bar', 'baz'], false))
+            .select(),
         )
         .execute();
 
@@ -322,7 +330,9 @@ describe(Scene, () => {
       scene
         .items((op) => [
           op.where((q) => q.all()).hide(),
-          op.where((q) => q.withItemId(itemId).or().withSuppliedId(suppliedId)).show(),
+          op
+            .where((q) => q.withItemId(itemId).or().withSuppliedId(suppliedId))
+            .show(),
           op
             .where((q) => q.all())
             .materialOverride(ColorMaterial.fromHex('#ff1122'))
@@ -447,7 +457,9 @@ describe(Scene, () => {
 
     it('supports selection', () => {
       const itemId = random.guid();
-      scene.items((op) => op.where((q) => q.withItemId(itemId)).select()).execute();
+      scene
+        .items((op) => op.where((q) => q.withItemId(itemId)).select())
+        .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
@@ -642,7 +654,9 @@ describe(Scene, () => {
     });
 
     it('should support passing withSelected queries', () => {
-      scene.elements((op) => op.items.where((q) => q.withSelected()).select()).execute();
+      scene
+        .elements((op) => op.items.where((q) => q.withSelected()).select())
+        .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
@@ -718,7 +732,9 @@ describe(Scene, () => {
     it('should support passing metadata queries', () => {
       scene
         .elements((op) =>
-          op.items.where((q) => q.withMetadata('foo', ['bar', 'baz'], false)).select(),
+          op.items
+            .where((q) => q.withMetadata('foo', ['bar', 'baz'], false))
+            .select(),
         )
         .execute();
 
@@ -753,7 +769,9 @@ describe(Scene, () => {
     });
 
     it('should support passing visibility queries', () => {
-      scene.elements((op) => op.items.where((q) => q.withVisible()).select()).execute();
+      scene
+        .elements((op) => op.items.where((q) => q.withVisible()).select())
+        .execute();
 
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
         sceneViewId: {
@@ -1041,7 +1059,8 @@ describe(Scene, () => {
         {
           frameCorrelationId: { value: 'foo' },
           includeCamera: true,
-          cameraType: vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
         true,
       );
@@ -1058,7 +1077,8 @@ describe(Scene, () => {
         {
           frameCorrelationId: { value: 'foo' },
           includeCamera: true,
-          cameraType: vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_PERSPECTIVE,
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_PERSPECTIVE,
         },
         true,
       );
@@ -1092,7 +1112,8 @@ describe(Scene, () => {
         {
           sceneViewStateId: { hex: mockSceneViewStateId },
           frameCorrelationId: { value: 'foo' },
-          cameraType: vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
         true,
       );
@@ -1169,16 +1190,21 @@ describe(Scene, () => {
             vertexvis.protobuf.stream.SceneViewStateFeature
               .SCENE_VIEW_STATE_FEATURE_CAMERA,
           ],
-          cameraType: vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
+          cameraType:
+            vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
         true,
       );
     });
 
     it('should support supplied ids', async () => {
-      await scene.applyPartialSceneViewState({ suppliedId: 'supplied-id' }, ['camera'], {
-        suppliedCorrelationId: 'foo',
-      });
+      await scene.applyPartialSceneViewState(
+        { suppliedId: 'supplied-id' },
+        ['camera'],
+        {
+          suppliedCorrelationId: 'foo',
+        },
+      );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
         {
@@ -1195,9 +1221,13 @@ describe(Scene, () => {
 
     it('should support object-based ids', async () => {
       const mockSceneViewStateId = UUID.create();
-      await scene.applyPartialSceneViewState({ id: mockSceneViewStateId }, ['camera'], {
-        suppliedCorrelationId: 'foo',
-      });
+      await scene.applyPartialSceneViewState(
+        { id: mockSceneViewStateId },
+        ['camera'],
+        {
+          suppliedCorrelationId: 'foo',
+        },
+      );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
         {

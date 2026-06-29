@@ -3,7 +3,9 @@ export class VisibilityObserver {
 
   private mutationObservers: MutationObserver[];
 
-  public constructor(private callback: (visible: boolean) => void | Promise<void>) {
+  public constructor(
+    private callback: (visible: boolean) => void | Promise<void>,
+  ) {
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
     this.emitVisibilityChange = this.emitVisibilityChange.bind(this);
 

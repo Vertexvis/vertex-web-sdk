@@ -113,17 +113,23 @@ export abstract class ReglComponent implements Disposable {
 
     // Reverse sorted elements to draw the closest element last.
     // This causes it to appear above any other element.
-    this.drawableElements = (drawableElements.filter((el) => el != null) as Drawable[])
+    this.drawableElements = (
+      drawableElements.filter((el) => el != null) as Drawable[]
+    )
       .filter((el) => el.points.valid)
       .sort(compare)
       .reverse();
   }
 
-  protected computeTriangleSize(position: Vector3.Vector3, frame: Frame): number {
+  protected computeTriangleSize(
+    position: Vector3.Vector3,
+    frame: Frame,
+  ): number {
     const baseTriangleSize = frame.scene.camera.isOrthographic()
       ? frame.scene.camera.fovHeight * DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
-      : Vector3.magnitude(Vector3.subtract(position, frame.scene.camera.position)) *
-        DEFAULT_PERSPECTIVE_MESH_SCALAR;
+      : Vector3.magnitude(
+          Vector3.subtract(position, frame.scene.camera.position),
+        ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
     // Increase the triangle size for small viewers
     const canvasArea = this.canvasElement.height * this.canvasElement.width;
@@ -135,10 +141,15 @@ export abstract class ReglComponent implements Disposable {
     const canvasHeightAdjustment =
       this.canvasElement.height < 650
         ? TRIANGLE_SIZE_CANVAS_HEIGHT_ADJUSTMENT_NUMERATOR /
-          (this.canvasElement.height + TRIANGLE_SIZE_CANVAS_HEIGHT_ADJUSTMENT_DENOMINATOR)
+          (this.canvasElement.height +
+            TRIANGLE_SIZE_CANVAS_HEIGHT_ADJUSTMENT_DENOMINATOR)
         : 1;
 
-    const sizeAdjustment = Math.max(canvasAreaAdjustment, canvasHeightAdjustment, 1);
+    const sizeAdjustment = Math.max(
+      canvasAreaAdjustment,
+      canvasHeightAdjustment,
+      1,
+    );
 
     return baseTriangleSize * sizeAdjustment;
   }

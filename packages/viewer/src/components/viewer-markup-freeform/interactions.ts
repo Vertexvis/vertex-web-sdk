@@ -35,7 +35,10 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
     super(scalingOptions);
   }
 
-  public editAnchor(anchor: BoundingBox2dAnchorPosition, event: PointerEvent): void {
+  public editAnchor(
+    anchor: BoundingBox2dAnchorPosition,
+    event: PointerEvent,
+  ): void {
     if (this.markupEl.mode === 'edit' && this.elementBounds != null) {
       this.resizeBounds = this.markupEl.bounds;
       this.resizePoints = this.markupEl.points;
@@ -114,7 +117,10 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         this.markupEl.points.length > 2 &&
         this.elementBounds != null
       ) {
-        const screenPosition = getMouseClientPosition(event, this.elementBounds);
+        const screenPosition = getMouseClientPosition(
+          event,
+          this.elementBounds,
+        );
         const position = translatePointToRelative(
           screenPosition,
           this.elementBounds,
@@ -186,11 +192,17 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
   private updateMinAndMax(position: Point.Point): void {
     this.min =
       this.min != null
-        ? Point.create(Math.min(this.min.x, position.x), Math.min(this.min.y, position.y))
+        ? Point.create(
+            Math.min(this.min.x, position.x),
+            Math.min(this.min.y, position.y),
+          )
         : position;
     this.max =
       this.max != null
-        ? Point.create(Math.max(this.max.x, position.x), Math.max(this.max.y, position.y))
+        ? Point.create(
+            Math.max(this.max.x, position.x),
+            Math.max(this.max.y, position.y),
+          )
         : position;
     this.markupEl.bounds = Rectangle.create(
       this.min.x,

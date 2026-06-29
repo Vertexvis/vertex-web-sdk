@@ -79,7 +79,9 @@ export async function selectFilterResults(
     .elements((op) => [
       ...(append ? [] : [op.items.where((q) => q.all()).deselect()]),
       op.items
-        .where((q) => q.withMetadata(filter, keys, exactMatch, removeHiddenResults))
+        .where((q) =>
+          q.withMetadata(filter, keys, exactMatch, removeHiddenResults),
+        )
         .select(),
     ])
     .execute({

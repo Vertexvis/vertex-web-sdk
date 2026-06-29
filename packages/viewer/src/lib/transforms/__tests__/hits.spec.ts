@@ -130,7 +130,12 @@ describe(testTriangleMesh, () => {
 
   it('returns false if the point is not on the mesh', () => {
     expect(
-      testTriangleMesh(mesh, frame, viewport, Point.create(0, viewport.height / 2)),
+      testTriangleMesh(
+        mesh,
+        frame,
+        viewport,
+        Point.create(0, viewport.height / 2),
+      ),
     ).toBe(false);
   });
 });

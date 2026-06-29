@@ -230,7 +230,10 @@ export function makeFeatureMapBytes(
   return data;
 }
 
-export function makeImageAttributes(width: number, height: number): ImageAttributesLike {
+export function makeImageAttributes(
+  width: number,
+  height: number,
+): ImageAttributesLike {
   return {
     frameDimensions: Dimensions.create(width, height),
     imageRect: Rectangle.create(0, 0, width, height),
@@ -250,7 +253,8 @@ export function makeHitTester({
   camera?: FrameCameraBase;
 } = {}): PointToPointHitTester {
   return new PointToPointHitTester(
-    stencilBuffer ?? makeStencilBuffer(200, 100, () => STENCIL_BUFFER_FEATURE_VALUE),
+    stencilBuffer ??
+      makeStencilBuffer(200, 100, () => STENCIL_BUFFER_FEATURE_VALUE),
     depthBuffer ?? makeDepthBuffer(200, 100),
     viewport ?? new Viewport(200, 100),
     camera ??

@@ -42,7 +42,11 @@ import {
   PointToPointInteractionController,
   PointToPointInteractionModel,
 } from './interactions';
-import { Anchor, getViewingElementPositions, MeasurementElementPositions } from './utils';
+import {
+  Anchor,
+  getViewingElementPositions,
+  MeasurementElementPositions,
+} from './utils';
 import { DistanceMeasurementRenderer } from './viewer-measurement-distance-components';
 
 /**
@@ -317,7 +321,8 @@ export class ViewerMeasurementDistance {
   public async computeElementMetrics(): Promise<
     ViewerMeasurementDistanceElementMetrics | undefined
   > {
-    const startAnchorEl = this.hostEl.shadowRoot?.getElementById('start-anchor');
+    const startAnchorEl =
+      this.hostEl.shadowRoot?.getElementById('start-anchor');
     const endAnchorEl = this.hostEl.shadowRoot?.getElementById('end-anchor');
     const labelEl = this.hostEl.shadowRoot?.getElementById('label');
 
@@ -403,7 +408,8 @@ export class ViewerMeasurementDistance {
 
   private renderMeasurement(): h.JSX.IntrinsicElements {
     const positions = this.computeElementPositions();
-    const { startPt, endPt, labelPt, indicatorPt, hideStart, hideEnd } = positions;
+    const { startPt, endPt, labelPt, indicatorPt, hideStart, hideEnd } =
+      positions;
     const distance = this.formatDistance(this.distance);
 
     if (this.mode === 'edit' || this.mode === 'replace') {
@@ -586,7 +592,9 @@ export class ViewerMeasurementDistance {
     }
   }
 
-  private computeLineElementPositions(line: Line3.Line3): MeasurementElementPositions {
+  private computeLineElementPositions(
+    line: Line3.Line3,
+  ): MeasurementElementPositions {
     if (this.internalCamera != null) {
       return getViewingElementPositions(line, this.interactingAnchor, {
         viewport: this.viewport,
@@ -628,7 +636,9 @@ export class ViewerMeasurementDistance {
     this.invalidateStateCounter = this.invalidateStateCounter + 1;
   }
 
-  private async addInteractionListeners(viewer: HTMLVertexViewerElement): Promise<void> {
+  private async addInteractionListeners(
+    viewer: HTMLVertexViewerElement,
+  ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
     if (this.mode === 'replace') {
       interactionTarget.addEventListener('pointermove', this.updateStartAnchor);
@@ -641,7 +651,10 @@ export class ViewerMeasurementDistance {
     viewer: HTMLVertexViewerElement,
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
-    interactionTarget.removeEventListener('pointermove', this.updateStartAnchor);
+    interactionTarget.removeEventListener(
+      'pointermove',
+      this.updateStartAnchor,
+    );
     interactionTarget.removeEventListener('pointerdown', this.newMeasurement);
     interactionTarget.removeEventListener('pointerleave', this.clearIndicator);
   }
@@ -806,7 +819,9 @@ export class ViewerMeasurementDistance {
     }
   }
 
-  private createInteractionMoveHandler(): (event: PointerEvent) => Promise<void> {
+  private createInteractionMoveHandler(): (
+    event: PointerEvent,
+  ) => Promise<void> {
     return async (event) => {
       const hits = this.getHitProvider();
       if (this.elementBounds != null && hits != null) {
@@ -922,7 +937,8 @@ export class ViewerMeasurementDistance {
 
   private async updateIndicator(pt: Point.Point): Promise<void> {
     const hits = this.getHitProvider();
-    const clearCursor = hits == null || !this.controller.moveIndicator(pt, hits);
+    const clearCursor =
+      hits == null || !this.controller.moveIndicator(pt, hits);
 
     if (clearCursor) {
       this.stateMap.hoverCursor?.dispose();
@@ -932,7 +948,11 @@ export class ViewerMeasurementDistance {
   }
 
   private setDepthBuffers(): void {
-    if (this.mode != null && this.viewer != null && this.viewer.depthBuffers == null) {
+    if (
+      this.mode != null &&
+      this.viewer != null &&
+      this.viewer.depthBuffers == null
+    ) {
       this.stateMap.shouldClearDepthBuffers = true;
       this.viewer.depthBuffers = 'final';
     }

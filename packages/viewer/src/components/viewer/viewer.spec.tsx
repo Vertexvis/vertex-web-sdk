@@ -128,7 +128,9 @@ describe('vertex-viewer', () => {
 
     it('disposing registered interaction handler removes handler', async () => {
       const viewer = await newViewerSpec({
-        template: () => <vertex-viewer cameraControls={false} keyboardControls={false} />,
+        template: () => (
+          <vertex-viewer cameraControls={false} keyboardControls={false} />
+        ),
       });
 
       const disposable = await viewer.registerInteractionHandler(handler);
@@ -194,7 +196,11 @@ describe('vertex-viewer', () => {
       onSceneReady.mockClear();
 
       const token2 = random.string();
-      await loadViewerStreamKey(key2, { viewer, stream, ws }, { token: token2 });
+      await loadViewerStreamKey(
+        key2,
+        { viewer, stream, ws },
+        { token: token2 },
+      );
       expect(onSceneReady).toHaveBeenCalled();
       expect(viewer.token).toBe(token2);
     });
@@ -518,7 +524,11 @@ describe('vertex-viewer', () => {
       const deviceId = 'device-id';
       const viewer = await newViewerSpec({
         template: () => (
-          <vertex-viewer clientId={clientId} stream={stream} deviceId={deviceId} />
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            deviceId={deviceId}
+          />
         ),
       });
 
@@ -536,7 +546,9 @@ describe('vertex-viewer', () => {
     });
 
     it('uses stored device id if available', async () => {
-      jest.spyOn(Storage, 'getStorageEntry').mockImplementation(() => 'some-device-id');
+      jest
+        .spyOn(Storage, 'getStorageEntry')
+        .mockImplementation(() => 'some-device-id');
 
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
@@ -620,13 +632,19 @@ describe('vertex-viewer', () => {
 
       viewer.addEventListener('interactionStarted', onInteractionStarted);
 
-      canvas?.dispatchEvent(new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }));
+      canvas?.dispatchEvent(
+        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }),
+      );
 
       const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
       await Async.delay(delay + 5);
 
-      window.dispatchEvent(new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }));
-      window.dispatchEvent(new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }));
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }),
+      );
 
       expect(onInteractionStarted).toHaveBeenCalled();
     });
@@ -650,13 +668,19 @@ describe('vertex-viewer', () => {
       );
       viewer.addEventListener('interactionFinished', onInteractionEnded);
 
-      canvas?.dispatchEvent(new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }));
+      canvas?.dispatchEvent(
+        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }),
+      );
 
       const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
       await Async.delay(delay + 5);
 
-      window.dispatchEvent(new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }));
-      window.dispatchEvent(new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }));
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }),
+      );
 
       // Wait for `endInteraction` to fire the `interactionFinished` event.
       // `endInteraction` will wait for any `beginInteraction` to finish
@@ -672,7 +696,11 @@ describe('vertex-viewer', () => {
       const { stream, ws } = makeViewerStream();
       const { page, viewer } = await newViewerSpecWithPage({
         template: () => (
-          <vertex-viewer clientId={clientId} stream={stream} resizeDebounce={1000} />
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
         ),
       });
 
@@ -698,7 +726,11 @@ describe('vertex-viewer', () => {
       const { stream, ws } = makeViewerStream();
       const { page, viewer } = await newViewerSpecWithPage({
         template: () => (
-          <vertex-viewer clientId={clientId} stream={stream} resizeDebounce={1000} />
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
         ),
       });
 
@@ -752,7 +784,8 @@ describe('vertex-viewer', () => {
         2,
         expect.objectContaining({
           detail: expect.objectContaining({
-            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
+            depthBufferBytes:
+              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
         }),
       );
@@ -760,7 +793,8 @@ describe('vertex-viewer', () => {
         3,
         expect.objectContaining({
           detail: expect.objectContaining({
-            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
+            depthBufferBytes:
+              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
         }),
       );
@@ -800,7 +834,8 @@ describe('vertex-viewer', () => {
         2,
         expect.objectContaining({
           detail: expect.objectContaining({
-            depthBufferBytes: Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
+            depthBufferBytes:
+              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
         }),
       );
@@ -820,7 +855,11 @@ describe('vertex-viewer', () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => (
-          <vertex-viewer clientId={clientId} stream={stream} resizeDebounce={1000} />
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
         ),
       });
 
@@ -873,7 +912,11 @@ describe('vertex-viewer', () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => (
-          <vertex-viewer clientId={clientId} stream={stream} resizeDebounce={1000} />
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
         ),
       });
 
@@ -919,7 +962,11 @@ describe('vertex-viewer', () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => (
-          <vertex-viewer clientId={clientId} stream={stream} resizeDebounce={1000} />
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
         ),
       });
 
@@ -987,7 +1034,11 @@ describe('vertex-viewer', () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => (
-          <vertex-viewer clientId={clientId} stream={stream} resizeDebounce={1000} />
+          <vertex-viewer
+            clientId={clientId}
+            stream={stream}
+            resizeDebounce={1000}
+          />
         ),
       });
 

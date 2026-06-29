@@ -16,7 +16,11 @@ import {
   Viewport,
 } from '../../lib/types';
 import * as Fixtures from '../../testing/fixtures';
-import { key1, loadViewerStreamKey, makeViewerStream } from '../../testing/viewer';
+import {
+  key1,
+  loadViewerStreamKey,
+  makeViewerStream,
+} from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
 import { Viewer } from '../viewer/viewer';
 import { ViewerLayer } from '../viewer-layer/viewer-layer';
@@ -45,7 +49,8 @@ describe('vertex-viewer-measurement-distance', () => {
   const stencilBuffer = Fixtures.makeStencilBuffer(
     100,
     100,
-    ({ x }) => (x > 49 ? STENCIL_BUFFER_FEATURE_VALUE : STENCIL_BUFFER_EMPTY_VALUE),
+    ({ x }) =>
+      x > 49 ? STENCIL_BUFFER_FEATURE_VALUE : STENCIL_BUFFER_EMPTY_VALUE,
     depthBuffer,
   );
 
@@ -79,7 +84,11 @@ describe('vertex-viewer-measurement-distance', () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-measurement-distance start={start} end={end} camera={camera} />
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          camera={camera}
+        />
       ),
     });
 
@@ -92,7 +101,9 @@ describe('vertex-viewer-measurement-distance', () => {
     expect(startEl?.style.transform).toContain(
       `translate(${startPt.x}px, ${startPt.y}px)`,
     );
-    expect(endEl?.style.transform).toContain(`translate(${endPt.x}px, ${endPt.y}px)`);
+    expect(endEl?.style.transform).toContain(
+      `translate(${endPt.x}px, ${endPt.y}px)`,
+    );
   });
 
   it('positions the start and end anchors as JSON strings', async () => {
@@ -116,14 +127,20 @@ describe('vertex-viewer-measurement-distance', () => {
     expect(startEl?.style.transform).toContain(
       `translate(${startPt.x}px, ${startPt.y}px)`,
     );
-    expect(endEl?.style.transform).toContain(`translate(${endPt.x}px, ${endPt.y}px)`);
+    expect(endEl?.style.transform).toContain(
+      `translate(${endPt.x}px, ${endPt.y}px)`,
+    );
   });
 
   it('positions the label between the start and end anchors', async () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-measurement-distance start={start} end={end} camera={camera} />
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          camera={camera}
+        />
       ),
     });
 
@@ -141,7 +158,11 @@ describe('vertex-viewer-measurement-distance', () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-measurement-distance start={start} end={end} camera={camera} />
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          camera={camera}
+        />
       ),
     });
 
@@ -160,7 +181,11 @@ describe('vertex-viewer-measurement-distance', () => {
     const page = await newSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
-        <vertex-viewer-measurement-distance start={start} end={end} camera={camera} />
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          camera={camera}
+        />
       ),
     });
 
@@ -184,7 +209,9 @@ describe('vertex-viewer-measurement-distance', () => {
     expect(startEl?.style.transform).toContain(
       `translate(${startPt.x}px, ${startPt.y}px)`,
     );
-    expect(endEl?.style.transform).toContain(`translate(${endPt.x}px, ${endPt.y}px)`);
+    expect(endEl?.style.transform).toContain(
+      `translate(${endPt.x}px, ${endPt.y}px)`,
+    );
   });
 
   it('supports slots for anchor labels', async () => {
@@ -222,12 +249,12 @@ describe('vertex-viewer-measurement-distance', () => {
       ),
     });
 
-    const startLabelEl = page.root?.shadowRoot?.querySelector('.anchor-label-start') as
-      | HTMLElement
-      | undefined;
-    const endLabelEl = page.root?.shadowRoot?.querySelector('.anchor-label-end') as
-      | HTMLElement
-      | undefined;
+    const startLabelEl = page.root?.shadowRoot?.querySelector(
+      '.anchor-label-start',
+    ) as HTMLElement | undefined;
+    const endLabelEl = page.root?.shadowRoot?.querySelector(
+      '.anchor-label-end',
+    ) as HTMLElement | undefined;
 
     expect(startLabelEl?.style.transform).toContain('translate(25px, 50px)');
     expect(endLabelEl?.style.transform).toContain('translate(75px, 50px)');
@@ -334,7 +361,9 @@ describe('vertex-viewer-measurement-distance', () => {
       ),
     });
 
-    const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
+    const viewer = page.body.querySelector(
+      'vertex-viewer',
+    ) as HTMLVertexViewerElement;
 
     await loadViewerStreamKey(key1, { stream, ws, viewer });
     await page.waitForChanges();
@@ -367,7 +396,9 @@ describe('vertex-viewer-measurement-distance', () => {
       ),
     });
 
-    const viewer = page.body.querySelector('vertex-viewer') as HTMLVertexViewerElement;
+    const viewer = page.body.querySelector(
+      'vertex-viewer',
+    ) as HTMLVertexViewerElement;
     const update = jest.spyOn(stream, 'update');
 
     await loadViewerStreamKey(key1, { stream, ws, viewer });
@@ -387,11 +418,16 @@ describe('vertex-viewer-measurement-distance', () => {
       const page = await newSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
-          <vertex-viewer-measurement-distance start={start} end={end} camera={camera} />
+          <vertex-viewer-measurement-distance
+            start={start}
+            end={end}
+            camera={camera}
+          />
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const metrics = await measurement.computeElementMetrics();
 
       expect(metrics).toMatchObject({
@@ -407,7 +443,8 @@ describe('vertex-viewer-measurement-distance', () => {
         template: () => <vertex-viewer-measurement-distance />,
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const metrics = await measurement.computeElementMetrics();
       expect(metrics).toBeUndefined();
     });
@@ -433,10 +470,13 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('mousedown'));
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 100 }));
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 100, clientY: 100 }),
+      );
 
       expect(measurement.start).toEqual(start);
     });
@@ -455,10 +495,13 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('mousedown', { button: 1 }));
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 100 }));
+      window.dispatchEvent(
+        new MouseEvent('mousemove', { clientX: 100, clientY: 100 }),
+      );
 
       expect(measurement.start).toEqual(start);
     });
@@ -480,7 +523,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(new MouseEvent('pointerdown', { button: 0 }));
 
@@ -503,14 +547,17 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
 
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 }),
       );
       await page.waitForChanges();
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 10, clientY: 10 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 10, clientY: 10 }),
+      );
       await page.waitForChanges();
       expect(measurement.start).not.toEqual(start);
 
@@ -540,7 +587,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('end-anchor');
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 }),
@@ -548,7 +596,9 @@ describe('vertex-viewer-measurement-distance', () => {
 
       await page.waitForChanges();
 
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 10, clientY: 10 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 10, clientY: 10 }),
+      );
 
       await page.waitForChanges();
 
@@ -571,7 +621,8 @@ describe('vertex-viewer-measurement-distance', () => {
         ),
       });
 
-      const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
+      const measurement =
+        page.root as HTMLVertexViewerMeasurementDistanceElement;
       const anchor = measurement.shadowRoot?.getElementById('start-anchor');
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 }),
@@ -667,18 +718,26 @@ describe('vertex-viewer-measurement-distance', () => {
       interactionTarget.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 1 }),
       );
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 10, clientY: 10 }),
+      );
       await page.waitForChanges();
       expect(onEditBegin).not.toHaveBeenCalled();
 
       // move end anchor
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 20, clientY: 20 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 20, clientY: 20 }),
+      );
       await page.waitForChanges();
       expect(measurement.end).toEqual(end);
 
       // end interaction
-      window.dispatchEvent(new MouseEvent('pointerdown', { clientX: 20, clientY: 20 }));
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 20, clientY: 20 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerdown', { clientX: 20, clientY: 20 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 20, clientY: 20 }),
+      );
       await page.waitForChanges();
       expect(onEditEnd).not.toHaveBeenCalled();
     });
@@ -718,12 +777,16 @@ describe('vertex-viewer-measurement-distance', () => {
       interactionTarget.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 }),
       );
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 10, clientY: 10 }),
+      );
       await page.waitForChanges();
       expect(onEditBegin).toHaveBeenCalled();
 
       // move end anchor
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 20, clientY: 20 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 20, clientY: 20 }),
+      );
       await page.waitForChanges();
       expect(measurement.end).not.toEqual(end);
 
@@ -734,8 +797,12 @@ describe('vertex-viewer-measurement-distance', () => {
       expect(measurement.end).toEqual(snapPt);
 
       // end interaction
-      window.dispatchEvent(new MouseEvent('pointerdown', { clientX: 20, clientY: 20 }));
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 20, clientY: 20 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerdown', { clientX: 20, clientY: 20 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 20, clientY: 20 }),
+      );
       await page.waitForChanges();
       expect(onEditEnd).toHaveBeenCalled();
     });
@@ -778,10 +845,14 @@ describe('vertex-viewer-measurement-distance', () => {
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 20, clientY: 20, buttons: 1 }),
       );
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 20, clientY: 20 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 20, clientY: 20 }),
+      );
 
       // move mouse after canceled
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 20, clientY: 20 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 20, clientY: 20 }),
+      );
 
       await page.waitForChanges();
 
@@ -826,26 +897,40 @@ describe('vertex-viewer-measurement-distance', () => {
       interactionTarget.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 10, clientY: 10, button: 0 }),
       );
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 10, clientY: 10 }),
+      );
       await page.waitForChanges();
       expect(onEditBegin).toHaveBeenCalled();
       expect(onEditEnd).not.toHaveBeenCalled();
 
       // move end anchor
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 20, clientY: 20 }));
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 20, clientY: 20 }),
+      );
       await page.waitForChanges();
       expect(measurement.end).not.toEqual(end);
 
       // rotate model interaction
-      window.dispatchEvent(new MouseEvent('pointerdown', { clientX: 20, clientY: 20 }));
-      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 30, clientY: 30 }));
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 30, clientY: 30 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerdown', { clientX: 20, clientY: 20 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointermove', { clientX: 30, clientY: 30 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 30, clientY: 30 }),
+      );
       await page.waitForChanges();
       expect(onEditEnd).not.toHaveBeenCalled();
 
       // end interaction
-      window.dispatchEvent(new MouseEvent('pointerdown', { clientX: 30, clientY: 30 }));
-      window.dispatchEvent(new MouseEvent('pointerup', { clientX: 30, clientY: 30 }));
+      window.dispatchEvent(
+        new MouseEvent('pointerdown', { clientX: 30, clientY: 30 }),
+      );
+      window.dispatchEvent(
+        new MouseEvent('pointerup', { clientX: 30, clientY: 30 }),
+      );
       await page.waitForChanges();
       expect(onEditEnd).toHaveBeenCalled();
     });

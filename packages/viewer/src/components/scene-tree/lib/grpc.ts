@@ -15,7 +15,9 @@ export function isGrpcServiceError(err: any): err is ServiceError {
 export function webSocketSubscriptionTransportFactory(
   options: TransportOptions,
 ): Transport {
-  if (options.methodDefinition.methodName === SceneTreeAPI.Subscribe.methodName) {
+  if (
+    options.methodDefinition.methodName === SceneTreeAPI.Subscribe.methodName
+  ) {
     return grpc.WebsocketTransport()(options);
   } else {
     return grpc.CrossBrowserHttpTransport({ withCredentials: false })(options);

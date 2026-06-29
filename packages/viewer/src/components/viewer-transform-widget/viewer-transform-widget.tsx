@@ -10,7 +10,14 @@ import {
   State,
   Watch,
 } from '@stencil/core';
-import { Angle, Euler, Matrix4, Point, Quaternion, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  Euler,
+  Matrix4,
+  Point,
+  Quaternion,
+  Vector3,
+} from '@vertexvis/geometry';
 import { Color, Disposable } from '@vertexvis/utils';
 import classNames from 'classnames';
 
@@ -346,7 +353,10 @@ export class ViewerTransformWidget {
     const undoDelta = await this.controller?.EXPERIMENTAL_undoTransform();
 
     if (this.currentTransform != null && undoDelta != null) {
-      this.currentTransform = Matrix4.multiply(undoDelta, this.currentTransform);
+      this.currentTransform = Matrix4.multiply(
+        undoDelta,
+        this.currentTransform,
+      );
 
       this.widget?.updateTransform(this.currentTransform);
 
@@ -368,9 +378,15 @@ export class ViewerTransformWidget {
     oldViewer?: HTMLVertexViewerElement,
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    oldViewer?.removeEventListener('dimensionschange', this.handleViewerDimensionsChange);
+    oldViewer?.removeEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChange,
+    );
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
-    newViewer?.addEventListener('dimensionschange', this.handleViewerDimensionsChange);
+    newViewer?.addEventListener(
+      'dimensionschange',
+      this.handleViewerDimensionsChange,
+    );
 
     if (newViewer?.stream != null) {
       this.controller?.dispose();
@@ -538,7 +554,9 @@ export class ViewerTransformWidget {
               ref={(el) => {
                 this.inputRef = el;
               }}
-              identifier={this.dragging?.identifier ?? this.lastDragged?.identifier}
+              identifier={
+                this.dragging?.identifier ?? this.lastDragged?.identifier
+              }
               disabled={this.isEndingTransform}
               onChange={this.handleInputChange}
               onIncrement={() => this.handleInputStep(1)}
@@ -670,7 +688,9 @@ export class ViewerTransformWidget {
       );
 
       this.lastAngle =
-        currentCanvas != null ? Angle.fromPoints(widgetCenter, currentCanvas) : 0;
+        currentCanvas != null
+          ? Angle.fromPoints(widgetCenter, currentCanvas)
+          : 0;
 
       this.lastWorldPosition = convertCanvasPointToWorld(
         currentCanvas,
@@ -736,7 +756,11 @@ export class ViewerTransformWidget {
         this.currentTransform,
       );
 
-      if (currentWorld != null && currentCanvas != null && widgetCenter != null) {
+      if (
+        currentWorld != null &&
+        currentCanvas != null &&
+        widgetCenter != null
+      ) {
         const angle = Angle.fromPoints(widgetCenter, currentCanvas);
         const angleToUse = calculateNewRotationAngle(
           this.lastMouseEvent,
@@ -747,7 +771,11 @@ export class ViewerTransformWidget {
           this.rotationSnapDegrees,
         );
 
-        this.transform(this.lastWorldPosition, currentWorld, angleToUse - this.lastAngle);
+        this.transform(
+          this.lastWorldPosition,
+          currentWorld,
+          angleToUse - this.lastAngle,
+        );
 
         this.updateInputPosition();
         this.updateInputValue();
@@ -852,7 +880,10 @@ export class ViewerTransformWidget {
       await this.controller?.beginTransform();
       this.getTransformWidget().updateTransform(this.currentTransform);
       await this.controller?.updateTransform(
-        Matrix4.multiply(this.currentTransform, Matrix4.invert(this.startingTransform)),
+        Matrix4.multiply(
+          this.currentTransform,
+          Matrix4.invert(this.startingTransform),
+        ),
       );
       this.updateInputPosition();
       await this.controller?.endTransformDebounced(
@@ -897,7 +928,10 @@ export class ViewerTransformWidget {
 
       this.getTransformWidget().updateTransform(this.currentTransform);
       this.controller?.updateTransform(
-        Matrix4.multiply(this.currentTransform, Matrix4.invert(this.startingTransform)),
+        Matrix4.multiply(
+          this.currentTransform,
+          Matrix4.invert(this.startingTransform),
+        ),
       );
     }
   }
@@ -920,7 +954,9 @@ export class ViewerTransformWidget {
     }
   }
 
-  private setupTransformWidget = (canvasRef: HTMLCanvasElement): TransformWidget => {
+  private setupTransformWidget = (
+    canvasRef: HTMLCanvasElement,
+  ): TransformWidget => {
     console.debug(
       `Initializing transform widget. [initial-position=${JSON.stringify(
         this.position,
@@ -1007,7 +1043,8 @@ export class ViewerTransformWidget {
       );
 
       if (this.inputRef != null) {
-        const definedValue = this.getDisplayedDistance() ?? this.getDisplayedAngle() ?? 0;
+        const definedValue =
+          this.getDisplayedDistance() ?? this.getDisplayedAngle() ?? 0;
         const displayValue = `${parseFloat(definedValue.toFixed(this.decimalPlaces))}`;
 
         this.inputRef.value = displayValue;
@@ -1091,7 +1128,8 @@ export class ViewerTransformWidget {
   };
 
   private isModifyingAngleUnits = (): boolean => {
-    const draggingIdentifier = this.dragging?.identifier ?? this.lastDragged?.identifier;
+    const draggingIdentifier =
+      this.dragging?.identifier ?? this.lastDragged?.identifier;
 
     return !!draggingIdentifier?.includes('rotate');
   };
@@ -1130,7 +1168,8 @@ export class ViewerTransformWidget {
   };
 
   private getDisplayedDistance = (): number | undefined => {
-    const draggingIdentifier = this.dragging?.identifier ?? this.lastDragged?.identifier;
+    const draggingIdentifier =
+      this.dragging?.identifier ?? this.lastDragged?.identifier;
     if (draggingIdentifier?.includes('translate')) {
       return this.inputValue;
     }
@@ -1141,9 +1180,13 @@ export class ViewerTransformWidget {
   ): Matrix4.Matrix4 | undefined => {
     if (newPosition != null) {
       const c =
-        this.currentTransform != null ? this.currentTransform : Matrix4.makeIdentity();
+        this.currentTransform != null
+          ? this.currentTransform
+          : Matrix4.makeIdentity();
 
-      const currentRotation = Matrix4.makeRotation(Quaternion.fromMatrixRotation(c));
+      const currentRotation = Matrix4.makeRotation(
+        Quaternion.fromMatrixRotation(c),
+      );
       const position = Matrix4.makeTranslation(newPosition);
 
       return Matrix4.multiply(position, currentRotation);
@@ -1154,13 +1197,17 @@ export class ViewerTransformWidget {
     newRotationEuler: Euler.Euler,
   ): Matrix4.Matrix4 | undefined => {
     const c =
-      this.currentTransform != null ? this.currentTransform : Matrix4.makeIdentity();
+      this.currentTransform != null
+        ? this.currentTransform
+        : Matrix4.makeIdentity();
 
     const oldRotation = Matrix4.invert(
       Matrix4.makeRotation(Quaternion.fromMatrixRotation(c)),
     );
 
-    const newRotation = Matrix4.makeRotation(Quaternion.fromEuler(newRotationEuler));
+    const newRotation = Matrix4.makeRotation(
+      Quaternion.fromEuler(newRotationEuler),
+    );
     const oldTranslation = Matrix4.multiply(c, oldRotation);
 
     return Matrix4.multiply(oldTranslation, newRotation);

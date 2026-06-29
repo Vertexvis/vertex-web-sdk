@@ -120,7 +120,9 @@ export class ViewerIcon {
     }
   }
 
-  private renderSvgIcon(content: h.JSX.IntrinsicElements): h.JSX.IntrinsicElements {
+  private renderSvgIcon(
+    content: h.JSX.IntrinsicElements,
+  ): h.JSX.IntrinsicElements {
     return (
       <Host
         class={classname({

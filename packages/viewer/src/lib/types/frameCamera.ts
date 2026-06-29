@@ -1,5 +1,10 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Angle, BoundingBox, BoundingSphere, Vector3 } from '@vertexvis/geometry';
+import {
+  Angle,
+  BoundingBox,
+  BoundingSphere,
+  Vector3,
+} from '@vertexvis/geometry';
 
 export type FrameCameraType = 'perspective' | 'orthographic';
 
@@ -118,7 +123,8 @@ export function toPerspective(
   data: OrthographicFrameCamera,
   fovY = 45,
 ): PerspectiveFrameCamera {
-  const expectedMagnitude = data.fovHeight / (2 * Math.tan(Angle.toRadians(fovY / 2.0)));
+  const expectedMagnitude =
+    data.fovHeight / (2 * Math.tan(Angle.toRadians(fovY / 2.0)));
   const receivedMagnitude = Vector3.magnitude(data.viewVector);
   const magnitudeScale = expectedMagnitude / receivedMagnitude;
 

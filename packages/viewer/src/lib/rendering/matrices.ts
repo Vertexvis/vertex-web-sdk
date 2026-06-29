@@ -101,7 +101,9 @@ export function makePerspectiveMatrix(
  * @param camera The camera to compute.
  * @returns A matrix.
  */
-export function makeLookAtViewMatrix(camera: FrameCamera.FrameCamera): Matrix4.Matrix4 {
+export function makeLookAtViewMatrix(
+  camera: FrameCamera.FrameCamera,
+): Matrix4.Matrix4 {
   const { lookAt, up } = camera;
   const position = isOrthographicFrameCamera(camera)
     ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))
@@ -132,7 +134,9 @@ export function makeLookAtViewMatrix(camera: FrameCamera.FrameCamera): Matrix4.M
  * @param camera The camera to compute the look at matrix for.
  * @returns A matrix.
  */
-export function makeLookAtMatrix(camera: FrameCamera.FrameCamera): Matrix4.Matrix4 {
+export function makeLookAtMatrix(
+  camera: FrameCamera.FrameCamera,
+): Matrix4.Matrix4 {
   const { lookAt, up } = camera;
   const position = isOrthographicFrameCamera(camera)
     ? Vector3.add(camera.lookAt, Vector3.negate(camera.viewVector))

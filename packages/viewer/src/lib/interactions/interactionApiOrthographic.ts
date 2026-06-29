@@ -118,8 +118,15 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         const startingCamera = camera.toFrameCamera();
         const direction = startingCamera.direction;
 
-        const ray = viewport.transformPointToRay(screenPt, frame.image, startingCamera);
-        const hitPlane = Plane.fromNormalAndCoplanarPoint(direction, camera.lookAt);
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera,
+        );
+        const hitPlane = Plane.fromNormalAndCoplanarPoint(
+          direction,
+          camera.lookAt,
+        );
         const hitPt = Ray.intersectPlane(ray, hitPlane);
         if (hitPt == null) {
           console.warn(
@@ -136,7 +143,11 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
 
         // Use a ray that originates at the screen and intersects with the hit
         // plane to determine the move distance.
-        const ray = viewport.transformPointToRay(screenPt, frame.image, startingCamera);
+        const ray = viewport.transformPointToRay(
+          screenPt,
+          frame.image,
+          startingCamera,
+        );
         const movePt = Ray.intersectPlane(ray, hitPlane);
 
         if (movePt != null) {
@@ -154,7 +165,10 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     });
   }
 
-  public async zoomCameraToPoint(point: Point.Point, delta: number): Promise<void> {
+  public async zoomCameraToPoint(
+    point: Point.Point,
+    delta: number,
+  ): Promise<void> {
     return this.transformCamera(
       ({ camera, viewport, frame, depthBuffer, boundingBox }) => {
         if (
@@ -163,9 +177,16 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         ) {
           const frameCam = camera.toFrameCamera();
           const dir = frameCam.direction;
-          const ray = viewport.transformPointToRay(point, frame.image, frameCam);
+          const ray = viewport.transformPointToRay(
+            point,
+            frame.image,
+            frameCam,
+          );
 
-          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(dir, frameCam.lookAt);
+          const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
+            dir,
+            frameCam.lookAt,
+          );
           const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
           if (fallbackPt == null) {
             console.warn(
@@ -258,7 +279,10 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         z: delta.x * crossX.z + delta.y * crossY.z,
       });
 
-      const rotationAxisDirection = Vector3.cross(mouseToWorld, directionVector);
+      const rotationAxisDirection = Vector3.cross(
+        mouseToWorld,
+        directionVector,
+      );
 
       // The 9.5 multiplier was chosen to match the desired rotation speed
       const epsilonX = (9.5 * delta.x) / viewport.width;

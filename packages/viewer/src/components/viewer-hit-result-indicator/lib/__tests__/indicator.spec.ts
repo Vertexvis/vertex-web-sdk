@@ -62,7 +62,12 @@ function createMeshes(
   const arrow = new TriangleMesh(
     mockShapeBuilder().createShape,
     'hit-normal-arrow',
-    computeArrowNdcValues(transform, frame.scene.camera, normal, expectedTriangleSize),
+    computeArrowNdcValues(
+      transform,
+      frame.scene.camera,
+      normal,
+      expectedTriangleSize,
+    ),
     '#000000',
     '#000000',
   );
@@ -105,7 +110,10 @@ function createMeshes(
   };
 }
 
-function updateFrameCameraPosition(baseFrame: Frame, position: Vector3.Vector3): Frame {
+function updateFrameCameraPosition(
+  baseFrame: Frame,
+  position: Vector3.Vector3,
+): Frame {
   return new Frame(
     baseFrame.correlationIds,
     baseFrame.temporalRefinementCorrelationId,
@@ -181,7 +189,9 @@ describe(HitIndicator, () => {
   it('creates meshes for the hit position, normal, and plane', async () => {
     const indicator = new HitIndicator(canvas);
     const frame = makePerspectiveFrame();
-    const hithitPositionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+    const hithitPositionTransform = Matrix4.makeTranslation(
+      Vector3.create(1, 1, 1),
+    );
     const hitNormal = Vector3.up();
     const meshes = createMeshes(hithitPositionTransform, hitNormal, frame);
 
@@ -210,7 +220,9 @@ describe(HitIndicator, () => {
   it('creates meshes for the hit position, normal, and plane with an orthographic camera', async () => {
     const indicator = new HitIndicator(canvas);
     const frame = makeOrthographicFrame();
-    const hitPositionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+    const hitPositionTransform = Matrix4.makeTranslation(
+      Vector3.create(1, 1, 1),
+    );
     const hitNormal = Vector3.up();
     const meshes = createMeshes(
       hitPositionTransform,
@@ -254,20 +266,36 @@ describe(HitIndicator, () => {
       Vector3.create(100, 0, 0),
     );
 
-    const hitPositionTransform = Matrix4.makeTranslation(Vector3.create(100, 100, 100));
+    const hitPositionTransform = Matrix4.makeTranslation(
+      Vector3.create(100, 100, 100),
+    );
     const hitNormal = Vector3.up();
 
     indicator.updateFrame(frameAbovePlane);
     indicator.updateTransformAndNormal(hitPositionTransform, hitNormal);
 
-    expect(indicator.getDrawableElements().map((e) => e.identifier)).toMatchObject(
-      ['hit-normal-arrow', 'hit-normal-axis', 'hit-position', 'hit-plane'].reverse(),
+    expect(
+      indicator.getDrawableElements().map((e) => e.identifier),
+    ).toMatchObject(
+      [
+        'hit-normal-arrow',
+        'hit-normal-axis',
+        'hit-position',
+        'hit-plane',
+      ].reverse(),
     );
 
     indicator.updateFrame(frameBelowPlane);
 
-    expect(indicator.getDrawableElements().map((e) => e.identifier)).toMatchObject(
-      ['hit-position', 'hit-plane', 'hit-normal-axis', 'hit-normal-arrow'].reverse(),
+    expect(
+      indicator.getDrawableElements().map((e) => e.identifier),
+    ).toMatchObject(
+      [
+        'hit-position',
+        'hit-plane',
+        'hit-normal-axis',
+        'hit-normal-arrow',
+      ].reverse(),
     );
   });
 
@@ -276,7 +304,9 @@ describe(HitIndicator, () => {
       arrow: '#555555',
     });
     const frame = makePerspectiveFrame();
-    const hitPositionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+    const hitPositionTransform = Matrix4.makeTranslation(
+      Vector3.create(1, 1, 1),
+    );
     const hitNormal = Vector3.up();
 
     indicator.updateFrame(
@@ -297,7 +327,10 @@ describe(HitIndicator, () => {
     expect(
       indicator
         .getDrawableElements()
-        .some((e) => e.identifier === 'hit-normal-arrow' && e.fillColor === '#555555'),
+        .some(
+          (e) =>
+            e.identifier === 'hit-normal-arrow' && e.fillColor === '#555555',
+        ),
     ).toBe(true);
 
     indicator.updateColors({
@@ -313,7 +346,10 @@ describe(HitIndicator, () => {
     expect(
       indicator
         .getDrawableElements()
-        .some((e) => e.identifier === 'hit-normal-arrow' && e.fillColor === '#111111'),
+        .some(
+          (e) =>
+            e.identifier === 'hit-normal-arrow' && e.fillColor === '#111111',
+        ),
     ).toBe(true);
   });
 
@@ -322,7 +358,9 @@ describe(HitIndicator, () => {
       outline: '#555555',
     });
     const frame = makePerspectiveFrame();
-    const hitPositionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
+    const hitPositionTransform = Matrix4.makeTranslation(
+      Vector3.create(1, 1, 1),
+    );
     const hitNormal = Vector3.up();
 
     indicator.updateFrame(
@@ -335,7 +373,9 @@ describe(HitIndicator, () => {
     });
 
     expect(
-      indicator.getDrawableElements().every((e) => e.outlineColor === '#333333'),
+      indicator
+        .getDrawableElements()
+        .every((e) => e.outlineColor === '#333333'),
     ).toBe(true);
   });
 });

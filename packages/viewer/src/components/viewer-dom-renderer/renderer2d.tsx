@@ -35,10 +35,12 @@ export function update2d(
     const depthBufferIsNull = depthBuffer == null;
     const occluded =
       depthBufferIsNull ||
-      (!element.occlusionOff && depthBuffer?.isOccluded(worldPosition, viewport));
+      (!element.occlusionOff &&
+        depthBuffer?.isOccluded(worldPosition, viewport));
     const detached =
       depthBufferIsNull ||
-      (!element.detachedOff && depthBuffer?.isDetached(worldPosition, viewport));
+      (!element.detachedOff &&
+        depthBuffer?.isDetached(worldPosition, viewport));
     const screenPt = getScreenPosition(
       worldPosition,
       camera.projectionViewMatrix,
@@ -71,7 +73,10 @@ function getElementDepths(
     } else if (isVertexViewerDomElement(child)) {
       const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
       const worldPosition = Vector3.fromMatrixPosition(worldMatrix);
-      const distanceToCamera = Vector3.distanceSquared(camera.position, worldPosition);
+      const distanceToCamera = Vector3.distanceSquared(
+        camera.position,
+        worldPosition,
+      );
       results.push({
         element: child,
         worldMatrix,

@@ -13,7 +13,9 @@ export class MeasurementEntity {
     public readonly modelEntity: Uint8Array,
   ) {}
 
-  public static fromHit(hit: vertexvis.protobuf.stream.IHit): MeasurementEntity {
+  public static fromHit(
+    hit: vertexvis.protobuf.stream.IHit,
+  ): MeasurementEntity {
     if (hit.hitPoint != null && hit.modelEntity != null) {
       const hitPoint = Mapper.ifInvalidThrow(fromPbVector3f)(hit.hitPoint);
       const modelEntity = vertexvis.protobuf.core.ModelEntity.encode(

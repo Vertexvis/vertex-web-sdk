@@ -30,7 +30,10 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
     super(scalingOptions);
   }
 
-  public editAnchor(anchor: BoundingBox2dAnchorPosition, event: PointerEvent): void {
+  public editAnchor(
+    anchor: BoundingBox2dAnchorPosition,
+    event: PointerEvent,
+  ): void {
     if (this.markupEl.mode === 'edit') {
       this.anchor = anchor;
       this.resizeBounds = this.markupEl.bounds;

@@ -1,6 +1,11 @@
 import { Point, Vector3 } from '@vertexvis/geometry';
 
-import { DepthBuffer, FrameCameraBase, StencilBuffer, Viewport } from '../../lib/types';
+import {
+  DepthBuffer,
+  FrameCameraBase,
+  StencilBuffer,
+  Viewport,
+} from '../../lib/types';
 
 export class PointToPointHitTester {
   public constructor(

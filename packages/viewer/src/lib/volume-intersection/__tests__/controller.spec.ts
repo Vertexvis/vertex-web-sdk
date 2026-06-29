@@ -37,7 +37,9 @@ describe('volume intersection controller', () => {
     }),
   };
 
-  async function drag(controller: VolumeIntersectionQueryController): Promise<void> {
+  async function drag(
+    controller: VolumeIntersectionQueryController,
+  ): Promise<void> {
     controller.setStartPoint(Point.create(1, 1));
     controller.setEndPoint(Point.create(5, 5));
     return controller.execute();
@@ -81,7 +83,9 @@ describe('volume intersection controller', () => {
       mockViewer as unknown as HTMLVertexViewerElement,
     );
 
-    controller.setOperationTransform((builder) => builder.materialOverride('#ff0000'));
+    controller.setOperationTransform((builder) =>
+      builder.materialOverride('#ff0000'),
+    );
 
     await drag(controller);
 
@@ -95,7 +99,8 @@ describe('volume intersection controller', () => {
     );
 
     controller.setAdditionalTransforms([
-      (op) => op.items.where((q) => q.withItemId('id')).materialOverride('#00ff00'),
+      (op) =>
+        op.items.where((q) => q.withItemId('id')).materialOverride('#00ff00'),
     ]);
 
     await drag(controller);

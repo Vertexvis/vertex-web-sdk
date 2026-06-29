@@ -43,7 +43,9 @@ export class Mesh extends Drawable<MeshPoints> {
       createShape,
       identifier,
       points,
-      typeof outlineColor === 'string' ? outlineColor : Color.toHexString(outlineColor),
+      typeof outlineColor === 'string'
+        ? outlineColor
+        : Color.toHexString(outlineColor),
       typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
       shapeProps,
     );
@@ -92,7 +94,9 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
       createShape,
       identifier,
       points,
-      typeof outlineColor === 'string' ? outlineColor : Color.toHexString(outlineColor),
+      typeof outlineColor === 'string'
+        ? outlineColor
+        : Color.toHexString(outlineColor),
       typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
       shapeProps,
     );

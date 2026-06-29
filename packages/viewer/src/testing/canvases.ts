@@ -35,7 +35,9 @@ import { makeRGBAi } from './colors';
 import { makeVector2d, makeVector3f } from './geometry';
 import { makeUuid2l } from './uuid';
 
-export function makeGetCanvasResponse(canvas: Canvas = makeCanvas()): GetCanvasResponse {
+export function makeGetCanvasResponse(
+  canvas: Canvas = makeCanvas(),
+): GetCanvasResponse {
   const res = new GetCanvasResponse();
   res.setCanvas(canvas);
   return res;
@@ -64,9 +66,15 @@ export function makeCanvas(
 export function makeLine2d(value: Partial<LineItem2d> = {}): CanvasItem {
   const item = new CanvasItem();
   const line2d = new ApiLineItem2d();
-  line2d.setStartPosition(makeVector2d(value.startPosition?.x, value.startPosition?.y));
-  line2d.setEndPosition(makeVector2d(value.endPosition?.x, value.endPosition?.y));
-  line2d.setStrokeStyle(makeStrokeStyle(value.stroke?.thickness, value.stroke?.color));
+  line2d.setStartPosition(
+    makeVector2d(value.startPosition?.x, value.startPosition?.y),
+  );
+  line2d.setEndPosition(
+    makeVector2d(value.endPosition?.x, value.endPosition?.y),
+  );
+  line2d.setStrokeStyle(
+    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color),
+  );
   line2d.setFillStyle(makeFillStyle(value.fill?.color));
   line2d.setStartShape(makeLineEndShape(value.startShape));
   line2d.setEndShape(makeLineEndShape(value.endShape));
@@ -77,20 +85,28 @@ export function makeLine2d(value: Partial<LineItem2d> = {}): CanvasItem {
 export function makeOval2d(value: Partial<OvalItem2d> = {}): CanvasItem {
   const item = new CanvasItem();
   const oval2d = new ApiOvalItem2d();
-  oval2d.setTopLeft(makeVector2d(value.topLeftPosition?.x, value.topLeftPosition?.y));
+  oval2d.setTopLeft(
+    makeVector2d(value.topLeftPosition?.x, value.topLeftPosition?.y),
+  );
   oval2d.setBottomRight(
     makeVector2d(value.bottomRightPosition?.x, value.bottomRightPosition?.y),
   );
-  oval2d.setStrokeStyle(makeStrokeStyle(value.stroke?.thickness, value.stroke?.color));
+  oval2d.setStrokeStyle(
+    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color),
+  );
   oval2d.setFillStyle(makeFillStyle(value.fill?.color));
   item.setOval(oval2d);
   return item;
 }
 
-export function makeFreeform2d(value: Partial<FreeformItem2d> = {}): CanvasItem {
+export function makeFreeform2d(
+  value: Partial<FreeformItem2d> = {},
+): CanvasItem {
   const item = new CanvasItem();
   const freeform2d = new ApiFreeformItem2d();
-  freeform2d.setPositionsList(value.positions?.map((p) => makeVector2d(p.x, p.y)) ?? []);
+  freeform2d.setPositionsList(
+    value.positions?.map((p) => makeVector2d(p.x, p.y)) ?? [],
+  );
   freeform2d.setStrokeStyle(
     makeStrokeStyle(value.stroke?.thickness, value.stroke?.color),
   );
@@ -122,7 +138,9 @@ export function makeCallout(value: Partial<CalloutItem> = {}): CanvasItem {
       value.anchorPosition?.z,
     ),
   );
-  callout.setTextPosition(makeVector2d(value.textPosition?.x, value.textPosition?.y));
+  callout.setTextPosition(
+    makeVector2d(value.textPosition?.x, value.textPosition?.y),
+  );
   callout.setPrimaryColor(makeRGBAi(value.primaryColor));
   callout.setAccentColor(makeRGBAi(value.accentColor));
   callout.setSceneItemId(makeUuid2l(value.sceneItemId));

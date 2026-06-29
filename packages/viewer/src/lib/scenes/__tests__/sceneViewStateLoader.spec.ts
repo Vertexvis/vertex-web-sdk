@@ -211,7 +211,9 @@ describe('SceneViewStateLoader', () => {
     it('applies a partial scene view state by ID in an identifier', async () => {
       const sceneViewStateId = random.guid();
 
-      await loader.applyPartialSceneViewState({ id: sceneViewStateId }, ['selection']);
+      await loader.applyPartialSceneViewState({ id: sceneViewStateId }, [
+        'selection',
+      ]);
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -323,11 +325,15 @@ describe('SceneViewStateLoader', () => {
         };
       });
 
-      await loader.applyPartialSceneViewState(sceneViewStateId, ['selection', 'camera'], {
-        animation: {
-          milliseconds: 1000,
+      await loader.applyPartialSceneViewState(
+        sceneViewStateId,
+        ['selection', 'camera'],
+        {
+          animation: {
+            milliseconds: 1000,
+          },
         },
-      });
+      );
 
       expect(streamApi.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -370,12 +376,16 @@ describe('SceneViewStateLoader', () => {
         },
       });
 
-      await loader.applyPartialSceneViewState(sceneViewStateId, ['selection', 'camera'], {
-        animation: {
-          milliseconds: 1000,
+      await loader.applyPartialSceneViewState(
+        sceneViewStateId,
+        ['selection', 'camera'],
+        {
+          animation: {
+            milliseconds: 1000,
+          },
+          waitForAnimation: false,
         },
-        waitForAnimation: false,
-      });
+      );
 
       expect(streamApi.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({

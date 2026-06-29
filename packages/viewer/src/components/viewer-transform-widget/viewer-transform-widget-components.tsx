@@ -59,7 +59,9 @@ export interface TransformWidgetInputProps {
   onUndo?: VoidFunction;
 }
 
-export const TransformWidgetInput: FunctionalComponent<TransformWidgetInputProps> = ({
+export const TransformWidgetInput: FunctionalComponent<
+  TransformWidgetInputProps
+> = ({
   ref,
   identifier,
   disabled,
@@ -136,12 +138,16 @@ function constrainInputToViewport(
     case 'top-left':
       return {
         right: toCssLength(constrainTo(width - paddedWidth, width - point.x)),
-        bottom: toCssLength(constrainTo(height - paddedHeight, height - point.y)),
+        bottom: toCssLength(
+          constrainTo(height - paddedHeight, height - point.y),
+        ),
       };
     case 'top-right':
       return {
         left: toCssLength(constrainTo(width - paddedWidth, point.x)),
-        bottom: toCssLength(constrainTo(height - paddedHeight, height - point.y)),
+        bottom: toCssLength(
+          constrainTo(height - paddedHeight, height - point.y),
+        ),
       };
     case 'bottom-left':
       return {

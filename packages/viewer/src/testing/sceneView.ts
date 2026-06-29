@@ -15,7 +15,9 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { makeVector3f } from './geometry';
 import { random } from './random';
 
-export function makeMeasureResponse(...result: MeasurementResult[]): MeasureResponse {
+export function makeMeasureResponse(
+  ...result: MeasurementResult[]
+): MeasureResponse {
   const response = new MeasureResponse();
   const outcome = new MeasurementOutcome();
   outcome.setResultsList(result);

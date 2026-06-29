@@ -38,7 +38,12 @@ export class ViewerMeasurementLine {
    */
   protected render(): h.JSX.IntrinsicElements {
     const angle = Angle.fromPoints(this.start, this.end);
-    const lineFillEndCaps = getEndCapPoints(this.start, this.end, angle, this.capLength);
+    const lineFillEndCaps = getEndCapPoints(
+      this.start,
+      this.end,
+      angle,
+      this.capLength,
+    );
     const lineStrokeEndCaps = getEndCapPoints(
       this.start,
       this.end,

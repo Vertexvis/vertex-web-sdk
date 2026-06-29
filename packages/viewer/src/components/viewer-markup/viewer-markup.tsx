@@ -22,7 +22,10 @@ import {
   MarkupCenteringBehavior,
   MarkupInteraction,
 } from '../../lib/types/markup';
-import { isVertexViewerArrowMarkup, LineAnchorStyle } from '../viewer-markup-arrow/utils';
+import {
+  isVertexViewerArrowMarkup,
+  LineAnchorStyle,
+} from '../viewer-markup-arrow/utils';
 import { isVertexViewerCircleMarkup } from '../viewer-markup-circle/utils';
 import { isVertexViewerFreeformMarkup } from '../viewer-markup-freeform/utils';
 import { ViewerMarkupToolType } from '../viewer-markup-tool/viewer-markup-tool';
@@ -506,7 +509,11 @@ export class ViewerMarkup {
       const el = event.target as Element;
       const markups = await this.getMarkupElements();
       const markup = markups.find((m) => m === el);
-      if (markup?.id != null && markup.id !== '' && markup.id === this.toSelectMarkupId) {
+      if (
+        markup?.id != null &&
+        markup.id !== '' &&
+        markup.id === this.toSelectMarkupId
+      ) {
         this.selectedMarkupId = el.id;
       } else if (
         this.pointerDownPosition != null &&

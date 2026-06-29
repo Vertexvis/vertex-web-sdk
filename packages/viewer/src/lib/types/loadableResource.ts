@@ -22,7 +22,8 @@ export function fromUrn(urn: string): Resource {
     throw new Error('Invalid URN. Expected URN scheme.');
   }
 
-  const [nid, resourceType, resourceId, ...subResourcePath] = uri.path.split(/[:/]/);
+  const [nid, resourceType, resourceId, ...subResourcePath] =
+    uri.path.split(/[:/]/);
 
   if (nid !== 'vertexvis' && nid !== 'vertex') {
     throw new Error('Invalid URN. Expected URN to be vertex namespace');

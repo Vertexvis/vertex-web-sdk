@@ -225,7 +225,10 @@ export class ViewerPinTool {
     this.setCameraAndKeyboardControls();
 
     if (oldViewer != null) {
-      oldViewer.removeEventListener('frameDrawn', this.handleSetProjectionMatrix);
+      oldViewer.removeEventListener(
+        'frameDrawn',
+        this.handleSetProjectionMatrix,
+      );
     }
 
     if (newViewer != null) {
@@ -236,7 +239,8 @@ export class ViewerPinTool {
   }
 
   private handleSetProjectionMatrix = (): void => {
-    this.projectionViewMatrix = this.viewer?.frame?.scene.camera.projectionViewMatrix;
+    this.projectionViewMatrix =
+      this.viewer?.frame?.scene.camera.projectionViewMatrix;
   };
 
   protected render(): JSX.Element {
@@ -303,9 +307,14 @@ export class ViewerPinTool {
     this.clearInteractionHandler();
 
     if (this.pinController != null) {
-      this.registeredInteractionHandler = this.viewer?.registerInteractionHandler(
-        new PinsInteractionHandler(this.pinController, xOffsetAsNumber, yOffsetAsNumber),
-      );
+      this.registeredInteractionHandler =
+        this.viewer?.registerInteractionHandler(
+          new PinsInteractionHandler(
+            this.pinController,
+            xOffsetAsNumber,
+            yOffsetAsNumber,
+          ),
+        );
     }
   }
 
@@ -322,7 +331,11 @@ export class ViewerPinTool {
   }
 
   private setDepthBuffers(): void {
-    if (this.pins.length > 0 && this.viewer != null && this.viewer.depthBuffers == null) {
+    if (
+      this.pins.length > 0 &&
+      this.viewer != null &&
+      this.viewer.depthBuffers == null
+    ) {
       this.stateMap.shouldClearDepthBuffers = true;
       this.viewer.depthBuffers = 'final';
     }

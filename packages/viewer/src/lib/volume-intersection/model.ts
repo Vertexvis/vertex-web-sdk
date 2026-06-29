@@ -32,7 +32,10 @@ export class VolumeIntersectionQueryModel {
   }
 
   public setEndPoint(point: Point.Point): void {
-    if (this.startPoint != null && Point.distance(this.startPoint, point) >= 2) {
+    if (
+      this.startPoint != null &&
+      Point.distance(this.startPoint, point) >= 2
+    ) {
       this.endPoint = point;
 
       this.updateQueryType();
@@ -84,7 +87,9 @@ export class VolumeIntersectionQueryModel {
     return this.dragStarted.on(listener);
   }
 
-  public onDragComplete(listener: Listener<VolumeIntersectionQueryDetails>): Disposable {
+  public onDragComplete(
+    listener: Listener<VolumeIntersectionQueryDetails>,
+  ): Disposable {
     return this.dragComplete.on(listener);
   }
 
@@ -108,7 +113,9 @@ export class VolumeIntersectionQueryModel {
   private updateQueryType(): void {
     if (this.startPoint != null && this.endPoint != null) {
       const directionalType =
-        Point.subtract(this.endPoint, this.startPoint).x > 0 ? 'exclusive' : 'inclusive';
+        Point.subtract(this.endPoint, this.startPoint).x > 0
+          ? 'exclusive'
+          : 'inclusive';
 
       this.type = this.mode ?? directionalType;
     }

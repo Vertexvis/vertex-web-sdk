@@ -5,10 +5,11 @@ import { Mapper as M } from '@vertexvis/utils';
 import { fromPbUuid2l, mapCursor } from '../mappers';
 import { PmiAnnotation, PmiAnnotationListResponse } from './types';
 
-const mapPmiAnnotation: M.Func<PBPmiAnnotation.AsObject, PmiAnnotation> = M.defineMapper(
-  M.read(M.mapRequiredProp('id', fromPbUuid2l), M.getProp('displayName')),
-  ([id, displayName]) => ({ id, displayName }),
-);
+const mapPmiAnnotation: M.Func<PBPmiAnnotation.AsObject, PmiAnnotation> =
+  M.defineMapper(
+    M.read(M.mapRequiredProp('id', fromPbUuid2l), M.getProp('displayName')),
+    ([id, displayName]) => ({ id, displayName }),
+  );
 
 const mapListPmiAnnotationsResponse: M.Func<
   ListPmiAnnotationsResponse.AsObject,

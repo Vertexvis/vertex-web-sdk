@@ -192,7 +192,11 @@ export class ViewerTeleportTool {
   }
 
   private setDepthBuffers(): void {
-    if (this.mode != null && this.viewer != null && this.viewer.depthBuffers == null) {
+    if (
+      this.mode != null &&
+      this.viewer != null &&
+      this.viewer.depthBuffers == null
+    ) {
       this.stateMap.shouldClearDepthBuffers = true;
       this.viewer.depthBuffers = 'final';
     }
@@ -221,9 +225,8 @@ export class ViewerTeleportTool {
           : undefined,
       );
 
-      this.interactionHandlerDisposable = await this.viewer?.registerInteractionHandler(
-        this.interactionHandler,
-      );
+      this.interactionHandlerDisposable =
+        await this.viewer?.registerInteractionHandler(this.interactionHandler);
     }
   }
 }
