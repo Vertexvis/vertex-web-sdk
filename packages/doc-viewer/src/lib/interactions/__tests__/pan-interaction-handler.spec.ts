@@ -121,7 +121,7 @@ describe('PanInteractionHandler', () => {
       new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
     );
 
-    element.dispatchEvent(new MouseEvent('pointerdown', { button: 0, clientX: 10, clientY: 10 }));
+    element.dispatchEvent(new MouseEvent('pointerdown', { button: 2, clientX: 10, clientY: 10 }));
     window.dispatchEvent(new MouseEvent('pointermove', { clientX: 15, clientY: 15 }));
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
 
@@ -130,7 +130,7 @@ describe('PanInteractionHandler', () => {
     handler.dispose();
   });
 
-  it('should not pan the document when the element is dragged with a different button than the primary button', () => {
+  it('should not pan the document when the element is dragged with a different button than the secondary button', () => {
     const element = document.createElement('div');
 
     const handler = new PanInteractionHandler(
@@ -175,7 +175,7 @@ describe('PanInteractionHandler', () => {
       new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
     );
 
-    element.dispatchEvent(new MouseEvent('pointerdown', { button: 0, clientX: 10, clientY: 10 }));
+    element.dispatchEvent(new MouseEvent('pointerdown', { button: 2, clientX: 10, clientY: 10 }));
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
     hostElement.dispatchEvent(new Event('wheel', { deltaX: 100, deltaY: 100 } as unknown as EventInit));
 
