@@ -257,7 +257,7 @@ export abstract class Camera {
    * promise will resolve when a frame is received that contains this camera.
    */
   public async render(
-    renderOptions: CameraRenderOptions = {}
+    renderOptions: CameraRenderOptions = {},
   ): Promise<CameraRenderResult> {
     if (this.flyToOptions == null && renderOptions.animation) {
       this.flyToOptions = {
@@ -275,7 +275,7 @@ export abstract class Camera {
           renderOptions.correlationId,
           this.flyToOptions,
           renderOptions.animation,
-          this.toFrameCamera()
+          this.toFrameCamera(),
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
 

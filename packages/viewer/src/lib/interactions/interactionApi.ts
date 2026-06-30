@@ -209,7 +209,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * mark the end of an interaction.
    */
   public async beginInteraction(
-    renderOptions: CameraRenderOptions = {}
+    renderOptions: CameraRenderOptions = {},
   ): Promise<void> {
     if (!this.isInteracting()) {
       this.activeRenderOptions = renderOptions;
@@ -230,7 +230,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    */
   public async transformCamera(
     t: CameraTransform<T>,
-    renderOptions: CameraRenderOptions = this.activeRenderOptions ?? {}
+    renderOptions: CameraRenderOptions = this.activeRenderOptions ?? {},
   ): Promise<void> {
     if (this.isInteracting()) {
       const scene = await this.getScene();
