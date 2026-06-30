@@ -110,7 +110,7 @@ export class RotatePointInteraction extends MouseInteraction {
 export class ZoomInteraction extends MouseInteraction {
   public type: InteractionType = 'zoom';
 
-  private didTransformBegin = false;
+  private isTransforming = false;
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
@@ -150,7 +150,7 @@ export class ZoomInteraction extends MouseInteraction {
   public endDrag(event: MouseEvent, api: InteractionApi): void {
     super.endDrag(event, api);
     this.stopInteractionTimer();
-    this.didTransformBegin = false;
+    this.isTransforming = false;
     this.startPt = undefined;
   }
 
@@ -159,7 +159,7 @@ export class ZoomInteraction extends MouseInteraction {
     api: InteractionApi,
     extraDelayMs?: number,
   ): Promise<void> {
-    await this.operateWithTimer(
+    await this.runWheelZoomInteraction(
       api,
       () => api.zoomCamera(this.getDirectionalDelta(delta)),
       extraDelayMs,
@@ -172,7 +172,7 @@ export class ZoomInteraction extends MouseInteraction {
     api: InteractionApi,
     extraDelayMs?: number,
   ): Promise<void> {
-    await this.operateWithTimer(
+    await this.runWheelZoomInteraction(
       api,
       () => api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta)),
       extraDelayMs,
@@ -180,12 +180,12 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   private async beginInteraction(api: InteractionApi): Promise<void> {
-    this.didTransformBegin = true;
+    this.isTransforming = true;
     await api.beginInteraction();
   }
 
   private async endInteraction(api: InteractionApi): Promise<void> {
-    this.didTransformBegin = false;
+    this.isTransforming = false;
     await api.endInteraction();
   }
 
@@ -227,12 +227,12 @@ export class ZoomInteraction extends MouseInteraction {
     }
   }
 
-  private async operateWithTimer(
+  private async runWheelZoomInteraction(
     api: InteractionApi,
     f: () => void | Promise<void>,
     extraDelayMs?: number,
   ): Promise<void> {
-    if (!this.didTransformBegin) {
+    if (!this.isTransforming) {
       await this.beginInteraction(api);
     }
 

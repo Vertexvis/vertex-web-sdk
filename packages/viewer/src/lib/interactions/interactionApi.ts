@@ -61,6 +61,7 @@ export interface ZoomData {
  */
 export abstract class InteractionApi<T extends Camera = Camera> {
   protected currentCamera?: Camera;
+  private activeRenderOptions?: CameraRenderOptions;
   private sceneLoadingPromise?: Promise<Scene>;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
@@ -207,8 +208,11 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * performing any additional interaction operations. Use `endInteraction()` to
    * mark the end of an interaction.
    */
-  public async beginInteraction(): Promise<void> {
+  public async beginInteraction(
+    renderOptions: CameraRenderOptions = {}
+  ): Promise<void> {
     if (!this.isInteracting()) {
+      this.activeRenderOptions = renderOptions;
       this.interactionStartedEmitter.emit();
       this.sceneLoadingPromise = this.getScene();
       this.currentCamera = (await this.sceneLoadingPromise).camera();
@@ -224,17 +228,10 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * @param t A function to transform the camera. Function will be passed the
    *  camera and scene viewport and is expected to return an updated camera.
    */
-  public async transformCamera(t: CameraTransform<T>): Promise<void>;
   public async transformCamera(
     t: CameraTransform<T>,
-    renderOptions?: CameraRenderOptions,
-  ): Promise<void>;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async transformCamera(...args: any[]): Promise<void> {
-    const t = args[0];
-    const renderOptions = args[1];
-
+    renderOptions: CameraRenderOptions = this.activeRenderOptions ?? {}
+  ): Promise<void> {
     if (this.isInteracting()) {
       const scene = await this.getScene();
       const viewport = this.getViewport();
@@ -244,7 +241,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
       this.currentCamera =
         this.currentCamera != null && viewport != null && frame != null
           ? t({
-              camera: this.currentCamera,
+              camera: this.currentCamera as T,
               viewport,
               scale: scene.scale(),
               boundingBox: scene.boundingBox(),
@@ -364,7 +361,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * new image for the updated scene.
    */
   public async viewAll(): Promise<void> {
-    await (await this.getScene()).camera().viewAll().render();
+    await (await this.getScene()).camera().viewAll().render({});
   }
 
   /**
@@ -623,6 +620,7 @@ export abstract class InteractionApi<T extends Camera = Camera> {
       this.interactionFinishedEmitter.emit();
       await this.stream.endInteraction();
     }
+    this.activeRenderOptions = undefined;
   }
 
   /**
