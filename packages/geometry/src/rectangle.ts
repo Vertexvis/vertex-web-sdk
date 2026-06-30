@@ -18,7 +18,7 @@ export function create(
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
 ): Rectangle {
   return { x, y, width, height };
 }
@@ -35,7 +35,7 @@ export function fromDimensions(dimensions: Dimensions.Dimensions): Rectangle {
  */
 export function fromPointAndDimensions(
   point: Point.Point,
-  dimensions: Dimensions.Dimensions
+  dimensions: Dimensions.Dimensions,
 ): Rectangle {
   return create(point.x, point.y, dimensions.width, dimensions.height);
 }
@@ -46,7 +46,7 @@ export function fromPointAndDimensions(
  */
 export function fromPoints(
   topLeftPt: Point.Point,
-  bottomRightPt: Point.Point
+  bottomRightPt: Point.Point,
 ): Rectangle {
   const minX = Math.min(topLeftPt.x, bottomRightPt.x);
   const minY = Math.min(topLeftPt.y, bottomRightPt.y);
@@ -96,7 +96,7 @@ export function cropFit(to: Rectangle, rect: Rectangle): Rectangle {
 export function scaleFit(to: number, rect: Rectangle): Rectangle {
   const scale = Math.min(Math.sqrt(to / area(rect)), 1);
   const dimensions = Dimensions.floor(
-    Dimensions.proportionalScale(scale, rect)
+    Dimensions.proportionalScale(scale, rect),
   );
   const position = Point.subtract(center(rect), Dimensions.center(dimensions));
   return fromPointAndDimensions(position, dimensions);
@@ -116,7 +116,7 @@ export function scaleFit(to: number, rect: Rectangle): Rectangle {
 export function scale(
   rect: Rectangle,
   scaleOrScaleX: number,
-  scaleY?: number
+  scaleY?: number,
 ): Rectangle {
   if (scaleY == null) {
     return scale(rect, scaleOrScaleX, scaleOrScaleX);
@@ -202,7 +202,7 @@ export function pad(rect: Rectangle, padding: number): Rectangle {
     rect.x - padding,
     rect.y - padding,
     rect.width + padding * 2,
-    rect.height + padding * 2
+    rect.height + padding * 2,
   );
 }
 

@@ -1,7 +1,7 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 
 export function validateBoundingBox(
-  boundingBox: vertexvis.protobuf.core.IBoundingBox3f
+  boundingBox: vertexvis.protobuf.core.IBoundingBox3f,
 ): boolean {
   const boundingBoxXMaxValid =
     boundingBox?.xmax != null && Number.isFinite(boundingBox.xmax);
@@ -27,12 +27,12 @@ export function validateBoundingBox(
 }
 
 export function validateCamera(
-  camera: vertexvis.protobuf.stream.ICamera
+  camera: vertexvis.protobuf.stream.ICamera,
 ): boolean {
   // If a perspective camera is provided, verify it is valid
   if (camera.perspective != null) {
     const perspectiveCameraIsValid = validatePerspectiveCamera(
-      camera.perspective
+      camera.perspective,
     );
     return perspectiveCameraIsValid;
   }
@@ -40,7 +40,7 @@ export function validateCamera(
   // If an orthographic camera is provided, verify it is valid
   if (camera.orthographic != null) {
     const orthographicCameraIsValid = validateOrthographicCamera(
-      camera.orthographic
+      camera.orthographic,
     );
     return orthographicCameraIsValid;
   }
@@ -49,7 +49,7 @@ export function validateCamera(
 }
 
 export function validatePerspectiveCamera(
-  camera: vertexvis.protobuf.stream.IPerspectiveCamera
+  camera: vertexvis.protobuf.stream.IPerspectiveCamera,
 ): boolean {
   const lookAtXValid =
     camera.lookAt?.x != null && Number.isFinite(camera.lookAt.x);
@@ -70,7 +70,7 @@ export function validatePerspectiveCamera(
   // Validate up vector has non-zero length
   const upVectorValid = validateVector(
     { x: camera?.up?.x, y: camera?.up?.y, z: camera?.up?.z },
-    true
+    true,
   );
 
   return (
@@ -88,7 +88,7 @@ export function validatePerspectiveCamera(
 }
 
 export function validateOrthographicCamera(
-  camera: vertexvis.protobuf.stream.IOrthographicCamera
+  camera: vertexvis.protobuf.stream.IOrthographicCamera,
 ): boolean {
   const fovHeightValid =
     camera.fovHeight != null && Number.isFinite(camera.fovHeight);
@@ -111,7 +111,7 @@ export function validateOrthographicCamera(
   // Validate up vector has non-zero length
   const upVectorValid = validateVector(
     { x: camera?.up?.x, y: camera?.up?.y, z: camera?.up?.z },
-    true
+    true,
   );
 
   return (
@@ -130,7 +130,7 @@ export function validateOrthographicCamera(
 }
 
 export function validateDimensions(
-  dimensions: vertexvis.protobuf.stream.IDimensions
+  dimensions: vertexvis.protobuf.stream.IDimensions,
 ): boolean {
   const heightValid =
     dimensions?.height != null &&
@@ -149,7 +149,7 @@ export function validateNumber(number: number): boolean {
 }
 
 export function validatePoint(
-  point: vertexvis.protobuf.stream.IPoint
+  point: vertexvis.protobuf.stream.IPoint,
 ): boolean {
   const xValid = point?.x != null && Number.isFinite(point.x);
   const yValid = point?.y != null && Number.isFinite(point.y);
@@ -159,7 +159,7 @@ export function validatePoint(
 
 export function validateVector(
   vector: vertexvis.protobuf.core.IVector3f,
-  verifyNonZeroLength: boolean
+  verifyNonZeroLength: boolean,
 ): boolean {
   const xValid = vector?.x != null && Number.isFinite(vector.x);
   const yValid = vector?.y != null && Number.isFinite(vector.y);

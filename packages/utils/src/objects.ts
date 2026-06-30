@@ -122,10 +122,10 @@ export function toPairs(obj: any): Array<[string, any]> {
 
 /* eslint-disable padding-line-between-statements */
 export function fromPairs<T>(
-  pairs: Array<[string, T]> | undefined | null
+  pairs: Array<[string, T]> | undefined | null,
 ): Record<string, T>;
 export function fromPairs(
-  pairs: Array<unknown[]> | undefined | null
+  pairs: Array<unknown[]> | undefined | null,
 ): Record<string, unknown>;
 export function fromPairs(pairs: unknown): Record<string, unknown> {
   if (Array.isArray(pairs)) {

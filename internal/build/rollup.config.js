@@ -15,7 +15,7 @@ function loadTsConfig(tsconfigPath) {
         getCanonicalFileName: (fileName) => fileName,
         getCurrentDirectory: () => process.cwd(),
         getNewLine: () => '\n',
-      })
+      }),
     );
   }
 
@@ -24,13 +24,13 @@ function loadTsConfig(tsconfigPath) {
     ts.sys,
     path.dirname(tsconfigPath),
     undefined,
-    tsconfigPath
+    tsconfigPath,
   );
 }
 
 function createTypeScriptPlugin() {
   const parsedConfig = loadTsConfig(
-    path.resolve(process.cwd(), 'tsconfig.json')
+    path.resolve(process.cwd(), 'tsconfig.json'),
   );
   const transpileOptions = {
     ...parsedConfig.options,
@@ -54,7 +54,7 @@ function createTypeScriptPlugin() {
       });
 
       const errors = (transpiled.diagnostics ?? []).filter(
-        (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error
+        (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error,
       );
       if (errors.length > 0) {
         this.error(
@@ -62,7 +62,7 @@ function createTypeScriptPlugin() {
             getCanonicalFileName: (fileName) => fileName,
             getCurrentDirectory: () => process.cwd(),
             getNewLine: () => '\n',
-          })
+          }),
         );
       }
 
@@ -78,7 +78,7 @@ function createTypeScriptPlugin() {
 }
 
 const packageJson = JSON.parse(
-  fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8')
+  fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 );
 const builtins = builtinModules.flatMap((module) => [module, `node:${module}`]);
 

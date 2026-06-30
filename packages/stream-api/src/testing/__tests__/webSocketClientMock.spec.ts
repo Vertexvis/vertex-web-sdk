@@ -53,7 +53,7 @@ describe(WebSocketClientMock, () => {
       expect(handler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: '123',
-        })
+        }),
       );
     });
 

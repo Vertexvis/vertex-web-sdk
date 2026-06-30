@@ -8,7 +8,7 @@ export interface InstancedTemplate<E extends Element> {
 export function append<E extends Element, D extends BindingDataMap>(
   container: Element,
   element: E,
-  data: D
+  data: D,
 ): InstancedTemplate<E> {
   const bindings = new CollectionBinding(generateBindings(element));
   bindings.bind(data);
@@ -22,7 +22,7 @@ export function append<E extends Element, D extends BindingDataMap>(
 }
 
 export function generateInstanceFromTemplate(
-  template: HTMLTemplateElement
+  template: HTMLTemplateElement,
 ): InstancedTemplate<HTMLElement> {
   const fragment = template.content.cloneNode(true) as HTMLElement;
   const element = fragment.firstElementChild as HTMLElement;

@@ -97,7 +97,7 @@ describe('Uri', () => {
     it('should add and encode query param', () => {
       const result = Uri.addQueryEntry(['query 3', 'some value'], subject);
       expect(result.query).toEqual(
-        'query1=1&query%202=2%2B3&query%203=some%20value'
+        'query1=1&query%202=2%2B3&query%203=some%20value',
       );
     });
   });
@@ -108,7 +108,7 @@ describe('Uri', () => {
     it('should add and encode query param', () => {
       const result = Uri.addQueryEntries([['query 3', 'some value']], subject);
       expect(result.query).toEqual(
-        'query1=1&query%202=2%2B3&query%203=some%20value'
+        'query1=1&query%202=2%2B3&query%203=some%20value',
       );
     });
   });
@@ -120,7 +120,7 @@ describe('Uri', () => {
       const params = { 'query 3': 3, 'query 4': 4 };
       const result = Uri.addQueryParams(params, subject);
       expect(result.query).toEqual(
-        'query1=1&query%202=2%2B3&query%203=3&query%204=4'
+        'query1=1&query%202=2%2B3&query%203=3&query%204=4',
       );
     });
 

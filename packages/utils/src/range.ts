@@ -73,7 +73,7 @@ export const intersection = (other: Range, range: Range): Range | undefined => {
   if (intersects(other, range)) {
     return create(
       Math.max(other.start, range.start),
-      Math.min(other.end, range.end)
+      Math.min(other.end, range.end),
     );
   }
 };

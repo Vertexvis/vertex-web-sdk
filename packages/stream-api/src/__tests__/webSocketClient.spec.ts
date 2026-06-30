@@ -19,7 +19,7 @@ describe('WebSocketClientImpl', () => {
     globalWebSocket = global.WebSocket;
     (global as any).WebSocket = class {
       public addEventListener = jest.fn((eventType, listener) =>
-        eventType === 'open' ? listener() : undefined
+        eventType === 'open' ? listener() : undefined,
       );
 
       public removeEventListener = jest.fn();

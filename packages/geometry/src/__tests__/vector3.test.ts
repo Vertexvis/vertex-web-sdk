@@ -62,7 +62,7 @@ describe(Vector3.add, () => {
   it('returns the sum of two vectors', () => {
     const result = Vector3.add(
       Vector3.create(1, 2, 3),
-      Vector3.create(1, 2, 3)
+      Vector3.create(1, 2, 3),
     );
     expect(result).toEqual(Vector3.create(2, 4, 6));
   });
@@ -72,7 +72,7 @@ describe(Vector3.subtract, () => {
   it('returns a vector of b subtracted from a', () => {
     const result = Vector3.subtract(
       Vector3.create(3, 4, 5),
-      Vector3.create(1, 2, 3)
+      Vector3.create(1, 2, 3),
     );
     expect(result).toEqual(Vector3.create(2, 2, 2));
   });
@@ -82,7 +82,7 @@ describe(Vector3.dot, () => {
   it('returns the dot product of two vectors', () => {
     const result = Vector3.dot(
       Vector3.create(1, 2, 3),
-      Vector3.create(2, 3, 4)
+      Vector3.create(2, 3, 4),
     );
     expect(result).toEqual(20);
   });
@@ -92,7 +92,7 @@ describe(Vector3.angleTo, () => {
   it('calculates the angle between two vectors', () => {
     const angle = Vector3.angleTo(
       Vector3.create(1, 1, 1),
-      Vector3.create(1, 2, 3)
+      Vector3.create(1, 2, 3),
     );
     expect(angle).toEqual(0.3875966866551805);
   });
@@ -103,7 +103,7 @@ describe(Vector3.eulerTo, () => {
     const angle1 = Vector3.eulerTo(Vector3.create(1, 1, 0), Vector3.up());
     const angle2 = Vector3.eulerTo(
       Vector3.create(1, 2, 3),
-      Vector3.create(3, 2, 1)
+      Vector3.create(3, 2, 1),
     );
     const angle3 = Vector3.eulerTo(Vector3.create(0, 1, 1), Vector3.up());
 
@@ -120,19 +120,19 @@ describe(Vector3.eulerTo, () => {
 
   it('returns an euler angle with no rotation if the vectors if the angle between them is near 0 degrees', () => {
     expect(
-      Vector3.eulerTo(Vector3.create(1e-6, 15, 0), Vector3.up())
+      Vector3.eulerTo(Vector3.create(1e-6, 15, 0), Vector3.up()),
     ).toMatchObject(Euler.create());
     expect(
-      Vector3.eulerTo(Vector3.create(0, 15, -1e-6), Vector3.up())
+      Vector3.eulerTo(Vector3.create(0, 15, -1e-6), Vector3.up()),
     ).toMatchObject(Euler.create());
   });
 
   it('returns an euler angle with no rotation if the vectors if the angle between them is near 180 degrees', () => {
     expect(
-      Vector3.eulerTo(Vector3.create(15, 1e-6, 0), Vector3.left())
+      Vector3.eulerTo(Vector3.create(15, 1e-6, 0), Vector3.left()),
     ).toMatchObject(Euler.create({ x: Math.PI }));
     expect(
-      Vector3.eulerTo(Vector3.create(15, 0, -1e-6), Vector3.left())
+      Vector3.eulerTo(Vector3.create(15, 0, -1e-6), Vector3.left()),
     ).toMatchObject(Euler.create({ x: Math.PI }));
   });
 });
@@ -140,14 +140,14 @@ describe(Vector3.eulerTo, () => {
 describe(Vector3.distance, () => {
   it('calculates euclidean distance between two vectors', () => {
     expect(
-      Vector3.distance(Vector3.create(0, 0, 0), Vector3.create(0, 4, 0))
+      Vector3.distance(Vector3.create(0, 0, 0), Vector3.create(0, 4, 0)),
     ).toEqual(4);
     // https://en.wikipedia.org/wiki/Pythagorean_quadruple#Primitive_Pythagorean_quadruples_with_small_norm
     expect(
-      Vector3.distance(Vector3.origin(), Vector3.create(2, 10, 11))
+      Vector3.distance(Vector3.origin(), Vector3.create(2, 10, 11)),
     ).toEqual(15);
     expect(Vector3.distance(Vector3.origin(), Vector3.create(1, 2, 2))).toEqual(
-      3
+      3,
     );
   });
 });
@@ -229,7 +229,7 @@ describe(Vector3.transformMatrix, () => {
     const values = Matrix4.makeIdentity();
     const transformed = Vector3.transformMatrix(
       Vector3.create(2, 2, 2),
-      values
+      values,
     );
     expect(transformed).toEqual(Vector3.create(2, 2, 2));
   });
@@ -247,7 +247,7 @@ describe(Vector3.lerp, () => {
     const pt = Vector3.lerp(
       Vector3.create(1, 1, 1),
       Vector3.create(2, 2, 2),
-      0.5
+      0.5,
     );
     expect(pt).toEqual(Vector3.create(1.5, 1.5, 1.5));
   });

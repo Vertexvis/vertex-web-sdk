@@ -50,11 +50,11 @@ describe(Rectangle.scaleFit, () => {
 
   it('scales the rectangle to have an area less than or equal to the provided area', () => {
     expect(Rectangle.scaleFit(2500, rect1)).toEqual(
-      Rectangle.create(125, 125, 50, 50)
+      Rectangle.create(125, 125, 50, 50),
     );
 
     expect(Rectangle.scaleFit(2500, rect2)).toEqual(
-      Rectangle.create(128, 135, 44, 55)
+      Rectangle.create(128, 135, 44, 55),
     );
   });
 });
@@ -155,8 +155,8 @@ describe(Rectangle.containsPoints, () => {
         rect,
         Point.create(2, 2),
         Point.create(3, 3),
-        Point.create(4, 4)
-      )
+        Point.create(4, 4),
+      ),
     ).toBe(true);
   });
 
@@ -167,15 +167,15 @@ describe(Rectangle.containsPoints, () => {
         rect,
         Point.create(2, 2),
         Point.create(3, 3),
-        Point.create(15, 15)
-      )
+        Point.create(15, 15),
+      ),
     ).toBe(false);
   });
 
   it('returns true if points lie on the bounds of the rectangle', () => {
     const rect = Rectangle.create(1, 1, 10, 10);
     expect(
-      Rectangle.containsPoints(rect, Point.create(1, 1), Point.create(11, 11))
+      Rectangle.containsPoints(rect, Point.create(1, 1), Point.create(11, 11)),
     ).toBe(true);
   });
 });
@@ -183,7 +183,7 @@ describe(Rectangle.containsPoints, () => {
 describe(Rectangle.fromJson, () => {
   it('parses json obj', () => {
     const v = Rectangle.fromJson(
-      JSON.stringify({ x: 1, y: 2, width: 10, height: 10 })
+      JSON.stringify({ x: 1, y: 2, width: 10, height: 10 }),
     );
     expect(v).toEqual(Rectangle.create(1, 2, 10, 10));
   });

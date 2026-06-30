@@ -79,7 +79,7 @@ export function scale(scalar: number, q: Quaternion): Quaternion {
  */
 export function fromAxisAngle(
   axis: Vector3.Vector3,
-  radians: number
+  radians: number,
 ): Quaternion {
   const halfAngle = radians / 2;
   const s = Math.sin(halfAngle);

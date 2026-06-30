@@ -25,7 +25,7 @@ describe(rollupCdnConfig, () => {
         output: expect.arrayContaining([
           expect.objectContaining({ format: 'esm' }),
         ]),
-      })
+      }),
     );
   });
 });
