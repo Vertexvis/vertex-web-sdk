@@ -32,6 +32,7 @@ import { buildFlyToOperation } from './mapper';
 import ISceneItemQueryExpression = vertexvis.protobuf.stream.ISceneItemQueryExpression;
 
 export interface CameraRenderOptions {
+  correlationId?: string;
   animation?: Animation.Animation;
 }
 
@@ -256,9 +257,9 @@ export abstract class Camera {
    * promise will resolve when a frame is received that contains this camera.
    */
   public async render(
-    renderOptions?: CameraRenderOptions
+    renderOptions: CameraRenderOptions = {}
   ): Promise<CameraRenderResult> {
-    if (this.flyToOptions == null && renderOptions != null) {
+    if (this.flyToOptions == null && renderOptions.animation) {
       this.flyToOptions = {
         flyTo: {
           type: 'camera',
@@ -268,12 +269,12 @@ export abstract class Camera {
     }
 
     try {
-      const corrId = UUID.create();
+      renderOptions.correlationId ??= UUID.create();
       if (this.flyToOptions != null) {
         const payload = buildFlyToOperation(
-          corrId,
+          renderOptions.correlationId,
           this.flyToOptions,
-          renderOptions?.animation,
+          renderOptions.animation,
           this.toFrameCamera()
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
@@ -282,21 +283,21 @@ export abstract class Camera {
           this.stream,
           this.decodeFrame,
           {
-            correlationId: corrId,
+            correlationId: renderOptions.correlationId,
             animationId: flyToResponse.flyTo?.animationId?.hex || undefined,
           },
-          renderOptions?.animation?.milliseconds != null
+          renderOptions.animation?.milliseconds != null
             ? renderOptions.animation.milliseconds + DEFAULT_TIMEOUT_IN_MS
             : undefined
         );
       } else {
         this.stream.replaceCamera({
           camera: FrameCamera.toProtobuf(this.data),
-          frameCorrelationId: { value: corrId },
+          frameCorrelationId: { value: renderOptions.correlationId },
         });
 
         return new CameraRenderResult(this.stream, this.decodeFrame, {
-          correlationId: corrId,
+          correlationId: renderOptions.correlationId,
         });
       }
     } catch (e) {
