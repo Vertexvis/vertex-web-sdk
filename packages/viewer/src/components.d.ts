@@ -1584,7 +1584,7 @@ export namespace Components {
         "labelFormatter"?: Formatter<number | undefined>;
         /**
           * The length of the caps at each end of the distance measurement.
-          * @default MEASUREMENT_LINE_CAP_LENGTH
+          * @default 10
          */
         "lineCapLength": number;
         /**
@@ -1610,7 +1610,7 @@ export namespace Components {
         "showAxisReferenceLines": boolean;
         /**
           * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-          * @default MEASUREMENT_SNAP_DISTANCE
+          * @default 16
          */
         "snapDistance": number;
         /**
@@ -4110,7 +4110,7 @@ declare namespace LocalJSX {
         "labelFormatter"?: Formatter<number | undefined>;
         /**
           * The length of the caps at each end of the distance measurement.
-          * @default MEASUREMENT_LINE_CAP_LENGTH
+          * @default 10
          */
         "lineCapLength"?: number;
         /**
@@ -4144,7 +4144,7 @@ declare namespace LocalJSX {
         "showAxisReferenceLines"?: boolean;
         /**
           * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-          * @default MEASUREMENT_SNAP_DISTANCE
+          * @default 16
          */
         "snapDistance"?: number;
         /**
