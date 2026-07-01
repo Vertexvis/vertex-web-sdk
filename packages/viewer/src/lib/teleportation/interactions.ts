@@ -308,9 +308,9 @@ export class TeleportInteractionHandler implements InteractionHandler {
     return Math.min(...Vector3.toArray(BoundingBox.lengths(boundingBox)));
   }
 
-  private renderConfiguration(): CameraRenderOptions | undefined {
+  private renderConfiguration(): CameraRenderOptions {
     return this.animationConfiguration != null
       ? { animation: { milliseconds: this.animationConfiguration.durationMs } }
-      : undefined;
+      : {};
   }
 }
