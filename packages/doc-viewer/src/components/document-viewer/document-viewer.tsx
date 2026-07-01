@@ -257,7 +257,7 @@ export class VertexDocumentViewer implements BasicViewer {
               'enable-pointer-events ': window.PointerEvent != null,
             })}
           >
-            <canvas role="presentation" ref={el => (this.canvasEl = el)} />
+            <canvas id="document-viewer-canvas" role="presentation" ref={el => (this.canvasEl = el)} />
           </div>
 
           <slot></slot>
