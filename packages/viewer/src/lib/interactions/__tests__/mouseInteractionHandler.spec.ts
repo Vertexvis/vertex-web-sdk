@@ -82,7 +82,7 @@ describe(MouseInteractionHandler, () => {
     rotatePointInteraction,
     zoomInteraction,
     panInteraction,
-    twistInteraction
+    twistInteraction,
   );
 
   beforeEach(() => {
@@ -276,7 +276,7 @@ describe(MouseInteractionHandler, () => {
   });
 
   async function simulatePrimaryInteractions(
-    interactionDelay?: number
+    interactionDelay?: number,
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMovePrimaryButton);
@@ -285,7 +285,7 @@ describe(MouseInteractionHandler, () => {
   }
 
   async function simulateSecondaryInteractions(
-    interactionDelay?: number
+    interactionDelay?: number,
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveSecondaryButton);
@@ -294,7 +294,7 @@ describe(MouseInteractionHandler, () => {
   }
 
   async function simulateAuxiliaryInteractions(
-    interactionDelay?: number
+    interactionDelay?: number,
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseMoveAuxiliaryButton);
@@ -311,7 +311,7 @@ describe(MouseInteractionHandler, () => {
 
   async function simulateCustomMouseEvent(
     mouseEvent: MouseEvent,
-    interactionDelay?: number
+    interactionDelay?: number,
   ): Promise<void> {
     div.dispatchEvent(mouseDown);
     window.dispatchEvent(mouseEvent);

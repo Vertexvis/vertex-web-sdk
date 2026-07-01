@@ -90,7 +90,7 @@ describe('vertex-viewer', () => {
         expect.arrayContaining([
           expect.any(MouseInteractionHandler),
           expect.any(TouchInteractionHandler),
-        ])
+        ]),
       );
     });
   });
@@ -106,7 +106,7 @@ describe('vertex-viewer', () => {
         expect.arrayContaining([
           expect.any(MouseInteractionHandler),
           expect.any(TouchInteractionHandler),
-        ])
+        ]),
       );
     });
   });
@@ -166,12 +166,12 @@ describe('vertex-viewer', () => {
       expect(onConnectionChange).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: { status: 'connecting' },
-        })
+        }),
       );
       expect(onConnectionChange).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: { status: 'connected', jwt: token },
-        })
+        }),
       );
       expect(onSceneReady).toHaveBeenCalled();
       expect(onFrameReceived).toHaveBeenCalled();
@@ -199,7 +199,7 @@ describe('vertex-viewer', () => {
       await loadViewerStreamKey(
         key2,
         { viewer, stream, ws },
-        { token: token2 }
+        { token: token2 },
       );
       expect(onSceneReady).toHaveBeenCalled();
       expect(viewer.token).toBe(token2);
@@ -245,7 +245,7 @@ describe('vertex-viewer', () => {
             featureMaps: 'all',
           }),
           dimensions: { width: 200, height: 150 },
-        })
+        }),
       );
     });
 
@@ -304,7 +304,7 @@ describe('vertex-viewer', () => {
               }),
             },
           }),
-        })
+        }),
       );
     });
 
@@ -329,14 +329,14 @@ describe('vertex-viewer', () => {
       loadViewerStreamKey(
         key1,
         { viewer, stream, ws },
-        { token, beforeConnected: async () => loadPromise }
+        { token, beforeConnected: async () => loadPromise },
       );
 
       await Async.delay(1);
       expect(onConnectionChange).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: { status: 'connecting' },
-        })
+        }),
       );
 
       onConnectionChange.mockClear();
@@ -346,12 +346,12 @@ describe('vertex-viewer', () => {
       expect(onConnectionChange).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: { status: 'connecting' },
-        })
+        }),
       );
       expect(onConnectionChange).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: { status: 'connected', jwt: token },
-        })
+        }),
       );
       expect(onSceneReady).toHaveBeenCalledTimes(1);
 
@@ -448,7 +448,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             depthBuffers: 'all',
           }),
-        })
+        }),
       );
 
       jest.useFakeTimers();
@@ -460,7 +460,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             phantom: expect.objectContaining({ opacity: 1 }),
           }),
-        })
+        }),
       );
 
       jest.useFakeTimers();
@@ -472,7 +472,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             featureLines: { width: 1 },
           }),
-        })
+        }),
       );
 
       jest.useFakeTimers();
@@ -484,7 +484,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             featureHighlighting: { highlightColor: 0xff0000 },
           }),
-        })
+        }),
       );
 
       jest.useFakeTimers();
@@ -496,7 +496,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             featureMaps: 'final',
           }),
-        })
+        }),
       );
 
       jest.useFakeTimers();
@@ -513,7 +513,7 @@ describe('vertex-viewer', () => {
               endCapColor: '#112233',
             }),
           }),
-        })
+        }),
       );
     });
   });
@@ -541,7 +541,7 @@ describe('vertex-viewer', () => {
         expect.anything(),
         deviceId,
         expect.anything(),
-        undefined
+        undefined,
       );
     });
 
@@ -564,7 +564,7 @@ describe('vertex-viewer', () => {
         expect.anything(),
         viewer.deviceId,
         expect.anything(),
-        undefined
+        undefined,
       );
     });
   });
@@ -590,7 +590,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             depthBuffers: 'final',
           }),
-        })
+        }),
       );
     });
 
@@ -614,7 +614,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             depthBuffers: undefined,
           }),
-        })
+        }),
       );
     });
   });
@@ -633,17 +633,17 @@ describe('vertex-viewer', () => {
       viewer.addEventListener('interactionStarted', onInteractionStarted);
 
       canvas?.dispatchEvent(
-        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 })
+        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }),
       );
 
       const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
       await Async.delay(delay + 5);
 
       window.dispatchEvent(
-        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 })
+        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }),
       );
       window.dispatchEvent(
-        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 })
+        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }),
       );
 
       expect(onInteractionStarted).toHaveBeenCalled();
@@ -664,22 +664,22 @@ describe('vertex-viewer', () => {
       const canvas = viewer.shadowRoot?.querySelector('canvas');
 
       viewer.addEventListener('interactionFinished', () =>
-        interactionEndedPromiseResolve()
+        interactionEndedPromiseResolve(),
       );
       viewer.addEventListener('interactionFinished', onInteractionEnded);
 
       canvas?.dispatchEvent(
-        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 })
+        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }),
       );
 
       const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
       await Async.delay(delay + 5);
 
       window.dispatchEvent(
-        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 })
+        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }),
       );
       window.dispatchEvent(
-        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 })
+        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }),
       );
 
       // Wait for `endInteraction` to fire the `interactionFinished` event.
@@ -713,7 +713,7 @@ describe('vertex-viewer', () => {
 
       expect(await viewer.getInteractionHandlers()).toHaveLength(1);
       expect((await viewer.getInteractionHandlers())[0]).toBeInstanceOf(
-        TapInteractionHandler
+        TapInteractionHandler,
       );
 
       viewer.cameraControls = true;
@@ -787,7 +787,7 @@ describe('vertex-viewer', () => {
             depthBufferBytes:
               Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
-        })
+        }),
       );
       expect(onFrameDrawn).toHaveBeenNthCalledWith(
         3,
@@ -796,7 +796,7 @@ describe('vertex-viewer', () => {
             depthBufferBytes:
               Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
-        })
+        }),
       );
     });
 
@@ -837,7 +837,7 @@ describe('vertex-viewer', () => {
             depthBufferBytes:
               Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
           }),
-        })
+        }),
       );
       expect(onFrameDrawn).toHaveBeenNthCalledWith(
         3,
@@ -845,7 +845,7 @@ describe('vertex-viewer', () => {
           detail: expect.objectContaining({
             depthBufferBytes: undefined,
           }),
-        })
+        }),
       );
     });
   });
@@ -904,7 +904,7 @@ describe('vertex-viewer', () => {
           detail: expect.objectContaining({
             dimensions: Dimensions.create(500, 500),
           }),
-        })
+        }),
       );
     });
 
@@ -946,13 +946,13 @@ describe('vertex-viewer', () => {
             jest.advanceTimersByTime(1000);
             jest.useRealTimers();
           },
-        }
+        },
       );
 
       expect(updateDimensionsSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           dimensions: Dimensions.create(500, 500),
-        })
+        }),
       );
     });
   });
@@ -1024,7 +1024,7 @@ describe('vertex-viewer', () => {
           detail: expect.objectContaining({
             dimensions: Dimensions.create(1, 1),
           }),
-        })
+        }),
       );
     });
   });
@@ -1050,7 +1050,7 @@ describe('vertex-viewer', () => {
         { viewer, stream, ws },
         {
           beforeReconnect: async () => await viewer.scene(),
-        }
+        },
       );
 
       expect(result).toBeDefined();
@@ -1129,7 +1129,7 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             depthBuffers: 'final',
           }),
-        })
+        }),
       );
 
       update.mockClear();
@@ -1144,20 +1144,20 @@ describe('vertex-viewer', () => {
           streamAttributes: expect.objectContaining({
             depthBuffers: undefined,
           }),
-        })
+        }),
       );
     });
   });
 
   async function newViewerSpec(
-    opts: Pick<NewSpecPageOptions, 'template' | 'html'>
+    opts: Pick<NewSpecPageOptions, 'template' | 'html'>,
   ): Promise<HTMLVertexViewerElement> {
     const page = await newSpecPage({ components: [Viewer], ...opts });
     return page.root as HTMLVertexViewerElement;
   }
 
   async function newViewerSpecWithPage(
-    opts: Pick<NewSpecPageOptions, 'template' | 'html'>
+    opts: Pick<NewSpecPageOptions, 'template' | 'html'>,
   ): Promise<{ page: SpecPage; viewer: HTMLVertexViewerElement }> {
     const page = await newSpecPage({ components: [Viewer], ...opts });
     return { page, viewer: page.root as HTMLVertexViewerElement };

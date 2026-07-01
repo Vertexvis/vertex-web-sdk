@@ -53,7 +53,7 @@ describe('vertex-viewer-pin-tool', () => {
 
     expect(addEventListener).toHaveBeenCalledWith(
       'frameDrawn',
-      expect.any(Function)
+      expect.any(Function),
     );
 
     expect(toolEl.shadowRoot).toEqualHtml(`
@@ -105,12 +105,12 @@ describe('vertex-viewer-pin-tool', () => {
 
     expect(addEventListener).toHaveBeenCalledWith(
       'frameDrawn',
-      expect.any(Function)
+      expect.any(Function),
     );
 
     expect(
       toolEl.shadowRoot?.querySelector('vertex-viewer-pin-group')
-        ?.projectionViewMatrix
+        ?.projectionViewMatrix,
     ).toMatchObject(matrix);
   });
 

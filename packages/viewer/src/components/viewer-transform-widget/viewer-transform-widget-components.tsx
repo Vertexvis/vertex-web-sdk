@@ -28,7 +28,7 @@ export const TransformWidgetInputWrapper: FunctionalComponent<
     viewport,
     bounds ?? Dimensions.create(0, 0),
     point,
-    placement
+    placement,
   );
 
   return (
@@ -124,7 +124,7 @@ function constrainInputToViewport(
   inputDimensions: Dimensions.Dimensions,
   point: Point.Point,
   placement: TransformWidgetInputPlacement,
-  padding = 5
+  padding = 5,
 ): InputPlacement {
   const { width, height } = viewport.dimensions;
   const paddedWidth = inputDimensions.width + padding;
@@ -139,14 +139,14 @@ function constrainInputToViewport(
       return {
         right: toCssLength(constrainTo(width - paddedWidth, width - point.x)),
         bottom: toCssLength(
-          constrainTo(height - paddedHeight, height - point.y)
+          constrainTo(height - paddedHeight, height - point.y),
         ),
       };
     case 'top-right':
       return {
         left: toCssLength(constrainTo(width - paddedWidth, point.x)),
         bottom: toCssLength(
-          constrainTo(height - paddedHeight, height - point.y)
+          constrainTo(height - paddedHeight, height - point.y),
         ),
       };
     case 'bottom-left':

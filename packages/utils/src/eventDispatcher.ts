@@ -31,7 +31,7 @@ export class EventDispatcher<T> {
 
   public async onceWhen(
     predicate: Predicate<T>,
-    opts: OnOptions = {}
+    opts: OnOptions = {},
   ): Promise<T> {
     const controller = new AbortController();
     opts.abort?.addEventListener('abort', () => controller.abort());
@@ -45,7 +45,7 @@ export class EventDispatcher<T> {
             resolve(event);
           }
         },
-        { ...opts, abort: controller.signal }
+        { ...opts, abort: controller.signal },
       );
     });
   }
@@ -53,7 +53,7 @@ export class EventDispatcher<T> {
   public when(
     predicate: Predicate<T>,
     listener: Listener<T>,
-    opts: OnOptions = {}
+    opts: OnOptions = {},
   ): Disposable {
     return this.on((event) => {
       if (predicate(event)) {

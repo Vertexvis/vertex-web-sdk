@@ -21,7 +21,7 @@ export interface BuildSceneOperationContext {
 }
 
 export function buildSceneViewStateIdentifier(
-  identifier: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier
+  identifier: UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
 ):
   | Pick<
       vertexvis.protobuf.stream.ILoadSceneViewStatePayload,
@@ -39,14 +39,14 @@ export function buildSceneViewStateIdentifier(
     return { sceneViewStateSuppliedId: { value: identifier.suppliedId } };
   } else {
     throw new Error(
-      'Unable to build scene view state identifier, input must be a string or `SceneViewStateIdentifier`.'
+      'Unable to build scene view state identifier, input must be a string or `SceneViewStateIdentifier`.',
     );
   }
 }
 
 export function buildQueryExpression(
   query: QueryExpression,
-  context: BuildSceneOperationContext
+  context: BuildSceneOperationContext,
 ): vertexvis.protobuf.stream.IQueryExpression {
   switch (query.type) {
     case 'and':
@@ -171,7 +171,7 @@ export function buildQueryExpression(
 
 export function buildAnnotationQueryExpression(
   query: QueryExpression,
-  context: BuildSceneOperationContext
+  context: BuildSceneOperationContext,
 ): vertexvis.protobuf.stream.IPmiAnnotationQueryExpression {
   switch (query.type) {
     case 'and':
@@ -185,7 +185,7 @@ export function buildAnnotationQueryExpression(
             type: 'annotation-id',
             value: (query.expressions[0] as AnnotationQueryExpression).value,
           },
-          context
+          context,
         );
       } else if (numberOfExpressionsAnd !== 2) {
         throw new Error('Incorrect number of query expressions provided.');
@@ -209,7 +209,7 @@ export function buildAnnotationQueryExpression(
             type: 'annotation-id',
             value: (query.expressions[0] as AnnotationQueryExpression).value,
           },
-          context
+          context,
         );
       } else if (numberOfExpressionsOr !== 2) {
         throw new Error('Incorrect number of query expressions provided.');
@@ -254,7 +254,7 @@ export function buildAnnotationQueryExpression(
 export function buildSceneElementOperationOnItem(
   query: QueryExpression,
   operations: ItemOperation[],
-  context: BuildSceneOperationContext
+  context: BuildSceneOperationContext,
 ): vertexvis.protobuf.stream.ISceneElementOperation {
   const operationTypes = buildOperationTypes(operations);
   const queryExpression = buildQueryExpression(query, context);
@@ -265,7 +265,7 @@ export function buildSceneElementOperationOnItem(
 export function buildSceneElementOperationOnAnnotation(
   query: QueryExpression,
   operations: PmiAnnotationOperation[],
-  context: BuildSceneOperationContext
+  context: BuildSceneOperationContext,
 ): vertexvis.protobuf.stream.ISceneElementOperation {
   const operationTypes = buildAnnotationOperationTypes(operations);
   const queryExpression = buildAnnotationQueryExpression(query, context);
@@ -274,7 +274,7 @@ export function buildSceneElementOperationOnAnnotation(
 }
 
 function buildSceneItemQuery(
-  item: QueryExpression
+  item: QueryExpression,
 ): vertexvis.protobuf.stream.ISceneItemQuery {
   switch (item.type) {
     case 'item-id':
@@ -296,7 +296,7 @@ export function buildFlyToOperation(
   frameCorrelationId: UUID.UUID,
   options: FlyTo.FlyToOptions,
   animation?: Animation.Animation,
-  baseCamera?: FrameCamera.FrameCamera
+  baseCamera?: FrameCamera.FrameCamera,
 ): vertexvis.protobuf.stream.IFlyToPayload {
   const payload = {
     frameCorrelationId: {
@@ -360,7 +360,7 @@ export function buildFlyToOperation(
 }
 
 function buildOperationTypes(
-  operations: ItemOperation[]
+  operations: ItemOperation[],
 ): vertexvis.protobuf.stream.IOperationType[] {
   return operations.map((op) => {
     switch (op.type) {
@@ -444,7 +444,7 @@ function buildOperationTypes(
 }
 
 function buildAnnotationOperationTypes(
-  operations: PmiAnnotationOperation[]
+  operations: PmiAnnotationOperation[],
 ): vertexvis.protobuf.stream.IOperationType[] {
   return operations.map((op) => {
     switch (op.type) {
@@ -463,7 +463,7 @@ function buildAnnotationOperationTypes(
 }
 
 export function toPbSceneViewStateFeatures(
-  features: SceneViewStateFeature[]
+  features: SceneViewStateFeature[],
 ): vertexvis.protobuf.stream.SceneViewStateFeature[] {
   return features.map((feature) => {
     switch (feature) {

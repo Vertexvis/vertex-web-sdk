@@ -6,7 +6,7 @@ import { random } from './random';
 import { makeUuid2l } from './uuid';
 
 export function makeListPmiAnnotationsResponse(
-  annotations: PmiAnnotation[] = [makeAnnotation(), makeAnnotation()]
+  annotations: PmiAnnotation[] = [makeAnnotation(), makeAnnotation()],
 ): ListPmiAnnotationsResponse {
   const res = new ListPmiAnnotationsResponse();
   res.setAnnotationsList(annotations);
@@ -15,7 +15,7 @@ export function makeListPmiAnnotationsResponse(
 
 export function makeAnnotation(
   id: UUID.UUID = UUID.create(),
-  displayName: string = random.string()
+  displayName: string = random.string(),
 ): PmiAnnotation {
   const annotation = new PmiAnnotation();
   annotation.setId(makeUuid2l(id));

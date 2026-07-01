@@ -1,6 +1,6 @@
 export function parseCssColorValue(
   styles: CSSStyleDeclaration,
-  property: string
+  property: string,
 ): string {
   return styles.getPropertyValue(property).trim().replace(/["']*/g, '');
 }

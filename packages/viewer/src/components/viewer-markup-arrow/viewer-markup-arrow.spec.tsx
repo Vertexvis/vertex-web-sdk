@@ -38,11 +38,11 @@ describe('vertex-viewer-markup-arrow', () => {
 
     const el = page.root as HTMLVertexViewerMarkupArrowElement;
     const startEl = el?.shadowRoot?.getElementById(
-      'bounding-box-1d-start-anchor'
+      'bounding-box-1d-start-anchor',
     );
     const endEl = el?.shadowRoot?.getElementById('bounding-box-1d-end-anchor');
     const centerEl = el?.shadowRoot?.getElementById(
-      'bounding-box-1d-center-anchor'
+      'bounding-box-1d-center-anchor',
     );
 
     expect(startEl?.getAttribute('style')).toContain('left: 50px');
@@ -66,19 +66,19 @@ describe('vertex-viewer-markup-arrow', () => {
     });
 
     const el = page.root?.querySelector(
-      'vertex-viewer-markup-arrow'
+      'vertex-viewer-markup-arrow',
     ) as HTMLVertexViewerMarkupArrowElement;
     const startEl = el?.shadowRoot?.getElementById(
-      'bounding-box-1d-start-anchor'
+      'bounding-box-1d-start-anchor',
     );
     const endEl = el?.shadowRoot?.getElementById('bounding-box-1d-end-anchor');
     const centerEl = el?.shadowRoot?.getElementById(
-      'bounding-box-1d-center-anchor'
+      'bounding-box-1d-center-anchor',
     );
 
     startEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 100, clientY: 0 })
+      new MouseEvent('pointermove', { clientX: 100, clientY: 0 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -87,7 +87,7 @@ describe('vertex-viewer-markup-arrow', () => {
 
     endEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 100, clientY: 50 })
+      new MouseEvent('pointermove', { clientX: 100, clientY: 50 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -96,7 +96,7 @@ describe('vertex-viewer-markup-arrow', () => {
 
     centerEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -131,7 +131,7 @@ describe('vertex-viewer-markup-arrow', () => {
     });
 
     const el = page.root?.querySelector(
-      'vertex-viewer-markup-arrow'
+      'vertex-viewer-markup-arrow',
     ) as HTMLVertexViewerMarkupArrowElement;
     const svg = el.shadowRoot?.querySelector('.svg') as SVGElement;
     const groupEl = svg.querySelector('g') as SVGElement;
@@ -156,22 +156,22 @@ describe('vertex-viewer-markup-arrow', () => {
     });
 
     const el = page.root?.querySelector(
-      'vertex-viewer-markup-arrow'
+      'vertex-viewer-markup-arrow',
     ) as HTMLVertexViewerMarkupArrowElement;
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-arrow-scale: 1'
+      '--viewer-markup-arrow-scale: 1',
     );
 
     el.scale = 2;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-arrow-scale: 2'
+      '--viewer-markup-arrow-scale: 2',
     );
 
     el.scale = 0.5;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-arrow-scale: 0.5'
+      '--viewer-markup-arrow-scale: 0.5',
     );
   });
 
@@ -199,7 +199,7 @@ describe('vertex-viewer-markup-arrow', () => {
     expect(
       page.root
         ?.querySelector('vertex-viewer-markup-arrow')
-        ?.shadowRoot?.querySelector('svg')
+        ?.shadowRoot?.querySelector('svg'),
     ).toBeNull();
   });
 
@@ -219,19 +219,19 @@ describe('vertex-viewer-markup-arrow', () => {
     const newViewer = page.doc.createElement('vertex-viewer');
 
     const canvas = root.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
 
     const markup = root.querySelector(
-      'vertex-viewer-markup-arrow'
+      'vertex-viewer-markup-arrow',
     ) as HTMLVertexViewerMarkupArrowElement;
     markup.viewer = newViewer;
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
       'pointerdown',
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -250,19 +250,19 @@ describe('vertex-viewer-markup-arrow', () => {
     const root = page.root as HTMLVertexViewerElement;
 
     const canvas = root.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
 
     const el = root.querySelector(
-      'vertex-viewer-markup-arrow'
+      'vertex-viewer-markup-arrow',
     ) as HTMLVertexViewerMarkupArrowElement;
     el.dispose();
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
       'pointerdown',
-      expect.anything()
+      expect.anything(),
     );
   });
 });

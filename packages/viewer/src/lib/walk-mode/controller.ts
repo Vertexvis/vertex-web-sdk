@@ -83,7 +83,7 @@ export class WalkModeController {
    *
    */
   public updateConfiguration(
-    configuration: Partial<ViewerWalkModeConfiguration>
+    configuration: Partial<ViewerWalkModeConfiguration>,
   ): void {
     const existing = this.model.getConfiguration();
 
@@ -154,7 +154,7 @@ export class WalkModeController {
       return {
         dispose: () => {
           this.excludeTagNames = this.excludeTagNames.filter(
-            (tn) => tn !== args[0]
+            (tn) => tn !== args[0],
           );
         },
       };
@@ -166,7 +166,7 @@ export class WalkModeController {
       return {
         dispose: () => {
           this.excludePredicates = this.excludePredicates.filter(
-            (tn) => tn !== args[0]
+            (tn) => tn !== args[0],
           );
         },
       };
@@ -177,7 +177,7 @@ export class WalkModeController {
     this.model.setExcludedPredicate(
       (el) =>
         this.excludeTagNames.some((tn) => tn === el.tagName) ||
-        this.excludePredicates.some((p) => p(el))
+        this.excludePredicates.some((p) => p(el)),
     );
   }
 }

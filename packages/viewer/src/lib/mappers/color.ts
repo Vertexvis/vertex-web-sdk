@@ -7,7 +7,7 @@ export const fromPbRGBAi: M.Func<vertexvis.protobuf.core.IRGBAi, Color.Color> =
       M.requiredProp('r'),
       M.requiredProp('g'),
       M.requiredProp('b'),
-      M.requiredProp('a')
+      M.requiredProp('a'),
     ),
-    ([r, g, b, a]) => Color.create(r, g, b, a)
+    ([r, g, b, a]) => Color.create(r, g, b, a),
   );

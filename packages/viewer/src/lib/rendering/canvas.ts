@@ -28,14 +28,14 @@ function drawImage(image: HtmlImage, data: DrawFrame): void {
     0,
     0,
     data.canvasDimensions.width,
-    data.canvasDimensions.height
+    data.canvasDimensions.height,
   );
   data.canvas.drawImage(image.image, rect.x, rect.y, rect.width, rect.height);
 }
 
 function reportTimings(
   meter: TimingMeter,
-  callback: ReportTimingsCallback
+  callback: ReportTimingsCallback,
 ): void {
   const timings = meter.takeMeasurements();
 
@@ -49,7 +49,7 @@ export function measureCanvasRenderer(
   renderer: CanvasRenderer,
   logFrameRate: boolean,
   callback: ReportTimingsCallback,
-  intervalMs: number = REPORTING_INTERVAL_MS
+  intervalMs: number = REPORTING_INTERVAL_MS,
 ): CanvasRenderer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let timer: any;
@@ -120,7 +120,7 @@ export function createCanvasRenderer(): CanvasRenderer {
         correlationIds: [
           ...frame.correlationIds,
           ...accumulatedCorrelationIds.filter(
-            (id) => !frame.correlationIds.includes(id)
+            (id) => !frame.correlationIds.includes(id),
           ),
         ],
       });
@@ -147,13 +147,13 @@ export function createCanvasRenderer(): CanvasRenderer {
 
   function drawFrame(): (
     data: DrawFrame,
-    image?: HtmlImage
+    image?: HtmlImage,
   ) => Promise<Frame | undefined> {
     let lastDrawnFrameNumber = -1;
 
     return async (
       data: DrawFrame,
-      image?: HtmlImage
+      image?: HtmlImage,
     ): Promise<Frame | undefined> => {
       if (image != null && data.frame.sequenceNumber > lastDrawnFrameNumber) {
         lastDrawnFrameNumber = data.frame.sequenceNumber;
@@ -181,7 +181,7 @@ export function createCanvasRenderer(): CanvasRenderer {
 
     if (predicatePassing) {
       return load(data).then((image) =>
-        draw(data, image).then(addCorrelationIds)
+        draw(data, image).then(addCorrelationIds),
       );
     }
   };
@@ -190,7 +190,7 @@ export function createCanvasRenderer(): CanvasRenderer {
 export function debugStencilBuffer(
   stencilManager: StencilBufferManager,
   drawStencil: () => boolean,
-  renderer: CanvasRenderer
+  renderer: CanvasRenderer,
 ): CanvasRenderer {
   return async (data) => {
     const frame = await renderer(data);
@@ -206,7 +206,7 @@ export function debugStencilBuffer(
           rect.x,
           rect.y,
           rect.width,
-          rect.height
+          rect.height,
         );
         data.canvas.globalAlpha = 1;
         stencilImage.dispose();

@@ -52,7 +52,7 @@ function response(res: Response, meta?: Metadata): ResponseMessage {
 
 export function startStream(
   res: StartStreamResponse = {},
-  meta?: Metadata
+  meta?: Metadata,
 ): ResponseMessage {
   const def: StartStreamResult = {
     streamId: { hex: UUID.create() },
@@ -71,13 +71,13 @@ export function startStream(
       requestId: res.requestId,
       result: { startStream: Objects.defaults(res.result, def) },
     },
-    meta
+    meta,
   );
 }
 
 export function syncTime(
   res: SyncTimeResponse = {},
-  meta?: Metadata
+  meta?: Metadata,
 ): ResponseMessage {
   const def: SyncTimeResult = { replyTime: { seconds: 1, nanos: 0 } };
   return response({
@@ -88,7 +88,7 @@ export function syncTime(
 
 export function reconnect(
   res: ReconnectResponse = {},
-  meta?: Metadata
+  meta?: Metadata,
 ): ResponseMessage {
   const def: ReconnectResult = {
     jwt: 'jwt',
@@ -99,13 +99,13 @@ export function reconnect(
       requestId: res.requestId,
       result: { reconnect: Objects.defaults(res.result, def) },
     },
-    meta
+    meta,
   );
 }
 
 export function loadSceneViewState(
   res: LoadSceneViewStateResponse = {},
-  meta?: Metadata
+  meta?: Metadata,
 ): ResponseMessage {
   const def: LoadSceneViewStateResult = {};
   return response(
@@ -113,13 +113,13 @@ export function loadSceneViewState(
       requestId: res.requestId,
       result: { loadSceneViewState: Objects.defaults(res.result, def) },
     },
-    meta
+    meta,
   );
 }
 
 export function refreshToken(
   res: RefreshTokenResponse = {},
-  meta?: Metadata
+  meta?: Metadata,
 ): ResponseMessage {
   const def: RefreshTokenResult = {
     token: { token: 'token', expiresIn: new Date().getTime() + 10000 },
@@ -129,6 +129,6 @@ export function refreshToken(
       requestId: res.requestId,
       result: { refreshToken: Objects.defaults(res.result, def) },
     },
-    meta
+    meta,
   );
 }

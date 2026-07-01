@@ -49,7 +49,7 @@ describe(Range.constrain, () => {
 
   it('returns input if contained in `to`', () => {
     expect(Range.constrain(Range.create(11, 19), range)).toEqual(
-      Range.create(11, 19)
+      Range.create(11, 19),
     );
   });
 
@@ -59,13 +59,13 @@ describe(Range.constrain, () => {
 
   it('returns `to`s start if input is before `to`', () => {
     expect(Range.constrain(Range.create(9, 14), range)).toEqual(
-      Range.create(10, 15)
+      Range.create(10, 15),
     );
   });
 
   it('returns `to`s end if input is after `to`', () => {
     expect(Range.constrain(Range.create(19, 24), range)).toEqual(
-      Range.create(15, 20)
+      Range.create(15, 20),
     );
   });
 });

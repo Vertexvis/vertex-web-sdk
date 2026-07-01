@@ -76,7 +76,7 @@ describe(Euler.fromRotationMatrix, () => {
 describe(Euler.fromJson, () => {
   it('parses obj', () => {
     expect(
-      Euler.fromJson(JSON.stringify({ x: 0, y: 0, z: 0, order: 'xyz' }))
+      Euler.fromJson(JSON.stringify({ x: 0, y: 0, z: 0, order: 'xyz' })),
     ).toEqual({
       x: 0,
       y: 0,

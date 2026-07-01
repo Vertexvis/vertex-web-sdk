@@ -51,7 +51,7 @@ export class WebSocketClientImpl implements WebSocketClient {
           this.webSocket,
           id,
           resolve,
-          reject
+          reject,
         );
       }
     });
@@ -75,7 +75,7 @@ export class WebSocketClientImpl implements WebSocketClient {
     ws: WebSocket,
     wsId: UUID.UUID,
     resolve: VoidFunction,
-    reject: VoidFunction
+    reject: VoidFunction,
   ): Disposable => {
     const onOpen = (): void => this.onOpen(resolve);
     const onError = (): void => reject();

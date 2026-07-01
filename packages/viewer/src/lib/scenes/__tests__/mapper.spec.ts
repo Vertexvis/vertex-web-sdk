@@ -32,8 +32,8 @@ describe(buildSceneElementOperationOnItem, () => {
           { type: 'clear-representation' },
           { type: 'clear-override' },
         ],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       sceneItemOperation: {
         queryExpression: { operand: { root: {} } },
@@ -78,8 +78,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
       buildSceneElementOperationOnAnnotation(
         { type: 'all' },
         [{ type: 'hide' }, { type: 'deselect' }],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       pmiAnnotationOperation: {
         queryExpression: { operand: { all: {} } },
@@ -102,8 +102,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
           ],
         },
         [{ type: 'hide' }, { type: 'deselect' }],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       pmiAnnotationOperation: {
         queryExpression: {
@@ -146,8 +146,8 @@ describe(buildSceneElementOperationOnAnnotation, () => {
           expressions: [{ type: 'annotation-id', value: annotationId1 }],
         },
         [{ type: 'hide' }, { type: 'deselect' }],
-        { dimensions: Dimensions.create(100, 100) }
-      )
+        { dimensions: Dimensions.create(100, 100) },
+      ),
     ).toMatchObject({
       pmiAnnotationOperation: {
         queryExpression: {
@@ -181,7 +181,7 @@ describe(toPbSceneViewStateFeatures, () => {
         'cross_section',
         'phantom',
         'shading',
-      ])
+      ]),
     ).toMatchObject([
       vertexvis.protobuf.stream.SceneViewStateFeature
         .SCENE_VIEW_STATE_FEATURE_CAMERA,

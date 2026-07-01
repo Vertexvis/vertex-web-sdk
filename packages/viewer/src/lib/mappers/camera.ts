@@ -17,7 +17,7 @@ export const toPbCameraType: M.Func<
         return vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_INVALID;
     }
   },
-  (cameraType) => cameraType
+  (cameraType) => cameraType,
 );
 
 export type CameraTypeEncoder = M.ThrowIfInvalidFunc<

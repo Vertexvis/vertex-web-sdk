@@ -9,7 +9,7 @@ declare module 'array-normalize' {
   const normalize: (
     array: Float64Array,
     dimension: number,
-    bounds: Bounds
+    bounds: Bounds,
   ) => void;
   export default normalize;
 }

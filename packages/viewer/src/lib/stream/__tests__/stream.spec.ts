@@ -42,7 +42,7 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
 
       const connecting = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
+        (s) => s.type === 'connecting' && s.resource.resource.id === '123',
       );
 
       stream.load(urn123, clientId, deviceId, config);
@@ -50,7 +50,7 @@ describe(ViewerStream, () => {
 
       await simulateFrame(ws);
       const connected = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected'
+        (s) => s.type === 'connected',
       );
       await expect(connected).resolves.toBeDefined();
     });
@@ -66,7 +66,7 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
 
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -74,7 +74,7 @@ describe(ViewerStream, () => {
 
       const closeWs = jest.spyOn(ws, 'close');
       const connected234 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '234'
+        (s) => s.type === 'connected' && s.resource.resource.id === '234',
       );
       stream.load(urn234, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -97,7 +97,7 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.loadSceneViewState().response);
 
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -108,7 +108,7 @@ describe(ViewerStream, () => {
         (s) =>
           s.type === 'connected' &&
           s.resource.resource.id === '123' &&
-          s.resource.subResource?.id === 'svs'
+          s.resource.subResource?.id === 'svs',
       );
       stream.load(`${urn123}?scene-view-state=svs`, clientId, deviceId, config);
 
@@ -128,7 +128,7 @@ describe(ViewerStream, () => {
 
       const closeWs = jest.spyOn(ws, 'close');
       const connected234 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '234'
+        (s) => s.type === 'connected' && s.resource.resource.id === '234',
       );
       stream.load(urn123, clientId, deviceId, config);
 
@@ -151,10 +151,10 @@ describe(ViewerStream, () => {
 
       const closeWs = jest.spyOn(ws, 'close');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       const connected234 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '234'
+        (s) => s.type === 'connected' && s.resource.resource.id === '234',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -181,7 +181,7 @@ describe(ViewerStream, () => {
 
       const connect = jest.spyOn(stream, 'connect');
       const connecting = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
+        (s) => s.type === 'connecting' && s.resource.resource.id === '123',
       );
 
       stream.load(urn123, clientId, deviceId, config);
@@ -193,7 +193,7 @@ describe(ViewerStream, () => {
         expect.objectContaining({
           url: expect.stringContaining(deviceId),
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -208,7 +208,7 @@ describe(ViewerStream, () => {
       const startStream = jest.spyOn(stream, 'startStream');
 
       let failure = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connection-failed'
+        (s) => s.type === 'connection-failed',
       );
       let load = stream.load(urnMalformed, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(InvalidResourceUrnError);
@@ -216,7 +216,7 @@ describe(ViewerStream, () => {
 
       connect.mockRejectedValue(new Error('WS connection failed'));
       failure = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connection-failed'
+        (s) => s.type === 'connection-failed',
       );
       load = stream.load(urn123, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(WebsocketConnectionError);
@@ -224,7 +224,7 @@ describe(ViewerStream, () => {
       connect.mockRestore();
 
       startStream.mockRejectedValue(
-        new StreamRequestError('123', {}, 'Request failed', '')
+        new StreamRequestError('123', {}, 'Request failed', ''),
       );
       load = stream.load(urn123, clientId, deviceId, config);
       await expect(load).rejects.toThrowError(StreamRequestError);
@@ -243,7 +243,7 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.syncTime().response);
 
       const connecting = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connecting' && s.resource.resource.id === '123'
+        (s) => s.type === 'connecting' && s.resource.resource.id === '123',
       );
 
       stream.load(urn123, clientId, deviceId, config);
@@ -251,7 +251,7 @@ describe(ViewerStream, () => {
 
       await simulateFrame(ws);
       const connected = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected'
+        (s) => s.type === 'connected',
       );
       await expect(connected).resolves.toBeDefined();
 
@@ -261,7 +261,7 @@ describe(ViewerStream, () => {
             width: 1,
             height: 1,
           }),
-        })
+        }),
       );
     });
   });
@@ -283,14 +283,14 @@ describe(ViewerStream, () => {
       const closeWs = jest.spyOn(ws, 'close');
 
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected123;
 
       const reconnected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       ws.receiveMessage(encode(Fixtures.Requests.gracefulReconnect()));
 
@@ -312,14 +312,14 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
       const connected = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected;
 
       const reconnecting = stream.stateChanged.onceWhen(
-        (s) => s.type === 'reconnecting'
+        (s) => s.type === 'reconnecting',
       );
       const reconnected = stream.stateChanged.onceWhen((s) => {
         return s.type === 'connected' && s.resource.resource.id === '123';
@@ -344,7 +344,7 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
       const connected = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -373,7 +373,7 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
       const connected = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -383,7 +383,7 @@ describe(ViewerStream, () => {
         offlineReconnectThresholdInMs * 2,
         stream.stateChanged.onceWhen((s) => {
           return s.type === 'connected' && s.resource.resource.id === '123';
-        })
+        }),
       )
         .then(() => true)
         .catch(() => false);
@@ -411,14 +411,14 @@ describe(ViewerStream, () => {
       const closeWs = jest.spyOn(ws, 'close');
 
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
       await connected123;
 
       const reconnected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       ws.receiveMessage(encode(Fixtures.Requests.gracefulReconnect()));
 
@@ -431,7 +431,7 @@ describe(ViewerStream, () => {
             width: 1,
             height: 1,
           }),
-        })
+        }),
       );
     });
   });
@@ -445,7 +445,7 @@ describe(ViewerStream, () => {
           result: {
             token: { token: random.string(), expiresIn: expiryInMs / 1000 },
           },
-        }).response
+        }).response,
       );
       jest
         .spyOn(stream, 'syncTime')
@@ -456,7 +456,7 @@ describe(ViewerStream, () => {
 
       const refreshToken = jest.spyOn(stream, 'refreshToken');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -480,7 +480,7 @@ describe(ViewerStream, () => {
 
       const updateStream = jest.spyOn(stream, 'updateStream');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -505,7 +505,7 @@ describe(ViewerStream, () => {
 
       const updateStream = jest.spyOn(stream, 'updateStream');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -531,7 +531,7 @@ describe(ViewerStream, () => {
 
       const updateDimensions = jest.spyOn(stream, 'updateDimensions');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -556,7 +556,7 @@ describe(ViewerStream, () => {
 
       const updateDimensions = jest.spyOn(stream, 'updateDimensions');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -582,7 +582,7 @@ describe(ViewerStream, () => {
 
       const updateDimensions = jest.spyOn(stream, 'updateDimensions');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -599,7 +599,7 @@ describe(ViewerStream, () => {
             width: 1,
             height: 1,
           },
-        })
+        }),
       );
     });
   });
@@ -617,7 +617,7 @@ describe(ViewerStream, () => {
 
       const close = jest.spyOn(ws, 'close');
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -647,7 +647,7 @@ describe(ViewerStream, () => {
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
       const connected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       stream.load(urn123, clientId, deviceId, config);
       await simulateFrame(ws);
@@ -656,7 +656,7 @@ describe(ViewerStream, () => {
       stream.pause();
 
       const reconnected123 = stream.stateChanged.onceWhen(
-        (s) => s.type === 'connected' && s.resource.resource.id === '123'
+        (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
       const resumePromise = stream.resume();
       await reconnected123;
@@ -673,7 +673,7 @@ describe(ViewerStream, () => {
               },
             }),
           }),
-        })
+        }),
       );
       expect(stream.isPaused()).toBe(false);
     });
@@ -698,7 +698,7 @@ describe(ViewerStream, () => {
 
   async function simulateFrame(
     ws: WebSocketClientMock,
-    latency = 10
+    latency = 10,
   ): Promise<void> {
     await Async.delay(latency);
     ws.receiveMessage(encode(Fixtures.Requests.drawFrame()));

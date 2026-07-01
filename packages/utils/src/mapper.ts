@@ -112,7 +112,7 @@ export type ThrowIfInvalidFunc<T, R> = (input: T) => R;
  * @param name A name to report when invalid.
  */
 export function required<T>(
-  name: string
+  name: string,
 ): Func<T | null | undefined, NonNullable<T>> {
   return (input) => {
     if (input != null) {
@@ -131,7 +131,7 @@ export function required<T>(
  * @returns A mapper that returns the property's value.
  */
 export function requiredProp<T, P extends keyof T>(
-  prop: P
+  prop: P,
 ): Func<T, NonNullable<T[P]>> {
   return (obj) => {
     const value = obj[prop];
@@ -150,7 +150,7 @@ export function requiredProp<T, P extends keyof T>(
  * @param mapper A mapping function.
  */
 export function ifDefined<T, R>(
-  mapper: Func<T, R | null | undefined>
+  mapper: Func<T, R | null | undefined>,
 ): Func<T | null | undefined, R | null | undefined> {
   return (input) => {
     if (input != null) {
@@ -180,7 +180,7 @@ export function getProp<T, P extends keyof T>(prop: P): Func<T, T[P]> {
  */
 export function mapProp<T, P extends keyof T, R>(
   prop: P,
-  mapper: Func<T[P], R>
+  mapper: Func<T[P], R>,
 ): Func<T, R> {
   return (input) => {
     const value = input[prop];
@@ -198,7 +198,7 @@ export function mapProp<T, P extends keyof T, R>(
  */
 export function mapRequiredProp<T, P extends keyof T, R>(
   prop: P,
-  mapper: Func<NonNullable<T[P]>, R>
+  mapper: Func<NonNullable<T[P]>, R>,
 ): Func<T, R> {
   return mapProp(prop, compose(required(prop.toString()), mapper));
 }
@@ -230,7 +230,7 @@ export function mapArray<T, R>(mapper: Func<T, R>): Func<T[], R[]> {
             return [...res, value];
           }
         },
-        isInvalid(first) ? first : [first]
+        isInvalid(first) ? first : [first],
       );
     } else {
       return [];
@@ -254,7 +254,7 @@ export function isInvalid(obj: unknown): obj is Invalid {
  * @throws {@link MapperValidationError} If the input is invalid.
  */
 export function ifInvalidThrow<T, R>(
-  mapper: Func<T, R>
+  mapper: Func<T, R>,
 ): ThrowIfInvalidFunc<T, R> {
   return (input) => {
     const value = mapper(input);
@@ -266,7 +266,7 @@ export function ifInvalidThrow<T, R>(
 
 function ifValidThen<T, R>(
   obj: Validated<T>,
-  f: (value: T) => R
+  f: (value: T) => R,
 ): Validated<R> {
   if (isInvalid(obj)) {
     return obj;
@@ -286,25 +286,25 @@ function ifValidThen<T, R>(
 export function read<T, R1>(a: Func<T, R1>): Func<T, [R1]>;
 export function read<T, R1, R2>(
   a: Func<T, R1>,
-  b: Func<T, R2>
+  b: Func<T, R2>,
 ): Func<T, [R1, R2]>;
 export function read<T, R1, R2, R3>(
   a: Func<T, R1>,
   b: Func<T, R2>,
-  c: Func<T, R3>
+  c: Func<T, R3>,
 ): Func<T, [R1, R2, R3]>;
 export function read<T, R1, R2, R3, R4>(
   a: Func<T, R1>,
   b: Func<T, R2>,
   c: Func<T, R3>,
-  d: Func<T, R4>
+  d: Func<T, R4>,
 ): Func<T, [R1, R2, R3, R4]>;
 export function read<T, R1, R2, R3, R4, R5>(
   a: Func<T, R1>,
   b: Func<T, R2>,
   c: Func<T, R3>,
   d: Func<T, R4>,
-  e: Func<T, R5>
+  e: Func<T, R5>,
 ): Func<T, [R1, R2, R3, R4, R5]>;
 export function read<T, R1, R2, R3, R4, R5, R6>(
   a: Func<T, R1>,
@@ -312,7 +312,7 @@ export function read<T, R1, R2, R3, R4, R5, R6>(
   c: Func<T, R3>,
   d: Func<T, R4>,
   e: Func<T, R5>,
-  f: Func<T, R6>
+  f: Func<T, R6>,
 ): Func<T, [R1, R2, R3, R4, R5, R6]>;
 export function read<T, R1, R2, R3, R4, R5, R6, R7>(
   a: Func<T, R1>,
@@ -321,7 +321,7 @@ export function read<T, R1, R2, R3, R4, R5, R6, R7>(
   d: Func<T, R4>,
   e: Func<T, R5>,
   f: Func<T, R6>,
-  g: Func<T, R7>
+  g: Func<T, R7>,
 ): Func<T, [R1, R2, R3, R4, R5, R6, R7]>;
 export function read<T, R1, R2, R3, R4, R5, R6, R7, R8>(
   a: Func<T, R1>,
@@ -331,7 +331,7 @@ export function read<T, R1, R2, R3, R4, R5, R6, R7, R8>(
   e: Func<T, R5>,
   f: Func<T, R6>,
   g: Func<T, R7>,
-  h: Func<T, R8>
+  h: Func<T, R8>,
 ): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8]>;
 export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9>(
   a: Func<T, R1>,
@@ -342,7 +342,7 @@ export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9>(
   f: Func<T, R6>,
   g: Func<T, R7>,
   h: Func<T, R8>,
-  i: Func<T, R9>
+  i: Func<T, R9>,
 ): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8, R9]>;
 export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10>(
   a: Func<T, R1>,
@@ -354,7 +354,7 @@ export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10>(
   g: Func<T, R7>,
   h: Func<T, R8>,
   i: Func<T, R9>,
-  j: Func<T, R10>
+  j: Func<T, R10>,
 ): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10]>;
 export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11>(
   a: Func<T, R1>,
@@ -367,7 +367,7 @@ export function read<T, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11>(
   h: Func<T, R8>,
   i: Func<T, R9>,
   j: Func<T, R10>,
-  k: Func<T, R11>
+  k: Func<T, R11>,
 ): Func<T, [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11]>;
 export function read(
   ...mappers: Func<unknown, unknown>[]
@@ -453,7 +453,7 @@ export function read(
  */
 export function defineMapper<T, V, R>(
   reader: Func<T, V>,
-  builder: Func<V, R>
+  builder: Func<V, R>,
 ): Func<T, R> {
   return (input) => {
     const values = reader(input);
@@ -469,20 +469,20 @@ export function compose<T, A, R>(a: Func<T, A>, b: Func<A, R>): Func<T, R>;
 export function compose<T, A, B, R>(
   a: Func<T, A>,
   b: Func<A, B>,
-  c: Func<B, R>
+  c: Func<B, R>,
 ): Func<T, R>;
 export function compose<T, A, B, C, R>(
   a: Func<T, A>,
   b: Func<A, B>,
   c: Func<B, C>,
-  d: Func<C, R>
+  d: Func<C, R>,
 ): Func<T, R>;
 export function compose<T, A, B, C, D, R>(
   a: Func<T, A>,
   b: Func<A, B>,
   c: Func<B, C>,
   d: Func<C, D>,
-  e: Func<D, R>
+  e: Func<D, R>,
 ): Func<T, R>;
 export function compose<T, A, B, C, D, E, R>(
   a: Func<T, A>,
@@ -490,7 +490,7 @@ export function compose<T, A, B, C, D, E, R>(
   c: Func<B, C>,
   d: Func<C, D>,
   e: Func<D, E>,
-  f: Func<E, R>
+  f: Func<E, R>,
 ): Func<T, R>;
 export function compose<T, A, B, C, D, E, F, R>(
   a: Func<T, A>,
@@ -499,7 +499,7 @@ export function compose<T, A, B, C, D, E, F, R>(
   d: Func<C, D>,
   e: Func<D, E>,
   f: Func<E, F>,
-  g: Func<F, R>
+  g: Func<F, R>,
 ): Func<T, R>;
 export function compose<T, A, B, C, D, E, F, G, R>(
   a: Func<T, A>,
@@ -509,7 +509,7 @@ export function compose<T, A, B, C, D, E, F, G, R>(
   e: Func<D, E>,
   f: Func<E, F>,
   g: Func<F, G>,
-  h: Func<G, R>
+  h: Func<G, R>,
 ): Func<T, R>;
 export function compose<T, A, B, C, D, E, F, G, H, R>(
   a: Func<T, A>,
@@ -520,7 +520,7 @@ export function compose<T, A, B, C, D, E, F, G, H, R>(
   f: Func<E, F>,
   g: Func<F, G>,
   h: Func<G, H>,
-  i: Func<H, R>
+  i: Func<H, R>,
 ): Func<T, R>;
 export function compose<T, A, B, C, D, E, F, G, H, I, R>(
   a: Func<T, A>,
@@ -532,7 +532,7 @@ export function compose<T, A, B, C, D, E, F, G, H, I, R>(
   g: Func<F, G>,
   h: Func<G, H>,
   i: Func<H, I>,
-  j: Func<I, R>
+  j: Func<I, R>,
 ): Func<T, R>;
 export function compose(
   ...decoders: Func<unknown, unknown>[]
@@ -556,25 +556,25 @@ export function compose(
  */
 export function pickFirst<T, A, B>(
   a: Func<T, A | undefined>,
-  b: Func<T, B | undefined>
+  b: Func<T, B | undefined>,
 ): Func<T, A | B | undefined>;
 export function pickFirst<T, A, B, C>(
   a: Func<T, A | undefined>,
   b: Func<T, B | undefined>,
-  c: Func<T, C | undefined>
+  c: Func<T, C | undefined>,
 ): Func<T, A | B | C | undefined>;
 export function pickFirst<T, A, B, C, D>(
   a: Func<T, A | undefined>,
   b: Func<T, B | undefined>,
   c: Func<T, C | undefined>,
-  d: Func<T, D | undefined>
+  d: Func<T, D | undefined>,
 ): Func<T, A | B | C | undefined>;
 export function pickFirst<T, A, B, C, D, E>(
   a: Func<T, A | undefined>,
   b: Func<T, B | undefined>,
   c: Func<T, C | undefined>,
   d: Func<T, D | undefined>,
-  e: Func<T, E | undefined>
+  e: Func<T, E | undefined>,
 ): Func<T, A | B | C | D | E | undefined>;
 export function pickFirst<T, A, B, C, D, E, F>(
   a: Func<T, A | undefined>,
@@ -582,7 +582,7 @@ export function pickFirst<T, A, B, C, D, E, F>(
   c: Func<T, C | undefined>,
   d: Func<T, D | undefined>,
   e: Func<T, E | undefined>,
-  f: Func<T, F | undefined>
+  f: Func<T, F | undefined>,
 ): Func<T, A | B | C | D | E | F | undefined>;
 export function pickFirst<T, A, B, C, D, E, F, G>(
   a: Func<T, A | undefined>,
@@ -591,7 +591,7 @@ export function pickFirst<T, A, B, C, D, E, F, G>(
   d: Func<T, D | undefined>,
   e: Func<T, E | undefined>,
   f: Func<T, F | undefined>,
-  g: Func<T, G | undefined>
+  g: Func<T, G | undefined>,
 ): Func<T, A | B | C | D | E | F | G | undefined>;
 export function pickFirst<T, A, B, C, D, E, F, G, H>(
   a: Func<T, A | undefined>,
@@ -601,7 +601,7 @@ export function pickFirst<T, A, B, C, D, E, F, G, H>(
   e: Func<T, E | undefined>,
   f: Func<T, F | undefined>,
   g: Func<T, G | undefined>,
-  h: Func<T, H | undefined>
+  h: Func<T, H | undefined>,
 ): Func<T, A | B | C | D | E | F | G | H | undefined>;
 export function pickFirst<T, A, B, C, D, E, F, G, H, I>(
   a: Func<T, A | undefined>,
@@ -612,7 +612,7 @@ export function pickFirst<T, A, B, C, D, E, F, G, H, I>(
   f: Func<T, F | undefined>,
   g: Func<T, G | undefined>,
   h: Func<T, H | undefined>,
-  i: Func<T, I | undefined>
+  i: Func<T, I | undefined>,
 ): Func<T, A | B | C | D | E | F | G | H | I | undefined>;
 export function pickFirst<T, A, B, C, D, E, F, G, H, I, J>(
   a: Func<T, A | undefined>,
@@ -624,7 +624,7 @@ export function pickFirst<T, A, B, C, D, E, F, G, H, I, J>(
   g: Func<T, G | undefined>,
   h: Func<T, H | undefined>,
   i: Func<T, I | undefined>,
-  j: Func<T, J | undefined>
+  j: Func<T, J | undefined>,
 ): Func<T, A | B | C | D | E | F | G | H | I | J | undefined>;
 export function pickFirst(
   ...decoders: Func<unknown, unknown | undefined>[]

@@ -14,11 +14,11 @@ describe('SceneViewSummary', () => {
 
       expect(
         SceneViewSummary.copySummaryIfInvalid(current, previousValid).scene
-          .sceneViewSummary
+          .sceneViewSummary,
       ).toMatchObject(previousValid.scene.sceneViewSummary);
       expect(
         SceneViewSummary.copySummaryIfInvalid(current, previousInvalid).scene
-          .sceneViewSummary
+          .sceneViewSummary,
       ).toMatchObject(current.scene.sceneViewSummary);
     });
 
@@ -29,11 +29,11 @@ describe('SceneViewSummary', () => {
 
       expect(
         SceneViewSummary.copySummaryIfInvalid(current, previousValid).scene
-          .sceneViewSummary
+          .sceneViewSummary,
       ).toMatchObject(current.scene.sceneViewSummary);
       expect(
         SceneViewSummary.copySummaryIfInvalid(current, previousInvalid).scene
-          .sceneViewSummary
+          .sceneViewSummary,
       ).toMatchObject(current.scene.sceneViewSummary);
     });
   });
@@ -41,7 +41,7 @@ describe('SceneViewSummary', () => {
 
 function copyWithSummary(
   frame: Frame,
-  summary?: SceneViewSummary.SceneViewSummary
+  summary?: SceneViewSummary.SceneViewSummary,
 ): Frame {
   return frame.copy({
     scene: frame.scene.copy({

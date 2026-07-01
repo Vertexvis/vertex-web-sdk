@@ -31,7 +31,7 @@ export function fromUrn(urn: string): Resource {
 
   if (nid === 'vertexvis') {
     console.warn(
-      "vertexvis namespace is deprecated. Use 'vertex' for the namespace urn instead"
+      "vertexvis namespace is deprecated. Use 'vertex' for the namespace urn instead",
     );
   }
 
@@ -51,7 +51,7 @@ export function fromUrn(urn: string): Resource {
       };
     default:
       throw new InvalidResourceUrnError(
-        `Invalid URN. Unknown resource type ${resourceType}`
+        `Invalid URN. Unknown resource type ${resourceType}`,
       );
   }
 }

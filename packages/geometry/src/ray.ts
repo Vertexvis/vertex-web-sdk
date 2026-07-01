@@ -53,7 +53,7 @@ export function at(ray: Ray, distance: number): Vector3.Vector3 {
  */
 export function distanceToPlane(
   ray: Ray,
-  plane: Plane.Plane
+  plane: Plane.Plane,
 ): number | undefined {
   const d = Vector3.dot(plane.normal, ray.direction);
   if (d === 0) {
@@ -77,7 +77,7 @@ export function distanceToPlane(
  */
 export function intersectPlane(
   ray: Ray,
-  plane: Plane.Plane
+  plane: Plane.Plane,
 ): Vector3.Vector3 | undefined {
   const t = distanceToPlane(ray, plane);
   return t != null ? at(ray, t) : undefined;

@@ -156,7 +156,7 @@ export class ViewerMarkupCircle {
       offset: this.offset,
       originatingViewport: this.originatingViewport,
       centeringBehavior: this.centeringBehavior,
-    }
+    },
   );
 
   private registeredHandler?: Disposable;
@@ -205,7 +205,7 @@ export class ViewerMarkupCircle {
 
     if (newViewer != null) {
       this.registeredHandler = await newViewer.registerBasicInteractionHandler(
-        this.interactionHandler
+        this.interactionHandler,
       );
     }
   }
@@ -240,7 +240,7 @@ export class ViewerMarkupCircle {
     writeDOM(() => {
       this.hostEl.style.setProperty(
         '--viewer-markup-circle-scale',
-        this.scale.toString()
+        this.scale.toString(),
       );
     });
   }
@@ -266,7 +266,7 @@ export class ViewerMarkupCircle {
         this.elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        this.scale
+        this.scale,
       );
       const center = Rectangle.center(relativeBounds);
       const offsetX = (this.offset?.x ?? 0) / getWindowDevicePixelRatio();

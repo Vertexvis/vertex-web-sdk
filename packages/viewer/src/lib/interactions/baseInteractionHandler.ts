@@ -61,7 +61,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     private panInteraction: PanInteraction,
     private twistInteraction: TwistInteraction,
     private pivotInteraction: PivotInteraction,
-    private getConfig: ConfigProvider
+    private getConfig: ConfigProvider,
   ) {
     this.primaryInteraction = rotateInteraction;
     this.handleDownEvent = this.handleDownEvent.bind(this);
@@ -270,7 +270,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         event,
         this.downPositionCanvas || Point.create(event.clientX, event.clientY),
         this.interactionApi,
-        this.element
+        this.element,
       );
     }
   }
@@ -323,7 +323,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
         void this.zoomInteraction.zoomToPoint(
           point,
           delta,
-          this.interactionApi
+          this.interactionApi,
         );
       } else {
         const divisions = Math.min(10, Math.ceil(scrollSize / 12));
@@ -338,7 +338,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
                 point,
                 zoomDelta,
                 this.interactionApi,
-                delayMs
+                delayMs,
               );
             }
           }, delayMs);

@@ -38,7 +38,7 @@ describe(CrossSectioner, () => {
             lineWidth: null,
           },
         }),
-        true
+        true,
       );
     });
 
@@ -57,7 +57,7 @@ describe(CrossSectioner, () => {
             },
           },
         }),
-        true
+        true,
       );
     });
   });

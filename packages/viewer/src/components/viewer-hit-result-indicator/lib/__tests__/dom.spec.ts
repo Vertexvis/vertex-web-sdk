@@ -12,7 +12,7 @@ describe('DOM utils', () => {
       const styles = createMockStyles();
 
       (styles.getPropertyValue as jest.Mock).mockImplementation(
-        () => '"#ff0000"'
+        () => '"#ff0000"',
       );
 
       expect(parseCssColorValue(styles, '--property')).toBe('#ff0000');
@@ -22,7 +22,7 @@ describe('DOM utils', () => {
       const styles = createMockStyles();
 
       (styles.getPropertyValue as jest.Mock).mockImplementation(
-        () => "'#ff0000'"
+        () => "'#ff0000'",
       );
 
       expect(parseCssColorValue(styles, '--property')).toBe('#ff0000');

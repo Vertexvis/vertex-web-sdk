@@ -30,7 +30,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
   public constructor(
     private model: WalkModeModel,
-    private animationConfiguration?: AnimationConfiguration
+    private animationConfiguration?: AnimationConfiguration,
   ) {
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);
@@ -38,7 +38,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     this.handleTeleportModeChange = this.handleTeleportModeChange.bind(this);
 
     this.enabledChangeDisposable = this.model.onEnabledChange(
-      this.handleEnabledChange
+      this.handleEnabledChange,
     );
   }
 
@@ -69,7 +69,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
     this.disable();
 
     this.teleportModeChangeDisposable = this.model.onTeleportModeChange(
-      this.handleTeleportModeChange
+      this.handleTeleportModeChange,
     );
     this.element?.addEventListener('pointerdown', this.handlePointerDown);
 
@@ -146,15 +146,15 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
         const positionPlane = Plane.fromNormalAndCoplanarPoint(
           camera.up,
-          camera.position
+          camera.position,
         );
         const projectedWorldPoint = Plane.projectPoint(
           positionPlane,
-          worldPoint ?? camera.position
+          worldPoint ?? camera.position,
         );
         const distanceToWorldPoint = Vector3.distance(
           camera.position,
-          projectedWorldPoint
+          projectedWorldPoint,
         );
 
         if (
@@ -167,27 +167,27 @@ export class TeleportInteractionHandler implements InteractionHandler {
           });
           const nextPosition = Plane.projectPoint(
             positionPlane,
-            Ray.at(mouseRayAtWorldPoint, -teleportCollisionDistance)
+            Ray.at(mouseRayAtWorldPoint, -teleportCollisionDistance),
           );
 
           return camera.update({
             position: nextPosition,
             lookAt: Vector3.add(
               camera.lookAt,
-              Vector3.subtract(nextPosition, camera.position)
+              Vector3.subtract(nextPosition, camera.position),
             ),
           });
         } else {
           const projectedNextStep = Plane.projectPoint(
             positionPlane,
-            Ray.at(mouseRay, stepDistance)
+            Ray.at(mouseRay, stepDistance),
           );
 
           return camera.update({
             position: projectedNextStep,
             lookAt: Vector3.add(
               camera.lookAt,
-              Vector3.subtract(projectedNextStep, camera.position)
+              Vector3.subtract(projectedNextStep, camera.position),
             ),
           });
         }
@@ -205,31 +205,31 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
         const cameraPlane = Plane.fromNormalAndCoplanarPoint(
           camera.up,
-          camera.position
+          camera.position,
         );
         const projectedHitPosition = Plane.projectPoint(
           cameraPlane,
-          worldPoint
+          worldPoint,
         );
 
         const rayToHitPosition = Ray.create({
           origin: camera.position,
           direction: Vector3.normalize(
-            Vector3.subtract(projectedHitPosition, camera.position)
+            Vector3.subtract(projectedHitPosition, camera.position),
           ),
         });
         const distanceToHitPosition = Vector3.distance(
           camera.position,
-          projectedHitPosition
+          projectedHitPosition,
         );
         const distanceToLookAt = Vector3.distance(
           camera.position,
-          camera.lookAt
+          camera.lookAt,
         );
 
         const newPosition = Ray.at(
           rayToHitPosition,
-          distanceToHitPosition - shortestBoundingBoxLength * heightScalar
+          distanceToHitPosition - shortestBoundingBoxLength * heightScalar,
         );
         const newPositionViewVectorRay = Ray.create({
           origin: newPosition,
@@ -260,7 +260,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
 
         return camera.alignTo(
           Ray.at(upRay, shortestBoundingBoxLength * heightScalar),
-          hit.hitNormal as Vector3.Vector3
+          hit.hitNormal as Vector3.Vector3,
         );
       });
     }
@@ -273,7 +273,7 @@ export class TeleportInteractionHandler implements InteractionHandler {
   }
 
   private async getWorldPointWithFallback(
-    point: Point.Point
+    point: Point.Point,
   ): Promise<Vector3.Vector3 | undefined> {
     const worldPoint = await this.api?.getWorldPointFromViewport(point);
 

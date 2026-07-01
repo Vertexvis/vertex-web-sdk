@@ -247,7 +247,7 @@ export class SceneTreeSearch {
         }
 
         this.isSearching = state.isSearching;
-      }
+      },
     );
   }
 

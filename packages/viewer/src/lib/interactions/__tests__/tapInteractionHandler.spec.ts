@@ -68,7 +68,7 @@ describe(TapInteractionHandler, () => {
         ...config.interactions,
         interactionDelay: 10,
       },
-    })
+    }),
   );
 
   beforeEach(() => {
@@ -108,7 +108,7 @@ describe(TapInteractionHandler, () => {
     expect(api.tap).not.toHaveBeenCalledWith(
       Point.create(15, 15),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -140,7 +140,7 @@ describe(TapInteractionHandler, () => {
     expect(api.doubleTap).toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -154,7 +154,7 @@ describe(TapInteractionHandler, () => {
     expect(api.doubleTap).not.toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -200,7 +200,7 @@ describe(TapInteractionHandler, () => {
     expect(api.doubleTap).not.toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -214,7 +214,7 @@ describe(TapInteractionHandler, () => {
     expect(api.doubleTap).toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -242,7 +242,7 @@ describe(TapInteractionHandler, () => {
     expect(api.longPress).toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -254,7 +254,7 @@ describe(TapInteractionHandler, () => {
     expect(api.longPress).not.toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -286,7 +286,7 @@ describe(TapInteractionHandler, () => {
     expect(api.longPress).not.toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 
@@ -299,7 +299,7 @@ describe(TapInteractionHandler, () => {
     expect(api.longPress).toHaveBeenCalledWith(
       Point.create(10, 10),
       keyDetails,
-      0
+      0,
     );
   });
 

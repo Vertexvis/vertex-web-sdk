@@ -88,7 +88,7 @@ describe(AttributeBinding, () => {
     const binding = new AttributeBinding(
       node,
       '123 {{data.name}} 456',
-      'title'
+      'title',
     );
 
     const data1 = { name: 'foo' };
@@ -109,7 +109,7 @@ describe(AttributeBinding, () => {
     const binding = new AttributeBinding(
       node,
       '123 {{data.name}} 456',
-      'title'
+      'title',
     );
 
     const data = { name: 'foo' };

@@ -5,6 +5,6 @@ declare module '@stencil/vue-output-target/runtime' {
     tagName: string,
     _component: unknown,
     _properties?: string[],
-    _events?: string[]
+    _events?: string[],
   ): StencilVueComponent<T>;
 }

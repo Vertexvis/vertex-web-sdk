@@ -150,7 +150,7 @@ export class ViewerMeasurementPrecise {
       this.measurementModel,
       client,
       () => this.viewer?.token,
-      this.viewer?.deviceId
+      this.viewer?.deviceId,
     );
   }
 
@@ -167,8 +167,8 @@ export class ViewerMeasurementPrecise {
         this.viewer?.registerInteractionHandler(
           new MeasurementInteractionHandler(
             this.measurementController,
-            this.measurableEntityTypes
-          )
+            this.measurableEntityTypes,
+          ),
         );
     }
   }

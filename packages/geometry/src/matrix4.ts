@@ -204,7 +204,7 @@ export function makeScale(scale: Vector3.Vector3): Matrix4 {
 export function makeTRS(
   translation: Vector3.Vector3,
   rotation: Quaternion.Quaternion,
-  scale: Vector3.Vector3
+  scale: Vector3.Vector3,
 ): Matrix4 {
   const t = makeTranslation(translation);
   const r = makeRotation(rotation);
@@ -231,7 +231,7 @@ export function makeTRS(
 export function makeBasis(
   x: Vector3.Vector3,
   y: Vector3.Vector3,
-  z: Vector3.Vector3
+  z: Vector3.Vector3,
 ): Matrix4 {
   /* eslint-disable prettier/prettier */
   return [
@@ -253,7 +253,7 @@ export function makeBasis(
  */
 export function makeRotationAxis(
   axis: Vector3.Vector3,
-  radians: number
+  radians: number,
 ): Matrix4 {
   const c = Math.cos(radians);
   const s = Math.sin(radians);
@@ -298,7 +298,7 @@ export function makeFrustum(
   top: number,
   bottom: number,
   near: number,
-  far: number
+  far: number,
 ): Matrix4 {
   const x = (2 * near) / (right - left);
   const y = (2 * near) / (top - bottom);
@@ -340,7 +340,7 @@ export function makePerspective(
   near: number,
   far: number,
   fovY: number,
-  aspect: number
+  aspect: number,
 ): Matrix4 {
   const ymax = near * Math.tan(Angle.toRadians(fovY / 2.0));
   const xmax = ymax * aspect;
@@ -376,7 +376,7 @@ export function makeOrthographic(
   bottom: number,
   top: number,
   near: number,
-  far: number
+  far: number,
 ): Matrix4 {
   const w = 1.0 / (right - left);
   const h = 1.0 / (top - bottom);
@@ -418,7 +418,7 @@ export function makeOrthographic(
 export function makeLookAtView(
   position: Vector3.Vector3,
   lookAt: Vector3.Vector3,
-  up: Vector3.Vector3
+  up: Vector3.Vector3,
 ): Matrix4 {
   const z = Vector3.normalize(Vector3.subtract(position, lookAt));
   const x = Vector3.normalize(Vector3.cross(up, z));
@@ -454,7 +454,7 @@ export function makeLookAtView(
 export function makeLookAt(
   position: Vector3.Vector3,
   lookAt: Vector3.Vector3,
-  up: Vector3.Vector3
+  up: Vector3.Vector3,
 ): Matrix4 {
   const z = Vector3.normalize(Vector3.subtract(position, lookAt));
   const x = Vector3.normalize(Vector3.cross(up, z));
@@ -551,7 +551,7 @@ export function lookAt(
   m: Matrix4,
   position: Vector3.Vector3,
   target: Vector3.Vector3,
-  up: Vector3.Vector3
+  up: Vector3.Vector3,
 ): Matrix4 {
   let z = Vector3.subtract(position, target);
   if (Vector3.magnitudeSquared(z) === 0) {

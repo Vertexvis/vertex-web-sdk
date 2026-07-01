@@ -57,8 +57,8 @@ describe('markup utils', () => {
           canvasDimensions,
           contentDimensions,
           'x-only',
-          0.5
-        )
+          0.5,
+        ),
       ).toMatchObject({
         x: 50,
         y: 25,
@@ -78,8 +78,8 @@ describe('markup utils', () => {
           canvasDimensions,
           contentDimensions,
           'y-only',
-          0.5
-        )
+          0.5,
+        ),
       ).toMatchObject({
         x: 15,
         y: 50,
@@ -99,8 +99,8 @@ describe('markup utils', () => {
           canvasDimensions,
           contentDimensions,
           'both',
-          0.5
-        )
+          0.5,
+        ),
       ).toMatchObject({
         x: 50,
         y: 50,
@@ -120,8 +120,8 @@ describe('markup utils', () => {
           canvasDimensions,
           contentDimensions,
           'both',
-          5
-        )
+          5,
+        ),
       ).toMatchObject({
         x: 250,
         y: 250,
@@ -184,8 +184,8 @@ describe('markup utils', () => {
           contentDimensions,
           'none',
           1,
-          offset
-        )
+          offset,
+        ),
       ).toMatchObject({
         x: -0.25,
         y: -0.375,
@@ -209,8 +209,8 @@ describe('markup utils', () => {
           contentDimensions,
           'both',
           0.5,
-          offset
-        )
+          offset,
+        ),
       ).toMatchObject({
         x: -1,
         y: -0.75,
@@ -231,8 +231,8 @@ describe('markup utils', () => {
           dimensions,
           canvasDimensions,
           contentDimensions,
-          0.5
-        )
+          0.5,
+        ),
       ).toMatchObject({
         width: 25,
         height: 25,

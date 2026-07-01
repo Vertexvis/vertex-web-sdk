@@ -20,6 +20,8 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
+      - name: Enable Corepack
+        run: corepack enable
       - name: "Install"
         run: "yarn install --frozen-lockfile"
       - name: "Build"
@@ -54,6 +56,8 @@ jobs:
           cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
+      - name: Enable Corepack
+        run: corepack enable
       - name: "Install"
         run: "yarn install"
       - name: "Publish Testing build to NPM"

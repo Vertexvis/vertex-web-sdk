@@ -89,7 +89,7 @@ export class SceneItemOperationsBuilder
 
   public constructor(
     private query: QueryExpression,
-    givenBuilder?: ItemOperationBuilder
+    givenBuilder?: ItemOperationBuilder,
   ) {
     this.builder = givenBuilder ?? new ItemOperationBuilder();
   }
@@ -127,17 +127,17 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public materialOverride(
-    color: ColorMaterial | string
+    color: ColorMaterial | string,
   ): SceneItemOperationsBuilder {
     if (typeof color === 'string') {
       return new SceneItemOperationsBuilder(
         this.query,
-        this.builder.materialOverride(fromHex(color))
+        this.builder.materialOverride(fromHex(color)),
       );
     } else {
       return new SceneItemOperationsBuilder(
         this.query,
-        this.builder.materialOverride(color)
+        this.builder.materialOverride(color),
       );
     }
   }
@@ -232,7 +232,7 @@ export class SceneItemOperationsBuilder
   public clearMaterialOverrides(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.clearMaterialOverrides()
+      this.builder.clearMaterialOverrides(),
     );
   }
 
@@ -256,12 +256,12 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public transform(
-    matrix: vertexvis.protobuf.core.IMatrix4x4f | number[]
+    matrix: vertexvis.protobuf.core.IMatrix4x4f | number[],
   ): SceneItemOperationsBuilder {
     if (Array.isArray(matrix)) {
       if (matrix.length !== 16) {
         throw new InvalidArgumentError(
-          'Matrix provided must contain exactly 16 values (4x4).'
+          'Matrix provided must contain exactly 16 values (4x4).',
         );
       }
 
@@ -292,12 +292,12 @@ export class SceneItemOperationsBuilder
             z: matrix[14],
             w: matrix[15],
           },
-        })
+        }),
       );
     } else {
       return new SceneItemOperationsBuilder(
         this.query,
-        this.builder.transform(matrix)
+        this.builder.transform(matrix),
       );
     }
   }
@@ -329,7 +329,7 @@ export class SceneItemOperationsBuilder
   public clearTransforms(cascade = true): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.clearTransforms(cascade)
+      this.builder.clearTransforms(cascade),
     );
   }
 
@@ -357,7 +357,7 @@ export class SceneItemOperationsBuilder
   public setPhantom(phantomState?: boolean): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.setPhantom(phantomState)
+      this.builder.setPhantom(phantomState),
     );
   }
 
@@ -379,7 +379,7 @@ export class SceneItemOperationsBuilder
   public clearPhantom(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.clearPhantom()
+      this.builder.clearPhantom(),
     );
   }
 
@@ -413,7 +413,7 @@ export class SceneItemOperationsBuilder
   public setEndItem(endItemState?: boolean): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.setEndItem(endItemState)
+      this.builder.setEndItem(endItemState),
     );
   }
 
@@ -435,7 +435,7 @@ export class SceneItemOperationsBuilder
   public clearEndItem(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.clearEndItem()
+      this.builder.clearEndItem(),
     );
   }
 
@@ -458,7 +458,7 @@ export class SceneItemOperationsBuilder
   public viewRenditionById(id: UUID.UUID): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.viewRenditionById(id)
+      this.builder.viewRenditionById(id),
     );
   }
 
@@ -480,11 +480,11 @@ export class SceneItemOperationsBuilder
    * ```
    */
   public viewRenditionBySuppliedId(
-    suppliedId: string
+    suppliedId: string,
   ): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.viewRenditionBySuppliedId(suppliedId)
+      this.builder.viewRenditionBySuppliedId(suppliedId),
     );
   }
 
@@ -507,7 +507,7 @@ export class SceneItemOperationsBuilder
   public viewDefaultRendition(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.viewDefaultRendition()
+      this.builder.viewDefaultRendition(),
     );
   }
 
@@ -529,7 +529,7 @@ export class SceneItemOperationsBuilder
   public clearRendition(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.clearRendition()
+      this.builder.clearRendition(),
     );
   }
 
@@ -552,7 +552,7 @@ export class SceneItemOperationsBuilder
   public viewRepresentation(id: RepresentationId): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.viewRepresentation(id)
+      this.builder.viewRepresentation(id),
     );
   }
 
@@ -573,7 +573,7 @@ export class SceneItemOperationsBuilder
   public clearRepresentation(): SceneItemOperationsBuilder {
     return new SceneItemOperationsBuilder(
       this.query,
-      this.builder.clearRepresentation()
+      this.builder.clearRepresentation(),
     );
   }
 
@@ -607,7 +607,7 @@ export class PmiAnnotationOperationsBuilder
 
   public constructor(
     private query: QueryExpression,
-    givenBuilder?: PmiAnnotationOperationBuilder
+    givenBuilder?: PmiAnnotationOperationBuilder,
   ) {
     this.builder = givenBuilder ?? new PmiAnnotationOperationBuilder();
   }
@@ -688,7 +688,7 @@ export class PmiAnnotationOperationsBuilder
   public select(): PmiAnnotationOperationsBuilder {
     return new PmiAnnotationOperationsBuilder(
       this.query,
-      this.builder.select()
+      this.builder.select(),
     );
   }
 
@@ -714,7 +714,7 @@ export class PmiAnnotationOperationsBuilder
   public deselect(): PmiAnnotationOperationsBuilder {
     return new PmiAnnotationOperationsBuilder(
       this.query,
-      this.builder.deselect()
+      this.builder.deselect(),
     );
   }
 
@@ -746,20 +746,20 @@ export class OperationExecutor<T extends SceneExecutionOptions> {
     protected decodeFrame: FrameDecoder,
     protected dimensions: Dimensions.Dimensions,
     protected sceneItemQueryOperations: QueryOperation[],
-    protected pmiAnnotationQueryOperations: QueryAnnotationOperation[]
+    protected pmiAnnotationQueryOperations: QueryAnnotationOperation[],
   ) {}
 
   public async execute(executionOptions?: T): Promise<void> {
     const pbItemOperations = this.sceneItemQueryOperations.map((op) =>
       buildSceneElementOperationOnItem(op.query, op.operations, {
         dimensions: this.dimensions,
-      })
+      }),
     );
     const pbPmiAnnotationOperations = this.pmiAnnotationQueryOperations.map(
       (op) =>
         buildSceneElementOperationOnAnnotation(op.query, op.operations, {
           dimensions: this.dimensions,
-        })
+        }),
     );
 
     const requestCorrelationId =
@@ -781,7 +781,7 @@ export class OperationExecutor<T extends SceneExecutionOptions> {
 
 export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExecutionOptions> {
   public async execute(
-    executionOptions?: SceneItemsExecutionOptions
+    executionOptions?: SceneItemsExecutionOptions,
   ): Promise<void> {
     if (executionOptions?.awaitCorrelatedFrame) {
       const correlationId =
@@ -789,7 +789,7 @@ export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExe
       const executeResult = new SceneOperationExecuteResult(
         this.stream,
         this.decodeFrame,
-        correlationId
+        correlationId,
       );
 
       await super.execute({
@@ -805,7 +805,7 @@ export class SceneItemsOperationExecutor extends OperationExecutor<SceneItemsExe
 
 export class SceneElementsOperationExecutor extends OperationExecutor<SceneElementsExecutionOptions> {
   public async execute(
-    executionOptions?: SceneElementsExecutionOptions
+    executionOptions?: SceneElementsExecutionOptions,
   ): Promise<void> {
     if (executionOptions?.skipAwaitCorrelatedFrame) {
       await super.execute(executionOptions);
@@ -815,7 +815,7 @@ export class SceneElementsOperationExecutor extends OperationExecutor<SceneEleme
       const executeResult = new SceneOperationExecuteResult(
         this.stream,
         this.decodeFrame,
-        correlationId
+        correlationId,
       );
 
       await super.execute({
@@ -864,14 +864,14 @@ export class Scene {
     private imageScaleProvider: ImageScaleProvider,
     private dimensions: Dimensions.Dimensions,
     public readonly sceneId: UUID.UUID,
-    public readonly sceneViewId: UUID.UUID
+    public readonly sceneViewId: UUID.UUID,
   ) {
     this.sceneViewStateLoader = new SceneViewStateLoader(
       stream,
       decodeFrame,
       encodeCameraType,
       sceneId,
-      sceneViewId
+      sceneViewId,
     );
   }
 
@@ -882,11 +882,11 @@ export class Scene {
     sceneViewStateId:
       | UUID.UUID
       | SceneViewStateIdentifier.SceneViewStateIdentifier,
-    opts: ApplySceneViewStateOptions = {}
+    opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     return await this.sceneViewStateLoader.applySceneViewState(
       sceneViewStateId,
-      opts
+      opts,
     );
   }
 
@@ -898,12 +898,12 @@ export class Scene {
       | UUID.UUID
       | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
-    opts: ApplySceneViewStateOptions = {}
+    opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     return await this.sceneViewStateLoader.applyPartialSceneViewState(
       sceneViewStateId,
       featuresToApply,
-      opts
+      opts,
     );
   }
 
@@ -911,7 +911,7 @@ export class Scene {
    * Resets the view to its default state, with the ability to reset the camera to that of the base scene.
    */
   public async reset(
-    opts: ResetViewOptions = {}
+    opts: ResetViewOptions = {},
   ): Promise<vertexvis.protobuf.stream.IResetViewResult | undefined> {
     return await this.stream.resetSceneView(
       {
@@ -923,7 +923,7 @@ export class Scene {
           ? this.encodeCameraType(opts.cameraTypeOverride)
           : undefined,
       },
-      true
+      true,
     );
   }
 
@@ -950,7 +950,7 @@ export class Scene {
    * @param operations
    */
   public items(
-    operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder
+    operations: (q: SceneItemQueryExecutor) => TerminalItemOperationBuilder,
   ): SceneItemsOperationExecutor {
     const sceneOperations = operations(new SceneItemQueryExecutor());
 
@@ -958,12 +958,12 @@ export class Scene {
       SceneItemOperationsBuilder | PmiAnnotationOperationsBuilder
     > = Array.isArray(sceneOperations) ? sceneOperations : [sceneOperations];
     const itemOps = ops.filter((op) =>
-      op.isItemBuilder()
+      op.isItemBuilder(),
     ) as Array<SceneItemOperationsBuilder>;
 
     const operationList = itemOps.reduce(
       (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
-      [] as QueryOperation[]
+      [] as QueryOperation[],
     );
 
     return new SceneItemsOperationExecutor(
@@ -972,7 +972,7 @@ export class Scene {
       this.decodeFrame,
       this.dimensions,
       operationList,
-      []
+      [],
     );
   }
 
@@ -1004,28 +1004,28 @@ export class Scene {
    * @param operations
    */
   public elements(
-    operations: (q: SceneElementQueryExecutor) => TerminalItemOperationBuilder
+    operations: (q: SceneElementQueryExecutor) => TerminalItemOperationBuilder,
   ): SceneElementsOperationExecutor {
     const ops = operations(new SceneElementQueryExecutor());
     const opsAsArray = Array.isArray(ops) ? ops : [ops];
 
     // Operations on scene items
     const sceneItemOps = opsAsArray.filter((op) =>
-      op.isItemBuilder()
+      op.isItemBuilder(),
     ) as Array<SceneItemOperationsBuilder>;
     const sceneItemsOperationList = sceneItemOps.reduce(
       (acc, builder: SceneItemOperationsBuilder) => acc.concat(builder.build()),
-      [] as QueryOperation[]
+      [] as QueryOperation[],
     );
 
     // Operations on PMI annotations
     const pmiAnnotationOps = opsAsArray.filter((op) =>
-      op.isAnnotationBuilder()
+      op.isAnnotationBuilder(),
     ) as Array<PmiAnnotationOperationsBuilder>;
     const pmiAnnotationOperationList = pmiAnnotationOps.reduce(
       (acc, builder: PmiAnnotationOperationsBuilder) =>
         acc.concat(builder.build()),
-      [] as QueryAnnotationOperation[]
+      [] as QueryAnnotationOperation[],
     );
 
     return new SceneElementsOperationExecutor(
@@ -1034,7 +1034,7 @@ export class Scene {
       this.decodeFrame,
       this.dimensions,
       sceneItemsOperationList,
-      pmiAnnotationOperationList
+      pmiAnnotationOperationList,
     );
   }
 
@@ -1070,7 +1070,7 @@ export class Scene {
           rotationPoint: scene.camera.lookAt,
         },
         this.frame.scene.boundingBox,
-        this.decodeFrame
+        this.decodeFrame,
       );
     } else if (scene.camera.isPerspective()) {
       return new PerspectiveCamera(
@@ -1083,11 +1083,11 @@ export class Scene {
           fovY: scene.camera.fovY,
         },
         this.frame.scene.boundingBox,
-        this.decodeFrame
+        this.decodeFrame,
       );
     } else {
       throw new InvalidCameraError(
-        'Cannot retrieve camera. Scene has an unknown or invalid camera type.'
+        'Cannot retrieve camera. Scene has an unknown or invalid camera type.',
       );
     }
   }

@@ -14,7 +14,7 @@ describe(BoundingBox.center, () => {
     const min = Vector3.create(1, 1, 0);
     const max = Vector3.create(-1, -1, 0);
     expect(BoundingBox.center(BoundingBox.create(min, max))).toEqual(
-      Vector3.origin()
+      Vector3.origin(),
     );
   });
 });
@@ -24,7 +24,7 @@ describe(BoundingBox.diagonal, () => {
     const min = Vector3.create(-1, -1, 0);
     const max = Vector3.create(1, 1, 0);
     expect(BoundingBox.diagonal(BoundingBox.create(min, max))).toEqual(
-      Vector3.create(2, 2, 0)
+      Vector3.create(2, 2, 0),
     );
   });
 });
@@ -34,7 +34,7 @@ describe(BoundingBox.epsilon, () => {
     const min = Vector3.create(1, 1, 1);
     const max = Vector3.create(5, 5, 5);
     expect(BoundingBox.epsilon(BoundingBox.create(min, max))).toBeCloseTo(
-      Vector3.magnitude(max) * 1e-6
+      Vector3.magnitude(max) * 1e-6,
     );
   });
 
@@ -42,7 +42,7 @@ describe(BoundingBox.epsilon, () => {
     const min = Vector3.create(-5, -5, -5);
     const max = Vector3.create(-1, -1, -1);
     expect(BoundingBox.epsilon(BoundingBox.create(min, max))).toBeCloseTo(
-      Vector3.magnitude(min) * 1e-6
+      Vector3.magnitude(min) * 1e-6,
     );
   });
 
@@ -50,23 +50,23 @@ describe(BoundingBox.epsilon, () => {
     const min = Vector3.create(-5, -5, -5);
     const max = Vector3.create(5, 5, 5);
     expect(BoundingBox.epsilon(BoundingBox.create(min, max))).toBeCloseTo(
-      Vector3.magnitude(Vector3.create(10, 10, 10)) * 1e-6
+      Vector3.magnitude(Vector3.create(10, 10, 10)) * 1e-6,
     );
   });
 });
 
 const bbox = BoundingBox.create(
   Vector3.create(10, 30, 30),
-  Vector3.create(100, 300, 300)
+  Vector3.create(100, 300, 300),
 );
 const bbox2 = BoundingBox.create(
   Vector3.create(-20, -30, -40),
-  Vector3.create(100, 200, 300)
+  Vector3.create(100, 200, 300),
 );
 
 const bbox3 = BoundingBox.create(
   Vector3.create(-1000, 200, 100),
-  Vector3.create(-200, 400, 600)
+  Vector3.create(-200, 400, 600),
 );
 
 describe(BoundingBox.union, () => {
@@ -74,8 +74,8 @@ describe(BoundingBox.union, () => {
     expect(BoundingBox.union(bbox2, bbox3)).toEqual(
       BoundingBox.create(
         Vector3.create(-1000, -30, -40),
-        Vector3.create(100, 400, 600)
-      )
+        Vector3.create(100, 400, 600),
+      ),
     );
   });
 
@@ -83,8 +83,8 @@ describe(BoundingBox.union, () => {
     expect(BoundingBox.union(bbox, bbox2, bbox3)).toEqual(
       BoundingBox.create(
         Vector3.create(-1000, -30, -40),
-        Vector3.create(100, 400, 600)
-      )
+        Vector3.create(100, 400, 600),
+      ),
     );
   });
 
@@ -104,12 +104,12 @@ describe(BoundingBox.fromVectors, () => {
         Vector3.create(-5, 100, 0),
         Vector3.create(100, -10, 2222),
         Vector3.create(101, 33, -2),
-      ])
+      ]),
     ).toEqual(
       BoundingBox.create(
         Vector3.create(-5, -10, -2),
-        Vector3.create(101, 100, 2222)
-      )
+        Vector3.create(101, 100, 2222),
+      ),
     );
   });
 });
@@ -118,7 +118,7 @@ describe(BoundingBox.lengths, () => {
   it('returns the lengths of a bounding box', () => {
     const box = BoundingBox.create(
       Vector3.create(-100, -200, -300),
-      Vector3.create(100, 200, 300)
+      Vector3.create(100, 200, 300),
     );
 
     expect(BoundingBox.lengths(box)).toMatchObject({
@@ -133,7 +133,7 @@ describe(BoundingBox.isValid, () => {
   it('returns true for a valid bounding box', () => {
     const box = BoundingBox.create(
       Vector3.create(-100, -200, -300),
-      Vector3.create(100, 200, 300)
+      Vector3.create(100, 200, 300),
     );
 
     expect(BoundingBox.isValid(box)).toEqual(true);
@@ -142,7 +142,7 @@ describe(BoundingBox.isValid, () => {
   it('returns false for an invalid bounding box', () => {
     const box = BoundingBox.create(
       Vector3.create(-100, Infinity, -300),
-      Vector3.create(100, 200, 300)
+      Vector3.create(100, 200, 300),
     );
 
     expect(BoundingBox.isValid(box)).toEqual(false);

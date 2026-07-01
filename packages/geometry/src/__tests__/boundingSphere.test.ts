@@ -6,7 +6,7 @@ describe(BoundingSphere.create, () => {
   it('creates a bounding sphere with correct radius', () => {
     const boundingBox = BoundingBox.create(
       Vector3.create(-2, -2, -2),
-      Vector3.create(10, 10, 10)
+      Vector3.create(10, 10, 10),
     );
     const boundingSphere = BoundingSphere.create(boundingBox);
 

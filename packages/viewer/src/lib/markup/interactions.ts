@@ -42,7 +42,7 @@ export abstract class MarkupInteractionHandler implements BasicInteractionHandle
   }
 
   public updateScalingOptions(
-    scalingOptions: MarkupInteractionHandlerScalingOptions
+    scalingOptions: MarkupInteractionHandlerScalingOptions,
   ): void {
     this.scalingOptions = {
       ...this.scalingOptions,

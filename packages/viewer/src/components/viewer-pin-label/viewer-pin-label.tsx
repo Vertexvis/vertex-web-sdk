@@ -257,7 +257,7 @@ export class VertexPinLabel {
           .split('\n')
           .reduce(
             (res, str) => [...res, str, <br />],
-            [] as Array<string | HTMLBRElement>
+            [] as Array<string | HTMLBRElement>,
           )
       : [this.value];
   }
@@ -315,8 +315,8 @@ export class VertexPinLabel {
           Math.ceil(
             (parseFloat(computedStyles.getPropertyValue('height')) -
               parseFloat(computedStyles.getPropertyValue('borderWidth')) * 2) /
-              parseFloat(computedStyles.getPropertyValue('lineHeight'))
-          )
+              parseFloat(computedStyles.getPropertyValue('lineHeight')),
+          ),
         );
       }
     });
@@ -345,7 +345,7 @@ export class VertexPinLabel {
         }
         this.relativePointerDownPosition = translatePointToRelative(
           getMouseClientPosition(event, this.elementBounds),
-          this.elementBounds
+          this.elementBounds,
         );
         this.pinPointerDownPosition = this.pin?.label.point;
 
@@ -370,7 +370,7 @@ export class VertexPinLabel {
 
       const relativeDelta = Point.subtract(
         relative,
-        this.relativePointerDownPosition
+        this.relativePointerDownPosition,
       );
 
       const myUpdatedPin =
@@ -399,11 +399,11 @@ export class VertexPinLabel {
     ) {
       const pointerDownScreen = translatePointToScreen(
         this.relativePointerDownPosition,
-        this.elementBounds
+        this.elementBounds,
       );
       const distanceBetweenStartAndEndPoint = Point.distance(
         pointerDownScreen,
-        getMouseClientPosition(event, this.elementBounds)
+        getMouseClientPosition(event, this.elementBounds),
       );
 
       if (distanceBetweenStartAndEndPoint <= 2) {

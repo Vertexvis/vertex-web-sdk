@@ -14,12 +14,12 @@ export interface BoundingSphere {
  * Returns a `BoundingSphere` that encompasses the provided `BoundingBox`.
  */
 export const create = (
-  boundingBox: BoundingBox.BoundingBox
+  boundingBox: BoundingBox.BoundingBox,
 ): BoundingSphere => {
   const boundingBoxCenter = BoundingBox.center(boundingBox);
   const centerToBoundingPlane = Vector3.subtract(
     boundingBox.max,
-    boundingBoxCenter
+    boundingBoxCenter,
   );
   const radius = Vector3.magnitude(centerToBoundingPlane);
   const length = Math.max(radius, Vector3.magnitude(boundingBoxCenter));

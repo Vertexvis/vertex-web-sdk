@@ -1,5 +1,5 @@
 jest.mock(
-  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
@@ -29,7 +29,7 @@ describe(AnnotationController, () => {
 
       const expected = mockFetchAnnotationState(client);
       (client.createSceneViewAnnotationSet as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(makeCreateSceneViewAnnotationSetResponse())
+        mockGrpcUnaryResult(makeCreateSceneViewAnnotationSetResponse()),
       );
 
       const onStateChange = jest.fn();
@@ -102,7 +102,7 @@ describe(AnnotationController, () => {
 
       const expected = mockFetchAnnotationState(client);
       (client.deleteSceneViewAnnotationSet as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(makeDeleteSceneViewAnnotationSetResponse())
+        mockGrpcUnaryResult(makeDeleteSceneViewAnnotationSetResponse()),
       );
 
       const onStateChange = jest.fn();
@@ -117,7 +117,7 @@ describe(AnnotationController, () => {
 
 function makeAnnotationController(
   jwt: string,
-  deviceId: string
+  deviceId: string,
 ): { controller: AnnotationController; client: SceneViewAPIClient } {
   const client = new SceneViewAPIClient('https://example.com');
   return {
@@ -125,7 +125,7 @@ function makeAnnotationController(
     controller: new AnnotationController(
       client,
       () => jwt,
-      () => deviceId
+      () => deviceId,
     ),
   };
 }
@@ -144,14 +144,16 @@ function mockFetchAnnotationState(client: SceneViewAPIClient): AnnotationState {
   const ann2 = makeSceneAnnotation({ id: annId2 });
 
   (client.listSceneViewAnnotationSets as jest.Mock).mockImplementationOnce(
-    mockGrpcUnaryResult(makeListSceneViewAnnotationSetsResponse(annotationSets))
+    mockGrpcUnaryResult(
+      makeListSceneViewAnnotationSetsResponse(annotationSets),
+    ),
   );
   (client.listSceneAnnotations as jest.Mock)
     .mockImplementationOnce(
-      mockGrpcUnaryResult(makeListSceneAnnotationsResponse([ann1]))
+      mockGrpcUnaryResult(makeListSceneAnnotationsResponse([ann1])),
     )
     .mockImplementationOnce(
-      mockGrpcUnaryResult(makeListSceneAnnotationsResponse([ann2]))
+      mockGrpcUnaryResult(makeListSceneAnnotationsResponse([ann2])),
     );
 
   return {

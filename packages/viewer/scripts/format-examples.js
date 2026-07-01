@@ -23,12 +23,12 @@ for (const exampleMatch of docExampleMatches) {
 
   const formattedMatch = `\`\`\`${type}\n${await formatExample(
     exampleMatch[2],
-    type !== '' ? type : undefined
+    type !== '' ? type : undefined,
   )}\`\`\``.replace(/^/gm, '* ');
 
   typeDefFormattedExamples = typeDefFormattedExamples.replace(
     exampleMatch[0],
-    `\n${formattedMatch}`
+    `\n${formattedMatch}`,
   );
 }
 let typeDefFormattedMultiline = typeDefFormattedExamples;
@@ -37,12 +37,12 @@ for (const mutilineMatch of docMatches) {
   const indentation = indentationMatch[1] == null ? '' : indentationMatch[1];
   const formattedMatch = `${indentation}*${mutilineMatch[1].replace(
     /([^ ])[ ]{2}([^ ])/gm,
-    `$1\n${indentation}*\n${indentation}* $2`
+    `$1\n${indentation}*\n${indentation}* $2`,
   )}`;
 
   typeDefFormattedMultiline = typeDefFormattedMultiline.replace(
     mutilineMatch[0],
-    `${formattedMatch}`
+    `${formattedMatch}`,
   );
 }
 

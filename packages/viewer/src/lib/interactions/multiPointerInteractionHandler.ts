@@ -43,7 +43,7 @@ export class MultiPointerInteractionHandler extends MultiTouchInteractionHandler
     if (this.touchPoints[event.pointerId] != null) {
       this.touchPoints[event.pointerId] = Point.create(
         event.screenX,
-        event.screenY
+        event.screenY,
       );
     }
 

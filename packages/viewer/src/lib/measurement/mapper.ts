@@ -26,9 +26,9 @@ const mapPlanePair: M.Func<
 > = M.defineMapper(
   M.read(
     M.mapRequiredProp('start', fromPbPlane),
-    M.mapRequiredProp('end', fromPbPlane)
+    M.mapRequiredProp('end', fromPbPlane),
   ),
-  ([start, end]) => ({ start, end })
+  ([start, end]) => ({ start, end }),
 );
 
 const mapPlanarDistance: M.Func<
@@ -39,16 +39,16 @@ const mapPlanarDistance: M.Func<
     M.getProp('distance'),
     M.mapRequiredProp(
       'planes',
-      M.compose(mapPlanePair, M.requiredProp('start'))
+      M.compose(mapPlanePair, M.requiredProp('start')),
     ),
-    M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('end')))
+    M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('end'))),
   ),
   ([distance, plane1, plane2]) => ({
     type: 'planar-distance',
     distance,
     plane1,
     plane2,
-  })
+  }),
 );
 
 const mapPlanarAngle: M.Func<
@@ -59,16 +59,16 @@ const mapPlanarAngle: M.Func<
     M.getProp('angleInRadians'),
     M.mapRequiredProp(
       'planes',
-      M.compose(mapPlanePair, M.requiredProp('start'))
+      M.compose(mapPlanePair, M.requiredProp('start')),
     ),
-    M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('end')))
+    M.mapRequiredProp('planes', M.compose(mapPlanePair, M.requiredProp('end'))),
   ),
   ([angle, plane1, plane2]) => ({
     type: 'planar-angle',
     angle,
     plane1,
     plane2,
-  })
+  }),
 );
 
 const mapMinimumDistance: M.Func<
@@ -78,14 +78,14 @@ const mapMinimumDistance: M.Func<
   M.read(
     M.getProp('distance'),
     M.mapRequiredProp('closestPoint1', fromPbVector3f),
-    M.mapRequiredProp('closestPoint2', fromPbVector3f)
+    M.mapRequiredProp('closestPoint2', fromPbVector3f),
   ),
   ([distance, point1, point2]) => ({
     type: 'minimum-distance',
     distance,
     point1,
     point2,
-  })
+  }),
 );
 
 const mapSurfaceArea: M.Func<
@@ -124,9 +124,9 @@ const mapMeasurementResult: M.Func<
     mapPlanarDistanceFromResult,
     mapPlanarAngleFromResult,
     mapMinimumDistanceFromResult,
-    mapSurfaceAreaFromResult
+    mapSurfaceAreaFromResult,
   ),
-  M.required('Result field')
+  M.required('Result field'),
 );
 
 export const mapMeasureResponse: M.Func<
@@ -136,11 +136,11 @@ export const mapMeasureResponse: M.Func<
   M.read(
     M.mapRequiredProp(
       'outcome',
-      M.mapRequiredProp('resultsList', M.mapArray(mapMeasurementResult))
+      M.mapRequiredProp('resultsList', M.mapArray(mapMeasurementResult)),
     ),
-    M.mapRequiredProp('outcome', M.getProp('isApproximate'))
+    M.mapRequiredProp('outcome', M.getProp('isApproximate')),
   ),
-  ([results, isApproximate]) => ({ results, isApproximate })
+  ([results, isApproximate]) => ({ results, isApproximate }),
 );
 
 export const mapMeasureResponseOrThrow = M.ifInvalidThrow(mapMeasureResponse);

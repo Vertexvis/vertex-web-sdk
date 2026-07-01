@@ -43,7 +43,7 @@ function createMeshes(
   transform: Matrix4.Matrix4,
   normal: Vector3.Vector3,
   frame: Frame,
-  triangleSize?: number
+  triangleSize?: number,
 ): {
   arrow: TriangleMesh;
   axis: AxisLine;
@@ -55,8 +55,8 @@ function createMeshes(
     Vector3.magnitude(
       Vector3.subtract(
         Vector3.fromMatrixPosition(transform),
-        frame.scene.camera.position
-      )
+        frame.scene.camera.position,
+      ),
     ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
   const arrow = new TriangleMesh(
@@ -66,17 +66,17 @@ function createMeshes(
       transform,
       frame.scene.camera,
       normal,
-      expectedTriangleSize
+      expectedTriangleSize,
     ),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const axis = new AxisLine(
     mockShapeBuilder().createShape,
     'hit-normal-axis',
     axisPositions(transform, frame.scene.camera, arrow),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const plane = new Mesh(
     mockShapeBuilder().createShape,
@@ -85,10 +85,10 @@ function createMeshes(
       transform,
       frame.scene.camera,
       normal,
-      expectedTriangleSize * DEFAULT_PLANE_SIZE_SCALAR
+      expectedTriangleSize * DEFAULT_PLANE_SIZE_SCALAR,
     ),
     '#000000',
-    '#000000'
+    '#000000',
   );
   const point = new Mesh(
     mockShapeBuilder().createShape,
@@ -97,10 +97,10 @@ function createMeshes(
       transform,
       frame.scene.camera,
       normal,
-      expectedTriangleSize * DEFAULT_POINT_SIZE_SCALAR
+      expectedTriangleSize * DEFAULT_POINT_SIZE_SCALAR,
     ),
     '#000000',
-    '#000000'
+    '#000000',
   );
   return {
     arrow,
@@ -112,7 +112,7 @@ function createMeshes(
 
 function updateFrameCameraPosition(
   baseFrame: Frame,
-  position: Vector3.Vector3
+  position: Vector3.Vector3,
 ): Frame {
   return new Frame(
     baseFrame.correlationIds,
@@ -127,15 +127,15 @@ function updateFrameCameraPosition(
         baseFrame.scene.camera.up,
         baseFrame.scene.camera.near,
         baseFrame.scene.camera.far,
-        baseFrame.scene.camera.aspectRatio
+        baseFrame.scene.camera.aspectRatio,
       ),
       baseFrame.scene.boundingBox,
       baseFrame.scene.crossSection,
       baseFrame.scene.worldOrientation,
-      baseFrame.scene.hasChanged
+      baseFrame.scene.hasChanged,
     ),
     makeDepthImagePng(100, 50),
-    makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0))
+    makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0)),
   );
 }
 
@@ -154,14 +154,14 @@ describe(HitIndicator, () => {
     indicator.updateFrame(makePerspectiveFrame());
     indicator.updateTransformAndNormal(
       Matrix4.makeTranslation(Vector3.create(1, 1, 1)),
-      Vector3.up()
+      Vector3.up(),
     );
 
     expect(regl).toHaveBeenCalledWith(
       expect.objectContaining({
         canvas,
         extensions: 'angle_instanced_arrays',
-      })
+      }),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalled();
     expect(regl().frame).toHaveBeenCalled();
@@ -172,7 +172,7 @@ describe(HitIndicator, () => {
 
     indicator.updateTransformAndNormal(
       Matrix4.makeTranslation(Vector3.create(1, 1, 1)),
-      Vector3.up()
+      Vector3.up(),
     );
     indicator.updateFrame(makePerspectiveFrame());
 
@@ -180,7 +180,7 @@ describe(HitIndicator, () => {
       expect.objectContaining({
         canvas,
         extensions: 'angle_instanced_arrays',
-      })
+      }),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalled();
     expect(regl().frame).toHaveBeenCalled();
@@ -190,7 +190,7 @@ describe(HitIndicator, () => {
     const indicator = new HitIndicator(canvas);
     const frame = makePerspectiveFrame();
     const hithitPositionTransform = Matrix4.makeTranslation(
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     const hitNormal = Vector3.up();
     const meshes = createMeshes(hithitPositionTransform, hitNormal, frame);
@@ -201,19 +201,19 @@ describe(HitIndicator, () => {
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.arrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.axis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.plane.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.point.points),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -221,7 +221,7 @@ describe(HitIndicator, () => {
     const indicator = new HitIndicator(canvas);
     const frame = makeOrthographicFrame();
     const hitPositionTransform = Matrix4.makeTranslation(
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     const hitNormal = Vector3.up();
     const meshes = createMeshes(
@@ -229,7 +229,7 @@ describe(HitIndicator, () => {
       hitNormal,
       frame,
       (frame.scene.camera as FrameOrthographicCamera).fovHeight *
-        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
+        DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
     );
 
     mockShapeBuilder().createShape.mockClear();
@@ -238,19 +238,19 @@ describe(HitIndicator, () => {
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.arrow.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.axis.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.plane.points),
-      expect.anything()
+      expect.anything(),
     );
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.point.points),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -259,15 +259,15 @@ describe(HitIndicator, () => {
     const baseFrame = makePerspectiveFrame();
     const frameAbovePlane = updateFrameCameraPosition(
       baseFrame,
-      Vector3.create(100, 200, 0)
+      Vector3.create(100, 200, 0),
     );
     const frameBelowPlane = updateFrameCameraPosition(
       baseFrame,
-      Vector3.create(100, 0, 0)
+      Vector3.create(100, 0, 0),
     );
 
     const hitPositionTransform = Matrix4.makeTranslation(
-      Vector3.create(100, 100, 100)
+      Vector3.create(100, 100, 100),
     );
     const hitNormal = Vector3.up();
 
@@ -275,27 +275,27 @@ describe(HitIndicator, () => {
     indicator.updateTransformAndNormal(hitPositionTransform, hitNormal);
 
     expect(
-      indicator.getDrawableElements().map((e) => e.identifier)
+      indicator.getDrawableElements().map((e) => e.identifier),
     ).toMatchObject(
       [
         'hit-normal-arrow',
         'hit-normal-axis',
         'hit-position',
         'hit-plane',
-      ].reverse()
+      ].reverse(),
     );
 
     indicator.updateFrame(frameBelowPlane);
 
     expect(
-      indicator.getDrawableElements().map((e) => e.identifier)
+      indicator.getDrawableElements().map((e) => e.identifier),
     ).toMatchObject(
       [
         'hit-position',
         'hit-plane',
         'hit-normal-axis',
         'hit-normal-arrow',
-      ].reverse()
+      ].reverse(),
     );
   });
 
@@ -305,12 +305,12 @@ describe(HitIndicator, () => {
     });
     const frame = makePerspectiveFrame();
     const hitPositionTransform = Matrix4.makeTranslation(
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     const hitNormal = Vector3.up();
 
     indicator.updateFrame(
-      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)),
     );
     indicator.updateTransformAndNormal(hitPositionTransform, hitNormal);
 
@@ -322,15 +322,15 @@ describe(HitIndicator, () => {
     expect(
       indicator
         .getDrawableElements()
-        .some((e) => e.identifier === 'hit-plane' && e.fillColor === '#333333')
+        .some((e) => e.identifier === 'hit-plane' && e.fillColor === '#333333'),
     ).toBe(true);
     expect(
       indicator
         .getDrawableElements()
         .some(
           (e) =>
-            e.identifier === 'hit-normal-arrow' && e.fillColor === '#555555'
-        )
+            e.identifier === 'hit-normal-arrow' && e.fillColor === '#555555',
+        ),
     ).toBe(true);
 
     indicator.updateColors({
@@ -341,15 +341,15 @@ describe(HitIndicator, () => {
     expect(
       indicator
         .getDrawableElements()
-        .some((e) => e.identifier === 'hit-plane' && e.fillColor === '#333333')
+        .some((e) => e.identifier === 'hit-plane' && e.fillColor === '#333333'),
     ).toBe(true);
     expect(
       indicator
         .getDrawableElements()
         .some(
           (e) =>
-            e.identifier === 'hit-normal-arrow' && e.fillColor === '#111111'
-        )
+            e.identifier === 'hit-normal-arrow' && e.fillColor === '#111111',
+        ),
     ).toBe(true);
   });
 
@@ -359,12 +359,12 @@ describe(HitIndicator, () => {
     });
     const frame = makePerspectiveFrame();
     const hitPositionTransform = Matrix4.makeTranslation(
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     const hitNormal = Vector3.up();
 
     indicator.updateFrame(
-      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100))
+      updateFrameCameraPosition(frame, Vector3.create(100, 100, 100)),
     );
     indicator.updateTransformAndNormal(hitPositionTransform, hitNormal);
 
@@ -373,7 +373,9 @@ describe(HitIndicator, () => {
     });
 
     expect(
-      indicator.getDrawableElements().every((e) => e.outlineColor === '#333333')
+      indicator
+        .getDrawableElements()
+        .every((e) => e.outlineColor === '#333333'),
     ).toBe(true);
   });
 });

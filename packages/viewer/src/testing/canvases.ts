@@ -36,7 +36,7 @@ import { makeVector2d, makeVector3f } from './geometry';
 import { makeUuid2l } from './uuid';
 
 export function makeGetCanvasResponse(
-  canvas: Canvas = makeCanvas()
+  canvas: Canvas = makeCanvas(),
 ): GetCanvasResponse {
   const res = new GetCanvasResponse();
   res.setCanvas(canvas);
@@ -51,7 +51,7 @@ export function makeCanvas(
     makeFreeform2d(),
     makePin2d(),
     makeCallout(),
-  ]
+  ],
 ): Canvas {
   const canvas = new Canvas();
   const doc = new CanvasDocument3d();
@@ -67,13 +67,13 @@ export function makeLine2d(value: Partial<LineItem2d> = {}): CanvasItem {
   const item = new CanvasItem();
   const line2d = new ApiLineItem2d();
   line2d.setStartPosition(
-    makeVector2d(value.startPosition?.x, value.startPosition?.y)
+    makeVector2d(value.startPosition?.x, value.startPosition?.y),
   );
   line2d.setEndPosition(
-    makeVector2d(value.endPosition?.x, value.endPosition?.y)
+    makeVector2d(value.endPosition?.x, value.endPosition?.y),
   );
   line2d.setStrokeStyle(
-    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color)
+    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color),
   );
   line2d.setFillStyle(makeFillStyle(value.fill?.color));
   line2d.setStartShape(makeLineEndShape(value.startShape));
@@ -86,13 +86,13 @@ export function makeOval2d(value: Partial<OvalItem2d> = {}): CanvasItem {
   const item = new CanvasItem();
   const oval2d = new ApiOvalItem2d();
   oval2d.setTopLeft(
-    makeVector2d(value.topLeftPosition?.x, value.topLeftPosition?.y)
+    makeVector2d(value.topLeftPosition?.x, value.topLeftPosition?.y),
   );
   oval2d.setBottomRight(
-    makeVector2d(value.bottomRightPosition?.x, value.bottomRightPosition?.y)
+    makeVector2d(value.bottomRightPosition?.x, value.bottomRightPosition?.y),
   );
   oval2d.setStrokeStyle(
-    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color)
+    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color),
   );
   oval2d.setFillStyle(makeFillStyle(value.fill?.color));
   item.setOval(oval2d);
@@ -100,15 +100,15 @@ export function makeOval2d(value: Partial<OvalItem2d> = {}): CanvasItem {
 }
 
 export function makeFreeform2d(
-  value: Partial<FreeformItem2d> = {}
+  value: Partial<FreeformItem2d> = {},
 ): CanvasItem {
   const item = new CanvasItem();
   const freeform2d = new ApiFreeformItem2d();
   freeform2d.setPositionsList(
-    value.positions?.map((p) => makeVector2d(p.x, p.y)) ?? []
+    value.positions?.map((p) => makeVector2d(p.x, p.y)) ?? [],
   );
   freeform2d.setStrokeStyle(
-    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color)
+    makeStrokeStyle(value.stroke?.thickness, value.stroke?.color),
   );
   freeform2d.setFillStyle(makeFillStyle(value.fill?.color));
   item.setFreeform(freeform2d);
@@ -119,7 +119,7 @@ export function makePin2d(value: Partial<PinItem2d> = {}): CanvasItem {
   const item = new CanvasItem();
   const pin2d = new ApiPinItem2d();
   pin2d.setPosition(
-    makeVector3f(value.position?.x, value.position?.y, value.position?.z)
+    makeVector3f(value.position?.x, value.position?.y, value.position?.z),
   );
   pin2d.setPrimaryColor(makeRGBAi(value.primaryColor));
   pin2d.setAccentColor(makeRGBAi(value.accentColor));
@@ -135,11 +135,11 @@ export function makeCallout(value: Partial<CalloutItem> = {}): CanvasItem {
     makeVector3f(
       value.anchorPosition?.x,
       value.anchorPosition?.y,
-      value.anchorPosition?.z
-    )
+      value.anchorPosition?.z,
+    ),
   );
   callout.setTextPosition(
-    makeVector2d(value.textPosition?.x, value.textPosition?.y)
+    makeVector2d(value.textPosition?.x, value.textPosition?.y),
   );
   callout.setPrimaryColor(makeRGBAi(value.primaryColor));
   callout.setAccentColor(makeRGBAi(value.accentColor));
@@ -154,7 +154,7 @@ export function makeLineEndShape(
     type: 'arrow-end',
     width: 1,
     filled: true,
-  }
+  },
 ): ApiEndShape {
   const s = new ApiEndShape();
 
@@ -183,7 +183,7 @@ export function makeLineEndShape(
 
 export function makeStrokeStyle(
   thickness = 4,
-  color: Color.Color | string = Color.create(255, 255, 255)
+  color: Color.Color | string = Color.create(255, 255, 255),
 ): ApiStrokeStyle {
   const s = new ApiStrokeStyle();
   s.setThickness(thickness);
@@ -192,7 +192,7 @@ export function makeStrokeStyle(
 }
 
 export function makeFillStyle(
-  color: Color.Color | string = Color.create(255, 255, 255)
+  color: Color.Color | string = Color.create(255, 255, 255),
 ): ApiFillStyle {
   const s = new ApiFillStyle();
   s.setColor(makeRGBAi(color));

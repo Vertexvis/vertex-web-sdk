@@ -40,7 +40,7 @@ export class StandardView {
    */
   public static TOP_FRONT_RIGHT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.up(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -49,7 +49,7 @@ export class StandardView {
    */
   public static TOP_FRONT_LEFT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.up(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -58,7 +58,7 @@ export class StandardView {
    */
   public static BOTTOM_FRONT_RIGHT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.down(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -67,7 +67,7 @@ export class StandardView {
    */
   public static BOTTOM_FRONT_LEFT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.down(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -76,7 +76,7 @@ export class StandardView {
    */
   public static TOP_BACK_LEFT = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.up(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -85,7 +85,7 @@ export class StandardView {
    */
   public static TOP_BACK_RIGHT = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.up(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -94,7 +94,7 @@ export class StandardView {
    */
   public static BOTTOM_BACK_LEFT = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.down(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -103,7 +103,7 @@ export class StandardView {
    */
   public static BOTTOM_BACK_RIGHT = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.down(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -112,7 +112,7 @@ export class StandardView {
    */
   public static TOP_FRONT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.up()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -121,7 +121,7 @@ export class StandardView {
    */
   public static BOTTOM_FRONT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.down()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -130,7 +130,7 @@ export class StandardView {
    */
   public static FRONT_RIGHT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -139,7 +139,7 @@ export class StandardView {
    */
   public static FRONT_LEFT = new StandardView(
     Vector3.add(Vector3.back(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -147,7 +147,7 @@ export class StandardView {
    */
   public static TOP_BACK = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.up()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -156,7 +156,7 @@ export class StandardView {
    */
   public static BOTTOM_BACK = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.down()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -165,7 +165,7 @@ export class StandardView {
    */
   public static BACK_LEFT = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -174,7 +174,7 @@ export class StandardView {
    */
   public static BACK_RIGHT = new StandardView(
     Vector3.add(Vector3.forward(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -182,7 +182,7 @@ export class StandardView {
    */
   public static TOP_LEFT = new StandardView(
     Vector3.add(Vector3.up(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -191,7 +191,7 @@ export class StandardView {
    */
   public static TOP_RIGHT = new StandardView(
     Vector3.add(Vector3.up(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -200,7 +200,7 @@ export class StandardView {
    */
   public static BOTTOM_LEFT = new StandardView(
     Vector3.add(Vector3.down(), Vector3.right()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   /**
@@ -209,7 +209,7 @@ export class StandardView {
    */
   public static BOTTOM_RIGHT = new StandardView(
     Vector3.add(Vector3.down(), Vector3.left()),
-    Vector3.up()
+    Vector3.up(),
   );
 
   public constructor(
@@ -221,7 +221,7 @@ export class StandardView {
     /**
      * The up vector of the standard view.
      */
-    public readonly up: Vector3.Vector3
+    public readonly up: Vector3.Vector3,
   ) {}
 
   /**

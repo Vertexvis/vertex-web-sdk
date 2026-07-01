@@ -86,7 +86,7 @@ function getEnvironmentConfig(environment: Environment): Config {
 
 export function parseAndValidateConfig(
   environment: Environment = 'platprod',
-  config?: string | PartialConfig
+  config?: string | PartialConfig,
 ): Config {
   const parsed = parseConfig(environment, config);
 
@@ -95,7 +95,7 @@ export function parseAndValidateConfig(
 
 export function parseConfig(
   environment: Environment = 'platprod',
-  config?: string | PartialConfig
+  config?: string | PartialConfig,
 ): Config {
   if (typeof config === 'string') {
     config = JSON.parse(config) as PartialConfig;
@@ -140,11 +140,11 @@ export function validateConfig(config: Config): Config {
 function validateUrlScheme(
   networkConfig: NetworkConfig,
   field: keyof NetworkConfig,
-  expectedScheme: string
+  expectedScheme: string,
 ): void {
   if (!networkConfig[field].startsWith(expectedScheme)) {
     throw new Error(
-      `Invalid ${field} "${networkConfig[field]}" specified. The URL must start with the ${expectedScheme} scheme.`
+      `Invalid ${field} "${networkConfig[field]}" specified. The URL must start with the ${expectedScheme} scheme.`,
     );
   }
 }

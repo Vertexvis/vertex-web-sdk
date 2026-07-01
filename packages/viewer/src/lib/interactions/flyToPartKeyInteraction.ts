@@ -10,7 +10,7 @@ export class FlyToPartKeyInteraction implements KeyInteraction<TapEventDetails> 
   public constructor(
     private stream: StreamApi,
     private configProvider: ConfigProvider,
-    private imageScaleProvider: ImageScaleProvider
+    private imageScaleProvider: ImageScaleProvider,
   ) {}
 
   public predicate(e: TapEventDetails): boolean {
@@ -23,7 +23,7 @@ export class FlyToPartKeyInteraction implements KeyInteraction<TapEventDetails> 
       {
         point: Point.scale(e.position, scale?.x || 1, scale?.y || 1),
       },
-      true
+      true,
     );
 
     if (
@@ -38,7 +38,7 @@ export class FlyToPartKeyInteraction implements KeyInteraction<TapEventDetails> 
       });
     } else {
       console.debug(
-        `No hit results found for fly to part [position={x: ${e.position.x}, y: ${e.position.y}}]`
+        `No hit results found for fly to part [position={x: ${e.position.x}, y: ${e.position.y}}]`,
       );
     }
   }

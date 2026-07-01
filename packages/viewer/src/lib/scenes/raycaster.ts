@@ -14,7 +14,7 @@ export interface RaycasterOptions {
 export interface RaycasterLike {
   hitItems(
     point: Point.Point,
-    options?: RaycasterOptions
+    options?: RaycasterOptions,
   ): Promise<vertexvis.protobuf.stream.IHitItemsResult | undefined>;
 }
 
@@ -24,7 +24,7 @@ export interface RaycasterLike {
 export class Raycaster implements RaycasterLike {
   public constructor(
     private stream: StreamApi,
-    private imageScaleProvider: ImageScaleProvider
+    private imageScaleProvider: ImageScaleProvider,
   ) {}
 
   /**
@@ -60,7 +60,7 @@ export class Raycaster implements RaycasterLike {
    */
   public async hitItems(
     point: Point.Point,
-    options?: RaycasterOptions
+    options?: RaycasterOptions,
   ): Promise<vertexvis.protobuf.stream.IHitItemsResult | undefined> {
     const scale = this.imageScaleProvider();
     const res = await this.stream.hitItems(
@@ -68,7 +68,7 @@ export class Raycaster implements RaycasterLike {
         point: Point.scale(point, scale?.x || 1, scale?.y || 1),
         includeMetadata: options?.includeMetadata,
       },
-      true
+      true,
     );
     return res.hitItems || undefined;
   }

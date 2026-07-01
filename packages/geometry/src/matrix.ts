@@ -109,7 +109,7 @@ export const translate = (dx: number, dy: number, matrix: Matrix): Matrix => {
  */
 export const transformPoint = (
   matrix: Matrix,
-  pt: Point.Point
+  pt: Point.Point,
 ): Point.Point => {
   const x = matrix.a * pt.x + matrix.c * pt.y + matrix.tx;
   const y = matrix.b * pt.x + matrix.d * pt.y + matrix.ty;

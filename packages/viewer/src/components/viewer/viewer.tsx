@@ -560,7 +560,7 @@ export class Viewer implements BasicViewer {
     this.stencilBuffer ??= new StencilBufferManager(this.hostElement);
 
     this.visibilityObserver = new VisibilityObserver(
-      this.handleVisibilityChange
+      this.handleVisibilityChange,
     );
     this.isVisible = this.visibilityObserver.isVisible(this.hostElement);
 
@@ -587,7 +587,7 @@ export class Viewer implements BasicViewer {
     this.annotations = new AnnotationController(
       client,
       () => this.token,
-      () => this.deviceId
+      () => this.deviceId,
     );
     this.annotations.onStateChange.on((state: AnnotationState) => {
       this.annotationStateChanged.emit(state);
@@ -608,25 +608,25 @@ export class Viewer implements BasicViewer {
       client,
       this.stream,
       () => this.token,
-      () => this.deviceId
+      () => this.deviceId,
     );
 
     this.pmi = new PmiController(
       client,
       () => this.token,
-      () => this.deviceId
+      () => this.deviceId,
     );
 
     this.sceneItems = new SceneItemController(
       client,
       () => this.token,
-      () => this.deviceId
+      () => this.deviceId,
     );
 
     this.canvases = new CanvasController(
       client,
       () => this.token,
-      () => this.deviceId
+      () => this.deviceId,
     );
 
     this.updateStreamAttributes();
@@ -747,7 +747,7 @@ export class Viewer implements BasicViewer {
    */
   @Method()
   public async registerInteractionHandler(
-    interactionHandler: InteractionHandler
+    interactionHandler: InteractionHandler,
   ): Promise<Disposable> {
     this.interactionHandlers.push(interactionHandler);
     this.initializeInteractionHandler(interactionHandler);
@@ -801,7 +801,7 @@ export class Viewer implements BasicViewer {
    */
   @Method()
   public async registerBasicInteractionHandler(
-    interactionHandler: BasicInteractionHandler
+    interactionHandler: BasicInteractionHandler,
   ): Promise<Disposable> {
     this.interactionHandlers.push(interactionHandler);
     this.initializeBasicInteractionHandler(interactionHandler);
@@ -852,7 +852,7 @@ export class Viewer implements BasicViewer {
    */
   @Method()
   public async registerTapKeyInteraction(
-    keyInteraction: KeyInteraction<TapEventDetails>
+    keyInteraction: KeyInteraction<TapEventDetails>,
   ): Promise<void> {
     this.tapKeyInteractions = [...this.tapKeyInteractions, keyInteraction];
   }
@@ -891,7 +891,7 @@ export class Viewer implements BasicViewer {
   @Method()
   public async addCursor(
     cursor: Cursor,
-    priority?: number
+    priority?: number,
   ): Promise<Disposable> {
     return this.stateMap.cursorManager.add(cursor, priority);
   }
@@ -968,7 +968,7 @@ export class Viewer implements BasicViewer {
   @Watch('cameraType')
   protected handleCameraTypeChanged(
     updatedCameraType: string,
-    previousCameraType: string
+    previousCameraType: string,
   ): void {
     if (updatedCameraType !== previousCameraType) {
       this.updateCameraType();
@@ -1047,7 +1047,7 @@ export class Viewer implements BasicViewer {
 
     if (!shouldLoadBasedOnVisibility) {
       console.debug(
-        'Detected the viewer is hidden. Delaying load until visible.'
+        'Detected the viewer is hidden. Delaying load until visible.',
       );
 
       return;
@@ -1070,7 +1070,7 @@ export class Viewer implements BasicViewer {
         this.clientId,
         this.getDeviceId(),
         this.getResolvedConfig(),
-        options?.cameraType
+        options?.cameraType,
       );
 
       if (state.type === 'connected') {
@@ -1082,7 +1082,7 @@ export class Viewer implements BasicViewer {
       }
     } else {
       throw new ViewerInitializationError(
-        'Cannot load scene. Viewer has not been initialized.'
+        'Cannot load scene. Viewer has not been initialized.',
       );
     }
   }
@@ -1109,7 +1109,7 @@ export class Viewer implements BasicViewer {
           0,
           0,
           this.canvasElement.width,
-          this.canvasElement.height
+          this.canvasElement.height,
         );
       }
     }
@@ -1147,7 +1147,7 @@ export class Viewer implements BasicViewer {
 
   @Listen('tap')
   private async handleTapEvent(
-    event: CustomEvent<TapEventDetails>
+    event: CustomEvent<TapEventDetails>,
   ): Promise<void> {
     this.tapKeyInteractions
       .filter((i) => i.predicate(event.detail))
@@ -1239,7 +1239,7 @@ export class Viewer implements BasicViewer {
           element,
           ...queryChildren(element),
         ],
-        [] as Element[]
+        [] as Element[],
       )
       .forEach((node) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1263,7 +1263,7 @@ export class Viewer implements BasicViewer {
       const measuredViewport = Dimensions.create(bounds.width, bounds.height);
       const trimmedViewport = Dimensions.scaleFit(
         maxPixelCount,
-        measuredViewport
+        measuredViewport,
       );
 
       this.hostDimensions = measuredViewport;
@@ -1272,7 +1272,7 @@ export class Viewer implements BasicViewer {
           ? Dimensions.create(trimmedViewport.width, trimmedViewport.height)
           : undefined;
       this.viewport = Viewport.fromDimensions(
-        this.getCanvasDimensions() ?? Dimensions.create(0, 0)
+        this.getCanvasDimensions() ?? Dimensions.create(0, 0),
       );
     }
   }
@@ -1307,7 +1307,7 @@ export class Viewer implements BasicViewer {
 
   private handleStreamStateChanged(
     previous: ViewerStreamState,
-    state: ViewerStreamState
+    state: ViewerStreamState,
   ): void {
     this.stateMap.streamState = state;
 
@@ -1324,7 +1324,7 @@ export class Viewer implements BasicViewer {
 
   private handleConnecting(
     previous: ViewerStreamState,
-    state: Connecting
+    state: Connecting,
   ): void {
     if (previous.type !== 'connecting') {
       this.token = undefined;
@@ -1342,7 +1342,7 @@ export class Viewer implements BasicViewer {
         paintTime,
         createCanvasRenderer(),
         this.getResolvedConfig().flags.logFrameRate,
-        (timings) => this.reportPerformance(timings)
+        (timings) => this.reportPerformance(timings),
       );
       this.emitConnectionChange({
         status: 'connected',
@@ -1360,7 +1360,7 @@ export class Viewer implements BasicViewer {
 
   private handleConnectionFailed(
     previous: ViewerStreamState,
-    state: ConnectionFailed
+    state: ConnectionFailed,
   ): void {
     if (previous.type !== 'connection-failed') {
       this.token = undefined;
@@ -1374,7 +1374,7 @@ export class Viewer implements BasicViewer {
 
   private handleDisconnected(
     previous: ViewerStreamState,
-    state: Disconnected
+    state: Disconnected,
   ): void {
     if (previous.type !== 'disconnected') {
       this.token = undefined;
@@ -1402,7 +1402,7 @@ export class Viewer implements BasicViewer {
         const previousFrame = this.frame;
         this.frame = SceneViewSummary.copySummaryIfInvalid(
           frame,
-          previousFrame
+          previousFrame,
         );
 
         this.updateInteractionApi(previousFrame);
@@ -1423,7 +1423,7 @@ export class Viewer implements BasicViewer {
                 this.dimensions == null ||
                 Dimensions.isEqual(
                   this.dimensions,
-                  data.frame.image.imageAttr.frameDimensions
+                  data.frame.image.imageAttr.frameDimensions,
                 )
               );
             }
@@ -1457,11 +1457,15 @@ export class Viewer implements BasicViewer {
     writeDOM(() => {
       this.viewerContainerElement?.style.setProperty(
         'background',
-        backgroundColor != null ? Color.toHexString(backgroundColor) : '#ffffff'
+        backgroundColor != null
+          ? Color.toHexString(backgroundColor)
+          : '#ffffff',
       );
       this.canvasContainerElement?.style.setProperty(
         'background',
-        backgroundColor != null ? Color.toHexString(backgroundColor) : '#ffffff'
+        backgroundColor != null
+          ? Color.toHexString(backgroundColor)
+          : '#ffffff',
       );
     });
   }
@@ -1478,7 +1482,7 @@ export class Viewer implements BasicViewer {
 
   private clearDefaultCameraInteractionHandlers(): void {
     this.defaultInteractionHandlerDisposables.forEach((disposable) =>
-      disposable.dispose()
+      disposable.dispose(),
     );
     this.defaultInteractionHandlerDisposables = [];
   }
@@ -1502,10 +1506,10 @@ export class Viewer implements BasicViewer {
           this.baseInteractionHandler ??
           new PointerInteractionHandler(() => this.getResolvedConfig());
         const baseDisposable = await this.registerInteractionHandler(
-          this.baseInteractionHandler
+          this.baseInteractionHandler,
         );
         const multiPointerDisposable = await this.registerInteractionHandler(
-          new MultiPointerInteractionHandler()
+          new MultiPointerInteractionHandler(),
         );
 
         this.defaultInteractionHandlerDisposables = [
@@ -1518,10 +1522,10 @@ export class Viewer implements BasicViewer {
           this.baseInteractionHandler ??
           new MouseInteractionHandler(() => this.getResolvedConfig());
         const baseDisposable = await this.registerInteractionHandler(
-          this.baseInteractionHandler
+          this.baseInteractionHandler,
         );
         const touchDisposable = await this.registerInteractionHandler(
-          new TouchInteractionHandler()
+          new TouchInteractionHandler(),
         );
 
         this.defaultInteractionHandlerDisposables = [
@@ -1537,19 +1541,19 @@ export class Viewer implements BasicViewer {
 
     if (this.keyboardControls && this.stream != null) {
       this.baseInteractionHandler?.setDefaultKeyboardControls(
-        this.keyboardControls
+        this.keyboardControls,
       );
 
       const flyToPart = new FlyToPartKeyInteraction(
         this.stream,
         () => this.getResolvedConfig(),
-        () => this.getImageScale()
+        () => this.getImageScale(),
       );
       const flyToPosition = new FlyToPositionKeyInteraction(
         this.stream,
         () => this.getResolvedConfig(),
         () => this.getImageScale(),
-        () => this.createScene()
+        () => this.createScene(),
       );
 
       this.registerTapKeyInteraction(flyToPart);
@@ -1566,22 +1570,22 @@ export class Viewer implements BasicViewer {
           'pointerdown',
           'pointerup',
           'pointermove',
-          () => this.getResolvedConfig()
+          () => this.getResolvedConfig(),
         );
 
         this.tapHandlerDisposable = await this.registerInteractionHandler(
-          tapInteractionHandler
+          tapInteractionHandler,
         );
       } else {
         const tapInteractionHandler = new TapInteractionHandler(
           'mousedown',
           'mouseup',
           'mousemove',
-          () => this.getResolvedConfig()
+          () => this.getResolvedConfig(),
         );
 
         this.tapHandlerDisposable = await this.registerInteractionHandler(
-          tapInteractionHandler
+          tapInteractionHandler,
         );
       }
     }
@@ -1590,23 +1594,23 @@ export class Viewer implements BasicViewer {
   private initializeInteractionHandler(handler: InteractionHandler): void {
     if (this.stateMap.interactionTarget == null) {
       throw new InteractionHandlerError(
-        'Cannot initialize interaction handler. Interaction target is undefined.'
+        'Cannot initialize interaction handler. Interaction target is undefined.',
       );
     }
     if (this.interactionApi == null) {
       throw new InteractionHandlerError(
-        'Cannot initialize interaction handler. Interaction APi is undefined.'
+        'Cannot initialize interaction handler. Interaction APi is undefined.',
       );
     }
     handler.initialize(this.stateMap.interactionTarget, this.interactionApi);
   }
 
   private initializeBasicInteractionHandler(
-    handler: BasicInteractionHandler
+    handler: BasicInteractionHandler,
   ): void {
     if (this.stateMap.interactionTarget == null) {
       throw new InteractionHandlerError(
-        'Cannot initialize interaction handler. Interaction target is undefined.'
+        'Cannot initialize interaction handler. Interaction target is undefined.',
       );
     }
     handler.initialize(this.stateMap.interactionTarget);
@@ -1615,7 +1619,7 @@ export class Viewer implements BasicViewer {
   private createInteractionApi(): InteractionApi {
     if (this.stream == null) {
       throw new ComponentInitializationError(
-        'Cannot create interaction API. Component has not been initialized.'
+        'Cannot create interaction API. Component has not been initialized.',
       );
     }
 
@@ -1631,7 +1635,7 @@ export class Viewer implements BasicViewer {
           this.doubletap,
           this.longpress,
           this.interactionStarted,
-          this.interactionFinished
+          this.interactionFinished,
         )
       : new InteractionApiOrthographic(
           this.stream,
@@ -1644,7 +1648,7 @@ export class Viewer implements BasicViewer {
           this.doubletap,
           this.longpress,
           this.interactionStarted,
-          this.interactionFinished
+          this.interactionFinished,
         );
   }
 
@@ -1669,7 +1673,7 @@ export class Viewer implements BasicViewer {
       () => this.getImageScale(),
       this.viewport,
       sceneId,
-      sceneViewId
+      sceneViewId,
     );
   }
 
@@ -1682,11 +1686,11 @@ export class Viewer implements BasicViewer {
     if (this.canvasContainerElement != null) {
       const imageBackground = getElementPropertyValue(
         this.hostElement,
-        '--image-background'
+        '--image-background',
       );
       const viewerBackground = getElementPropertyValue(
         this.hostElement,
-        '--viewer-background'
+        '--viewer-background',
       );
       const propertyColor = imageBackground ?? viewerBackground;
 
@@ -1711,7 +1715,7 @@ export class Viewer implements BasicViewer {
     if (this.dimensions != null && canvasDimensions != null) {
       return Point.create(
         this.dimensions.width / canvasDimensions.width,
-        this.dimensions.height / canvasDimensions.height
+        this.dimensions.height / canvasDimensions.height,
       );
     }
   }
@@ -1769,7 +1773,7 @@ export class Viewer implements BasicViewer {
         this.cameraTypeChanged.emit(this.cameraType);
 
         this.interactionHandlers.forEach((handler) =>
-          this.initializeInteractionHandler(handler)
+          this.initializeInteractionHandler(handler),
         );
       }
     }
@@ -1785,8 +1789,8 @@ export class Viewer implements BasicViewer {
           camera: FrameCamera.toProtobuf(
             FrameCamera.toOrthographic(
               this.frame.scene.camera,
-              this.frame.scene.boundingBox
-            )
+              this.frame.scene.boundingBox,
+            ),
           ),
         });
       } else if (
@@ -1795,7 +1799,7 @@ export class Viewer implements BasicViewer {
       ) {
         this.stream?.replaceCamera({
           camera: FrameCamera.toProtobuf(
-            FrameCamera.toPerspective(this.frame.scene.camera)
+            FrameCamera.toPerspective(this.frame.scene.camera),
           ),
         });
       }
@@ -1839,7 +1843,7 @@ export class Viewer implements BasicViewer {
   private getResolvedConfig(): Config {
     return getRequiredProp(
       'Resolved config is undefined',
-      () => this.resolvedConfig
+      () => this.resolvedConfig,
     );
   }
 
@@ -1852,7 +1856,7 @@ export class Viewer implements BasicViewer {
       try {
         this.deviceId = getStorageEntry(
           StorageKeys.DEVICE_ID,
-          (entry) => entry['device-id']
+          (entry) => entry['device-id'],
         );
       } catch (e) {
         console.warn('Cannot read device ID. Local storage is not supported.');
@@ -1867,7 +1871,7 @@ export class Viewer implements BasicViewer {
           });
         } catch (e) {
           console.warn(
-            'Cannot write device ID. Local storage is not supported.'
+            'Cannot write device ID. Local storage is not supported.',
           );
         }
       }
@@ -1878,7 +1882,7 @@ export class Viewer implements BasicViewer {
   private async waitForConnectedState(): Promise<Connected> {
     if (this.stateMap.streamState.type !== 'connected') {
       console.debug(
-        'Stream was not in a connected state. Waiting for successful connection.'
+        'Stream was not in a connected state. Waiting for successful connection.',
       );
       return new Promise<Connected>((resolve, reject) => {
         const disposable = this.getStream().onStateChanged((state) => {

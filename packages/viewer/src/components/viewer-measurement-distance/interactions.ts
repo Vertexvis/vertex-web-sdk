@@ -66,7 +66,7 @@ export class PointToPointInteractionController {
    */
   public newMeasurement(
     pt: Point.Point,
-    hits: PointToPointHitProvider
+    hits: PointToPointHitProvider,
   ): PointToPointInteraction | undefined {
     const world = hits.hitTester().transformPointToWorld(pt);
     return world != null
@@ -108,7 +108,7 @@ export class PointToPointInteractionController {
    */
   public moveIndicator(
     pt: Point.Point,
-    hits: PointToPointHitProvider
+    hits: PointToPointHitProvider,
   ): boolean {
     const worldPt = hits.hitTester().transformPointToWorld(pt);
     this.model.setIndicator(worldPt);
@@ -149,7 +149,7 @@ export class PointToPointInteractionModel {
    * @param measurement The new measurement.
    */
   public setMeasurement(
-    measurement: PointToPointMeasurementResult | undefined
+    measurement: PointToPointMeasurementResult | undefined,
   ): void {
     if (this.measurement !== measurement) {
       this.measurement = measurement;
@@ -168,7 +168,7 @@ export class PointToPointInteractionModel {
   public setMeasurementFromValues(
     start: Vector3.Vector3 | undefined,
     end: Vector3.Vector3 | undefined,
-    valid: boolean
+    valid: boolean,
   ): void {
     if (start != null && end != null) {
       const measurement = valid
@@ -187,7 +187,7 @@ export class PointToPointInteractionModel {
    * @returns A `Disposable` to remove the event listener.
    */
   public onMeasurementChanged(
-    listener: Listener<PointToPointMeasurementResult | undefined>
+    listener: Listener<PointToPointMeasurementResult | undefined>,
   ): Disposable {
     return this.measurementChanged.on(listener);
   }
@@ -217,7 +217,7 @@ export class PointToPointInteractionModel {
    * @returns A `Disposable` to remove the event listener.
    */
   public onIndicatorChanged(
-    listener: Listener<Vector3.Vector3 | undefined>
+    listener: Listener<Vector3.Vector3 | undefined>,
   ): Disposable {
     return this.indicatorChanged.on(listener);
   }
@@ -246,7 +246,7 @@ export interface PointToPointInteraction {
    */
   finish(
     pt: Point.Point,
-    hits: PointToPointHitProvider
+    hits: PointToPointHitProvider,
   ): Promise<PointToPointMeasurementResult>;
 }
 
@@ -266,7 +266,7 @@ class NewMeasurementInteraction implements PointToPointInteraction {
   public constructor(
     public readonly pt: Point.Point,
     public readonly world: Vector3.Vector3,
-    private readonly model: PointToPointInteractionModel
+    private readonly model: PointToPointInteractionModel,
   ) {}
 
   private fetchStartIfMissing(hits: PointToPointHitProvider): void {
@@ -304,7 +304,7 @@ class NewMeasurementInteraction implements PointToPointInteraction {
 
       if (end == null) {
         throw new Error(
-          'Cannot update new measurement interaction. End point is empty.'
+          'Cannot update new measurement interaction. End point is empty.',
         );
       } else if (!this.hitWorldValid || !isHit) {
         this.model.setIndicator(end);
@@ -318,7 +318,7 @@ class NewMeasurementInteraction implements PointToPointInteraction {
 
   public async finish(
     pt: Point.Point,
-    hits: PointToPointHitProvider
+    hits: PointToPointHitProvider,
   ): Promise<PointToPointMeasurementResult> {
     this.preventUpdate = true;
 
@@ -338,7 +338,7 @@ class NewMeasurementInteraction implements PointToPointInteraction {
         .transformPointToWorld(pt, { ignoreHitTest: true });
       if (end == null) {
         throw new Error(
-          'Cannot complete new measurement interaction. End point is empty.'
+          'Cannot complete new measurement interaction. End point is empty.',
         );
       }
       return this.setMeasurement(invalidMeasurement(start, end));
@@ -350,7 +350,7 @@ class NewMeasurementInteraction implements PointToPointInteraction {
   }
 
   private setMeasurement(
-    measurement: PointToPointMeasurementResult
+    measurement: PointToPointMeasurementResult,
   ): PointToPointMeasurementResult {
     this.model.setMeasurement(measurement);
     return measurement;
@@ -366,7 +366,7 @@ class NewMeasurementInteraction implements PointToPointInteraction {
 abstract class EditAnchorInteraction implements PointToPointInteraction {
   public constructor(
     protected readonly measurement: PointToPointMeasurementResult,
-    protected readonly model: PointToPointInteractionModel
+    protected readonly model: PointToPointInteractionModel,
   ) {}
 
   public update(pt: Point.Point, context: PointToPointHitProvider): void {
@@ -377,7 +377,7 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
 
     if (world == null) {
       throw new Error(
-        'Cannot update new measurement interaction. End point is empty.'
+        'Cannot update new measurement interaction. End point is empty.',
       );
     } else if (!isHit) {
       this.model.setIndicator(world);
@@ -390,7 +390,7 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
 
   public async finish(
     pt: Point.Point,
-    hits: PointToPointHitProvider
+    hits: PointToPointHitProvider,
   ): Promise<PointToPointMeasurementResult> {
     const raycaster = await hits.raycaster();
     const hitPt = await getHit(raycaster, pt);
@@ -403,7 +403,7 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
         .transformPointToWorld(pt, { ignoreHitTest: true });
       if (end == null) {
         throw new Error(
-          'Cannot complete edit measurement interaction. End point is empty.'
+          'Cannot complete edit measurement interaction. End point is empty.',
         );
       }
       return this.setMeasurement(this.getInvalidMeasurement(end));
@@ -413,18 +413,18 @@ abstract class EditAnchorInteraction implements PointToPointInteraction {
   }
 
   private setMeasurement(
-    measurement: PointToPointMeasurementResult
+    measurement: PointToPointMeasurementResult,
   ): PointToPointMeasurementResult {
     this.model.setMeasurement(measurement);
     return measurement;
   }
 
   protected abstract getInvalidMeasurement(
-    world: Vector3.Vector3
+    world: Vector3.Vector3,
   ): PointToPointMeasurementResult;
 
   protected abstract getValidMeasurement(
-    world: Vector3.Vector3
+    world: Vector3.Vector3,
   ): PointToPointMeasurementResult;
 }
 
@@ -434,19 +434,19 @@ class EditStartAnchorInteraction
 {
   public constructor(
     measurement: PointToPointMeasurementResult,
-    model: PointToPointInteractionModel
+    model: PointToPointInteractionModel,
   ) {
     super(measurement, model);
   }
 
   protected getInvalidMeasurement(
-    startPt: Vector3.Vector3
+    startPt: Vector3.Vector3,
   ): PointToPointMeasurementResult {
     return invalidMeasurement(startPt, this.measurement.end);
   }
 
   protected getValidMeasurement(
-    startPt: Vector3.Vector3
+    startPt: Vector3.Vector3,
   ): PointToPointMeasurementResult {
     return validMeasurement(startPt, this.measurement.end);
   }
@@ -458,19 +458,19 @@ class EditEndAnchorInteraction
 {
   public constructor(
     measurement: PointToPointMeasurementResult,
-    model: PointToPointInteractionModel
+    model: PointToPointInteractionModel,
   ) {
     super(measurement, model);
   }
 
   protected getInvalidMeasurement(
-    endPt: Vector3.Vector3
+    endPt: Vector3.Vector3,
   ): PointToPointMeasurementResult {
     return invalidMeasurement(this.measurement.start, endPt);
   }
 
   protected getValidMeasurement(
-    endPt: Vector3.Vector3
+    endPt: Vector3.Vector3,
   ): PointToPointMeasurementResult {
     return validMeasurement(this.measurement.start, endPt);
   }
@@ -478,7 +478,7 @@ class EditEndAnchorInteraction
 
 async function getHit(
   raycaster: RaycasterLike,
-  pt: Point.Point
+  pt: Point.Point,
 ): Promise<Vector3.Vector3 | undefined> {
   const hitRes = await raycaster.hitItems(pt);
   const [hit] = hitRes?.hits ?? [];
@@ -494,14 +494,14 @@ async function getHit(
 
 function validMeasurement(
   start: Vector3.Vector3,
-  end: Vector3.Vector3
+  end: Vector3.Vector3,
 ): PointToPointMeasurementResult {
   return { start, end, distance: Vector3.distance(start, end), valid: true };
 }
 
 function invalidMeasurement(
   start: Vector3.Vector3,
-  end: Vector3.Vector3
+  end: Vector3.Vector3,
 ): PointToPointMeasurementResult {
   return { start, end, valid: false };
 }

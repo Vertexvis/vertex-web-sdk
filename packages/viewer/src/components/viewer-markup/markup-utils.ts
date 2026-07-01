@@ -19,7 +19,7 @@ export type BoundingBox2dAnchorPosition =
 
 export function getBoundingBox2dAnchorPosition(
   rect: Rectangle.Rectangle,
-  position: BoundingBox2dAnchorPosition
+  position: BoundingBox2dAnchorPosition,
 ): Point.Point {
   switch (position) {
     case 'top-left':
@@ -48,17 +48,17 @@ export function translatePointToScreen(
   canvasDimensions: Dimensions.Dimensions,
   contentDimensions: Dimensions.Dimensions = canvasDimensions,
   centeringBehavior: MarkupCenteringBehavior = 'none',
-  scale = 1
+  scale = 1,
 ): Point.Point {
   const canvasToContentScaleFactor = Math.min(
     canvasDimensions.width / contentDimensions.width,
-    canvasDimensions.height / contentDimensions.height
+    canvasDimensions.height / contentDimensions.height,
   );
   const effectiveScalar = canvasToContentScaleFactor * scale;
   const contentScaleFactor = getScaleFactor(contentDimensions);
   const contentRelativePoint = Point.add(
     Point.scale(pt, contentScaleFactor, contentScaleFactor),
-    Dimensions.center(contentDimensions)
+    Dimensions.center(contentDimensions),
   );
 
   // Include an offset for width and height to account for cases where the
@@ -76,14 +76,14 @@ export function translatePointToScreen(
 
   return Point.create(
     contentRelativePoint.x * effectiveScalar + centerOffsetX,
-    contentRelativePoint.y * effectiveScalar + centerOffsetY
+    contentRelativePoint.y * effectiveScalar + centerOffsetY,
   );
 }
 
 export function translatePointToBounds(
   pt: Point.Point,
   rect: Rectangle.Rectangle,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
 ): Point.Point {
   const rectToScreen = translateRectToScreen(rect, canvasDimensions);
   return Point.add(pt, rectToScreen);
@@ -93,24 +93,24 @@ export function translateDimensionsToScreen(
   dimensions: Dimensions.Dimensions,
   canvasDimensions: Dimensions.Dimensions,
   contentDimensions: Dimensions.Dimensions = canvasDimensions,
-  scale = 1
+  scale = 1,
 ): Dimensions.Dimensions {
   const canvasToContentScaleFactor = Math.min(
     canvasDimensions.width / contentDimensions.width,
-    canvasDimensions.height / contentDimensions.height
+    canvasDimensions.height / contentDimensions.height,
   );
   const effectiveScalar = canvasToContentScaleFactor * scale;
   const contentScaleFactor = getScaleFactor(contentDimensions);
   const contentRelativeDimensions = Dimensions.scale(
     contentScaleFactor,
     contentScaleFactor,
-    dimensions
+    dimensions,
   );
 
   return Dimensions.scale(
     effectiveScalar,
     effectiveScalar,
-    contentRelativeDimensions
+    contentRelativeDimensions,
   );
 }
 
@@ -125,20 +125,20 @@ export function translateRectToScreen(
   canvasDimensions: Dimensions.Dimensions,
   contentDimensions?: Dimensions.Dimensions,
   centeringBehavior: MarkupCenteringBehavior = 'none',
-  scale = 1
+  scale = 1,
 ): Rectangle.Rectangle {
   const position = translatePointToScreen(
     rect,
     canvasDimensions,
     contentDimensions,
     centeringBehavior,
-    scale
+    scale,
   );
   const dimensions = translateDimensionsToScreen(
     rect,
     canvasDimensions,
     contentDimensions,
-    scale
+    scale,
   );
   return Rectangle.fromPointAndDimensions(position, dimensions);
 }
@@ -152,11 +152,11 @@ export function translatePointToRelative(
   contentDimensions: Dimensions.Dimensions = canvasDimensions,
   centeringBehavior: MarkupCenteringBehavior = 'none',
   scale = 1,
-  offset: Point.Point = Point.create(0, 0)
+  offset: Point.Point = Point.create(0, 0),
 ): Point.Point {
   const canvasToContentScaleFactor = Math.min(
     canvasDimensions.width / contentDimensions.width,
-    canvasDimensions.height / contentDimensions.height
+    canvasDimensions.height / contentDimensions.height,
   );
   const effectiveScalar = canvasToContentScaleFactor * scale;
 
@@ -178,23 +178,23 @@ export function translatePointToRelative(
     Point.scale(
       offset,
       1 / getWindowDevicePixelRatio(),
-      1 / getWindowDevicePixelRatio()
-    )
+      1 / getWindowDevicePixelRatio(),
+    ),
   );
   const centeredContentPoint = Point.create(
     (pointWithoutOffset.x - centerOffsetX) / effectiveScalar,
-    (pointWithoutOffset.y - centerOffsetY) / effectiveScalar
+    (pointWithoutOffset.y - centerOffsetY) / effectiveScalar,
   );
   const contentScaleFactor = getScaleFactor(contentDimensions);
   const contentCenterRelativePoint = Point.subtract(
     centeredContentPoint,
-    Dimensions.center(contentDimensions)
+    Dimensions.center(contentDimensions),
   );
 
   return Point.scale(
     contentCenterRelativePoint,
     1 / contentScaleFactor,
-    1 / contentScaleFactor
+    1 / contentScaleFactor,
   );
 }
 
@@ -205,24 +205,24 @@ export function translatePointToRelative(
 export function translatePointsToBounds(
   points: Point.Point[],
   original: Rectangle.Rectangle,
-  bounds: Rectangle.Rectangle
+  bounds: Rectangle.Rectangle,
 ): Point.Point[] {
   return points.map((pt) =>
     Point.add(
       Point.scale(
         Point.subtract(pt, original),
         bounds.width / (original.width || 1),
-        bounds.height / (original.height || 1)
+        bounds.height / (original.height || 1),
       ),
-      bounds
-    )
+      bounds,
+    ),
   );
 }
 
 export function createRectangle(
   initialPoint: Point.Point,
   currentPoint: Point.Point,
-  maintainAspectRatio: boolean
+  maintainAspectRatio: boolean,
 ): Rectangle.Rectangle {
   const bounds = Rectangle.fromPoints(initialPoint, currentPoint);
   if (maintainAspectRatio) {
@@ -244,7 +244,7 @@ export function createRectangle(
       fitBoundsX,
       fitBoundsY,
       fitBoundsSize,
-      fitBoundsSize
+      fitBoundsSize,
     );
   } else {
     return bounds;
@@ -256,7 +256,7 @@ export function transformRectangle(
   start: Point.Point,
   current: Point.Point,
   anchor: BoundingBox2dAnchorPosition,
-  maintainAspectRatio?: boolean
+  maintainAspectRatio?: boolean,
 ): Rectangle.Rectangle {
   const delta = Point.subtract(current, start);
   const { x: left, y: top, width: w, height: h } = bounds;
@@ -273,7 +273,7 @@ export function transformRectangle(
       return createRectangle(
         bottomRight,
         Point.create(left, current.y),
-        !!maintainAspectRatio
+        !!maintainAspectRatio,
       );
     case 'top-right':
       return createRectangle(bottomLeft, current, !!maintainAspectRatio);
@@ -281,7 +281,7 @@ export function transformRectangle(
       return createRectangle(
         bottomLeft,
         Point.create(current.x, top),
-        !!maintainAspectRatio
+        !!maintainAspectRatio,
       );
     case 'bottom-right':
       return createRectangle(topLeft, current, !!maintainAspectRatio);
@@ -289,7 +289,7 @@ export function transformRectangle(
       return createRectangle(
         topLeft,
         Point.create(right, current.y),
-        !!maintainAspectRatio
+        !!maintainAspectRatio,
       );
     case 'bottom-left':
       return createRectangle(topRight, current, !!maintainAspectRatio);
@@ -297,20 +297,20 @@ export function transformRectangle(
       return createRectangle(
         bottomRight,
         Point.create(current.x, top),
-        !!maintainAspectRatio
+        !!maintainAspectRatio,
       );
     case 'center':
       return Rectangle.create(
         bounds.x + delta.x,
         bounds.y + delta.y,
         bounds.width,
-        bounds.height
+        bounds.height,
       );
   }
 }
 
 export function isVertexViewerMarkupElement(
-  el: HTMLElement
+  el: HTMLElement,
 ): el is
   | HTMLVertexViewerMarkupArrowElement
   | HTMLVertexViewerMarkupCircleElement

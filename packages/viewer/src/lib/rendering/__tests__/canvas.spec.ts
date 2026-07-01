@@ -165,7 +165,7 @@ describe(createCanvasRenderer, () => {
       0,
       0,
       image2.image.width,
-      image2.image.height
+      image2.image.height,
     );
   });
 
@@ -188,7 +188,7 @@ describe(createCanvasRenderer, () => {
 
     expect(firstResult).toBeUndefined();
     expect(secondResult?.correlationIds).toMatchObject(
-      expect.arrayContaining(['corr-id-2', 'corr-id-1'])
+      expect.arrayContaining(['corr-id-2', 'corr-id-1']),
     );
   });
 
@@ -210,7 +210,7 @@ describe(createCanvasRenderer, () => {
 
     expect(firstResult).toBeUndefined();
     expect(secondResult?.correlationIds).toMatchObject(
-      expect.arrayContaining(['corr-id-2', 'corr-id-1'])
+      expect.arrayContaining(['corr-id-2', 'corr-id-1']),
     );
   });
 
@@ -248,14 +248,14 @@ describe(measureCanvasRenderer, () => {
       renderer,
       false,
       callback,
-      reportIntervalInMs
+      reportIntervalInMs,
     );
 
     render(drawFrame1);
     jest.advanceTimersByTime(reportIntervalInMs);
 
     expect(callback).toHaveBeenCalledWith(
-      expect.arrayContaining([measurement])
+      expect.arrayContaining([measurement]),
     );
   });
 
@@ -268,7 +268,7 @@ describe(measureCanvasRenderer, () => {
       renderer,
       false,
       callback,
-      reportIntervalInMs
+      reportIntervalInMs,
     );
 
     render(drawFrame1);

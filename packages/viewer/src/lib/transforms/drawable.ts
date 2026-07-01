@@ -29,13 +29,13 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     public outlineColor: string,
     public fillColor?: string,
     public shapeProps: Partial<ShapeProps> = {},
-    public disabled: boolean = false
+    public disabled: boolean = false,
   ) {
     const pointsAsArray = points.toArray();
 
     this.pointsArray = new Float64Array(pointsAsArray.length * 2 + 4);
     flattenPointArray(pointsAsArray).forEach(
-      (v, i) => (this.pointsArray[i] = v)
+      (v, i) => (this.pointsArray[i] = v),
     );
 
     this.initialFillColor = fillColor;
@@ -52,7 +52,7 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
 
   public updateFillColor(
     color?: Color.Color | string,
-    isInitialColor = false
+    isInitialColor = false,
   ): void {
     if (color != null) {
       this.fillColor =
@@ -74,7 +74,7 @@ export abstract class Drawable<T extends DrawablePoints = DrawablePoints> {
     if (points != null) {
       this.points = points;
       flattenPointArray(points.toArray()).forEach(
-        (v, i) => (this.pointsArray[i] = v)
+        (v, i) => (this.pointsArray[i] = v),
       );
     }
   }

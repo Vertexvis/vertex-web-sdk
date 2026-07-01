@@ -20,14 +20,14 @@ export abstract class MultiElementInteractionHandler extends BaseInteractionHand
 
     this.registeredExternalElements = Object.fromEntries(
       Object.entries(this.registeredExternalElements).filter(
-        ([key]) => key !== id
-      )
+        ([key]) => key !== id,
+      ),
     );
   }
 
   protected deregisterAllListeners(): void {
     Object.keys(this.registeredExternalElements).forEach((id) =>
-      this.deregisterAdditionalElementById(id)
+      this.deregisterAdditionalElementById(id),
     );
   }
 
