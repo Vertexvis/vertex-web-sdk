@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Private repo for shared build tooling.",
   "license": "MIT",
-  "author": "Vertex Developers <support@vertexvis.com> (https://developer.vertexvis.com)",
+  "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
   "homepage": "https://github.com/Vertexvis/vertex-web-sdk#readme",
   "repository": {
     "type": "git",
