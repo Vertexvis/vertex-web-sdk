@@ -27,7 +27,7 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
 
   protected handleTwoPointTouchMove(
     point1: Point.Point,
-    point2: Point.Point
+    point2: Point.Point,
   ): void {
     this.previousFirstPoints = [...this.previousFirstPoints, point1];
     this.previousSecondPoints = [...this.previousSecondPoints, point2];
@@ -67,7 +67,7 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
                     previousFirstPoint,
                     previousSecondPoint,
                     firstPoint,
-                    secondPoint
+                    secondPoint,
                   ),
                 ],
                 zooms: [
@@ -76,7 +76,7 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
                     previousFirstPoint,
                     previousSecondPoint,
                     firstPoint,
-                    secondPoint
+                    secondPoint,
                   ),
                 ],
                 angles: [
@@ -85,7 +85,7 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
                     previousFirstPoint,
                     previousSecondPoint,
                     firstPoint,
-                    secondPoint
+                    secondPoint,
                   ),
                 ],
               };
@@ -96,12 +96,12 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
             deltas: [],
             zooms: [],
             angles: [],
-          }
+          },
         );
 
         const delta = changes.deltas.reduce(
           (r, d) => Point.add(r, d),
-          Point.create()
+          Point.create(),
         );
         const zoom = changes.zooms.reduce((z, d) => z + d, 0);
         const angle = changes.angles.reduce((a, d) => a + d, 0);
@@ -112,7 +112,7 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
             2,
           (previousFirstPoints[previousFirstPoints.length - 1].y +
             previousSecondPoints[previousSecondPoints.length - 1].y) /
-            2
+            2,
         );
 
         this.interactionApi?.beginInteraction();
@@ -132,11 +132,11 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
     previousPoint1: Point.Point,
     previousPoint2: Point.Point,
     point1: Point.Point,
-    point2: Point.Point
+    point2: Point.Point,
   ): Point.Point {
     return Point.add(
       Point.subtract(point1, previousPoint1),
-      Point.subtract(point2, previousPoint2)
+      Point.subtract(point2, previousPoint2),
     );
   }
 
@@ -144,7 +144,7 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
     previousPoint1: Point.Point,
     previousPoint2: Point.Point,
     point1: Point.Point,
-    point2: Point.Point
+    point2: Point.Point,
   ): number {
     const distance =
       Point.distance(point1, point2) -
@@ -156,17 +156,17 @@ export abstract class MultiTouchInteractionHandler implements InteractionHandler
     previousPoint1: Point.Point,
     previousPoint2: Point.Point,
     point1: Point.Point,
-    point2: Point.Point
+    point2: Point.Point,
   ): number {
     const previousToCurrent = Matrix2.create(
       Point.subtract(previousPoint1, previousPoint2),
-      Point.subtract(point1, point2)
+      Point.subtract(point1, point2),
     );
     return Angle.toDegrees(
       Math.atan2(
         Matrix2.determinant(previousToCurrent),
-        Matrix2.dot(previousToCurrent)
-      )
+        Matrix2.dot(previousToCurrent),
+      ),
     );
   }
 }

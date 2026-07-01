@@ -52,7 +52,7 @@ export class ViewerMeasurementOverlays {
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
+    oldViewer?: HTMLVertexViewerElement,
   ): void {
     this.removeViewerListeners(oldViewer);
     this.addViewerListeners();
@@ -76,7 +76,7 @@ export class ViewerMeasurementOverlays {
 
   private addModelListeners(): void {
     this.onOverlaysChangedListener = this.measurementOverlays.onOverlaysChanged(
-      () => this.updateOverlays()
+      () => this.updateOverlays(),
     );
   }
 

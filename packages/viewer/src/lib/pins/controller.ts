@@ -24,7 +24,7 @@ export class PinController {
     private model: PinModel,
     private mode: ViewerPinToolMode = 'view',
     private type: ViewerPinToolType = 'pin-icon',
-    private styleAttributes: PinStyleAttributes | undefined = undefined
+    private styleAttributes: PinStyleAttributes | undefined = undefined,
   ) {}
 
   /**
@@ -140,7 +140,7 @@ export class PinController {
   public updateDraggable(
     draggable: Draggable,
     worldPosition: Vector3.Vector3,
-    partId?: string
+    partId?: string,
   ): void {
     if (this.draggable != null) {
       this.draggable = draggable;

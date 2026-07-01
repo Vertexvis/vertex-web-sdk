@@ -9,7 +9,7 @@ describe(PointToPointHitTester, () => {
     const camera = FrameCameraBase.fromBoundingBox(
       FrameCamera.createOrthographic(),
       BoundingBox.create(Vector3.create(-1, -1, -1), Vector3.create(1, 1, 1)),
-      1
+      1,
     );
 
     const viewport = new Viewport(100, 100);
@@ -18,7 +18,7 @@ describe(PointToPointHitTester, () => {
     const ray = viewport.transformPointToRay(
       Point.create(10, 10),
       depthBuffer,
-      camera
+      camera,
     );
 
     it('transforms points to world coordinates for orthographic cameras with hit test', () => {
@@ -26,11 +26,11 @@ describe(PointToPointHitTester, () => {
         makeStencilBuffer(100, 100, () => 1, depthBuffer),
         depthBuffer,
         viewport,
-        camera
+        camera,
       );
 
       expect(
-        hitTester.transformPointToWorld(Point.create(10, 10))
+        hitTester.transformPointToWorld(Point.create(10, 10)),
       ).toMatchObject(Ray.at(ray, depth));
     });
 
@@ -43,13 +43,13 @@ describe(PointToPointHitTester, () => {
         undefined,
         failingHitTestBuffer,
         viewport,
-        camera
+        camera,
       );
 
       expect(
         hitTester.transformPointToWorld(Point.create(10, 10), {
           ignoreHitTest: true,
-        })
+        }),
       ).toMatchObject(Ray.at(ray, depth));
     });
   });

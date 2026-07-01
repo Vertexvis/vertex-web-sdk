@@ -60,7 +60,7 @@ export class VolumeIntersectionQueryInteractionHandler implements InteractionHan
       this.elementBounds = this.element?.getBoundingClientRect();
       this.isInteracting = true;
       this.controller.setStartPoint(
-        getMouseClientPosition(event, this.elementBounds)
+        getMouseClientPosition(event, this.elementBounds),
       );
 
       window.addEventListener('pointermove', this.handleDrag);
@@ -71,7 +71,7 @@ export class VolumeIntersectionQueryInteractionHandler implements InteractionHan
   private handleDrag(event: PointerEvent): void {
     if (this.enabled) {
       this.controller.setEndPoint(
-        getMouseClientPosition(event, this.elementBounds)
+        getMouseClientPosition(event, this.elementBounds),
       );
     }
   }

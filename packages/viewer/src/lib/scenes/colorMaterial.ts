@@ -51,7 +51,7 @@ export const create = (
   r: number,
   g: number,
   b: number,
-  opacity?: number
+  opacity?: number,
 ): ColorMaterial => {
   return {
     ...defaultColor,

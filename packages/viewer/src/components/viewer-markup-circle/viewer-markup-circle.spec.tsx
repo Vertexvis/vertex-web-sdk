@@ -37,29 +37,29 @@ describe('vertex-viewer-markup-circle', () => {
 
     const el = page.root as HTMLVertexViewerMarkupCircleElement;
     const leftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-left-anchor'
+      'bounding-box-2d-left-anchor',
     );
     const rightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-right-anchor'
+      'bounding-box-2d-right-anchor',
     );
     const topEl = el?.shadowRoot?.getElementById('bounding-box-2d-top-anchor');
     const bottomEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-anchor'
+      'bounding-box-2d-bottom-anchor',
     );
     const topLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-left-anchor'
+      'bounding-box-2d-top-left-anchor',
     );
     const topRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-right-anchor'
+      'bounding-box-2d-top-right-anchor',
     );
     const bottomLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-left-anchor'
+      'bounding-box-2d-bottom-left-anchor',
     );
     const bottomRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-right-anchor'
+      'bounding-box-2d-bottom-right-anchor',
     );
     const centerEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-center-anchor'
+      'bounding-box-2d-center-anchor',
     );
 
     /**
@@ -102,32 +102,32 @@ describe('vertex-viewer-markup-circle', () => {
 
     const root = page.root as HTMLVertexViewerElement;
     const el = root.querySelector(
-      'vertex-viewer-markup-circle'
+      'vertex-viewer-markup-circle',
     ) as HTMLVertexViewerMarkupCircleElement;
     const leftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-left-anchor'
+      'bounding-box-2d-left-anchor',
     );
     const rightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-right-anchor'
+      'bounding-box-2d-right-anchor',
     );
     const topEl = el?.shadowRoot?.getElementById('bounding-box-2d-top-anchor');
     const bottomEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-anchor'
+      'bounding-box-2d-bottom-anchor',
     );
     const topLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-left-anchor'
+      'bounding-box-2d-top-left-anchor',
     );
     const topRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-right-anchor'
+      'bounding-box-2d-top-right-anchor',
     );
     const bottomLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-left-anchor'
+      'bounding-box-2d-bottom-left-anchor',
     );
     const bottomRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-right-anchor'
+      'bounding-box-2d-bottom-right-anchor',
     );
     const centerEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-center-anchor'
+      'bounding-box-2d-center-anchor',
     );
 
     /**
@@ -137,7 +137,7 @@ describe('vertex-viewer-markup-circle', () => {
      */
     rightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 75, clientY: 0 })
+      new MouseEvent('pointermove', { clientX: 75, clientY: 0 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -146,7 +146,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     bottomRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
+      new MouseEvent('pointermove', { clientX: 100, clientY: 100 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -155,7 +155,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     topRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 90, clientY: 10 })
+      new MouseEvent('pointermove', { clientX: 90, clientY: 10 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -164,7 +164,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     leftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -173,7 +173,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     topLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 60, clientY: 20 })
+      new MouseEvent('pointermove', { clientX: 60, clientY: 20 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -182,7 +182,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     bottomLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 40, clientY: 90 })
+      new MouseEvent('pointermove', { clientX: 40, clientY: 90 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -191,7 +191,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     topEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 30 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 30 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -200,7 +200,7 @@ describe('vertex-viewer-markup-circle', () => {
 
     bottomEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 80 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 80 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -213,10 +213,10 @@ describe('vertex-viewer-markup-circle', () => {
      */
 
     centerEl?.dispatchEvent(
-      new MouseEvent('pointerdown', { clientX: 65, clientY: 55 })
+      new MouseEvent('pointerdown', { clientX: 65, clientY: 55 }),
     );
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -260,10 +260,10 @@ describe('vertex-viewer-markup-circle', () => {
 
     const root = page.root as HTMLVertexViewerElement;
     const el = root.querySelector(
-      'vertex-viewer-markup-circle'
+      'vertex-viewer-markup-circle',
     ) as HTMLVertexViewerMarkupCircleElement;
     const bottomRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-right-anchor'
+      'bounding-box-2d-bottom-right-anchor',
     );
 
     bottomRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
@@ -272,7 +272,7 @@ describe('vertex-viewer-markup-circle', () => {
         clientX: 50,
         clientY: 100,
         shiftKey: true,
-      })
+      }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -303,7 +303,7 @@ describe('vertex-viewer-markup-circle', () => {
     });
 
     const el = page.root?.querySelector(
-      'vertex-viewer-markup-circle'
+      'vertex-viewer-markup-circle',
     ) as HTMLVertexViewerMarkupCircleElement;
     const svg = el.shadowRoot?.querySelector('.svg') as SVGElement;
     const groupEl = svg.querySelector('g') as SVGElement;
@@ -328,23 +328,23 @@ describe('vertex-viewer-markup-circle', () => {
     });
 
     const el = page.root?.querySelector(
-      'vertex-viewer-markup-circle'
+      'vertex-viewer-markup-circle',
     ) as HTMLVertexViewerMarkupCircleElement;
 
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-circle-scale: 1'
+      '--viewer-markup-circle-scale: 1',
     );
 
     el.scale = 2;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-circle-scale: 2'
+      '--viewer-markup-circle-scale: 2',
     );
 
     el.scale = 0.5;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-circle-scale: 0.5'
+      '--viewer-markup-circle-scale: 0.5',
     );
   });
 
@@ -372,7 +372,7 @@ describe('vertex-viewer-markup-circle', () => {
     expect(
       page.root
         ?.querySelector('vertex-viewer-markup-circle')
-        ?.shadowRoot?.querySelector('svg')
+        ?.shadowRoot?.querySelector('svg'),
     ).toBeNull();
   });
 
@@ -390,20 +390,20 @@ describe('vertex-viewer-markup-circle', () => {
 
     const root = page.root as HTMLVertexViewerElement;
     const canvas = root.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
 
     const newViewer = page.doc.createElement('vertex-viewer');
     const el = root.querySelector(
-      'vertex-viewer-markup-circle'
+      'vertex-viewer-markup-circle',
     ) as HTMLVertexViewerMarkupCircleElement;
     el.viewer = newViewer;
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
       'pointerdown',
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -421,19 +421,19 @@ describe('vertex-viewer-markup-circle', () => {
 
     const root = page.root as HTMLVertexViewerElement;
     const canvas = root.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
 
     const el = root.querySelector(
-      'vertex-viewer-markup-circle'
+      'vertex-viewer-markup-circle',
     ) as HTMLVertexViewerMarkupCircleElement;
     el.dispose();
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
       'pointerdown',
-      expect.anything()
+      expect.anything(),
     );
   });
 });

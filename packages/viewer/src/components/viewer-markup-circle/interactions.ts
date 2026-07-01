@@ -25,14 +25,14 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
     private readonly markupEl: HTMLVertexViewerMarkupCircleElement,
     private readonly interactionBegin: EventEmitter<void>,
     private readonly interactionEnd: EventEmitter<MarkupInteraction>,
-    scalingOptions?: MarkupInteractionHandlerScalingOptions
+    scalingOptions?: MarkupInteractionHandlerScalingOptions,
   ) {
     super(scalingOptions);
   }
 
   public editAnchor(
     anchor: BoundingBox2dAnchorPosition,
-    event: PointerEvent
+    event: PointerEvent,
   ): void {
     if (this.markupEl.mode === 'edit') {
       this.anchor = anchor;
@@ -61,7 +61,7 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
         this.scalingOptions.originatingViewport,
         this.scalingOptions.centeringBehavior,
         this.scalingOptions.scale,
-        this.scalingOptions.offset
+        this.scalingOptions.offset,
       );
       this.pointerId = event.pointerId;
       this.startPosition = position;
@@ -87,7 +87,7 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
         this.scalingOptions.originatingViewport,
         this.scalingOptions.centeringBehavior,
         this.scalingOptions.scale,
-        this.scalingOptions.offset
+        this.scalingOptions.offset,
       );
 
       this.markupEl.bounds = transformRectangle(
@@ -95,7 +95,7 @@ export class CircleMarkupInteractionHandler extends MarkupInteractionHandler {
         this.startPosition,
         position,
         this.anchor,
-        event.shiftKey
+        event.shiftKey,
       );
     }
   }

@@ -143,14 +143,14 @@ export function appendSettingsToUrl(url: string, settings: Settings): string {
   const builder = defineParams(
     toFrameDeliverySettingsParams(defaults.EXPERIMENTAL_frameDelivery),
     toAdaptiveRenderingSettingsParams(defaults.EXPERIMENTAL_adaptiveRendering),
-    toQualityOfServiceSettingsParams(defaults.EXPERIMENTAL_qualityOfService)
+    toQualityOfServiceSettingsParams(defaults.EXPERIMENTAL_qualityOfService),
   );
   const params = builder(settings);
   return Uri.toString(Uri.addQueryParams(params, uri));
 }
 
 function toFrameDeliverySettingsParams(
-  defaults: FrameDeliverySettings | undefined
+  defaults: FrameDeliverySettings | undefined,
 ): ParamsBuilder<Settings> {
   return defineSettings(
     (s) => s.EXPERIMENTAL_frameDelivery,
@@ -159,20 +159,20 @@ function toFrameDeliverySettingsParams(
       defineBoolean('frame-delivery.rate-limit-enabled', 'rateLimitingEnabled'),
       defineNumber(
         'frame-delivery.packet-loss-threshold',
-        'packetLossThreshold'
+        'packetLossThreshold',
       ),
       defineNumber('frame-delivery.history-max-size', 'historyMaxSize'),
       defineString('frame-delivery.timeout', 'timeout'),
       defineNumber(
         'frame-delivery.timeout-ratio-threshold',
-        'timeoutRatioThreshold'
-      )
-    )
+        'timeoutRatioThreshold',
+      ),
+    ),
   );
 }
 
 function toAdaptiveRenderingSettingsParams(
-  defaults: AdaptiveRenderingSettings | undefined
+  defaults: AdaptiveRenderingSettings | undefined,
 ): ParamsBuilder<Settings> {
   return defineSettings(
     (s) => s.EXPERIMENTAL_adaptiveRendering,
@@ -184,25 +184,25 @@ function toAdaptiveRenderingSettingsParams(
       defineNumber('adaptive-rendering.jpeg-quality-max', 'jpegMaxQuality'),
       defineNumber('adaptive-rendering.image-scale-min', 'imageMinScale'),
       defineNumber('adaptive-rendering.image-scale-max', 'imageMaxScale'),
-      defineNumber('adaptive-rendering.window-size', 'windowSize')
-    )
+      defineNumber('adaptive-rendering.window-size', 'windowSize'),
+    ),
   );
 }
 
 function toQualityOfServiceSettingsParams(
-  defaults: QualityOfServiceSettings | undefined
+  defaults: QualityOfServiceSettings | undefined,
 ): ParamsBuilder<Settings> {
   return defineSettings(
     (s) => s.EXPERIMENTAL_qualityOfService,
     defaults,
-    defineParams(defineNumber('qos.history-max-size', 'historyMaxSize'))
+    defineParams(defineNumber('qos.history-max-size', 'historyMaxSize')),
   );
 }
 
 function defineSettings<S, T>(
   getter: (settings: S) => T | undefined,
   defaults: T | undefined,
-  builder: ParamsBuilder<T>
+  builder: ParamsBuilder<T>,
 ): ParamsBuilder<S> {
   return (settings) => {
     const merged = Objects.defaults(getter(settings) || {}, defaults);

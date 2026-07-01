@@ -27,7 +27,7 @@ describe(Angle.fromPointsInDegrees, () => {
   it('should return an angle', () => {
     const angle = Angle.fromPointsInDegrees(
       Point.create(0, 0),
-      Point.create(10, 0)
+      Point.create(10, 0),
     );
     expect(angle).toEqual(90);
   });

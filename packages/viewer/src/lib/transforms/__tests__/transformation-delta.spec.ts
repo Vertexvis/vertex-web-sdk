@@ -6,13 +6,13 @@ import * as TransformationDelta from '../transformation-delta';
 describe('transformation delta functions', () => {
   const generatedExpectedRotation = (
     normal1: Vector3.Vector3,
-    normal2: Vector3.Vector3
+    normal2: Vector3.Vector3,
   ): Matrix4.Matrix4 => {
     const direction = Vector3.normalize(Vector3.cross(normal1, normal2));
 
     const angle = Vector3.angleTo(normal2, normal1);
     return Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(direction, angle + Math.PI)
+      Quaternion.fromAxisAngle(direction, angle + Math.PI),
     );
   };
   describe('calculateOrthogonalCoordinate', () => {
@@ -23,8 +23,8 @@ describe('transformation delta functions', () => {
 
       expect(result).toEqual(
         Vector3.normalize(
-          Vector3.cross(normal, Vector3.create(0, normal.z, -normal.y))
-        )
+          Vector3.cross(normal, Vector3.create(0, normal.z, -normal.y)),
+        ),
       );
     });
 
@@ -35,8 +35,8 @@ describe('transformation delta functions', () => {
 
       expect(result).toEqual(
         Vector3.normalize(
-          Vector3.cross(normal, Vector3.create(-normal.z, 0, normal.x))
-        )
+          Vector3.cross(normal, Vector3.create(-normal.z, 0, normal.x)),
+        ),
       );
     });
   });
@@ -47,7 +47,7 @@ describe('transformation delta functions', () => {
 
       const result = TransformationDelta.computeRotationMatrix(
         normal,
-        Vector3.scale(-1, normal)
+        Vector3.scale(-1, normal),
       );
 
       expect(result).toEqual(Matrix4.makeIdentity());
@@ -70,19 +70,19 @@ describe('transformation delta functions', () => {
         Vector3.create(
           0.1993226759480711,
           0.8827308315910894,
-          0.4255076377826886
-        )
+          0.4255076377826886,
+        ),
       );
       const normal2 = Vector3.normalize(
         Vector3.create(
           0.8725693698462239,
           0.3901546914165199,
-          0.2939421908672582
-        )
+          0.2939421908672582,
+        ),
       );
       const result = TransformationDelta.computeRotationMatrix(
         normal1,
-        normal2
+        normal2,
       );
 
       expect(result).toEqual([
@@ -99,7 +99,7 @@ describe('transformation delta functions', () => {
           x: random.integer({ min: 1, max: 10 }),
           y: random.integer({ min: 1, max: 10 }),
           z: 0,
-        })
+        }),
       );
       const normal2 = Vector3.normalize(
         Vector3.create({
@@ -109,12 +109,12 @@ describe('transformation delta functions', () => {
             max: 10,
           }),
           z: random.integer({ min: 1, max: 10 }),
-        })
+        }),
       );
 
       const result = TransformationDelta.computeRotationMatrix(
         normal1,
-        normal2
+        normal2,
       );
 
       expect(result).toEqual(generatedExpectedRotation(normal1, normal2));
@@ -127,7 +127,7 @@ describe('transformation delta functions', () => {
         x: random.integer({ min: 1, max: 10 }),
         y: 0,
         z: random.integer({ min: 1, max: 10 }),
-      })
+      }),
     );
     const normal2 = Vector3.normalize(
       Vector3.create({
@@ -140,7 +140,7 @@ describe('transformation delta functions', () => {
           max: 10,
         }),
         z: 0,
-      })
+      }),
     );
 
     const result = TransformationDelta.computeRotationMatrix(normal1, normal2);
@@ -154,7 +154,7 @@ describe('transformation delta functions', () => {
         x: 0,
         y: random.integer({ min: 1, max: 10 }),
         z: random.integer({ min: 1, max: 10 }),
-      })
+      }),
     );
     const normal2 = Vector3.normalize(
       Vector3.create({
@@ -164,7 +164,7 @@ describe('transformation delta functions', () => {
         }),
         y: 0,
         z: random.integer({ min: 1, max: 10 }),
-      })
+      }),
     );
     const result = TransformationDelta.computeRotationMatrix(normal1, normal2);
     expect(result).toEqual(generatedExpectedRotation(normal1, normal2));
@@ -182,11 +182,11 @@ describe('transformation delta functions', () => {
         normal1,
         position1,
         normal2,
-        position2
+        position2,
       );
 
       const expectedTranslationMatrixDelta = Matrix4.makeTranslation(
-        Vector3.subtract(position2, position1)
+        Vector3.subtract(position2, position1),
       );
 
       expect(matrix).toMatchObject(expectedTranslationMatrixDelta);
@@ -203,12 +203,12 @@ describe('transformation delta functions', () => {
           normal1,
           position,
           normal2,
-          position
-        )
+          position,
+        ),
       );
 
       const expectedTranslationMatrixDelta = Matrix4.toObject(
-        TransformationDelta.computeRotationMatrix(normal1, normal2)
+        TransformationDelta.computeRotationMatrix(normal1, normal2),
       );
 
       expect(matrix).toMatchObject({
@@ -223,35 +223,35 @@ describe('transformation delta functions', () => {
       const position1 = Vector3.create(
         -587706686819.5328,
         13948870983.68,
-        633868784762.88
+        633868784762.88,
       );
       const position2 = Vector3.create(
         -278040905829.5808,
         656032649759.9489,
-        -672287245415.2192
+        -672287245415.2192,
       );
 
       const normal1 = Vector3.normalize(
         Vector3.create(
           0.0317054253956362,
           0.14174190176872653,
-          0.9893957748461767
-        )
+          0.9893957748461767,
+        ),
       );
 
       const normal2 = Vector3.normalize(
         Vector3.create(
           0.241741901762653,
           0.3317054253956362,
-          0.5893957748461767
-        )
+          0.5893957748461767,
+        ),
       );
 
       const matrix = TransformationDelta.computeTransformationDelta(
         normal1,
         position1,
         normal2,
-        position2
+        position2,
       );
 
       expect(matrix).toEqual([

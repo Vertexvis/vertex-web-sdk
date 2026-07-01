@@ -8,7 +8,7 @@ export function xAxisRotationPositions(
   camera: FrameCameraBase,
   triangleSize = 3,
   rotationSizeScalar = 1,
-  translationSizeScalar = 1
+  translationSizeScalar = 1,
 ): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
@@ -17,7 +17,7 @@ export function xAxisRotationPositions(
     Vector3.up(),
     triangleSize,
     rotationSizeScalar,
-    translationSizeScalar
+    translationSizeScalar,
   );
 }
 
@@ -26,7 +26,7 @@ export function yAxisRotationPositions(
   camera: FrameCameraBase,
   triangleSize = 3,
   rotationSizeScalar = 1,
-  translationSizeScalar = 1
+  translationSizeScalar = 1,
 ): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
@@ -35,7 +35,7 @@ export function yAxisRotationPositions(
     Vector3.back(),
     triangleSize,
     rotationSizeScalar,
-    translationSizeScalar
+    translationSizeScalar,
   );
 }
 
@@ -44,7 +44,7 @@ export function zAxisRotationPositions(
   camera: FrameCameraBase,
   triangleSize = 3,
   rotationSizeScalar = 1,
-  translationSizeScalar = 1
+  translationSizeScalar = 1,
 ): TriangleMeshPoints {
   return computeRotationNdcValues(
     widgetTransform,
@@ -53,7 +53,7 @@ export function zAxisRotationPositions(
     Vector3.up(),
     triangleSize,
     rotationSizeScalar,
-    translationSizeScalar
+    translationSizeScalar,
   );
 }
 
@@ -64,19 +64,19 @@ function computeRotationNdcValues(
   yDirection: Vector3.Vector3,
   triangleSize: number,
   rotationSizeScalar = 1,
-  translationSizeScalar = 1
+  translationSizeScalar = 1,
 ): TriangleMeshPoints {
   const transformedDirection = Vector3.transformMatrix(
     Vector3.add(xDirection, yDirection),
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform)),
   );
   const transformedX = Vector3.transformMatrix(
     xDirection,
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform)),
   );
   const transformedY = Vector3.transformMatrix(
     yDirection,
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform)),
   );
   // Position the rotation handle relative to the translation scale to
   // ensure that the rotation axis lines are angled inward.
@@ -87,7 +87,7 @@ function computeRotationNdcValues(
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(
     basePosition,
-    Vector3.scale(triangleSize * relativePositionScalar, transformedDirection)
+    Vector3.scale(triangleSize * relativePositionScalar, transformedDirection),
   );
 
   const xRay = Ray.create({
@@ -104,25 +104,25 @@ function computeRotationNdcValues(
     Angle.toRadians(45),
     Ray.at(yRay, -(triangleSize * rotationSizeScalar)),
     rotationAxis,
-    position
+    position,
   );
   const right = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(xRay, triangleSize * rotationSizeScalar),
     rotationAxis,
-    position
+    position,
   );
   const up = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(yRay, triangleSize * rotationSizeScalar),
     rotationAxis,
-    position
+    position,
   );
   const left = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(xRay, -(triangleSize * rotationSizeScalar)),
     rotationAxis,
-    position
+    position,
   );
 
   return new TriangleMeshPoints(
@@ -135,6 +135,6 @@ function computeRotationNdcValues(
     Vector3.transformMatrix(base, camera.projectionViewMatrix),
     Vector3.transformMatrix(left, camera.projectionViewMatrix),
     Vector3.transformMatrix(right, camera.projectionViewMatrix),
-    Vector3.transformMatrix(up, camera.projectionViewMatrix)
+    Vector3.transformMatrix(up, camera.projectionViewMatrix),
   );
 }

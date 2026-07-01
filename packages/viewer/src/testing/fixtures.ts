@@ -87,7 +87,7 @@ export const drawFramePayloadOrthographic: DrawFramePayload = {
 
 export function copyDrawFramePayloadPerspective(
   payload: DrawFramePayload,
-  partial: Partial<DrawFramePayload>
+  partial: Partial<DrawFramePayload>,
 ): DrawFramePayload {
   return {
     ...payload,
@@ -109,14 +109,14 @@ export function copyDrawFramePayloadPerspective(
 }
 
 export function makePerspectiveFrame(
-  payload: DrawFramePayload = drawFramePayloadPerspective
+  payload: DrawFramePayload = drawFramePayloadPerspective,
 ): Frame {
   return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(payload);
 }
 
 export function makeOrthographicFrame(): Frame {
   return Mapper.ifInvalidThrow(fromPbFrame(Orientation.DEFAULT))(
-    drawFramePayloadOrthographic
+    drawFramePayloadOrthographic,
   );
 }
 
@@ -137,7 +137,7 @@ export function makeImagePng(width: number, height: number): Uint8Array {
 export function makeDepthImagePng(
   width: number,
   height: number,
-  value = 2 ** 16 - 1
+  value = 2 ** 16 - 1,
 ): Uint8Array {
   const bytes = makeDepthImageBytes(width, height, value);
   return encode({ width, height, data: bytes, depth: 16, channels: 1 });
@@ -146,7 +146,7 @@ export function makeDepthImagePng(
 export function makeDepthImageBytes(
   width: number,
   height: number,
-  value = 2 ** 16 - 1
+  value = 2 ** 16 - 1,
 ): Uint16Array {
   const data = new Uint16Array(width * height);
   return data.fill(value);
@@ -156,19 +156,19 @@ export function makeDepthBuffer(
   width: number,
   height: number,
   value = 2 ** 16 - 1,
-  camera?: FrameCameraBase
+  camera?: FrameCameraBase,
 ): DepthBuffer {
   return DepthBuffer.fromPng(
     { data: makeDepthImageBytes(width, height, value) },
     camera ?? makePerspectiveFrame().scene.camera,
-    makeImageAttributes(width, height)
+    makeImageAttributes(width, height),
   );
 }
 
 export function makeStencilImageBytes(
   width: number,
   height: number,
-  fill: (pixel: Point.Point) => number
+  fill: (pixel: Point.Point) => number,
 ): Uint8Array {
   const data = new Uint8Array(width * height * 3);
   for (let i = 0; i < width * height; i++) {
@@ -183,21 +183,21 @@ export function makeStencilBuffer(
   width: number,
   height: number,
   fill: (pixel: Point.Point) => number,
-  depthBuffer?: DepthBuffer
+  depthBuffer?: DepthBuffer,
 ): StencilBuffer {
   const data = makeStencilImageBytes(width, height, fill);
   return StencilBuffer.fromPng(
     { data, channels: 1 },
     makeImageAttributes(width, height),
     data,
-    depthBuffer ?? makeDepthBuffer(width, height)
+    depthBuffer ?? makeDepthBuffer(width, height),
   );
 }
 
 export function makeFeatureMap(
   width: number,
   height: number,
-  fill: (pixel: Point.Point) => Color.Color
+  fill: (pixel: Point.Point) => Color.Color,
 ): FeatureMap {
   return FeatureMap.fromPng(
     {
@@ -206,14 +206,14 @@ export function makeFeatureMap(
       height,
       channels: 4,
     },
-    makeImageAttributes(width, height)
+    makeImageAttributes(width, height),
   );
 }
 
 export function makeFeatureMapBytes(
   width: number,
   height: number,
-  fill: (pixel: Point.Point) => Color.Color
+  fill: (pixel: Point.Point) => Color.Color,
 ): Uint8Array {
   const data = new Uint8Array(width * height * 4);
   for (let i = 0; i < width * height; i++) {
@@ -232,7 +232,7 @@ export function makeFeatureMapBytes(
 
 export function makeImageAttributes(
   width: number,
-  height: number
+  height: number,
 ): ImageAttributesLike {
   return {
     frameDimensions: Dimensions.create(width, height),
@@ -265,8 +265,8 @@ export function makeHitTester({
         0,
         100,
         1,
-        45
-      )
+        45,
+      ),
   );
 }
 

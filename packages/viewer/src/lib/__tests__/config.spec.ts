@@ -52,50 +52,50 @@ describe(Config.parseAndValidateConfig, () => {
     expect(() =>
       Config.parseAndValidateConfig(
         'platdev',
-        JSON.stringify(invalidApiHostConfig)
-      )
+        JSON.stringify(invalidApiHostConfig),
+      ),
     ).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid apiHost "${invalidApiHost}" specified.`
+          `Invalid apiHost "${invalidApiHost}" specified.`,
         ),
-      })
+      }),
     );
     expect(() =>
       Config.parseAndValidateConfig(
         'platdev',
-        JSON.stringify(invalidRenderingHostConfig)
-      )
+        JSON.stringify(invalidRenderingHostConfig),
+      ),
     ).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid renderingHost "${invalidRenderingHost}" specified.`
+          `Invalid renderingHost "${invalidRenderingHost}" specified.`,
         ),
-      })
+      }),
     );
     expect(() =>
       Config.parseAndValidateConfig(
         'platdev',
-        JSON.stringify(invalidSceneTreeHostConfig)
-      )
+        JSON.stringify(invalidSceneTreeHostConfig),
+      ),
     ).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid sceneTreeHost "${invalidSceneTreeHost}" specified.`
+          `Invalid sceneTreeHost "${invalidSceneTreeHost}" specified.`,
         ),
-      })
+      }),
     );
     expect(() =>
       Config.parseAndValidateConfig(
         'platdev',
-        JSON.stringify(invalidSceneViewHostConfig)
-      )
+        JSON.stringify(invalidSceneViewHostConfig),
+      ),
     ).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid sceneViewHost "${invalidSceneViewHost}" specified.`
+          `Invalid sceneViewHost "${invalidSceneViewHost}" specified.`,
         ),
-      })
+      }),
     );
   });
 
@@ -110,8 +110,8 @@ describe(Config.parseAndValidateConfig, () => {
     expect(
       Config.parseAndValidateConfig(
         'platdev',
-        JSON.stringify({ network: expectedNetwork })
-      )
+        JSON.stringify({ network: expectedNetwork }),
+      ),
     ).toMatchObject({
       network: expectedNetwork,
     });
@@ -190,9 +190,9 @@ describe(Config.validateConfig, () => {
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid apiHost "${invalidHost}" specified.`
+          `Invalid apiHost "${invalidHost}" specified.`,
         ),
-      })
+      }),
     );
   });
 
@@ -208,9 +208,9 @@ describe(Config.validateConfig, () => {
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid renderingHost "${invalidHost}" specified.`
+          `Invalid renderingHost "${invalidHost}" specified.`,
         ),
-      })
+      }),
     );
   });
 
@@ -226,9 +226,9 @@ describe(Config.validateConfig, () => {
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid sceneTreeHost "${invalidHost}" specified.`
+          `Invalid sceneTreeHost "${invalidHost}" specified.`,
         ),
-      })
+      }),
     );
   });
 
@@ -244,9 +244,9 @@ describe(Config.validateConfig, () => {
     expect(() => Config.validateConfig(config)).toThrow(
       expect.objectContaining({
         message: expect.stringContaining(
-          `Invalid sceneViewHost "${invalidHost}" specified.`
+          `Invalid sceneViewHost "${invalidHost}" specified.`,
         ),
-      })
+      }),
     );
   });
 

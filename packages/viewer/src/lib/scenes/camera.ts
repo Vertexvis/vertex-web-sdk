@@ -75,7 +75,7 @@ export class FlyToExecutor {
   }
 
   public withBoundingBox(
-    boundingBox: BoundingBox.BoundingBox
+    boundingBox: BoundingBox.BoundingBox,
   ): TerminalFlyToExecutor {
     return new TerminalFlyToExecutor({
       flyTo: {
@@ -115,7 +115,7 @@ export abstract class Camera {
     private data: FrameCamera.FrameCamera,
     protected boundingBox: BoundingBox.BoundingBox,
     protected decodeFrame: FrameDecoder,
-    protected flyToOptions?: FlyTo.FlyToOptions
+    protected flyToOptions?: FlyTo.FlyToOptions,
   ) {}
 
   /**
@@ -137,12 +137,12 @@ export abstract class Camera {
    * @param boundingBox - The bounding box to determine distance from.
    */
   public signedDistanceToBoundingBoxCenter(
-    boundingBox?: BoundingBox.BoundingBox
+    boundingBox?: BoundingBox.BoundingBox,
   ): number {
     const { position, viewVector } = withPositionAndViewVector(this.data);
 
     const boundingBoxCenter = BoundingBox.center(
-      boundingBox ?? this.boundingBox
+      boundingBox ?? this.boundingBox,
     );
     const cameraToCenter = Vector3.subtract(boundingBoxCenter, position);
 
@@ -221,7 +221,7 @@ export abstract class Camera {
    * be positioned.
    */
   public flyTo(
-    paramsOrQuery: FlyToParams | ((q: FlyToExecutor) => TerminalFlyToExecutor)
+    paramsOrQuery: FlyToParams | ((q: FlyToExecutor) => TerminalFlyToExecutor),
   ): Camera {
     if (typeof paramsOrQuery !== 'function') {
       return this.updateFlyToOptions({
@@ -229,7 +229,7 @@ export abstract class Camera {
       });
     } else {
       return this.updateFlyToOptions(
-        paramsOrQuery(new FlyToExecutor()).build()
+        paramsOrQuery(new FlyToExecutor()).build(),
       );
     }
   }
@@ -257,7 +257,7 @@ export abstract class Camera {
    * promise will resolve when a frame is received that contains this camera.
    */
   public async render(
-    renderOptions: CameraRenderOptions = {}
+    renderOptions: CameraRenderOptions = {},
   ): Promise<CameraRenderResult> {
     if (this.flyToOptions == null && renderOptions.animation) {
       this.flyToOptions = {
@@ -275,7 +275,7 @@ export abstract class Camera {
           renderOptions.correlationId,
           this.flyToOptions,
           renderOptions.animation,
-          this.toFrameCamera()
+          this.toFrameCamera(),
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
 
@@ -288,7 +288,7 @@ export abstract class Camera {
           },
           renderOptions.animation?.milliseconds != null
             ? renderOptions.animation.milliseconds + DEFAULT_TIMEOUT_IN_MS
-            : undefined
+            : undefined,
         );
       } else {
         this.stream.replaceCamera({
@@ -318,7 +318,7 @@ export abstract class Camera {
    */
   public rotateAroundAxis(
     angleInRadians: number,
-    axis: Vector3.Vector3
+    axis: Vector3.Vector3,
   ): Camera {
     return this.rotateAroundAxisAtPoint(angleInRadians, this.data.lookAt, axis);
   }
@@ -355,10 +355,10 @@ export abstract class Camera {
    */
   public alignTo(position: Vector3.Vector3, normal: Vector3.Vector3): Camera {
     const worldX = Vector3.normalize(
-      Vector3.cross(this.up, Vector3.normalize(this.viewVector))
+      Vector3.cross(this.up, Vector3.normalize(this.viewVector)),
     );
     const positiveWorldY = Vector3.normalize(
-      Vector3.cross(Vector3.normalize(this.viewVector), worldX)
+      Vector3.cross(Vector3.normalize(this.viewVector), worldX),
     );
 
     // Invert the world y axis if the provided normal is more than 90 degrees from it
@@ -374,8 +374,8 @@ export abstract class Camera {
     const transformedViewVector = Vector3.transformMatrix(
       this.viewVector,
       Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(localX, Vector3.angleTo(normal, worldY))
-      )
+        Quaternion.fromAxisAngle(localX, Vector3.angleTo(normal, worldY)),
+      ),
     );
     const lookAtRay = Ray.create({
       origin: position,
@@ -424,7 +424,7 @@ export abstract class Camera {
     });
     const updatedPosition = Ray.at(
       standardViewRay,
-      Vector3.magnitude(this.viewVector)
+      Vector3.magnitude(this.viewVector),
     );
 
     return this.update({
@@ -454,11 +454,11 @@ export abstract class Camera {
   }
 
   protected computeClippingPlanes(
-    camera: FrameCamera.FrameCamera
+    camera: FrameCamera.FrameCamera,
   ): ClippingPlanes.ClippingPlanes {
     return ClippingPlanes.fromBoundingBoxAndLookAtCamera(
       this.boundingBox,
-      camera
+      camera,
     );
   }
 
@@ -497,7 +497,7 @@ export abstract class Camera {
   public abstract rotateAroundAxisAtPoint(
     angleInRadians: number,
     point: Vector3.Vector3,
-    axis: Vector3.Vector3
+    axis: Vector3.Vector3,
   ): Camera;
 
   public abstract get position(): Vector3.Vector3;
@@ -560,7 +560,7 @@ export abstract class Camera {
   public abstract toFrameCamera(): FrameCameraBase;
 
   protected abstract updateFlyToOptions(
-    flyToOptions?: FlyTo.FlyToOptions
+    flyToOptions?: FlyTo.FlyToOptions,
   ): Camera;
 }
 
@@ -574,7 +574,7 @@ export class PerspectiveCamera
     private perspectiveData: FrameCamera.PerspectiveFrameCamera,
     boundingBox: BoundingBox.BoundingBox,
     decodeFrame: FrameDecoder,
-    flyToOptions?: FlyTo.FlyToOptions
+    flyToOptions?: FlyTo.FlyToOptions,
   ) {
     super(
       stream,
@@ -582,7 +582,7 @@ export class PerspectiveCamera
       perspectiveData,
       boundingBox,
       decodeFrame,
-      flyToOptions
+      flyToOptions,
     );
   }
 
@@ -602,21 +602,21 @@ export class PerspectiveCamera
   public rotateAroundAxisAtPoint(
     angleInRadians: number,
     point: Vector3.Vector3,
-    axis: Vector3.Vector3
+    axis: Vector3.Vector3,
   ): Camera {
     return this.update({
       position: Vector3.rotateAboutAxis(
         angleInRadians,
         this.position,
         axis,
-        point
+        point,
       ),
       lookAt: Vector3.rotateAboutAxis(angleInRadians, this.lookAt, axis, point),
       up: Vector3.rotateAboutAxis(
         angleInRadians,
         this.up,
         axis,
-        Vector3.origin()
+        Vector3.origin(),
       ),
     });
   }
@@ -629,7 +629,7 @@ export class PerspectiveCamera
       { ...this.perspectiveData, ...camera, fovY },
       this.boundingBox,
       this.decodeFrame,
-      this.flyToOptions
+      this.flyToOptions,
     );
   }
 
@@ -641,7 +641,7 @@ export class PerspectiveCamera
       this.near,
       this.far,
       this.aspectRatio,
-      this.fovY ?? 45
+      this.fovY ?? 45,
     );
   }
 
@@ -701,7 +701,7 @@ export class PerspectiveCamera
   }
 
   protected updateFlyToOptions(
-    flyToOptions?: FlyTo.FlyToOptions
+    flyToOptions?: FlyTo.FlyToOptions,
   ): PerspectiveCamera {
     return new PerspectiveCamera(
       this.stream,
@@ -709,7 +709,7 @@ export class PerspectiveCamera
       this.perspectiveData,
       this.boundingBox,
       this.decodeFrame,
-      flyToOptions
+      flyToOptions,
     );
   }
 }
@@ -724,7 +724,7 @@ export class OrthographicCamera
     private orthographicData: FrameCamera.OrthographicFrameCamera,
     boundingBox: BoundingBox.BoundingBox,
     decodeFrame: FrameDecoder,
-    flyToOptions?: FlyTo.FlyToOptions
+    flyToOptions?: FlyTo.FlyToOptions,
   ) {
     super(
       stream,
@@ -732,7 +732,7 @@ export class OrthographicCamera
       orthographicData,
       boundingBox,
       decodeFrame,
-      flyToOptions
+      flyToOptions,
     );
   }
 
@@ -754,23 +754,23 @@ export class OrthographicCamera
   public rotateAroundAxisAtPoint(
     angleInRadians: number,
     point: Vector3.Vector3,
-    axis: Vector3.Vector3
+    axis: Vector3.Vector3,
   ): Camera {
     const updatedLookAt = Vector3.rotateAboutAxis(
       angleInRadians,
       this.lookAt,
       axis,
-      point
+      point,
     );
     const updatedPosition = Vector3.rotateAboutAxis(
       angleInRadians,
       this.position,
       axis,
-      point
+      point,
     );
     const viewVector = constrainViewVector(
       Vector3.subtract(updatedLookAt, updatedPosition),
-      BoundingSphere.create(this.boundingBox)
+      BoundingSphere.create(this.boundingBox),
     );
 
     return this.update({
@@ -780,7 +780,7 @@ export class OrthographicCamera
         angleInRadians,
         this.up,
         axis,
-        Vector3.origin()
+        Vector3.origin(),
       ),
     });
   }
@@ -792,7 +792,7 @@ export class OrthographicCamera
       { ...this.orthographicData, ...camera },
       this.boundingBox,
       this.decodeFrame,
-      this.flyToOptions
+      this.flyToOptions,
     );
   }
 
@@ -802,7 +802,7 @@ export class OrthographicCamera
     const lookAt = updateLookAtRelativeToBoundingBoxCenter(
       this.lookAt,
       viewVector,
-      boundingSphere.center
+      boundingSphere.center,
     );
 
     return new FrameOrthographicCamera(
@@ -813,7 +813,7 @@ export class OrthographicCamera
       this.far,
       this.aspectRatio,
       this.fovHeight,
-      this.rotationPoint
+      this.rotationPoint,
     );
   }
 
@@ -884,7 +884,7 @@ export class OrthographicCamera
   }
 
   protected updateFlyToOptions(
-    flyToOptions?: FlyTo.FlyToOptions
+    flyToOptions?: FlyTo.FlyToOptions,
   ): OrthographicCamera {
     return new OrthographicCamera(
       this.stream,
@@ -892,7 +892,7 @@ export class OrthographicCamera
       this.orthographicData,
       this.boundingBox,
       this.decodeFrame,
-      flyToOptions
+      flyToOptions,
     );
   }
 }

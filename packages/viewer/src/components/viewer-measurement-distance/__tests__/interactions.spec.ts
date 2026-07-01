@@ -61,7 +61,7 @@ describe(PointToPointInteractionController, () => {
       (hitTester.hitTest as jest.Mock).mockReturnValue(true);
       (hitTester.transformPointToWorld as jest.Mock).mockReturnValue(start);
       (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
-        Async.delay(50, Promise.resolve({ hits: [{ hitPoint: hitStart }] }))
+        Async.delay(50, Promise.resolve({ hits: [{ hitPoint: hitStart }] })),
       );
 
       const interaction = controller.newMeasurement(pt, hits);
@@ -74,7 +74,7 @@ describe(PointToPointInteractionController, () => {
       expect(model.getIndicator()).toEqual(end);
 
       (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
-        Promise.resolve({ hits: [{ hitPoint: hitEnd }] })
+        Promise.resolve({ hits: [{ hitPoint: hitEnd }] }),
       );
       res = await interaction?.finish(pt, hits);
       expect(res).toMatchObject({ start: hitStart, end: hitEnd, valid: true });
@@ -139,7 +139,7 @@ describe(PointToPointInteractionController, () => {
 
         (hitTester.hitTest as jest.Mock).mockReturnValue(true);
         (hitTester.transformPointToWorld as jest.Mock).mockReturnValueOnce(
-          start
+          start,
         );
 
         const interaction = controller.editMeasurement('start');
@@ -155,7 +155,7 @@ describe(PointToPointInteractionController, () => {
         expect(model.getIndicator()).toEqual(start);
 
         (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
-          Promise.resolve({ hits: [{ hitPoint: hitStart }] })
+          Promise.resolve({ hits: [{ hitPoint: hitStart }] }),
         );
         res = await interaction.finish(pt, hits);
         expect(res).toMatchObject({
@@ -228,7 +228,7 @@ describe(PointToPointInteractionController, () => {
         expect(model.getIndicator()).toEqual(end);
 
         (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
-          Promise.resolve({ hits: [{ hitPoint: hitEnd }] })
+          Promise.resolve({ hits: [{ hitPoint: hitEnd }] }),
         );
         res = await interaction.finish(pt, hits);
         expect(res).toMatchObject({
@@ -363,6 +363,6 @@ describe(PointToPointInteractionModel, () => {
         expect(model.getMeasurement()).toBeUndefined();
         expect(handleMeasurementChanged).not.toHaveBeenCalled();
       });
-    }
+    },
   );
 });

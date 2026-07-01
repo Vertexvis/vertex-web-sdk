@@ -11,7 +11,7 @@ export class AxisLinePoints implements DrawablePoints {
     public worldOrigin: Vector3.Vector3,
     public worldEnd: Vector3.Vector3,
     public origin: Point.Point,
-    public end: Point.Point
+    public end: Point.Point,
   ) {}
 
   public shortestDistanceFrom(vector: Vector3.Vector3): number {
@@ -36,7 +36,7 @@ export class AxisLine extends Drawable<AxisLinePoints> {
     points: AxisLinePoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
-    shapeProps: Partial<ShapeProps> = { thickness: 3 }
+    shapeProps: Partial<ShapeProps> = { thickness: 3 },
   ) {
     super(
       createShape,
@@ -46,7 +46,7 @@ export class AxisLine extends Drawable<AxisLinePoints> {
         ? outlineColor
         : Color.toHexString(outlineColor),
       typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
-      shapeProps
+      shapeProps,
     );
   }
 }
@@ -55,7 +55,7 @@ export class RotationLinePoints implements DrawablePoints {
   public constructor(
     public valid: boolean,
     public world: Vector3.Vector3[],
-    public ndc: Vector3.Vector3[]
+    public ndc: Vector3.Vector3[],
   ) {}
 
   public shortestDistanceFrom(vector: Vector3.Vector3): number {
@@ -82,7 +82,7 @@ export class RotationLine extends Drawable<RotationLinePoints> {
     shapeProps: Partial<ShapeProps> = {
       join: 'round' as JoinStyle,
     },
-    public disabled: boolean = false
+    public disabled: boolean = false,
   ) {
     super(
       createShape,
@@ -92,7 +92,7 @@ export class RotationLine extends Drawable<RotationLinePoints> {
         ? outlineColor
         : Color.toHexString(outlineColor),
       undefined,
-      shapeProps
+      shapeProps,
     );
   }
 

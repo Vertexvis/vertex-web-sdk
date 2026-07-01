@@ -18,7 +18,7 @@ describe('Stream utils', () => {
         'default',
         {
           maxRetries: 100,
-        }
+        },
       );
 
       expect(callback).toHaveBeenCalledTimes(5);
@@ -43,7 +43,7 @@ describe('Stream utils', () => {
         'default',
         {
           maxRetries: 100,
-        }
+        },
       );
 
       expect(callback).toHaveBeenCalledTimes(2);

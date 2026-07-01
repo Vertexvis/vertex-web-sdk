@@ -9,7 +9,7 @@ import { CrossSectioning } from '../types';
 export class CrossSectioner {
   public constructor(
     private stream: StreamApi,
-    private data: CrossSectioning.CrossSectioning
+    private data: CrossSectioning.CrossSectioning,
   ) {}
 
   /**
@@ -45,7 +45,7 @@ export class CrossSectioner {
    * @param crossSectioning The new cross sectioning.
    */
   public async update(
-    crossSectioning: CrossSectioning.CrossSectioning
+    crossSectioning: CrossSectioning.CrossSectioning,
   ): Promise<
     vertexvis.protobuf.stream.IUpdateCrossSectioningResult | undefined
   > {
@@ -60,7 +60,7 @@ export class CrossSectioner {
               : null,
         },
       },
-      true
+      true,
     );
 
     return res.updateCrossSectioning || undefined;

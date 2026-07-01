@@ -1,6 +1,6 @@
 jest.mock('@vertexvis/stream-api');
 jest.mock(
-  '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service'
+  '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service',
 );
 jest.mock('./lib/dom');
 jest.mock('./lib/window');
@@ -91,7 +91,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     expect(
       table
         .querySelector('vertex-scene-tree-table-column')
-        ?.querySelector('div.templated-div')
+        ?.querySelector('div.templated-div'),
     ).not.toBeNull();
   });
 
@@ -129,7 +129,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     const hoverController = new SceneTreeCellHoverController();
     const disposable = hoverController.stateChanged(hovered);
     const cell = table.querySelector(
-      'vertex-scene-tree-table-cell'
+      'vertex-scene-tree-table-cell',
     ) as HTMLVertexSceneTreeTableCellElement;
     cell.hoverController = hoverController;
 
@@ -259,7 +259,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
 
     table
@@ -273,7 +273,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  110px 1fr');
   });
 
@@ -305,7 +305,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
 
     table
@@ -319,7 +319,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
 
     table
@@ -333,7 +333,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
   });
 
@@ -365,7 +365,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
 
     table
@@ -379,7 +379,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
 
     table
@@ -393,7 +393,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
   });
 
@@ -430,7 +430,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  100px 1fr');
 
     table.addEventListener('columnsResized', resizeListener);
@@ -446,7 +446,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  110px 1fr');
     expect(resizeDetail).toHaveLength(2);
     expect(resizeDetail[0]).toBeCloseTo(110);
@@ -481,7 +481,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  150px 1fr');
   });
 
@@ -513,7 +513,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     expect(
-      table.shadowRoot?.querySelector('div.table')?.getAttribute('style')
+      table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
     ).toContain('grid-template-columns:  150px 1fr');
   });
 
@@ -563,7 +563,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     const tableContainer = table.shadowRoot?.querySelector(
-      'div.table'
+      'div.table',
     ) as HTMLDivElement;
 
     tableContainer.scrollTop = 5;
@@ -573,11 +573,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(restartTimeout).toHaveBeenCalledWith(
       expect.any(Function),
-      undefined
+      undefined,
     );
 
     expect(
-      table.querySelector('vertex-scene-tree-table-cell')?.isScrolling
+      table.querySelector('vertex-scene-tree-table-cell')?.isScrolling,
     ).toBe(true);
 
     tableContainer.scrollTop = 10;
@@ -587,11 +587,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(restartTimeout).toHaveBeenCalledWith(
       expect.any(Function),
-      expect.any(Number)
+      expect.any(Number),
     );
 
     expect(
-      table.querySelector('vertex-scene-tree-table-cell')?.isScrolling
+      table.querySelector('vertex-scene-tree-table-cell')?.isScrolling,
     ).toBe(true);
 
     restartTimeoutFn?.();
@@ -599,7 +599,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     await page.waitForChanges();
 
     expect(
-      tableContainer.querySelector('vertex-scene-tree-table-cell')?.isScrolling
+      tableContainer.querySelector('vertex-scene-tree-table-cell')?.isScrolling,
     ).toBeFalsy();
   });
 
@@ -681,7 +681,7 @@ async function newSceneTreeTableSpec(data?: {
   });
 
   const table = page.body.querySelector(
-    'vertex-scene-tree-table-layout'
+    'vertex-scene-tree-table-layout',
   ) as HTMLVertexSceneTreeTableLayoutElement;
 
   table.controller = data?.controller;

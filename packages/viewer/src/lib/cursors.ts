@@ -111,7 +111,7 @@ export class CursorManager {
    */
   public add(
     cursor: Cursor,
-    priority = CursorManager.NORMAL_PRIORITY
+    priority = CursorManager.NORMAL_PRIORITY,
   ): Disposable {
     // Ensure a duplicate cursor will not be added to the cursor manager.
     // If a matching cursor exists, delete it before proceeding.
@@ -151,11 +151,11 @@ export class CursorManager {
    */
   private getExistingDuplicateCursor(
     cursorToCheck: Cursor,
-    priorityToCheck: number
+    priorityToCheck: number,
   ): CursorInstance | undefined {
     return this.cursors.find(
       (cursor) =>
-        cursor.cursor === cursorToCheck && cursor.priority === priorityToCheck
+        cursor.cursor === cursorToCheck && cursor.priority === priorityToCheck,
     );
   }
 

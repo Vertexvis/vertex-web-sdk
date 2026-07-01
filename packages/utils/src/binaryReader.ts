@@ -52,11 +52,11 @@ export const readInt32 = (reader: BinaryReader): BinaryReaderValue<number> => {
  */
 export const readUtf8String = (
   length: number,
-  reader: BinaryReader
+  reader: BinaryReader,
 ): BinaryReaderValue<string> => {
   const value = String.fromCharCode.apply(
     null,
-    Array.from(new Uint8Array(reader.data.buffer, reader.offset, length))
+    Array.from(new Uint8Array(reader.data.buffer, reader.offset, length)),
   );
   return { ...reader, offset: reader.offset + length, value };
 };
@@ -68,7 +68,7 @@ export const readUtf8String = (
  */
 export const readInt8Array = (
   length: number,
-  reader: BinaryReader
+  reader: BinaryReader,
 ): BinaryReaderValue<Int8Array> => {
   const value = new Int8Array(reader.data.buffer, reader.offset, length);
   return { ...reader, offset: reader.offset + length, value };
@@ -82,10 +82,10 @@ export const readInt8Array = (
  */
 export const sliceInt8Array = (
   length: number,
-  reader: BinaryReader
+  reader: BinaryReader,
 ): BinaryReaderValue<Int8Array> => {
   const value = new Int8Array(
-    reader.data.buffer.slice(reader.offset, length + reader.offset)
+    reader.data.buffer.slice(reader.offset, length + reader.offset),
   );
 
   return { ...reader, offset: 0, value };

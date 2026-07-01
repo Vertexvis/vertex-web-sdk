@@ -24,7 +24,7 @@ describe('VolumeIntersectionInteractionHandler', () => {
 
     expect(addEventListenerSpy).toHaveBeenCalledWith(
       'pointerdown',
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(mockApi.addCursor).toHaveBeenCalledWith(boxQueryCursor);
 
@@ -32,7 +32,7 @@ describe('VolumeIntersectionInteractionHandler', () => {
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
       'pointerdown',
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(dispose).toHaveBeenCalled();
   });

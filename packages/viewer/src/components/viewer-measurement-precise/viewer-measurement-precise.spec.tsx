@@ -20,7 +20,7 @@ describe('vertex-viewer-measurement-precise', () => {
     const handlers = await viewer?.getInteractionHandlers();
 
     expect(handlers).toEqual(
-      expect.arrayContaining([expect.any(MeasurementInteractionHandler)])
+      expect.arrayContaining([expect.any(MeasurementInteractionHandler)]),
     );
   });
 
@@ -34,20 +34,20 @@ describe('vertex-viewer-measurement-precise', () => {
     });
 
     const measurement = page.body.querySelector(
-      'vertex-viewer-measurement-precise'
+      'vertex-viewer-measurement-precise',
     ) as HTMLVertexViewerMeasurementPreciseElement;
     const viewer = page.body.querySelector('vertex-viewer');
 
     measurement.remove();
     let handlers = await viewer?.getInteractionHandlers();
     expect(handlers).not.toEqual(
-      expect.arrayContaining([expect.any(MeasurementInteractionHandler)])
+      expect.arrayContaining([expect.any(MeasurementInteractionHandler)]),
     );
 
     viewer?.appendChild(measurement);
     handlers = await viewer?.getInteractionHandlers();
     expect(handlers).toEqual(
-      expect.arrayContaining([expect.any(MeasurementInteractionHandler)])
+      expect.arrayContaining([expect.any(MeasurementInteractionHandler)]),
     );
   });
 });

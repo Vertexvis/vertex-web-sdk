@@ -7,11 +7,11 @@ export function computePlaneNdcValues(
   transform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   direction: Vector3.Vector3,
-  planeSize: number
+  planeSize: number,
 ): MeshPoints {
   const transformedDirection = Vector3.transformMatrix(
     direction,
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(transform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(transform)),
   );
 
   const position = Vector3.fromMatrixPosition(transform);
@@ -34,25 +34,25 @@ export function computePlaneNdcValues(
     Angle.toRadians(45),
     Ray.at(xRay, -planeSize),
     transformedDirection,
-    position
+    position,
   );
   const topLeft = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(yRay, -planeSize),
     transformedDirection,
-    position
+    position,
   );
   const bottomRight = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(yRay, planeSize),
     transformedDirection,
-    position
+    position,
   );
   const topRight = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(xRay, planeSize),
     transformedDirection,
-    position
+    position,
   );
 
   const world = [bottomLeft, topLeft, topRight, bottomRight];
@@ -61,6 +61,6 @@ export function computePlaneNdcValues(
     !isNaN(worldX.x),
     [bottomLeft, topLeft, topRight, bottomRight],
     world.map((v) => Vector3.transformMatrix(v, camera.projectionViewMatrix)),
-    (vector) => Vector3.distance(position, vector)
+    (vector) => Vector3.distance(position, vector),
   );
 }

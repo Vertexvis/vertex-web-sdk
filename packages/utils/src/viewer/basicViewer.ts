@@ -3,6 +3,6 @@ import { BasicInteractionHandler } from '../interactions/basicInteractionHandler
 
 export interface BasicViewer {
   registerBasicInteractionHandler(
-    interactionHandler: BasicInteractionHandler
+    interactionHandler: BasicInteractionHandler,
   ): Promise<Disposable>;
 }

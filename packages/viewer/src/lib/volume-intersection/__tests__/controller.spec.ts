@@ -38,7 +38,7 @@ describe('volume intersection controller', () => {
   };
 
   async function drag(
-    controller: VolumeIntersectionQueryController
+    controller: VolumeIntersectionQueryController,
   ): Promise<void> {
     controller.setStartPoint(Point.create(1, 1));
     controller.setEndPoint(Point.create(5, 5));
@@ -59,7 +59,7 @@ describe('volume intersection controller', () => {
 
     const controller = new VolumeIntersectionQueryController(
       model,
-      mockViewer as unknown as HTMLVertexViewerElement
+      mockViewer as unknown as HTMLVertexViewerElement,
     );
 
     const firstDrag = drag(controller);
@@ -80,11 +80,11 @@ describe('volume intersection controller', () => {
   it('supports changing the base operation', async () => {
     const controller = new VolumeIntersectionQueryController(
       model,
-      mockViewer as unknown as HTMLVertexViewerElement
+      mockViewer as unknown as HTMLVertexViewerElement,
     );
 
     controller.setOperationTransform((builder) =>
-      builder.materialOverride('#ff0000')
+      builder.materialOverride('#ff0000'),
     );
 
     await drag(controller);
@@ -95,7 +95,7 @@ describe('volume intersection controller', () => {
   it('supports changing the additional operations', async () => {
     const controller = new VolumeIntersectionQueryController(
       model,
-      mockViewer as unknown as HTMLVertexViewerElement
+      mockViewer as unknown as HTMLVertexViewerElement,
     );
 
     controller.setAdditionalTransforms([
@@ -115,7 +115,7 @@ describe('volume intersection controller', () => {
       'request-id',
       {},
       'Operation aborted.',
-      undefined
+      undefined,
     );
 
     mockExecute.mockImplementation(async () => {
@@ -124,7 +124,7 @@ describe('volume intersection controller', () => {
 
     const controller = new VolumeIntersectionQueryController(
       model,
-      mockViewer as unknown as HTMLVertexViewerElement
+      mockViewer as unknown as HTMLVertexViewerElement,
     );
 
     const handleExecuteAborted = jest.fn();
@@ -138,7 +138,7 @@ describe('volume intersection controller', () => {
     expect(handleExecuteComplete).toHaveBeenCalledWith(
       expect.objectContaining({
         aborted: true,
-      })
+      }),
     );
   });
 });

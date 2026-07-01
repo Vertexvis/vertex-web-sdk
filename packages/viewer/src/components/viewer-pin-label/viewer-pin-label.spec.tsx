@@ -33,21 +33,21 @@ describe('vertex-viewer-pin-label', () => {
       new MouseEvent('pointerdown', {
         clientX: 50,
         clientY: 50,
-      })
+      }),
     );
 
     window.dispatchEvent(
       new MouseEvent('pointermove', {
         clientX: 50,
         clientY: 50,
-      })
+      }),
     );
 
     window.dispatchEvent(
       new MouseEvent('pointerup', {
         clientX: 50,
         clientY: 50,
-      })
+      }),
     );
   }
 
@@ -84,7 +84,7 @@ describe('vertex-viewer-pin-label', () => {
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
     const label = el.querySelector(
-      '.pin-label-input-wrapper'
+      '.pin-label-input-wrapper',
     ) as HTMLDivElement;
 
     expect(label.style.top).toBe('50px');
@@ -93,7 +93,7 @@ describe('vertex-viewer-pin-label', () => {
     const originalPin = pinModel.getPinById(pin.id) as TextPin;
     expect(originalPin.label.point).toEqual({ x: 0, y: 0 });
     label?.dispatchEvent(
-      new MouseEvent('pointerdown', { clientX: 50, clientY: 50 })
+      new MouseEvent('pointerdown', { clientX: 50, clientY: 50 }),
     );
 
     const draggingPoint = Point.create(40, 90);
@@ -101,7 +101,7 @@ describe('vertex-viewer-pin-label', () => {
       new MouseEvent('pointermove', {
         clientX: draggingPoint.x,
         clientY: draggingPoint.y,
-      })
+      }),
     );
 
     await page.waitForChanges();
@@ -144,10 +144,10 @@ describe('vertex-viewer-pin-label', () => {
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
     const label = el.querySelector(
-      '.pin-label-input-wrapper'
+      '.pin-label-input-wrapper',
     ) as HTMLDivElement;
     const input = el.querySelector(
-      `#pin-label-input-${pin.id}`
+      `#pin-label-input-${pin.id}`,
     ) as HTMLTextAreaElement;
 
     expect(input).toEqualHtml(`
@@ -211,10 +211,10 @@ describe('vertex-viewer-pin-label', () => {
     const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
     const label = el.querySelector(
-      '.pin-label-input-wrapper'
+      '.pin-label-input-wrapper',
     ) as HTMLDivElement;
     const input = el.querySelector(
-      `#pin-label-input-${pin.id}`
+      `#pin-label-input-${pin.id}`,
     ) as HTMLTextAreaElement;
 
     expect(input).toEqualHtml(`
@@ -238,7 +238,7 @@ describe('vertex-viewer-pin-label', () => {
     input.dispatchEvent(
       new KeyboardEvent('keydown', {
         key: 'Enter',
-      })
+      }),
     );
 
     await page.waitForChanges();
@@ -283,10 +283,10 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
     const label = el.querySelector(
-      '.pin-label-input-wrapper'
+      '.pin-label-input-wrapper',
     ) as HTMLDivElement;
     const input = el.querySelector(
-      `#pin-label-input-${pin.id}`
+      `#pin-label-input-${pin.id}`,
     ) as HTMLTextAreaElement;
 
     clickLabel(label);
@@ -296,7 +296,7 @@ describe('vertex-viewer-pin-label', () => {
     input.value = 'Some really long text that will overflow';
     input.dispatchEvent(new Event('input'));
     input.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', metaKey: true })
+      new KeyboardEvent('keydown', { key: 'Enter', metaKey: true }),
     );
 
     await page.waitForChanges();
@@ -310,10 +310,10 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     expect(label.style.maxWidth).toBe(
-      'min(var(--viewer-annotations-pin-label-max-width), calc(100px - 90px))'
+      'min(var(--viewer-annotations-pin-label-max-width), calc(100px - 90px))',
     );
     expect(label.style.minWidth).toBe(
-      'min(8px, min(var(--viewer-annotations-pin-label-max-width), calc(100px - 90px)))'
+      'min(8px, min(var(--viewer-annotations-pin-label-max-width), calc(100px - 90px)))',
     );
   });
 
@@ -349,10 +349,10 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
     const label = el.querySelector(
-      '.pin-label-input-wrapper'
+      '.pin-label-input-wrapper',
     ) as HTMLDivElement;
     const input = el.querySelector(
-      `#pin-label-input-${pin.id}`
+      `#pin-label-input-${pin.id}`,
     ) as HTMLTextAreaElement;
 
     clickLabel(label);
@@ -362,7 +362,7 @@ describe('vertex-viewer-pin-label', () => {
     input.value = 'Some really long text that will overflow';
     input.dispatchEvent(new Event('input'));
     input.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', metaKey: true })
+      new KeyboardEvent('keydown', { key: 'Enter', metaKey: true }),
     );
 
     await page.waitForChanges();
@@ -372,7 +372,7 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     expect(label.style.maxHeight).toBe(
-      'min(var(--viewer-annotations-pin-label-max-height), calc(100px - 90px))'
+      'min(var(--viewer-annotations-pin-label-max-height), calc(100px - 90px))',
     );
   });
 
@@ -408,10 +408,10 @@ describe('vertex-viewer-pin-label', () => {
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
     const label = el.querySelector(
-      '.pin-label-input-wrapper'
+      '.pin-label-input-wrapper',
     ) as HTMLDivElement;
     const input = el.querySelector(
-      `#pin-label-input-${pin.id}`
+      `#pin-label-input-${pin.id}`,
     ) as HTMLTextAreaElement;
 
     clickLabel(label);
@@ -421,7 +421,7 @@ describe('vertex-viewer-pin-label', () => {
     input.value = 'Some really long text that will overflow';
     input.dispatchEvent(new Event('input'));
     input.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', metaKey: true })
+      new KeyboardEvent('keydown', { key: 'Enter', metaKey: true }),
     );
 
     await page.waitForChanges();

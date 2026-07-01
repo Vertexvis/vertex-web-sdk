@@ -1,5 +1,5 @@
 jest.mock(
-  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 jest.mock('@vertexvis/stream-api');
 
@@ -30,12 +30,12 @@ describe(ModelViewController, () => {
       const expected = makeListItemModelViewsResponse();
 
       (client.listItemModelViews as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(expected)
+        mockGrpcUnaryResult(expected),
       );
 
       const res = await controller.listByItem(sceneItemId);
       expect(res).toEqual(
-        mapListItemModelViewsResponseOrThrow(expected.toObject())
+        mapListItemModelViewsResponseOrThrow(expected.toObject()),
       );
     });
   });
@@ -45,14 +45,14 @@ describe(ModelViewController, () => {
       const { controller, streamApi } = makeModelViewController(jwt, deviceId);
 
       (streamApi.updateModelView as jest.Mock).mockImplementationOnce(() =>
-        Promise.resolve({})
+        Promise.resolve({}),
       );
 
       await controller.load(sceneItemId, modelViewId);
 
       expect(streamApi.updateModelView).toHaveBeenCalledWith(
         expect.objectContaining({ itemModelView }),
-        true
+        true,
       );
     });
   });
@@ -62,7 +62,7 @@ describe(ModelViewController, () => {
       const { controller, streamApi } = makeModelViewController(jwt, deviceId);
 
       (streamApi.updateModelView as jest.Mock).mockImplementationOnce(() =>
-        Promise.resolve({})
+        Promise.resolve({}),
       );
 
       await controller.unload();
@@ -73,7 +73,7 @@ describe(ModelViewController, () => {
 
   function makeModelViewController(
     jwt: string,
-    deviceId: string
+    deviceId: string,
   ): {
     controller: ModelViewController;
     client: SceneViewAPIClient;
@@ -87,7 +87,7 @@ describe(ModelViewController, () => {
         client,
         streamApi,
         () => jwt,
-        () => deviceId
+        () => deviceId,
       ),
       streamApi,
     };

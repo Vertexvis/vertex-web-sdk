@@ -15,7 +15,7 @@ export const fromPbVector2d: M.Func<
   vertexvis.protobuf.core.IVector2d,
   Point.Point
 > = M.defineMapper(M.read(M.requiredProp('x'), M.requiredProp('y')), ([x, y]) =>
-  Point.create(x, y)
+  Point.create(x, y),
 );
 
 export const fromPbDim: M.Func<
@@ -23,7 +23,7 @@ export const fromPbDim: M.Func<
   Dimensions.Dimensions
 > = M.defineMapper(
   M.read(M.requiredProp('width'), M.requiredProp('height')),
-  ([width, height]) => Dimensions.create(width, height)
+  ([width, height]) => Dimensions.create(width, height),
 );
 
 export const fromPbRect: M.Func<
@@ -34,9 +34,9 @@ export const fromPbRect: M.Func<
     M.requiredProp('x'),
     M.requiredProp('y'),
     M.requiredProp('width'),
-    M.requiredProp('height')
+    M.requiredProp('height'),
   ),
-  ([x, y, width, height]) => Rectangle.create(x, y, width, height)
+  ([x, y, width, height]) => Rectangle.create(x, y, width, height),
 );
 
 export const fromPbVector3f: M.Func<
@@ -44,7 +44,7 @@ export const fromPbVector3f: M.Func<
   Vector3.Vector3
 > = M.defineMapper(
   M.read(M.requiredProp('x'), M.requiredProp('y'), M.requiredProp('z')),
-  ([x, y, z]) => Vector3.create(x, y, z)
+  ([x, y, z]) => Vector3.create(x, y, z),
 );
 
 export const fromPbBoundingBox3f: M.Func<
@@ -57,19 +57,19 @@ export const fromPbBoundingBox3f: M.Func<
     M.requiredProp('zmin'),
     M.requiredProp('xmax'),
     M.requiredProp('ymax'),
-    M.requiredProp('zmax')
+    M.requiredProp('zmax'),
   ),
   ([xmin, ymin, zmin, xmax, ymax, zmax]) =>
     BoundingBox.create(
       Vector3.create(xmin, ymin, zmin),
-      Vector3.create(xmax, ymax, zmax)
-    )
+      Vector3.create(xmax, ymax, zmax),
+    ),
 );
 
 export const fromPbPlane: M.Func<vertexvis.protobuf.core.IPlane, Plane.Plane> =
   M.defineMapper(
     M.read(M.requiredProp('d'), M.mapRequiredProp('normal', fromPbVector3f)),
-    ([constant, normal]) => Plane.create({ normal, constant })
+    ([constant, normal]) => Plane.create({ normal, constant }),
   );
 
 export const fromPbVector4f: M.Func<
@@ -80,9 +80,9 @@ export const fromPbVector4f: M.Func<
     M.requiredProp('x'),
     M.requiredProp('y'),
     M.requiredProp('z'),
-    M.requiredProp('w')
+    M.requiredProp('w'),
   ),
-  ([x, y, z, w]) => Vector4.create({ x, y, z, w })
+  ([x, y, z, w]) => Vector4.create({ x, y, z, w }),
 );
 
 export const fromPbMatrix4f: M.Func<
@@ -93,7 +93,7 @@ export const fromPbMatrix4f: M.Func<
     M.mapRequiredProp('r0', fromPbVector4f),
     M.mapRequiredProp('r1', fromPbVector4f),
     M.mapRequiredProp('r2', fromPbVector4f),
-    M.mapRequiredProp('r3', fromPbVector4f)
+    M.mapRequiredProp('r3', fromPbVector4f),
   ),
   ([r0, r1, r2, r3]) =>
     Matrix4.fromValues(
@@ -112,6 +112,6 @@ export const fromPbMatrix4f: M.Func<
       r3.x,
       r3.y,
       r3.z,
-      r3.w
-    )
+      r3.w,
+    ),
 );

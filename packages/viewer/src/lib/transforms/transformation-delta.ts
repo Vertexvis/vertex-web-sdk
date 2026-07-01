@@ -9,7 +9,7 @@ export const ALMOST_ONE = 0.9999;
  * @returns
  */
 export function calculateOrthogonalCoordinate(
-  norm: Vector3.Vector3
+  norm: Vector3.Vector3,
 ): Vector3.Vector3 {
   const orthogonalCandidate0 = Vector3.create(0, norm.z, -norm.y);
   const orthogonalCandidate1 = Vector3.create(-norm.z, 0, norm.x);
@@ -35,7 +35,7 @@ export function calculateOrthogonalCoordinate(
  */
 export function computeRotationMatrix(
   normal1: Vector3.Vector3,
-  normal2: Vector3.Vector3
+  normal2: Vector3.Vector3,
 ): Matrix4.Matrix4 {
   const dot = Vector3.dot(normal1, normal2);
   // the angle is almost 0 in this case.
@@ -54,7 +54,7 @@ export function computeRotationMatrix(
     const angle = Vector3.angleTo(normal2, normal1);
     const axisDirection = Vector3.normalize(Vector3.cross(normal1, normal2));
     return Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(axisDirection, angle + Math.PI)
+      Quaternion.fromAxisAngle(axisDirection, angle + Math.PI),
     );
   }
 }
@@ -76,13 +76,13 @@ export function computeTransformationDelta(
   normal1: Vector3.Vector3,
   position1: Vector3.Vector3,
   normal2: Vector3.Vector3,
-  position2: Vector3.Vector3
+  position2: Vector3.Vector3,
 ): Matrix4.Matrix4 {
   const rotationMatrix = computeRotationMatrix(normal1, normal2);
 
   const translationDeltaMatrix = Matrix4.makeTranslation(position2);
   return Matrix4.multiply(
     Matrix4.multiply(translationDeltaMatrix, rotationMatrix),
-    Matrix4.makeTranslation(Vector3.negate(position1))
+    Matrix4.makeTranslation(Vector3.negate(position1)),
   );
 }

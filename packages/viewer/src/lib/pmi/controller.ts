@@ -21,7 +21,7 @@ export class PmiController {
   public constructor(
     private client: SceneViewAPIClient,
     private jwtProvider: JwtProvider,
-    private deviceIdProvider: () => string | undefined
+    private deviceIdProvider: () => string | undefined,
   ) {}
 
   public async listAnnotations({
@@ -48,7 +48,7 @@ export class PmiController {
         req.setPage(page);
 
         this.client.listPmiAnnotations(req, meta, handler);
-      }
+      },
     );
 
     return mapListPmiAnnotationsResponseOrThrow(res.toObject());

@@ -11,8 +11,8 @@ describe(constrainViewVector, () => {
     const boundingSphere = BoundingSphere.create(
       BoundingBox.create(
         Vector3.create(-100, -100, -100),
-        Vector3.create(100, 100, 100)
-      )
+        Vector3.create(100, 100, 100),
+      ),
     );
 
     expect(constrainViewVector(viewVector, boundingSphere)).toMatchObject({
@@ -27,8 +27,8 @@ describe(constrainViewVector, () => {
     const boundingSphere = BoundingSphere.create(
       BoundingBox.create(
         Vector3.create(-100, -100, -100),
-        Vector3.create(100, 100, 100)
-      )
+        Vector3.create(100, 100, 100),
+      ),
     );
 
     expect(constrainViewVector(viewVector, boundingSphere)).toMatchObject({
@@ -49,8 +49,8 @@ describe(updateLookAtRelativeToBoundingBoxCenter, () => {
       updateLookAtRelativeToBoundingBoxCenter(
         originalLookAt,
         viewVector,
-        boundingSphereCenter
-      )
+        boundingSphereCenter,
+      ),
     ).toMatchObject({
       x: -1,
       y: 0,

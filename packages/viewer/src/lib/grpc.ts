@@ -1,7 +1,7 @@
 import { grpc } from '@improbable-eng/grpc-web';
 
 export type GrpcCaller<R, E> = (
-  handler: GrpcHandler<R, E>
+  handler: GrpcHandler<R, E>,
 ) => void | Promise<void>;
 
 type GrpcHandler<R, E> = (err: E | null, res: R | null) => void | Promise<void>;
@@ -12,7 +12,7 @@ export type JwtProvider = () =>
   | undefined;
 
 export function requestUnary<R, E = unknown>(
-  caller: GrpcCaller<R, E>
+  caller: GrpcCaller<R, E>,
 ): Promise<R> {
   return new Promise((resolve, reject) => {
     caller((err, res) => {
@@ -29,7 +29,7 @@ export function requestUnary<R, E = unknown>(
 
 export async function* requestPaged<R, E = unknown>(
   fetch: (cursor: string | undefined) => GrpcCaller<R, E>,
-  next: (res: R) => string | undefined
+  next: (res: R) => string | undefined,
 ): AsyncGenerator<R, void, void> {
   let cursor = undefined;
 
@@ -42,7 +42,7 @@ export async function* requestPaged<R, E = unknown>(
 
 export async function createMetadata(
   jwtProvider: JwtProvider,
-  deviceId?: string
+  deviceId?: string,
 ): Promise<grpc.Metadata> {
   const jwt = await jwtProvider();
   const meta = new grpc.Metadata({

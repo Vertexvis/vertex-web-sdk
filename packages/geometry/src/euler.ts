@@ -65,7 +65,7 @@ export function fromDegrees(value: Partial<Euler> = {}): Euler {
  */
 export function fromRotationMatrix(
   matrix: Matrix4.Matrix4,
-  order: EulerOrder = 'xyz'
+  order: EulerOrder = 'xyz',
 ): Euler {
   const m = Matrix4.toObject(matrix);
 

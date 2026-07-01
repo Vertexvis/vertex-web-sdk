@@ -116,7 +116,7 @@ describe(PanInteraction, () => {
       interaction.drag(event2, api);
 
       expect(api.panCameraToScreenPoint).toHaveBeenCalledWith(
-        Point.create(15, 10)
+        Point.create(15, 10),
       );
     });
 
@@ -128,7 +128,7 @@ describe(PanInteraction, () => {
 
       expect(api.panCameraToScreenPoint).toHaveBeenNthCalledWith(
         2,
-        Point.create(25, 20)
+        Point.create(25, 20),
       );
     });
 

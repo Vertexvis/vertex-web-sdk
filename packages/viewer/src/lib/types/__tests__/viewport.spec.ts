@@ -10,12 +10,12 @@ describe('viewport utilities', () => {
   const perspective = FrameCameraBase.fromBoundingBox(
     FrameCamera.createPerspective(),
     BoundingBox.create(Vector3.create(-1, -1, -1), Vector3.create(1, 1, 1)),
-    1
+    1,
   );
   const orthographic = FrameCameraBase.fromBoundingBox(
     FrameCamera.createOrthographic(),
     BoundingBox.create(Vector3.create(-1, -1, -1), Vector3.create(1, 1, 1)),
-    1
+    1,
   );
 
   describe(Viewport.prototype.transformPointToRay, () => {
@@ -26,20 +26,20 @@ describe('viewport utilities', () => {
       const lookAtPoint = Vector3.transformMatrix(
         Vector3.transformMatrix(
           Vector3.create(-0.8, 0.8, 0.5),
-          perspective.projectionMatrixInverse
+          perspective.projectionMatrixInverse,
         ),
-        perspective.worldMatrix
+        perspective.worldMatrix,
       );
       const expectedDirection = Vector3.normalize(
-        Vector3.subtract(lookAtPoint, expectedOrigin)
+        Vector3.subtract(lookAtPoint, expectedOrigin),
       );
 
       expect(
         viewport.transformPointToRay(
           Point.create(10, 10),
           makeDepthBuffer(100, 100),
-          perspective
-        )
+          perspective,
+        ),
       ).toMatchObject({
         origin: expectedOrigin,
         direction: expectedDirection,
@@ -52,17 +52,17 @@ describe('viewport utilities', () => {
       const expectedOrigin = Vector3.transformMatrix(
         Vector3.transformMatrix(
           Vector3.create(-0.8, 0.8, 0),
-          orthographic.projectionMatrixInverse
+          orthographic.projectionMatrixInverse,
         ),
-        orthographic.worldMatrix
+        orthographic.worldMatrix,
       );
 
       expect(
         viewport.transformPointToRay(
           Point.create(10, 10),
           makeDepthBuffer(100, 100),
-          orthographic
-        )
+          orthographic,
+        ),
       ).toMatchObject({
         origin: expectedOrigin,
         direction: Vector3.normalize(orthographic.viewVector),
@@ -82,7 +82,7 @@ describe('viewport utilities', () => {
       const ray = viewport.transformPointToRay(
         Point.create(10, 10),
         buffer,
-        perspective
+        perspective,
       );
 
       const worldPt = Ray.at(ray, perspective.far);
@@ -97,8 +97,8 @@ describe('viewport utilities', () => {
         viewport.transformPointToWorldSpace(
           Point.create(10, 10),
           buffer,
-          desiredDepthPercentageToTest * DepthBuffer.MAX_DEPTH_VALUE
-        )
+          desiredDepthPercentageToTest * DepthBuffer.MAX_DEPTH_VALUE,
+        ),
       ).toMatchObject(Ray.at(ray, depth / angle));
     });
 
@@ -112,15 +112,15 @@ describe('viewport utilities', () => {
       const ray = viewport.transformPointToRay(
         Point.create(10, 10),
         buffer,
-        orthographic
+        orthographic,
       );
 
       expect(
         viewport.transformPointToWorldSpace(
           Point.create(10, 10),
           buffer,
-          desiredDepthPercentageToTest * DepthBuffer.MAX_DEPTH_VALUE
-        )
+          desiredDepthPercentageToTest * DepthBuffer.MAX_DEPTH_VALUE,
+        ),
       ).toMatchObject(Ray.at(ray, depth));
     });
   });

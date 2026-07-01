@@ -49,7 +49,7 @@ describe(InteractionApiOrthographic, () => {
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
     sceneId,
-    sceneViewId
+    sceneViewId,
   );
   const frameProvider = (): Frame | undefined => frame;
   const sceneProvider = (): Scene => scene;
@@ -75,7 +75,7 @@ describe(InteractionApiOrthographic, () => {
       { emit: emitLongPress },
       { emit: emitInteractionStarted },
       { emit: emitInteractionFinished },
-      { emit: emitCameraChanged }
+      { emit: emitCameraChanged },
     );
   });
 
@@ -89,14 +89,14 @@ describe(InteractionApiOrthographic, () => {
         const expectedRay = viewport.transformPointToRay(
           Point.create(1, 1),
           frame.image,
-          frame.scene.camera
+          frame.scene.camera,
         );
 
         expect(
-          await api.getWorldPointFromViewport(Point.create(1, 1))
+          await api.getWorldPointFromViewport(Point.create(1, 1)),
         ).toMatchObject(Ray.at(expectedRay, 0));
       });
-    }
+    },
   );
 
   describe(InteractionApiOrthographic.prototype.panCameraByDelta, () => {
@@ -109,7 +109,7 @@ describe(InteractionApiOrthographic, () => {
         1,
         data,
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
-        fromPbFrameOrThrow(Orientation.DEFAULT)
+        fromPbFrameOrThrow(Orientation.DEFAULT),
       );
       jest
         .spyOn(scene, 'camera')
@@ -118,7 +118,7 @@ describe(InteractionApiOrthographic, () => {
 
       await api.beginInteraction();
       await api.panCameraByDelta(
-        Point.create(frame.image.imageAttr.frameDimensions.width, 0)
+        Point.create(frame.image.imageAttr.frameDimensions.width, 0),
       );
       await api.endInteraction();
 
@@ -134,7 +134,7 @@ describe(InteractionApiOrthographic, () => {
         1,
         data,
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
-        fromPbFrameOrThrow(Orientation.DEFAULT)
+        fromPbFrameOrThrow(Orientation.DEFAULT),
       );
       jest
         .spyOn(scene, 'camera')
@@ -145,7 +145,7 @@ describe(InteractionApiOrthographic, () => {
 
       await api.beginInteraction();
       await api.panCameraToScreenPoint(
-        Point.create(frame.image.imageAttr.frameDimensions.width, 0)
+        Point.create(frame.image.imageAttr.frameDimensions.width, 0),
       );
       await api.panCameraToScreenPoint(Point.create(0, 0));
       await api.endInteraction();
@@ -167,7 +167,7 @@ describe(InteractionApiOrthographic, () => {
         1,
         data,
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
-        fromPbFrameOrThrow(Orientation.DEFAULT)
+        fromPbFrameOrThrow(Orientation.DEFAULT),
       );
       jest
         .spyOn(scene, 'camera')
@@ -177,7 +177,7 @@ describe(InteractionApiOrthographic, () => {
       await api.beginInteraction();
       await api.zoomCameraToPoint(
         Point.create(frame.image.imageAttr.frameDimensions.width, 0),
-        -100
+        -100,
       );
       await api.endInteraction();
 
@@ -186,7 +186,7 @@ describe(InteractionApiOrthographic, () => {
       expect(update.mock.calls[0][0].lookAt?.z).toBe(0);
       expect(
         (update.mock.calls[0][0] as FrameCamera.OrthographicFrameCamera)
-          .fovHeight
+          .fovHeight,
       ).toBe(5);
     });
   });
@@ -199,7 +199,7 @@ describe(InteractionApiOrthographic, () => {
         1,
         data,
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 100)),
-        fromPbFrameOrThrow(Orientation.DEFAULT)
+        fromPbFrameOrThrow(Orientation.DEFAULT),
       );
       jest
         .spyOn(scene, 'camera')

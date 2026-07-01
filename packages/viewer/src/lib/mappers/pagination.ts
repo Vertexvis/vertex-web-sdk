@@ -7,5 +7,5 @@ export const mapCursor: M.Func<
   PBCursor.AsObject | null | undefined,
   Cursor | undefined
 > = M.defineMapper(M.ifDefined(M.getProp('next')), (next) =>
-  next != null ? next : undefined
+  next != null ? next : undefined,
 );

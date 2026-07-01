@@ -13,7 +13,7 @@ function asBlobPart(bytes: Uint8Array): ArrayBuffer {
 }
 
 function loadImageBytesAsImageElement(
-  imageData: Uint8Array
+  imageData: Uint8Array,
 ): Promise<HtmlImage> {
   return new Promise((resolve, reject) => {
     const blob = new Blob([asBlobPart(imageData)]);
@@ -34,7 +34,7 @@ function loadImageBytesAsImageElement(
 }
 
 async function loadImageBytesAsImageBitmap(
-  imageData: Uint8Array
+  imageData: Uint8Array,
 ): Promise<HtmlImage> {
   const blob = new Blob([asBlobPart(imageData)]);
   const bitmap = await window.createImageBitmap(blob);

@@ -4,7 +4,7 @@ export function retryIfNotAborted<T>(
   abortSignal: AbortSignal,
   fn: () => Promise<T>,
   fallback: T,
-  opts: Async.RetryOptions
+  opts: Async.RetryOptions,
 ): Promise<T> {
   return Async.retry<T>((): Promise<T> => {
     if (!abortSignal.aborted) {

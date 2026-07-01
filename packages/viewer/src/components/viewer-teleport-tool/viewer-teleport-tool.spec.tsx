@@ -50,7 +50,7 @@ describe('vertex-viewer-teleport-tool', () => {
       drawFramePayloadPerspective.imageAttributes?.frameDimensions
         ?.width as number,
       drawFramePayloadPerspective.imageAttributes?.frameDimensions
-        ?.height as number
+        ?.height as number,
     );
 
     jest
@@ -88,14 +88,14 @@ describe('vertex-viewer-teleport-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
@@ -123,7 +123,7 @@ describe('vertex-viewer-teleport-tool', () => {
             z: expectedPositionZ - viewVectorDistance,
           },
         }),
-      })
+      }),
     );
   });
 
@@ -153,14 +153,14 @@ describe('vertex-viewer-teleport-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
@@ -188,7 +188,7 @@ describe('vertex-viewer-teleport-tool', () => {
             z: mockHit.hitPoint.z - viewVectorDistance,
           },
         }),
-      })
+      }),
     );
   });
 
@@ -219,14 +219,14 @@ describe('vertex-viewer-teleport-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const maxLength = Math.max(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     tool.controller?.updateConfiguration({ teleportDistancePercentage: 1 });
@@ -234,10 +234,10 @@ describe('vertex-viewer-teleport-tool', () => {
     await page.waitForChanges();
 
     canvas.dispatchEvent(
-      new MouseEvent('pointerdown', { clientX: 50, clientY: 25 })
+      new MouseEvent('pointerdown', { clientX: 50, clientY: 25 }),
     );
     window.dispatchEvent(
-      new MouseEvent('pointerup', { clientX: 50, clientY: 25 })
+      new MouseEvent('pointerup', { clientX: 50, clientY: 25 }),
     );
 
     await page.waitForChanges();
@@ -258,7 +258,7 @@ describe('vertex-viewer-teleport-tool', () => {
             z: camera.lookAt.z - distance,
           },
         }),
-      })
+      }),
     );
   });
 
@@ -288,14 +288,14 @@ describe('vertex-viewer-teleport-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const maxLength = Math.max(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     tool.controller?.updateConfiguration({ teleportDistancePercentage: 1 });
@@ -303,10 +303,10 @@ describe('vertex-viewer-teleport-tool', () => {
     await page.waitForChanges();
 
     canvas.dispatchEvent(
-      new MouseEvent('pointerdown', { clientX: 75, clientY: 25 })
+      new MouseEvent('pointerdown', { clientX: 75, clientY: 25 }),
     );
     window.dispatchEvent(
-      new MouseEvent('pointerup', { clientX: 75, clientY: 25 })
+      new MouseEvent('pointerup', { clientX: 75, clientY: 25 }),
     );
 
     await page.waitForChanges();
@@ -315,13 +315,13 @@ describe('vertex-viewer-teleport-tool', () => {
     const ray = viewer.viewport.transformPointToRay(
       Point.create(75, 25),
       viewer.frame?.image as FrameImage,
-      camera
+      camera,
     );
     const position = Ray.at(ray, distance);
     const lookAt = Vector3.create(
       camera.lookAt.x + (position.x - camera.position.x),
       0,
-      camera.lookAt.z + (position.z - camera.position.z)
+      camera.lookAt.z + (position.z - camera.position.z),
     );
 
     expect(streamSpy).toHaveBeenCalledWith(
@@ -330,7 +330,7 @@ describe('vertex-viewer-teleport-tool', () => {
           position,
           lookAt,
         }),
-      })
+      }),
     );
   });
 
@@ -357,10 +357,10 @@ describe('vertex-viewer-teleport-tool', () => {
 
     const camera = viewer.frame?.scene.camera as FramePerspectiveCamera;
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     tool.controller?.updateConfiguration({
@@ -371,7 +371,7 @@ describe('vertex-viewer-teleport-tool', () => {
     const hitPoint = Vector3.create(
       0,
       0,
-      camera.position.z - collisionDistance * 1.5
+      camera.position.z - collisionDistance * 1.5,
     );
     mockViewport(viewer, {
       ...mockHit,
@@ -381,10 +381,10 @@ describe('vertex-viewer-teleport-tool', () => {
     await page.waitForChanges();
 
     canvas.dispatchEvent(
-      new MouseEvent('pointerdown', { clientX: 50, clientY: 25 })
+      new MouseEvent('pointerdown', { clientX: 50, clientY: 25 }),
     );
     window.dispatchEvent(
-      new MouseEvent('pointerup', { clientX: 50, clientY: 25 })
+      new MouseEvent('pointerup', { clientX: 50, clientY: 25 }),
     );
 
     await page.waitForChanges();
@@ -405,7 +405,7 @@ describe('vertex-viewer-teleport-tool', () => {
               (hitPoint.z + collisionDistance - camera.position.z),
           },
         }),
-      })
+      }),
     );
   });
 
@@ -434,14 +434,14 @@ describe('vertex-viewer-teleport-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
@@ -470,7 +470,7 @@ describe('vertex-viewer-teleport-tool', () => {
           },
         }),
       }),
-      true
+      true,
     );
   });
 
@@ -499,14 +499,14 @@ describe('vertex-viewer-teleport-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
@@ -542,7 +542,7 @@ describe('vertex-viewer-teleport-tool', () => {
           }),
         }),
       }),
-      true
+      true,
     );
   });
 });

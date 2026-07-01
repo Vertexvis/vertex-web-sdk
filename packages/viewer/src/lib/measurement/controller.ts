@@ -26,7 +26,7 @@ export class MeasurementController {
     private model: MeasurementModel,
     private client: SceneViewAPIClient,
     private jwtProvider: JwtProvider,
-    private deviceId: string | undefined
+    private deviceId: string | undefined,
   ) {}
 
   /**
@@ -38,15 +38,15 @@ export class MeasurementController {
    * entity.
    */
   public addEntity(
-    entity: MeasurementEntity
+    entity: MeasurementEntity,
   ): Promise<MeasurementOutcome | undefined> {
     if (this.debugLogs) {
       const deserializedEntity = ModelEntity.deserializeBinary(
-        entity.modelEntity
+        entity.modelEntity,
       );
 
       this.log(
-        `Adding ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`
+        `Adding ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`,
       );
     }
 
@@ -76,15 +76,15 @@ export class MeasurementController {
    * entity.
    */
   public removeEntity(
-    entity: MeasurementEntity
+    entity: MeasurementEntity,
   ): Promise<MeasurementOutcome | undefined> {
     if (this.debugLogs) {
       const deserializedEntity = ModelEntity.deserializeBinary(
-        entity.modelEntity
+        entity.modelEntity,
       );
 
       this.log(
-        `Removing ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`
+        `Removing ModelEntity. [entityId={${deserializedEntity.getEntityId()}}, sceneItemId={${deserializedEntity.getSceneItemId()}}]`,
       );
     }
 
@@ -99,15 +99,15 @@ export class MeasurementController {
    * entities.
    */
   public setEntities(
-    entities: Set<MeasurementEntity>
+    entities: Set<MeasurementEntity>,
   ): Promise<MeasurementOutcome | undefined> {
     if (this.debugLogs) {
       const deserializedEntities = Array.from(entities).map((e) =>
-        ModelEntity.deserializeBinary(e.modelEntity)
+        ModelEntity.deserializeBinary(e.modelEntity),
       );
 
       this.log(
-        `Setting ${deserializedEntities.length} ModelEntities. [entityIds=[${deserializedEntities.map((e) => e.getEntityId()).join(', ')}], sceneItemIds=[${deserializedEntities.map((e) => e.getSceneItemId()).join(', ')}]]`
+        `Setting ${deserializedEntities.length} ModelEntities. [entityIds=[${deserializedEntities.map((e) => e.getEntityId()).join(', ')}], sceneItemIds=[${deserializedEntities.map((e) => e.getSceneItemId()).join(', ')}]]`,
       );
     }
 
@@ -119,7 +119,7 @@ export class MeasurementController {
   }
 
   private performMeasurement(
-    effect: () => boolean
+    effect: () => boolean,
   ): Promise<MeasurementOutcome | undefined> {
     const previous = this.model.getEntities();
     const changed = effect();
@@ -143,7 +143,7 @@ export class MeasurementController {
   }
 
   private async measureEntities(
-    entities: MeasurementEntity[]
+    entities: MeasurementEntity[],
   ): Promise<MeasurementOutcome | undefined> {
     if (entities.length > 0) {
       const res = await requestUnary<MeasureResponse>(async (handler) => {
@@ -162,7 +162,7 @@ export class MeasurementController {
 
   private async highlightEntities(
     previous: MeasurementEntity[],
-    entities: MeasurementEntity[]
+    entities: MeasurementEntity[],
   ): Promise<void> {
     await requestUnary(async (handler) => {
       const meta = await createMetadata(this.jwtProvider, this.deviceId);

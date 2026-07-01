@@ -224,7 +224,7 @@ export class ViewerWalkModeTool {
     if (this.hostEl != null) {
       const slotted: Element | undefined =
         this.hostEl?.querySelector(
-          'vertex-viewer-teleport-tool[slot="teleport-tool"]'
+          'vertex-viewer-teleport-tool[slot="teleport-tool"]',
         ) ?? undefined;
       const slottedTeleportTool =
         slotted?.tagName === 'VERTEX-VIEWER-TELEPORT-TOOL'
@@ -235,7 +235,7 @@ export class ViewerWalkModeTool {
         this.stateMap.teleportTool = slottedTeleportTool;
       } else {
         this.stateMap.teleportTool = document.createElement(
-          'vertex-viewer-teleport-tool'
+          'vertex-viewer-teleport-tool',
         );
         this.stateMap.teleportTool.slot = 'teleport-tool';
 
@@ -286,7 +286,7 @@ export class ViewerWalkModeTool {
       this.stateMap.previousPrimaryInteractionType != null
     ) {
       baseInteractionHandler.setPrimaryInteractionType(
-        this.stateMap.previousPrimaryInteractionType
+        this.stateMap.previousPrimaryInteractionType,
       );
       this.stateMap.previousPrimaryInteractionType = undefined;
     }

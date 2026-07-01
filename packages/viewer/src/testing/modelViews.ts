@@ -7,7 +7,7 @@ import { random } from './random';
 import { makeUuid2l } from './uuid';
 
 export function makeListItemModelViewsResponse(
-  modelViews: ModelView[] = [makeModelView(), makeModelView()]
+  modelViews: ModelView[] = [makeModelView(), makeModelView()],
 ): ListItemModelViewsResponse {
   const res = new ListItemModelViewsResponse();
   res.setModelViewsList(modelViews);
@@ -17,7 +17,7 @@ export function makeListItemModelViewsResponse(
 export function makeModelView(
   id: UUID.UUID = UUID.create(),
   partRevisionId: UUID.UUID = UUID.create(),
-  displayName: string = random.string()
+  displayName: string = random.string(),
 ): ModelView {
   const modelView = new ModelView();
   modelView.setId(makeUuid2l(id));

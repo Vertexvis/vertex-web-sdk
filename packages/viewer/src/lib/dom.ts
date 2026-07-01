@@ -4,7 +4,7 @@ import { Cursor } from './cursors';
 
 export function getMouseClientPosition(
   event: MouseEvent,
-  offsets?: DOMRect
+  offsets?: DOMRect,
 ): Point.Point {
   const pt = Point.create(event.clientX, event.clientY);
   if (offsets == null) {

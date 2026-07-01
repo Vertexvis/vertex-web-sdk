@@ -78,7 +78,7 @@ export class VolumeIntersectionQueryModel {
   }
 
   public onScreenBoundsChanged(
-    listener: Listener<VolumeIntersectionQueryDetails | undefined>
+    listener: Listener<VolumeIntersectionQueryDetails | undefined>,
   ): Disposable {
     return this.screenBoundsChanged.on(listener);
   }
@@ -88,7 +88,7 @@ export class VolumeIntersectionQueryModel {
   }
 
   public onDragComplete(
-    listener: Listener<VolumeIntersectionQueryDetails>
+    listener: Listener<VolumeIntersectionQueryDetails>,
   ): Disposable {
     return this.dragComplete.on(listener);
   }
@@ -105,7 +105,7 @@ export class VolumeIntersectionQueryModel {
       };
     } else {
       throw new Error(
-        'Failed to create query details, the start and end points must be set.'
+        'Failed to create query details, the start and end points must be set.',
       );
     }
   }
