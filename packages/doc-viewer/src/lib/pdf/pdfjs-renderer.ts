@@ -22,7 +22,7 @@ export class PdfJsRenderer extends DocumentRenderer {
 
     // Render pages using an offscreen canvas to avoid flickering that can occur for
     // PDFs with annotations.
-    this.offscreenCanvas = createElement('canvas');
+    this.offscreenCanvas = createElement<HTMLCanvasElement>('canvas');
 
     this.handleStateChanged = this.handleStateChanged.bind(this);
 

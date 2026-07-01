@@ -48,9 +48,9 @@ describe('PdfJsRenderer', () => {
       const firstCall = mockPageRender.mock.calls[0][0];
 
       // Expect the fill style to have been updated to `#ffffff` to give the page a white background.
-      expect(firstCall.canvas.getContext('2d')?.fillStyle).toBe('#ffffff');
-      expect(firstCall.viewport.width).toBe(100);
-      expect(firstCall.viewport.height).toBe(100);
+      expect(firstCall?.canvas.getContext('2d')?.fillStyle).toBe('#ffffff');
+      expect(firstCall?.viewport.width).toBe(100);
+      expect(firstCall?.viewport.height).toBe(100);
     });
 
     it('scales the page to fit within the viewport', async () => {
