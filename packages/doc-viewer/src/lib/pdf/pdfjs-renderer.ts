@@ -76,10 +76,20 @@ export class PdfJsRenderer extends DocumentRenderer {
       this.offscreenCanvas.width = this.canvas.width;
       this.offscreenCanvas.height = this.canvas.height;
 
+      const offscreenCanvasCtx = this.offscreenCanvas.getContext('2d');
+
+      // Fill the offscreen canvas with a white background prior to rendering the page to give the content
+      // of the PDF a white background, but maintain the canvas it gets drawn to when copying to the main canvas.
+      if (offscreenCanvasCtx != null) {
+        offscreenCanvasCtx.fillStyle = '#ffffff';
+        offscreenCanvasCtx.fillRect(panOffset.x + centerOffsetX, panOffset.y, scaled.width, scaled.height);
+      }
+
       await page.render({
         canvas: this.offscreenCanvas,
         viewport: scaled,
         intent: 'display',
+        background: 'transparent',
         optionalContentConfigPromise: optionalContentConfig != null ? Promise.resolve(optionalContentConfig) : undefined,
       }).promise;
 
