@@ -5,11 +5,24 @@ export class DocumentLayersController {
   private apiSupportsLayers = false;
   private api?: LayerSupportedApi;
 
-  public constructor(api: DocumentApi) {
+  public constructor(api?: DocumentApi) {
+    if (api != null) {
+      this.setApi(api);
+    }
+  }
+
+  public setApi(api: DocumentApi): void {
     if (apiSupportsLayers(api)) {
       this.apiSupportsLayers = true;
       this.api = api as LayerSupportedApi;
+    } else {
+      this.clear();
     }
+  }
+
+  public clear(): void {
+    this.apiSupportsLayers = false;
+    this.api = undefined;
   }
 
   /**
