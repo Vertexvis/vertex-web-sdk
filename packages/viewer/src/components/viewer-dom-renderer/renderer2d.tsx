@@ -68,10 +68,10 @@ function getElementDepths(
     const child = element.children[i] as HTMLElement;
 
     if (isVertexViewerDomGroup(child)) {
-      const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
+      const worldMatrix = Matrix4.multiply(child.matrix, parentWorldMatrix);
       results.push(...getElementDepths(child, worldMatrix, camera));
     } else if (isVertexViewerDomElement(child)) {
-      const worldMatrix = Matrix4.multiply(parentWorldMatrix, child.matrix);
+      const worldMatrix = Matrix4.multiply(child.matrix, parentWorldMatrix);
       const worldPosition = Vector3.fromMatrixPosition(worldMatrix);
       const distanceToCamera = Vector3.distanceSquared(
         camera.position,
@@ -114,6 +114,9 @@ function getScreenPosition(
   projectionViewMatrix: Matrix4.Matrix4,
   viewport: Viewport
 ): Point.Point {
-  const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
+  const ndcPt = Vector3.multiplyByTransformMatrixColumnMajor(
+    pt,
+    projectionViewMatrix
+  );
   return viewport.transformVectorToViewport(ndcPt);
 }

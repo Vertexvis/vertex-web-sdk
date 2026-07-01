@@ -42,8 +42,14 @@ describe('vertex-viewer-measurement-distance', () => {
   const end = Vector3.create(2, 2, 2);
   const viewport = new Viewport(100, 100);
 
-  const startNdc = Vector3.transformMatrix(start, projectionViewMatrix);
-  const endNdc = Vector3.transformMatrix(end, projectionViewMatrix);
+  const startNdc = Vector3.multiplyByTransformMatrixColumnMajor(
+    start,
+    projectionViewMatrix
+  );
+  const endNdc = Vector3.multiplyByTransformMatrixColumnMajor(
+    end,
+    projectionViewMatrix
+  );
 
   const depthBuffer = Fixtures.makeDepthBuffer(100, 100, 0);
   const stencilBuffer = Fixtures.makeStencilBuffer(
@@ -192,8 +198,14 @@ describe('vertex-viewer-measurement-distance', () => {
     const newStart = Vector3.create(0, 0, 0);
     const newEnd = Vector3.create(1, 1, 1);
 
-    const newStartNdc = Vector3.transformMatrix(newStart, projectionViewMatrix);
-    const newEndNdc = Vector3.transformMatrix(newEnd, projectionViewMatrix);
+    const newStartNdc = Vector3.multiplyByTransformMatrixColumnMajor(
+      newStart,
+      projectionViewMatrix
+    );
+    const newEndNdc = Vector3.multiplyByTransformMatrixColumnMajor(
+      newEnd,
+      projectionViewMatrix
+    );
     const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
     measurement.start = newStart;
     measurement.end = newEnd;
@@ -368,7 +380,7 @@ describe('vertex-viewer-measurement-distance', () => {
     await loadViewerStreamKey(key1, { stream, ws, viewer });
     await page.waitForChanges();
 
-    const startNdc = Vector3.transformMatrix(
+    const startNdc = Vector3.multiplyByTransformMatrixColumnMajor(
       start,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       viewer.frame!.scene.camera.projectionViewMatrix

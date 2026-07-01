@@ -96,55 +96,50 @@ export function fromAxisAngle(
  * (unscaled).
  */
 export function fromMatrixRotation(matrix: Matrix4.Matrix4): Quaternion {
-  const m = Matrix4.toObject(matrix);
+  // Determine the scalars for each vector
   const scale = Vector3.fromMatrixScale(matrix);
+  const oneOverScaleVector = Vector3.create(
+    1 / scale.x,
+    1 / scale.y,
+    1 / scale.z
+  );
 
-  const is1 = 1 / scale.x;
-  const is2 = 1 / scale.y;
-  const is3 = 1 / scale.z;
+  // Scale the matrix
+  const scaledMatrix = Matrix4.scale(matrix, oneOverScaleVector);
+  const sM = Matrix4.toObjectRowMajor(scaledMatrix);
 
-  const sm11 = m.m11 * is1;
-  const sm12 = m.m21 * is2;
-  const sm13 = m.m31 * is3;
-  const sm21 = m.m12 * is1;
-  const sm22 = m.m22 * is2;
-  const sm23 = m.m32 * is3;
-  const sm31 = m.m13 * is1;
-  const sm32 = m.m23 * is2;
-  const sm33 = m.m33 * is3;
-
-  const trace = sm11 + sm22 + sm33;
+  const trace = sM.m11 + sM.m22 + sM.m33;
   if (trace > 0) {
-    const s = Math.sqrt(trace + 1.0) * 2;
+    const s = Math.sqrt(trace + 1) * 2;
     return {
-      x: (sm23 - sm32) / s,
-      y: (sm31 - sm13) / s,
-      z: (sm12 - sm21) / s,
+      x: (sM.m23 - sM.m32) / s,
+      y: (sM.m31 - sM.m13) / s,
+      z: (sM.m12 - sM.m21) / s,
       w: 0.25 * s,
     };
-  } else if (sm11 > sm22 && sm11 > sm33) {
-    const s = Math.sqrt(1.0 + sm11 - sm22 - sm33) * 2;
+  } else if (sM.m11 > sM.m22 && sM.m11 > sM.m33) {
+    const s = Math.sqrt(1 + sM.m11 - sM.m22 - sM.m33) * 2;
     return {
       x: 0.25 * s,
-      y: (sm12 + sm21) / s,
-      z: (sm31 + sm13) / s,
-      w: (sm23 - sm32) / s,
+      y: (sM.m12 + sM.m21) / s,
+      z: (sM.m31 + sM.m13) / s,
+      w: (sM.m23 - sM.m32) / s,
     };
-  } else if (sm22 > sm33) {
-    const s = Math.sqrt(1.0 + sm22 - sm11 - sm33) * 2;
+  } else if (sM.m22 > sM.m33) {
+    const s = Math.sqrt(1 + sM.m22 - sM.m11 - sM.m33) * 2;
     return {
-      x: (sm12 + sm21) / s,
+      x: (sM.m12 + sM.m21) / s,
       y: 0.25 * s,
-      z: (sm23 + sm32) / s,
-      w: (sm31 - sm13) / s,
+      z: (sM.m23 + sM.m32) / s,
+      w: (sM.m31 - sM.m13) / s,
     };
   } else {
-    const s = Math.sqrt(1.0 + sm33 - sm11 - sm22) * 2;
+    const s = Math.sqrt(1 + sM.m33 - sM.m11 - sM.m22) * 2;
     return {
-      x: (sm31 + sm13) / s,
-      y: (sm23 + sm32) / s,
+      x: (sM.m31 + sM.m13) / s,
+      y: (sM.m23 + sM.m32) / s,
       z: 0.25 * s,
-      w: (sm12 - sm21) / s,
+      w: (sM.m12 - sM.m21) / s,
     };
   }
 }

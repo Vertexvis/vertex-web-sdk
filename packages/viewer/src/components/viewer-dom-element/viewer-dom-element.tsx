@@ -33,14 +33,6 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public position: Vector3.Vector3 = Vector3.origin();
 
   /**
-   * @ignore
-   */
-  @Watch('position', { immediate: true })
-  protected handlePositionChange(): void {
-    this.syncMatrix();
-  }
-
-  /**
    * The local 3D position of where this element is located, as a JSON string.
    * JSON representation can either be in the format of `[x, y, z]` or `{"x": 0,
    * "y": 0, "z": 0}`.
@@ -49,26 +41,10 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public positionJson = '';
 
   /**
-   * @ignore
-   */
-  @Watch('positionJson', { immediate: true })
-  protected handlePositionJsonChanged(): void {
-    this.syncPosition();
-  }
-
-  /**
    * The local rotation of this element in Euler angles.
    */
   @Prop({ mutable: true, attribute: null })
   public rotation?: Euler.Euler;
-
-  /**
-   * @ignore
-   */
-  @Watch('rotation', { immediate: true })
-  protected handleRotationChanged(): void {
-    this.syncQuaternionWithRotation();
-  }
 
   /**
    * The local rotation of this element in Euler angles, as a JSON string. JSON
@@ -79,26 +55,10 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public rotationJson?: string;
 
   /**
-   * @ignore
-   */
-  @Watch('rotationJson', { immediate: true })
-  protected handleRotationJsonChanged(): void {
-    this.syncRotation();
-  }
-
-  /**
    * The local rotation of this element.
    */
   @Prop({ mutable: true, attribute: null })
   public quaternion: Quaternion.Quaternion = Quaternion.create();
-
-  /**
-   * @ignore
-   */
-  @Watch('quaternion', { immediate: true })
-  protected handleQuaternionChange(): void {
-    this.syncMatrix();
-  }
 
   /**
    * The local quaternion rotation of this element, as a JSON string. JSON
@@ -109,26 +69,10 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   public quaternionJson = '';
 
   /**
-   * @ignore
-   */
-  @Watch('quaternionJson', { immediate: true })
-  protected handleQuaternionJsonChanged(): void {
-    this.syncQuaternion();
-  }
-
-  /**
    * The local scale of this element.
    */
   @Prop({ mutable: true, attribute: null })
   public scale: Vector3.Vector3 = Vector3.create(1, 1, 1);
-
-  /**
-   * @ignore
-   */
-  @Watch('scale', { immediate: true })
-  protected handleScaleChange(): void {
-    this.syncMatrix();
-  }
 
   /**
    * The local scale of this element, as a JSON string. JSON string
@@ -137,27 +81,6 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
    */
   @Prop({ attribute: 'scale' })
   public scaleJson = '';
-
-  /**
-   * @ignore
-   */
-  @Watch('scaleJson', { immediate: true })
-  protected handleScaleJsonChanged(): void {
-    this.syncScale();
-  }
-
-  /**
-   * @ignore
-   */
-  @Watch('matrix')
-  protected handleMatrixChanged(
-    newMatrix: Matrix4.Matrix4,
-    oldMatrix: Matrix4.Matrix4
-  ): void {
-    if (!Objects.isEqual(newMatrix, oldMatrix)) {
-      this.propertyChange.emit();
-    }
-  }
 
   /**
    * The local matrix of this element.
@@ -211,7 +134,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   /**
    * **EXPERIMENTAL**
    * Indicates if the element is detached from geometry. This property can be used
-   * with a CSS selector to modify the appearance of the element when its
+   * with a CSS selector to modify the appearance of the element when it's
    * detached.
    *
    * @example
@@ -269,6 +192,69 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
     prop: string
   ): boolean {
     return prop === 'occluded';
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('position', { immediate: true })
+  @Watch('quaternion', { immediate: true })
+  @Watch('scale', { immediate: true })
+  protected handleMatrixPropertyChange(): void {
+    this.syncMatrix();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('positionJson', { immediate: true })
+  protected handlePositionJsonChanged(): void {
+    this.syncPosition();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('rotation', { immediate: true })
+  protected handleRotationChanged(): void {
+    this.syncQuaternionWithRotation();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('rotationJson', { immediate: true })
+  protected handleRotationJsonChanged(): void {
+    this.syncRotation();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('quaternionJson', { immediate: true })
+  protected handleQuaternionJsonChanged(): void {
+    this.syncQuaternion();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('scaleJson', { immediate: true })
+  protected handleScaleJsonChanged(): void {
+    this.syncScale();
+  }
+
+  /**
+   * @ignore
+   */
+  @Watch('matrix')
+  protected handleMatrixChanged(
+    newMatrix: Matrix4.Matrix4,
+    oldMatrix: Matrix4.Matrix4
+  ): void {
+    if (!Objects.isEqual(newMatrix, oldMatrix)) {
+      this.propertyChange.emit();
+    }
   }
 
   /**

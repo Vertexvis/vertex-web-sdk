@@ -15,6 +15,7 @@ import {
   FrameCameraBase,
   FrameOrthographicCamera,
   FrameScene,
+  SceneViewSummary,
 } from '../../../../lib/types';
 import {
   DEFAULT_ORTHOGRAPHIC_MESH_SCALAR,
@@ -132,10 +133,14 @@ function updateFrameCameraPosition(
       baseFrame.scene.boundingBox,
       baseFrame.scene.crossSection,
       baseFrame.scene.worldOrientation,
-      baseFrame.scene.hasChanged
+      baseFrame.scene.hasChanged,
+      {} as SceneViewSummary.SceneViewSummary,
+      undefined,
+      undefined
     ),
     makeDepthImagePng(100, 50),
-    makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0))
+    makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0)),
+    false
   );
 }
 
@@ -189,15 +194,15 @@ describe(HitIndicator, () => {
   it('creates meshes for the hit position, normal, and plane', async () => {
     const indicator = new HitIndicator(canvas);
     const frame = makePerspectiveFrame();
-    const hithitPositionTransform = Matrix4.makeTranslation(
+    const hitPositionTransform = Matrix4.makeTranslation(
       Vector3.create(1, 1, 1)
     );
     const hitNormal = Vector3.up();
-    const meshes = createMeshes(hithitPositionTransform, hitNormal, frame);
+    const meshes = createMeshes(hitPositionTransform, hitNormal, frame);
 
     mockShapeBuilder().createShape.mockClear();
     indicator.updateFrame(frame);
-    indicator.updateTransformAndNormal(hithitPositionTransform, hitNormal);
+    indicator.updateTransformAndNormal(hitPositionTransform, hitNormal);
 
     expect(mockShapeBuilder().createShape).toHaveBeenCalledWith(
       createdPaddedFloat64Array(meshes.arrow.points),

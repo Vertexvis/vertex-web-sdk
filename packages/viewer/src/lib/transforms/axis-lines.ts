@@ -14,7 +14,10 @@ export function axisPositions(
     arrowMesh.points.valid,
     position,
     arrowMesh.points.worldBase,
-    Vector3.transformMatrix(position, camera.projectionViewMatrix),
+    Vector3.multiplyByTransformMatrixColumnMajor(
+      position,
+      camera.projectionViewMatrix
+    ),
     arrowMesh.points.base
   );
 }
@@ -64,7 +67,10 @@ export function rotationAxisPositions(
       rotationMesh.points.valid,
       worldPoints,
       worldPoints.map((p) =>
-        Vector3.transformMatrix(p, camera.projectionViewMatrix)
+        Vector3.multiplyByTransformMatrixColumnMajor(
+          p,
+          camera.projectionViewMatrix
+        )
       )
     );
   }

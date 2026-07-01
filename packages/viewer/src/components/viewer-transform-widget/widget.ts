@@ -198,6 +198,9 @@ export class TransformWidget extends ReglComponent {
     }
   }
 
+  /**
+   * @param transform A transformation matrix in row-major form.
+   */
   public updateTransform(transform?: Matrix4.Matrix4): void {
     this.transform = transform;
 

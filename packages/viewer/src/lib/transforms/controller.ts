@@ -1,5 +1,5 @@
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
-import { Matrix4, Vector3 } from '@vertexvis/geometry';
+import { Matrix4 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
 
 export class TransformController {
@@ -35,18 +35,10 @@ export class TransformController {
     }
   }
 
-  public async updateTransform(delta: Matrix4.Matrix4): Promise<void> {
+  public async updateTransformController(
+    delta: Matrix4.Matrix4
+  ): Promise<void> {
     this.currentDelta = delta;
-
-    await this.stream.updateInteraction({
-      transform: {
-        delta: this.toDeltaTransform(this.currentDelta, true),
-      },
-    });
-  }
-
-  public async updateTranslation(delta: Vector3.Vector3): Promise<void> {
-    this.currentDelta = Matrix4.makeTranslation(delta);
 
     await this.stream.updateInteraction({
       transform: {
@@ -89,7 +81,7 @@ export class TransformController {
       console.debug(`Undo of previous transform [delta-applied=${undoDelta}]`);
 
       await this.beginTransform();
-      await this.updateTransform(Matrix4.invert(this.previousDelta));
+      await this.updateTransformController(undoDelta);
       await this.endTransform();
 
       this.previousDelta = undefined;
@@ -136,51 +128,26 @@ export class TransformController {
   }
 
   private toDeltaTransform(
-    delta: Matrix4.Matrix4,
-    columnMajor = false
+    delta: Matrix4.Matrix4
   ): vertexvis.protobuf.core.IAffineMatrix4f {
-    const asObject = Matrix4.toObject(delta);
-
-    // TODO: update this to pass a single order for the
-    // transform matrix after work in https://vertexvis.atlassian.net/browse/PLAT-1582
-    const basisX = columnMajor
-      ? {
-          x: asObject.m11,
-          y: asObject.m21,
-          z: asObject.m31,
-        }
-      : {
-          x: asObject.m11,
-          y: asObject.m12,
-          z: asObject.m13,
-        };
-    const basisY = columnMajor
-      ? {
-          x: asObject.m12,
-          y: asObject.m22,
-          z: asObject.m32,
-        }
-      : {
-          x: asObject.m21,
-          y: asObject.m22,
-          z: asObject.m23,
-        };
-    const basisZ = columnMajor
-      ? {
-          x: asObject.m13,
-          y: asObject.m23,
-          z: asObject.m33,
-        }
-      : {
-          x: asObject.m31,
-          y: asObject.m32,
-          z: asObject.m33,
-        };
+    const asObject = Matrix4.toObjectColumnMajor(delta);
 
     return {
-      basisX,
-      basisY,
-      basisZ,
+      basisX: {
+        x: asObject.m11,
+        y: asObject.m21,
+        z: asObject.m31,
+      },
+      basisY: {
+        x: asObject.m12,
+        y: asObject.m22,
+        z: asObject.m32,
+      },
+      basisZ: {
+        x: asObject.m13,
+        y: asObject.m23,
+        z: asObject.m33,
+      },
       xlate: {
         x: asObject.m14,
         y: asObject.m24,

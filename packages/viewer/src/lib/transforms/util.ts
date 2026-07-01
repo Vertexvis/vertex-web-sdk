@@ -91,7 +91,7 @@ export function toWorldTransform(
   parentWM: Matrix4.Matrix4
 ): Transform {
   const localM = toMatrix(toRadiansTransform(localT));
-  const worldM = Matrix4.multiply(parentWM, localM);
+  const worldM = Matrix4.multiply(localM, parentWM);
   return toDegreesTransform(toTransform(worldM));
 }
 
@@ -106,6 +106,6 @@ export function toLocalTransform(
   parentWM: Matrix4.Matrix4
 ): Transform {
   const worldM = toMatrix(toRadiansTransform(worldT));
-  const localM = Matrix4.multiply(Matrix4.invert(parentWM), worldM);
+  const localM = Matrix4.multiply(worldM, Matrix4.invert(parentWM));
   return toDegreesTransform(toTransform(localM));
 }

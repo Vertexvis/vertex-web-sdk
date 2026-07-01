@@ -232,8 +232,11 @@ export class StandardView {
    * @returns A new standard view.
    */
   public transformMatrix(matrix: Matrix4.Matrix4): StandardView {
-    const newPosition = Vector3.transformMatrix(this.position, matrix);
-    const newUp = Vector3.transformMatrix(this.up, matrix);
+    const newPosition = Vector3.multiplyByTransformMatrixColumnMajor(
+      this.position,
+      matrix
+    );
+    const newUp = Vector3.multiplyByTransformMatrixColumnMajor(this.up, matrix);
     return new StandardView(newPosition, newUp);
   }
 }

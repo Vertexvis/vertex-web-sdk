@@ -85,7 +85,10 @@ export class Viewport implements Dimensions.Dimensions {
     worldPt: Vector3.Vector3,
     projectionViewMatrix: Matrix4.Matrix4
   ): Point.Point {
-    const ndc = Vector3.transformMatrix(worldPt, projectionViewMatrix);
+    const ndc = Vector3.multiplyByTransformMatrixColumnMajor(
+      worldPt,
+      projectionViewMatrix
+    );
     return this.transformVectorToViewport(ndc);
   }
 

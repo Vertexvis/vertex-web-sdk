@@ -224,14 +224,39 @@ describe(Vector3.cross, () => {
   });
 });
 
-describe(Vector3.transformMatrix, () => {
-  it('returns correct value given a Matrix4 and Vector3', () => {
-    const values = Matrix4.makeIdentity();
-    const transformed = Vector3.transformMatrix(
+describe(Vector3.multiplyByTransformMatrixColumnMajor, () => {
+  it('returns correct value given a column-major Matrix4 and Vector3', () => {
+    /* eslint-disable prettier/prettier */
+    const values = Matrix4.fromValues(
+        5, 3, 2, 1,
+        5, 3, 2, 1,
+        5, 3, 2, 1,
+        5, 3, 2, 1,
+    );
+    /* eslint-enable prettier/prettier */
+    const transformed = Vector3.multiplyByTransformMatrixColumnMajor(
       Vector3.create(2, 2, 2),
       values
     );
-    expect(transformed).toEqual(Vector3.create(2, 2, 2));
+    expect(transformed).toEqual(Vector3.create(5, 3, 2));
+  });
+});
+
+describe(Vector3.multiplyByTransformMatrixRowMajor, () => {
+  it('returns correct value given a row-major Matrix4 and Vector3', () => {
+    /* eslint-disable prettier/prettier */
+    const values = Matrix4.fromValues(
+        5, 5, 5, 5,
+        3, 3, 3, 3,
+        2, 2, 2, 2,
+        1, 1, 1, 1,
+    );
+    /* eslint-enable prettier/prettier */
+    const transformed = Vector3.multiplyByTransformMatrixRowMajor(
+      Vector3.create(2, 2, 2),
+      values
+    );
+    expect(transformed).toEqual(Vector3.create(5, 3, 2));
   });
 });
 

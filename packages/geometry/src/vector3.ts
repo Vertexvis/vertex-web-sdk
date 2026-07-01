@@ -68,11 +68,11 @@ export function isValid({ x, y, z }: Vector3): boolean {
  * Returns a vector representing the scale elements of `matrix`.
  */
 export function fromMatrixScale(matrix: Matrix4.Matrix4): Vector3 {
-  const m = Matrix4.toObject(matrix);
+  const m = Matrix4.toObjectRowMajor(matrix);
   return {
-    x: Math.hypot(m.m11, m.m21, m.m31),
-    y: Math.hypot(m.m12, m.m22, m.m32),
-    z: Math.hypot(m.m13, m.m23, m.m33),
+    x: Math.hypot(m.m11, m.m12, m.m13),
+    y: Math.hypot(m.m21, m.m22, m.m23),
+    z: Math.hypot(m.m31, m.m32, m.m33),
   };
 }
 
@@ -80,8 +80,9 @@ export function fromMatrixScale(matrix: Matrix4.Matrix4): Vector3 {
  * Returns a vector representing the position elements of `matrix`.
  */
 export function fromMatrixPosition(matrix: Matrix4.Matrix4): Vector3 {
-  const m = Matrix4.toObject(matrix);
-  return { x: m.m14, y: m.m24, z: m.m34 };
+  const m = Matrix4.toObjectRowMajor(matrix);
+
+  return { x: m.m41, y: m.m42, z: m.m43 };
 }
 
 /**
@@ -298,7 +299,11 @@ export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
     })
   );
 
-  return Euler.fromRotationMatrix(Matrix4.makeRotation(normalizedQ));
+  return Euler.fromRotationMatrix(
+    Matrix4.makeRotation(normalizedQ),
+    'xyz',
+    false
+  );
 }
 
 /**
@@ -364,15 +369,34 @@ export function rotateAboutAxis(
 }
 
 /**
- * Returns a vector that is multiplied with a matrix.
+ * Returns a vector that is multiplied with a matrix in column-major form.
  */
-export function transformMatrix(vector: Vector3, m: Matrix4.Matrix4): Vector3 {
+export function multiplyByTransformMatrixColumnMajor(
+  vector: Vector3,
+  m: Matrix4.Matrix4
+): Vector3 {
   const { x, y, z } = vector;
   const w = 1 / (m[3] * x + m[7] * y + m[11] * z + m[15]);
   return {
     x: (m[0] * x + m[4] * y + m[8] * z + m[12]) * w,
     y: (m[1] * x + m[5] * y + m[9] * z + m[13]) * w,
     z: (m[2] * x + m[6] * y + m[10] * z + m[14]) * w,
+  };
+}
+
+/**
+ * Returns a vector that is multiplied with a matrix in row-major form.
+ */
+export function multiplyByTransformMatrixRowMajor(
+  vector: Vector3,
+  m: Matrix4.Matrix4
+): Vector3 {
+  const { x, y, z } = vector;
+  const w = 1 / (m[12] * x + m[13] * y + m[14] * z + m[15]);
+  return {
+    x: (m[0] * x + m[1] * y + m[2] * z + m[3]) * w,
+    y: (m[4] * x + m[5] * y + m[6] * z + m[7]) * w,
+    z: (m[8] * x + m[9] * y + m[10] * z + m[11]) * w,
   };
 }
 
@@ -450,8 +474,8 @@ export function transformNdcToWorldSpace(
   worldMatrix: Matrix4.Matrix4,
   projectionMatrixInverse: Matrix4.Matrix4
 ): Vector3 {
-  return transformMatrix(
-    transformMatrix(ndc, projectionMatrixInverse),
+  return multiplyByTransformMatrixColumnMajor(
+    multiplyByTransformMatrixColumnMajor(ndc, projectionMatrixInverse),
     worldMatrix
   );
 }
