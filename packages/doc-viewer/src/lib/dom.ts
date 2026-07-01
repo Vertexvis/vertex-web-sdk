@@ -2,6 +2,10 @@ export function getElementBoundingClientRect(element: HTMLElement): ClientRect {
   return element.getBoundingClientRect();
 }
 
+export function createElement(tagName: string): HTMLElement {
+  return document.createElement(tagName);
+}
+
 export function getAllVertexElementChildren(element: Element): Element[] {
   return getAllChildren(element)
     .filter(node => node.nodeName.startsWith('VERTEX-'))

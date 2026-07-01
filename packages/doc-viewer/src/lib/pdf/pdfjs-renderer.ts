@@ -3,6 +3,7 @@ import { Disposable } from '@vertexvis/utils';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 import { DocumentRenderer } from '../document/renderer';
+import { createElement } from '../dom';
 import { PdfJsApi, PdfJsApiState } from './pdfjs-api';
 
 interface PdfJsRendererState {
@@ -21,7 +22,7 @@ export class PdfJsRenderer extends DocumentRenderer {
 
     // Render pages using an offscreen canvas to avoid flickering that can occur for
     // PDFs with annotations.
-    this.offscreenCanvas = document.createElement('canvas');
+    this.offscreenCanvas = createElement('canvas');
 
     this.handleStateChanged = this.handleStateChanged.bind(this);
 
