@@ -18,7 +18,7 @@ web platform.
 ## Documentation
 
 Please refer to our [SDK API documentation](https://vertexvis.github.io/vertex-web-sdk/) and
-our [developer guides](https://developer.vertexvis.com/docs/guides/render-your-first-scene).
+our [developer guides](https://developer.vertex3d.com/docs/guides/render-your-first-scene).
 
 Each component of the `@vertexvis/viewer` package also exposes a component-level README with
 additional examples and property definitions. See the
