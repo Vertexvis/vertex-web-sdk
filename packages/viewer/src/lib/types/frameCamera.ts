@@ -45,7 +45,7 @@ export function isValidFrameCamera(camera: Partial<FrameCamera>): boolean {
 }
 
 export function isPerspectiveFrameCamera(
-  camera: Partial<FrameCamera>
+  camera: Partial<FrameCamera>,
 ): camera is PerspectiveFrameCamera {
   return (
     (camera as PerspectiveFrameCamera).position != null &&
@@ -54,7 +54,7 @@ export function isPerspectiveFrameCamera(
 }
 
 export function isOrthographicFrameCamera(
-  camera: Partial<FrameCamera>
+  camera: Partial<FrameCamera>,
 ): camera is OrthographicFrameCamera {
   const asOrtho = camera as OrthographicFrameCamera;
   return asOrtho.viewVector != null && asOrtho.fovHeight != null;
@@ -78,7 +78,7 @@ export function withPositionAndViewVector(camera: FrameCamera): FrameCamera & {
 }
 
 export function createPerspective(
-  data: Partial<PerspectiveFrameCamera> = {}
+  data: Partial<PerspectiveFrameCamera> = {},
 ): PerspectiveFrameCamera {
   return {
     position: data.position ?? Vector3.forward(),
@@ -89,7 +89,7 @@ export function createPerspective(
 }
 
 export function createOrthographic(
-  data: Partial<OrthographicFrameCamera> = {}
+  data: Partial<OrthographicFrameCamera> = {},
 ): OrthographicFrameCamera {
   return {
     viewVector: data.viewVector ?? Vector3.back(),
@@ -102,7 +102,7 @@ export function createOrthographic(
 
 export function toOrthographic(
   data: PerspectiveFrameCamera,
-  boundingBox: BoundingBox.BoundingBox
+  boundingBox: BoundingBox.BoundingBox,
 ): OrthographicFrameCamera {
   const viewVector = Vector3.subtract(data.lookAt, data.position);
   const boundingSphere = BoundingSphere.create(boundingBox);
@@ -121,7 +121,7 @@ export function toOrthographic(
 
 export function toPerspective(
   data: OrthographicFrameCamera,
-  fovY = 45
+  fovY = 45,
 ): PerspectiveFrameCamera {
   const expectedMagnitude =
     data.fovHeight / (2 * Math.tan(Angle.toRadians(fovY / 2.0)));
@@ -131,7 +131,7 @@ export function toPerspective(
   return {
     position: Vector3.add(
       data.lookAt,
-      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector))
+      Vector3.negate(Vector3.scale(magnitudeScale, data.viewVector)),
     ),
     up: data.up,
     lookAt: data.lookAt,
@@ -140,7 +140,7 @@ export function toPerspective(
 }
 
 export function toProtobuf(
-  camera: Partial<FrameCamera>
+  camera: Partial<FrameCamera>,
 ): vertexvis.protobuf.stream.ICamera {
   if (isOrthographicFrameCamera(camera)) {
     return {

@@ -157,7 +157,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector(
-      'vertex-viewer-markup-tool'
+      'vertex-viewer-markup-tool',
     ) as HTMLVertexViewerMarkupToolElement;
     toolEl.circleTemplateId = 'my-template';
     await page.waitForChanges();
@@ -246,7 +246,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector(
-      'vertex-viewer-markup-tool'
+      'vertex-viewer-markup-tool',
     ) as HTMLVertexViewerMarkupToolElement;
     toolEl.freeformTemplateId = 'my-template';
     await page.waitForChanges();
@@ -273,7 +273,7 @@ describe('vertex-viewer-markup-tool', () => {
     });
 
     const toolEl = page.body.querySelector(
-      'vertex-viewer-markup-tool'
+      'vertex-viewer-markup-tool',
     ) as HTMLVertexViewerMarkupToolElement;
 
     toolEl.disabled = true;
@@ -330,7 +330,7 @@ describe('vertex-viewer-markup-tool', () => {
           end,
           id: expect.stringContaining('markup'),
         }),
-      })
+      }),
     );
 
     markupEl.start = undefined;

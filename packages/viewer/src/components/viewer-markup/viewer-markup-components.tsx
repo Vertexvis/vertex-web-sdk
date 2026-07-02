@@ -13,7 +13,7 @@ export interface RelativeAnchorProps {
 
 export const RelativeAnchor: FunctionalComponent<RelativeAnchorProps> = (
   { id, transform, rotation, name, point, onPointerDown },
-  children
+  children,
 ) => {
   return (
     <div

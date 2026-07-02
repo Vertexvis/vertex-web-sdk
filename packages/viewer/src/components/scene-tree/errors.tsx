@@ -9,7 +9,7 @@ interface SceneTreeErrorProps {
 
 export const SceneTreeError: FunctionalComponent<SceneTreeErrorProps> = (
   { details },
-  children
+  children,
 ) => {
   return (
     <div class="error">

@@ -30,7 +30,7 @@ export class TimingMeter {
 
   public constructor(
     public readonly name: string,
-    private readonly perf: Performance = getPerformance()
+    private readonly perf: Performance = getPerformance(),
   ) {}
 
   /**

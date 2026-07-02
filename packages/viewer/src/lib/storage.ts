@@ -13,7 +13,7 @@ function getLocalStorage(): Storage {
 export function upsertStorageEntry<T>(
   key: string,
   values: Record<string, T>,
-  storage: Storage = getLocalStorage()
+  storage: Storage = getLocalStorage(),
 ): void {
   const existing = storage.getItem(key);
 
@@ -28,7 +28,7 @@ export function upsertStorageEntry<T>(
 export function getStorageEntry<T>(
   key: string,
   f: (value: Record<string, T>) => T | undefined,
-  storage: Storage = getLocalStorage()
+  storage: Storage = getLocalStorage(),
 ): T | undefined {
   const item = storage.getItem(key);
 

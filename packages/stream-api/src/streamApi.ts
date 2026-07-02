@@ -63,7 +63,7 @@ export class StreamApi {
 
   public constructor(
     private websocket: WebSocketClient = new WebSocketClientImpl(),
-    opts: StreamApiOptions = {}
+    opts: StreamApiOptions = {},
   ) {
     this.opts = {
       loggingEnabled: opts.loggingEnabled ?? false,
@@ -81,7 +81,7 @@ export class StreamApi {
    */
   public async connect(
     descriptor: ConnectionDescriptor,
-    settings: Settings = {}
+    settings: Settings = {},
   ): Promise<Disposable> {
     const desc = {
       ...descriptor,
@@ -150,7 +150,7 @@ export class StreamApi {
    */
   public startStream(
     payload: StartStreamPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ startStream: payload }, withResponse);
   }
@@ -173,14 +173,14 @@ export class StreamApi {
    */
   public async reconnect(
     payload: ReconnectPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ reconnect: payload }, withResponse);
   }
 
   public async updateStream(
     payload: UpdateStreamPayload,
-    withResponse = false
+    withResponse = false,
   ): Promise<vertexvis.protobuf.stream.IUpdateStreamResult> {
     return this.sendRequest({ updateStream: payload }, withResponse);
   }
@@ -202,7 +202,7 @@ export class StreamApi {
    */
   public beginInteraction(
     payload: BeginInteractionPayload = {},
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ beginInteraction: payload }, withResponse);
   }
@@ -225,7 +225,7 @@ export class StreamApi {
    */
   public replaceCamera(
     payload: ReplaceCameraPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     // If a camera is provided, verify it is valid
     if (payload.camera != null) {
@@ -233,7 +233,7 @@ export class StreamApi {
 
       if (!cameraIsValid) {
         console.warn(
-          'Invalid camera provided. Canceling replaceCamera operation.'
+          'Invalid camera provided. Canceling replaceCamera operation.',
         );
         return Promise.resolve({});
       }
@@ -259,7 +259,7 @@ export class StreamApi {
    */
   public flyTo(
     payload: vertexvis.protobuf.stream.IFlyToPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     // If a bounding box is provided, verify it is valid
     if (payload.boundingBox != null) {
@@ -267,7 +267,7 @@ export class StreamApi {
 
       if (!validBoundingBox) {
         console.warn(
-          'Invalid bounding box provided. Canceling flyTo operation.'
+          'Invalid bounding box provided. Canceling flyTo operation.',
         );
         return Promise.resolve({});
       }
@@ -289,7 +289,7 @@ export class StreamApi {
 
       if (!baseCameraIsValid) {
         console.warn(
-          'Invalid base camera provided. Canceling flyTo operation.'
+          'Invalid base camera provided. Canceling flyTo operation.',
         );
         return Promise.resolve({});
       }
@@ -311,7 +311,7 @@ export class StreamApi {
    */
   public updateInteraction(
     payload: UpdateInteractionPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ updateInteraction: payload }, withResponse);
   }
@@ -334,7 +334,7 @@ export class StreamApi {
    */
   public updateDimensions(
     payload: UpdateDimensionsPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     // Verify the provided dimensions are valid
     if (payload.dimensions != null) {
@@ -342,7 +342,7 @@ export class StreamApi {
 
       if (!validDimensions) {
         console.warn(
-          'Invalid dimensions provided. Canceling updateDimensions operation.'
+          'Invalid dimensions provided. Canceling updateDimensions operation.',
         );
         return Promise.resolve({});
       }
@@ -369,7 +369,7 @@ export class StreamApi {
    */
   public updateCrossSectioning(
     payload: UpdateCrossSectioningPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     // If a section plane is provided, verify it is valid
     const invalidSectionPlane = payload.crossSectioning?.sectionPlanes?.some(
@@ -380,12 +380,12 @@ export class StreamApi {
           plane.offset != null && validateNumber(plane.offset);
 
         return !validNormal || !validOffset;
-      }
+      },
     );
 
     if (invalidSectionPlane) {
       console.warn(
-        'Invalid cross section plane provided. Canceling updateCrossSectioning operation.'
+        'Invalid cross section plane provided. Canceling updateCrossSectioning operation.',
       );
       return Promise.resolve({});
     }
@@ -411,7 +411,7 @@ export class StreamApi {
    */
   public updateModelView(
     payload: UpdateModelViewPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ updateModelView: payload }, withResponse);
   }
@@ -429,7 +429,7 @@ export class StreamApi {
    */
   public hitItems(
     payload: HitItemsPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     // If a point is provided, verify it is valid
     if (payload.point != null) {
@@ -458,7 +458,7 @@ export class StreamApi {
    */
   public createSceneAlteration(
     payload: vertexvis.protobuf.stream.ICreateSceneAlterationPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ createSceneAlteration: payload }, withResponse);
   }
@@ -477,7 +477,7 @@ export class StreamApi {
    */
   public resetSceneView(
     payload: vertexvis.protobuf.stream.IResetViewPlayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ resetView: payload }, withResponse);
   }
@@ -495,7 +495,7 @@ export class StreamApi {
    */
   public endInteraction(
     payload: EndInteractionPayload = {},
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IBeginInteractionResult> {
     return this.sendRequest({ endInteraction: payload }, withResponse);
   }
@@ -513,7 +513,7 @@ export class StreamApi {
    */
   public syncTime(
     payload: SyncTimePayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ syncTime: payload }, withResponse);
   }
@@ -533,7 +533,7 @@ export class StreamApi {
    */
   public recordPerformance(
     payload: RecordPerformancePayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ recordPerformance: payload }, withResponse);
   }
@@ -551,7 +551,7 @@ export class StreamApi {
    */
   public loadSceneViewState(
     payload: LoadSceneViewStatePayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ loadSceneViewState: payload }, withResponse);
   }
@@ -561,7 +561,7 @@ export class StreamApi {
    */
   public getStencilBuffer(
     payload: GetStencilBufferPayload,
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ getStencilBuffer: payload }, withResponse);
   }
@@ -574,7 +574,7 @@ export class StreamApi {
    * @returns A promise that completes with the refreshed token.
    */
   public refreshToken(
-    withResponse = true
+    withResponse = true,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     return this.sendRequest({ refreshToken: {} }, withResponse);
   }
@@ -640,7 +640,7 @@ export class StreamApi {
 
   private sendRequest(
     req: vertexvis.protobuf.stream.IStreamRequest,
-    withResponse: boolean
+    withResponse: boolean,
   ): Promise<vertexvis.protobuf.stream.IStreamResponse> {
     const sentAtTime = currentDateAsProtoTimestamp();
     if (withResponse) {
@@ -659,8 +659,8 @@ export class StreamApi {
                   requestId,
                   req,
                   summary?.value,
-                  details?.value
-                )
+                  details?.value,
+                ),
               );
             }
             subscription.dispose();
@@ -679,7 +679,7 @@ export class StreamApi {
   }
 
   private sendResponse(
-    response: vertexvis.protobuf.stream.IStreamResponse
+    response: vertexvis.protobuf.stream.IStreamResponse,
   ): void {
     const sentAtTime = currentDateAsProtoTimestamp();
     this.websocket.send(encode({ sentAtTime, response }));

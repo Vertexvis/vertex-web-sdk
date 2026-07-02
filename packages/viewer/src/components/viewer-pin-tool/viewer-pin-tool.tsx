@@ -217,7 +217,7 @@ export class ViewerPinTool {
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
+    oldViewer?: HTMLVertexViewerElement,
   ): void {
     this.setupInteractionHandler();
     this.setDepthBuffers();
@@ -227,7 +227,7 @@ export class ViewerPinTool {
     if (oldViewer != null) {
       oldViewer.removeEventListener(
         'frameDrawn',
-        this.handleSetProjectionMatrix
+        this.handleSetProjectionMatrix,
       );
     }
 
@@ -278,7 +278,7 @@ export class ViewerPinTool {
       this.pinModel,
       this.mode,
       this.tool,
-      attributes
+      attributes,
     );
   }
 
@@ -312,8 +312,8 @@ export class ViewerPinTool {
           new PinsInteractionHandler(
             this.pinController,
             xOffsetAsNumber,
-            yOffsetAsNumber
-          )
+            yOffsetAsNumber,
+          ),
         );
     }
   }

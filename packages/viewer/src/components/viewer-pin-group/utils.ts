@@ -3,7 +3,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 export function getClosestCenterToPoint(
   boxPoint: Point.Point,
   pointToMeasure: Point.Point,
-  dimensions: Dimensions.Dimensions
+  dimensions: Dimensions.Dimensions,
 ): Point.Point {
   const topPoint = {
     x: boxPoint.x + dimensions.width / 2,
@@ -28,7 +28,7 @@ export function getClosestCenterToPoint(
   const candidates = [topPoint, bottomPoint, leftPoint, rightPoint];
 
   const distances = candidates.map((candidate) =>
-    Point.distance(candidate, pointToMeasure)
+    Point.distance(candidate, pointToMeasure),
   );
 
   const candidateIndex = distances.indexOf(Math.min(...distances));

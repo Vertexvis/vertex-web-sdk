@@ -47,7 +47,7 @@ export class WebSocketClientMock implements WebSocketClient {
    */
   public receiveMessage(data: WebSocketSendData): void {
     this.msgHandlers.forEach((handler) =>
-      handler(new MessageEvent('message', { data }))
+      handler(new MessageEvent('message', { data })),
     );
   }
 
@@ -100,7 +100,7 @@ export class WebSocketClientMock implements WebSocketClient {
    */
   public nextSent(): WebSocketSendData;
   public nextSent<T>(
-    decoder?: (data: WebSocketSendData) => T
+    decoder?: (data: WebSocketSendData) => T,
   ): T | WebSocketSendData {
     const next = this.sentMessages.shift();
     if (next != null) {
@@ -137,7 +137,7 @@ export class WebSocketClientMock implements WebSocketClient {
       }
     } else {
       throw new Error(
-        `Cannot skip the next ${n} messages. Sent message queue only has ${this.sentMessages.length} messages.`
+        `Cannot skip the next ${n} messages. Sent message queue only has ${this.sentMessages.length} messages.`,
       );
     }
     return this;

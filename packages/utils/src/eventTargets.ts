@@ -10,7 +10,7 @@
 export async function once<E extends Event>(
   target: EventTarget,
   type: string,
-  opts?: boolean | AddEventListenerOptions
+  opts?: boolean | AddEventListenerOptions,
 ): Promise<E> {
   return new Promise((resolve) => {
     function handler(event: Event): void {

@@ -27,31 +27,31 @@ describe(FeatureMap, () => {
 
     it('should return the correct entity type', () => {
       expect(featureMap.getEntityType(Point.create(1, 0))).toEqual(
-        EntityType.CROSS_SECTION
+        EntityType.CROSS_SECTION,
       );
 
       expect(featureMap.getEntityType(Point.create(1, 1))).toEqual(
-        EntityType.GENERIC_GEOMETRY
+        EntityType.GENERIC_GEOMETRY,
       );
 
       expect(featureMap.getEntityType(Point.create(1, 2))).toEqual(
-        EntityType.IMPRECISE_EDGE
+        EntityType.IMPRECISE_EDGE,
       );
 
       expect(featureMap.getEntityType(Point.create(1, 3))).toEqual(
-        EntityType.IMPRECISE_SURFACE
+        EntityType.IMPRECISE_SURFACE,
       );
 
       expect(featureMap.getEntityType(Point.create(1, 4))).toEqual(
-        EntityType.PRECISE_EDGE
+        EntityType.PRECISE_EDGE,
       );
 
       expect(featureMap.getEntityType(Point.create(1, 5))).toEqual(
-        EntityType.PRECISE_SURFACE
+        EntityType.PRECISE_SURFACE,
       );
 
       expect(featureMap.getEntityType(Point.create(1, 6))).toEqual(
-        EntityType.NO_GEOMETRY
+        EntityType.NO_GEOMETRY,
       );
     });
   });

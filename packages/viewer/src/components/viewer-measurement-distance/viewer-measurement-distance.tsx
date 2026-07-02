@@ -452,7 +452,7 @@ export class ViewerMeasurementDistance {
   @Watch('viewer')
   protected async handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
+    oldViewer?: HTMLVertexViewerElement,
   ): Promise<void> {
     if (oldViewer != null) {
       oldViewer.removeEventListener('frameDrawn', this.handleFrameDrawn);
@@ -581,7 +581,7 @@ export class ViewerMeasurementDistance {
           ? {
               indicatorPt: this.viewport.transformWorldToViewport(
                 this.indicatorPt,
-                this.internalCamera.projectionViewMatrix
+                this.internalCamera.projectionViewMatrix,
               ),
             }
           : {};
@@ -593,7 +593,7 @@ export class ViewerMeasurementDistance {
   }
 
   private computeLineElementPositions(
-    line: Line3.Line3
+    line: Line3.Line3,
   ): MeasurementElementPositions {
     if (this.internalCamera != null) {
       return getViewingElementPositions(line, this.interactingAnchor, {
@@ -637,7 +637,7 @@ export class ViewerMeasurementDistance {
   }
 
   private async addInteractionListeners(
-    viewer: HTMLVertexViewerElement
+    viewer: HTMLVertexViewerElement,
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
     if (this.mode === 'replace') {
@@ -648,12 +648,12 @@ export class ViewerMeasurementDistance {
   }
 
   private async removeInteractionListeners(
-    viewer: HTMLVertexViewerElement
+    viewer: HTMLVertexViewerElement,
   ): Promise<void> {
     const interactionTarget = await viewer.getInteractionTarget_DEPRECATED();
     interactionTarget.removeEventListener(
       'pointermove',
-      this.updateStartAnchor
+      this.updateStartAnchor,
     );
     interactionTarget.removeEventListener('pointerdown', this.newMeasurement);
     interactionTarget.removeEventListener('pointerleave', this.clearIndicator);
@@ -704,7 +704,7 @@ export class ViewerMeasurementDistance {
         const pointerMove = (event: PointerEvent): void => {
           const dist = Point.distance(
             downPt,
-            getMouseClientPosition(event, this.elementBounds)
+            getMouseClientPosition(event, this.elementBounds),
           );
           if (dist >= INTERACTION_THRESHOLD) {
             callback();
@@ -785,7 +785,7 @@ export class ViewerMeasurementDistance {
   };
 
   private handleEditAnchor(
-    anchor: Anchor
+    anchor: Anchor,
   ): ((event: PointerEvent) => Promise<void>) | undefined {
     if (this.mode === 'edit' || this.mode === 'replace') {
       const handlePointerMove = this.createInteractionMoveHandler();
@@ -820,7 +820,7 @@ export class ViewerMeasurementDistance {
   }
 
   private createInteractionMoveHandler(): (
-    event: PointerEvent
+    event: PointerEvent,
   ) => Promise<void> {
     return async (event) => {
       const hits = this.getHitProvider();
@@ -868,7 +868,7 @@ export class ViewerMeasurementDistance {
 
   private beginEditing(
     type: EditBeginEventDetails['type'],
-    anchor: EditBeginEventDetails['anchor']
+    anchor: EditBeginEventDetails['anchor'],
   ): void {
     if (this.interactionCount === 0) {
       this.interactingAnchor = anchor;
@@ -922,7 +922,7 @@ export class ViewerMeasurementDistance {
         stencil,
         depthBuffer,
         this.viewport,
-        this.internalCamera
+        this.internalCamera,
       );
     }
   }
@@ -967,7 +967,7 @@ export class ViewerMeasurementDistance {
 }
 
 function parseVector3(
-  value: string | Vector3.Vector3 | undefined
+  value: string | Vector3.Vector3 | undefined,
 ): Vector3.Vector3 | undefined {
   return typeof value === 'string' ? Vector3.fromJson(value) : value;
 }

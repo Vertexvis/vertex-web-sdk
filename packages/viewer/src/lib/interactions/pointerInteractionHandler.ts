@@ -23,7 +23,7 @@ export class PointerInteractionHandler extends MultiElementInteractionHandler {
     zoomInteraction = new ZoomInteraction(() => getConfig().interactions),
     panInteraction = new PanInteraction(),
     twistInteraction = new TwistInteraction(),
-    pivotInteraction = new PivotInteraction()
+    pivotInteraction = new PivotInteraction(),
   ) {
     super(
       'pointerdown',
@@ -35,7 +35,7 @@ export class PointerInteractionHandler extends MultiElementInteractionHandler {
       panInteraction,
       twistInteraction,
       pivotInteraction,
-      getConfig
+      getConfig,
     );
     this.touchPoints = new Set();
     this.handlePointerDown = this.handlePointerDown.bind(this);

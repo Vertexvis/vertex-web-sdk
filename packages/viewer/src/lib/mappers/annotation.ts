@@ -25,8 +25,8 @@ export const fromPbAnnotationSet: M.Func<SceneAnnotationSet, AnnotationSet> =
         M.mapRequiredProp('createdAt', fromPbTimestamp),
         M.mapRequiredProp('modifiedAt', fromPbTimestamp),
         M.mapProp('name', fromPbStringValue),
-        M.mapProp('suppliedId', fromPbStringValue)
-      )
+        M.mapProp('suppliedId', fromPbStringValue),
+      ),
     ),
     ([id, createdAt, modifiedAt, name, suppliedId]) => ({
       id,
@@ -34,7 +34,7 @@ export const fromPbAnnotationSet: M.Func<SceneAnnotationSet, AnnotationSet> =
       modifiedAt,
       name,
       suppliedId,
-    })
+    }),
   );
 
 export const fromPbAnnotationSetOrThrow = M.ifInvalidThrow(fromPbAnnotationSet);
@@ -56,8 +56,8 @@ export const fromPbAnnotation: M.Func<SceneAnnotation, Annotation> =
           } else {
             throw new Error('Undefined or unknown annotation data.');
           }
-        })
-      )
+        }),
+      ),
     ),
     ([id, createdAt, modifiedAt, suppliedId, data]) => ({
       id,
@@ -65,7 +65,7 @@ export const fromPbAnnotation: M.Func<SceneAnnotation, Annotation> =
       modifiedAt,
       suppliedId,
       data,
-    })
+    }),
   );
 
 export const fromPbAnnotationOrThrow = M.ifInvalidThrow(fromPbAnnotation);
@@ -78,7 +78,7 @@ const fromPbCalloutAnnotationData: M.Func<
     M.mapRequiredProp('position', fromPbVector3f),
     M.mapProp('icon', fromPbStringValue),
     M.mapProp('primaryColor', fromPbStringValue),
-    M.mapProp('accentColor', fromPbStringValue)
+    M.mapProp('accentColor', fromPbStringValue),
   ),
   ([position, icon, primaryColor, accentColor]) => ({
     type: 'callout',
@@ -86,7 +86,7 @@ const fromPbCalloutAnnotationData: M.Func<
     icon: icon as ViewerIconName,
     primaryColor,
     accentColor,
-  })
+  }),
 );
 
 const fromPbCustomAnnotationData: M.Func<
@@ -95,7 +95,7 @@ const fromPbCustomAnnotationData: M.Func<
 > = M.defineMapper(
   M.read(
     M.requiredProp('type'),
-    M.mapRequiredProp('jsonData', (json) => JSON.parse(json))
+    M.mapRequiredProp('jsonData', (json) => JSON.parse(json)),
   ),
-  ([jsonType, jsonData]) => ({ type: 'custom', jsonType, jsonData })
+  ([jsonType, jsonData]) => ({ type: 'custom', jsonType, jsonData }),
 );

@@ -222,7 +222,7 @@ export class ViewerTeleportTool {
         this.model,
         !this.animationsDisabled && this.animationMs != null
           ? { durationMs: this.animationMs }
-          : undefined
+          : undefined,
       );
 
       this.interactionHandlerDisposable =

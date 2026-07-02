@@ -68,7 +68,7 @@ describe(PointerInteractionHandler, () => {
     rotatePointInteraction,
     zoomInteraction,
     panInteraction,
-    twistInteraction
+    twistInteraction,
   );
 
   beforeEach(() => {
@@ -123,7 +123,7 @@ describe(PointerInteractionHandler, () => {
   });
 
   async function simulatePrimaryInteractions(
-    interactionDelay?: number
+    interactionDelay?: number,
   ): Promise<void> {
     div.dispatchEvent(pointerDown);
     window.dispatchEvent(pointerMove);

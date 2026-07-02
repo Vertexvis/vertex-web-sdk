@@ -44,7 +44,7 @@ export async function delay(...args: unknown[]): Promise<unknown> {
     }
   } else {
     return Promise.reject(
-      new TypeError('First argument to `delay` must be a number')
+      new TypeError('First argument to `delay` must be a number'),
     );
   }
 }
@@ -75,7 +75,7 @@ export async function timeout(...args: unknown[]): Promise<unknown> {
     const timeout = new Promise((_, reject) => {
       timer = setTimeout(
         () => reject(new Error(`Promise timed out after ${ms}ms`)),
-        ms
+        ms,
       );
     });
     if (promise != null) {
@@ -119,12 +119,12 @@ export interface RetryOptions {
  */
 export async function retry<T>(
   process: () => Promise<T>,
-  opts: RetryOptions = {}
+  opts: RetryOptions = {},
 ): Promise<T> {
   async function execute<T>(
     attempt: number,
     process: () => Promise<T>,
-    opts: RetryOptions
+    opts: RetryOptions,
   ): Promise<T> {
     const { delaysInMs = [], maxRetries = 1 } = opts;
 
@@ -159,7 +159,7 @@ export async function retry<T>(
  */
 export async function abort<T>(
   signal: AbortSignal,
-  promise: Promise<T>
+  promise: Promise<T>,
 ): Promise<{ aborted: true } | { aborted: false; result: T }> {
   const controller = new AbortController();
   const pendingAbort = once(signal, 'abort', { signal: controller.signal });

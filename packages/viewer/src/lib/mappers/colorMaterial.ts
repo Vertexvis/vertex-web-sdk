@@ -16,7 +16,7 @@ export const fromPbColorMaterial: M.Func<
     M.mapRequiredProp('ka', fromPbRGBi),
     M.mapRequiredProp('kd', fromPbRGBi),
     M.mapRequiredProp('ks', fromPbRGBi),
-    M.mapRequiredProp('ke', fromPbRGBi)
+    M.mapRequiredProp('ke', fromPbRGBi),
   ),
   ([opacity, glossiness, ambient, diffuse, specular, emissive]) => ({
     opacity,
@@ -25,7 +25,7 @@ export const fromPbColorMaterial: M.Func<
     diffuse,
     specular,
     emissive,
-  })
+  }),
 );
 
 export const fromPbMaterialOverride: M.Func<
@@ -34,10 +34,10 @@ export const fromPbMaterialOverride: M.Func<
 > = M.defineMapper(
   M.read(
     M.mapRequiredProp('defaultMaterial', () => defaultColor),
-    M.mapRequiredProp('colorMaterial', fromPbColorMaterial)
+    M.mapRequiredProp('colorMaterial', fromPbColorMaterial),
   ),
   ([defaultMaterial, colorMaterial]) => ({
     defaultMaterial,
     colorMaterial,
-  })
+  }),
 );

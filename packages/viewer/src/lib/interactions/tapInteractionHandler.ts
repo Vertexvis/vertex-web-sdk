@@ -10,7 +10,7 @@ type TapEmitter = (
   position: Point.Point,
   keyDetails?: Partial<TapEventKeys>,
   buttons?: number,
-  downPosition?: Point.Point
+  downPosition?: Point.Point,
 ) => Promise<void> | void;
 
 export class TapInteractionHandler implements InteractionHandler {
@@ -33,7 +33,7 @@ export class TapInteractionHandler implements InteractionHandler {
     protected downEvent: 'mousedown' | 'pointerdown',
     protected upEvent: 'mouseup' | 'pointerup',
     protected moveEvent: 'mousemove' | 'pointermove',
-    private getConfig: ConfigProvider
+    private getConfig: ConfigProvider,
   ) {
     this.handleDown = this.handleDown.bind(this);
     this.handleUp = this.handleUp.bind(this);
@@ -73,7 +73,7 @@ export class TapInteractionHandler implements InteractionHandler {
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
       this.setPointerPositions(
-        Point.create(event.touches[0].clientX, event.touches[0].clientY)
+        Point.create(event.touches[0].clientX, event.touches[0].clientY),
       );
 
       this.restartLongPressTimer();
@@ -87,7 +87,7 @@ export class TapInteractionHandler implements InteractionHandler {
     if (event.touches.length > 0) {
       this.handlePointerMove(
         Point.create(event.touches[0].clientX, event.touches[0].clientY),
-        true
+        true,
       );
     }
   }
@@ -120,7 +120,7 @@ export class TapInteractionHandler implements InteractionHandler {
   private handleMove(event: BaseEvent): void {
     this.handlePointerMove(
       Point.create(event.clientX, event.clientY),
-      this.isTouch(event)
+      this.isTouch(event),
     );
   }
 
@@ -139,7 +139,7 @@ export class TapInteractionHandler implements InteractionHandler {
         shiftKey: event.shiftKey,
       },
       this.buttons,
-      this.isTouch(event)
+      this.isTouch(event),
     );
     this.buttons = undefined;
   }
@@ -161,7 +161,7 @@ export class TapInteractionHandler implements InteractionHandler {
     position?: Point.Point,
     keyDetails: Partial<TapEventKeys> = {},
     buttons = 0,
-    isTouch = false
+    isTouch = false,
   ): void {
     if (position != null) {
       if (this.longPressTimer != null) {
@@ -176,7 +176,7 @@ export class TapInteractionHandler implements InteractionHandler {
           position,
           keyDetails,
           buttons,
-          this.secondPointerDownPosition
+          this.secondPointerDownPosition,
         );
         this.clearDoubleTapTimer();
       }
@@ -193,7 +193,7 @@ export class TapInteractionHandler implements InteractionHandler {
       keyDetails: Partial<TapEventKeys> = {},
       buttons = 0,
       pointerDownPosition?: Point.Point,
-      isTouch = false
+      isTouch = false,
     ): void => {
       const downPosition = pointerDownPosition || this.pointerDownPosition;
       const threshold = this.interactionApi?.pixelThreshold(isTouch) || 1;
@@ -201,7 +201,7 @@ export class TapInteractionHandler implements InteractionHandler {
       let emittedPosition: Point.Point | undefined;
       if (this.interactionTimer != null) {
         emittedPosition = this.getCanvasPosition(
-          downPosition || pointerUpPosition
+          downPosition || pointerUpPosition,
         );
       } else if (
         downPosition != null &&
@@ -250,7 +250,7 @@ export class TapInteractionHandler implements InteractionHandler {
     this.clearDoubleTapTimer();
     this.doubleTapTimer = window.setTimeout(
       () => this.clearDoubleTapTimer(),
-      this.getConfig().events.doubleTapThreshold
+      this.getConfig().events.doubleTapThreshold,
     );
   }
 
@@ -268,7 +268,7 @@ export class TapInteractionHandler implements InteractionHandler {
         this.emit(this.interactionApi?.longPress)(
           this.pointerDownPosition,
           eventKeys,
-          this.buttons
+          this.buttons,
         );
       }
       this.clearLongPressTimer();

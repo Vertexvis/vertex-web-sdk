@@ -30,7 +30,7 @@ describe(Quaternion.normalize, () => {
 describe(Quaternion.magnitude, () => {
   it('returns the magnitude of the provided quaternion', () => {
     const magnitude = Quaternion.magnitude(
-      Quaternion.create({ w: 1, x: 2, y: 3, z: 4 })
+      Quaternion.create({ w: 1, x: 2, y: 3, z: 4 }),
     );
     expect(magnitude).toBeCloseTo(5.48);
   });
@@ -45,7 +45,7 @@ describe(Quaternion.scale, () => {
         x: 200,
         y: 300,
         z: 400,
-      })
+      }),
     );
   });
 });
@@ -64,7 +64,7 @@ describe(Quaternion.fromMatrixRotation, () => {
   it('creates a quaternion from a x-rotation matrix of less than 90 degrees', () => {
     const angle = Angle.toRadians(45);
     const m = Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(Vector3.right(), angle)
+      Quaternion.fromAxisAngle(Vector3.right(), angle),
     );
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
@@ -79,7 +79,7 @@ describe(Quaternion.fromMatrixRotation, () => {
   it('creates a quaternion from a x-rotation matrix of over 90 degrees', () => {
     const angle = Angle.toRadians(170);
     const m = Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(Vector3.right(), angle)
+      Quaternion.fromAxisAngle(Vector3.right(), angle),
     );
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
@@ -94,7 +94,7 @@ describe(Quaternion.fromMatrixRotation, () => {
   it('creates a quaternion from a y-rotation matrix of over 90 degrees', () => {
     const angle = Angle.toRadians(190);
     const m = Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(Vector3.up(), angle)
+      Quaternion.fromAxisAngle(Vector3.up(), angle),
     );
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
@@ -109,7 +109,7 @@ describe(Quaternion.fromMatrixRotation, () => {
   it('creates a quaternion from a z-rotation matrix of over 90 degrees', () => {
     const angle = Angle.toRadians(200);
     const m = Matrix4.makeRotation(
-      Quaternion.fromAxisAngle(Vector3.back(), angle)
+      Quaternion.fromAxisAngle(Vector3.back(), angle),
     );
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
@@ -128,7 +128,7 @@ describe(Quaternion.fromEuler, () => {
     const q = Quaternion.fromEuler(e);
 
     expect(q).toEqual(
-      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90))
+      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90)),
     );
   });
 
@@ -137,7 +137,7 @@ describe(Quaternion.fromEuler, () => {
     const q = Quaternion.fromEuler(e);
 
     expect(q).toEqual(
-      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90))
+      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90)),
     );
   });
 
@@ -146,7 +146,7 @@ describe(Quaternion.fromEuler, () => {
     const q = Quaternion.fromEuler(e);
 
     expect(q).toEqual(
-      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90))
+      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90)),
     );
   });
 
@@ -155,7 +155,7 @@ describe(Quaternion.fromEuler, () => {
     const q = Quaternion.fromEuler(e);
 
     expect(q).toEqual(
-      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90))
+      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90)),
     );
   });
 
@@ -164,7 +164,7 @@ describe(Quaternion.fromEuler, () => {
     const q = Quaternion.fromEuler(e);
 
     expect(q).toEqual(
-      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90))
+      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90)),
     );
   });
 
@@ -173,7 +173,7 @@ describe(Quaternion.fromEuler, () => {
     const q = Quaternion.fromEuler(e);
 
     expect(q).toEqual(
-      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90))
+      Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90)),
     );
   });
 });

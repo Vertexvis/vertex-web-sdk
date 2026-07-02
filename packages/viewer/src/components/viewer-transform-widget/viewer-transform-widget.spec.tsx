@@ -52,7 +52,7 @@ import { TransformWidget } from './widget';
 function dispatchKeydownEvent(
   target: Element,
   key: string,
-  count: number
+  count: number,
 ): void {
   for (let i = 0; i < count; i++) {
     target.dispatchEvent(new KeyboardEvent('keydown', { key }));
@@ -61,7 +61,7 @@ function dispatchKeydownEvent(
 
 describe('vertex-viewer-transform-widget', () => {
   const mockTransformWidget = new TransformWidget(
-    document.createElement('canvas')
+    document.createElement('canvas'),
   );
 
   (loadImageBytes as jest.Mock).mockResolvedValue({
@@ -103,10 +103,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -121,7 +121,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     expect(mockTransformWidget.updateTransform).toHaveBeenCalledWith(
-      Matrix4.makeTranslation(widget.position)
+      Matrix4.makeTranslation(widget.position),
     );
     expect(mockTransformWidget.updateFrame).toHaveBeenCalledWith(frame, true);
   });
@@ -138,10 +138,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -156,20 +156,20 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     (mockTransformWidget.boundsContainsPoint as jest.Mock).mockImplementation(
-      () => true
+      () => true,
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Point.create(0, 0)
+      Point.create(0, 0),
     );
 
     window.dispatchEvent(new MouseEvent('pointermove'));
 
     expect(mockTransformWidget.updateCursor).toHaveBeenCalledWith(
-      Point.create(0, 0)
+      Point.create(0, 0),
     );
 
     (mockTransformWidget.boundsContainsPoint as jest.Mock).mockImplementation(
-      () => false
+      () => false,
     );
     window.dispatchEvent(new MouseEvent('pointermove'));
 
@@ -188,10 +188,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -222,10 +222,10 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
     const beginSpy = jest
       .spyOn(stream, 'beginInteraction')
@@ -236,13 +236,13 @@ describe('vertex-viewer-transform-widget', () => {
       .mockReturnValue(Promise.resolve({}));
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2)),
     );
 
     widget.shadowRoot
@@ -267,7 +267,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
 
     window.dispatchEvent(new MouseEvent('pointerup'));
@@ -283,7 +283,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
 
     await page.waitForChanges();
@@ -303,14 +303,14 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
-      Rectangle.create(0, 0, 100, 100)
+      Rectangle.create(0, 0, 100, 100),
     );
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -341,21 +341,21 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
     jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
     widget.shadowRoot
@@ -389,7 +389,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
   });
 
@@ -405,14 +405,14 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
-      Rectangle.create(0, 0, 100, 100)
+      Rectangle.create(0, 0, 100, 100),
     );
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -443,21 +443,21 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
     jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
     widget.shadowRoot
@@ -489,7 +489,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
 
     dispatchKeydownEvent(input, 'ArrowDown', 3);
@@ -507,7 +507,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
   });
 
@@ -523,14 +523,14 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
-      Rectangle.create(0, 0, 100, 100)
+      Rectangle.create(0, 0, 100, 100),
     );
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -561,21 +561,21 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
     jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
     widget.shadowRoot
@@ -621,14 +621,14 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
-      Rectangle.create(0, 0, 100, 100)
+      Rectangle.create(0, 0, 100, 100),
     );
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -659,22 +659,22 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
     jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
     const updateSpy = jest.spyOn(stream, 'updateInteraction');
     jest.spyOn(stream, 'endInteraction').mockReturnValue(Promise.resolve({}));
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(0, 0, 0))
+      Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
     widget.shadowRoot
@@ -739,10 +739,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -773,10 +773,10 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
     const beginSpy = jest
       .spyOn(stream, 'beginInteraction')
@@ -787,13 +787,13 @@ describe('vertex-viewer-transform-widget', () => {
       .mockReturnValue(Promise.resolve({}));
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(2, 2, 2))
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2)),
     );
 
     widget.shadowRoot
@@ -818,7 +818,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
 
     window.dispatchEvent(new MouseEvent('pointerup'));
@@ -834,7 +834,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
 
     updateSpy.mockClear();
@@ -853,7 +853,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
   });
 
@@ -872,14 +872,14 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
-      Rectangle.create(0, 0, 100, 100)
+      Rectangle.create(0, 0, 100, 100),
     );
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -920,14 +920,14 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
-      Rectangle.create(0, 0, 100, 100)
+      Rectangle.create(0, 0, 100, 100),
     );
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -968,14 +968,14 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
-      Rectangle.create(0, 0, 100, 100)
+      Rectangle.create(0, 0, 100, 100),
     );
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -1005,10 +1005,10 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
     const beginSpy = jest
       .spyOn(stream, 'beginInteraction')
@@ -1019,13 +1019,13 @@ describe('vertex-viewer-transform-widget', () => {
       .mockReturnValue(Promise.resolve({}));
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Matrix4.makeTranslation(Vector3.create(1, 1, 1))
+      Matrix4.makeTranslation(Vector3.create(1, 1, 1)),
     );
 
     widget.shadowRoot
@@ -1050,7 +1050,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
 
     window.dispatchEvent(new MouseEvent('pointerup'));
@@ -1066,7 +1066,7 @@ describe('vertex-viewer-transform-widget', () => {
             scale: 1,
           },
         },
-      })
+      }),
     );
 
     await page.waitForChanges();
@@ -1098,10 +1098,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -1124,10 +1124,10 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
 
     widget.shadowRoot
@@ -1177,10 +1177,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -1204,7 +1204,7 @@ describe('vertex-viewer-transform-widget', () => {
       expect.objectContaining({
         width: 5000,
         height: 5000,
-      })
+      }),
     );
   });
 
@@ -1220,10 +1220,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -1249,23 +1249,23 @@ describe('vertex-viewer-transform-widget', () => {
         Point.create(),
         Point.create(),
         Point.create(),
-        Point.create()
+        Point.create(),
       ),
       '#000000',
-      '#000000'
+      '#000000',
     );
 
     jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
     const endSpy = jest.spyOn(stream, 'endInteraction');
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Vector3.create(1, 1, 1)
+      Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Vector3.create(2, 2, 2)
+      Vector3.create(2, 2, 2),
     );
 
     widget.shadowRoot
@@ -1299,10 +1299,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -1325,11 +1325,11 @@ describe('vertex-viewer-transform-widget', () => {
 
     expect(mockTransformWidget.updateTransform).toHaveBeenNthCalledWith(
       1,
-      undefined
+      undefined,
     );
     expect(mockTransformWidget.updateTransform).toHaveBeenNthCalledWith(
       2,
-      undefined
+      undefined,
     );
   });
 
@@ -1346,10 +1346,10 @@ describe('vertex-viewer-transform-widget', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const widget = page.body.querySelector(
-      'vertex-viewer-transform-widget'
+      'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -1371,12 +1371,12 @@ describe('vertex-viewer-transform-widget', () => {
     expect(onPositionChanged).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: position1,
-      })
+      }),
     );
     expect(onPositionChanged).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: position2,
-      })
+      }),
     );
   });
 });

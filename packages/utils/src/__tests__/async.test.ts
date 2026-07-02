@@ -82,7 +82,7 @@ describe(abort, () => {
     const controller = new AbortController();
     const pendingResult = abort(
       controller.signal,
-      delay(10, Promise.resolve(1))
+      delay(10, Promise.resolve(1)),
     );
     controller.abort();
     await expect(pendingResult).resolves.toMatchObject({ aborted: true });

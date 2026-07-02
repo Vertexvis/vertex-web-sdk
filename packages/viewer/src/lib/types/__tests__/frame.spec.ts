@@ -19,14 +19,14 @@ describe(FramePerspectiveCamera, () => {
     1,
     10,
     1,
-    45
+    45,
   );
 
   describe(FramePerspectiveCamera.prototype.toOrthographic, () => {
     it('converts to an orthographic camera', () => {
       const bounds = BoundingBox.create(
         Vector3.create(-1, -1, -1),
-        Vector3.create(1, 1, 1)
+        Vector3.create(1, 1, 1),
       );
       const asOrthographic = FrameCamera.toOrthographic(camera, bounds);
 
@@ -81,14 +81,14 @@ describe(FrameOrthographicCamera, () => {
     1,
     10,
     1,
-    45
+    45,
   );
 
   describe(FrameOrthographicCamera.prototype.toPerspective, () => {
     it('converts to a perspective camera', () => {
       const bounds = BoundingBox.create(
         Vector3.create(-1, -1, -1),
-        Vector3.create(1, 1, 1)
+        Vector3.create(1, 1, 1),
       );
       const asPerspective = FrameCamera.toPerspective(camera);
       const converted = camera.toPerspective(bounds);
@@ -140,8 +140,8 @@ describe(FrameOrthographicCamera, () => {
           camera.bottom,
           camera.top,
           camera.near,
-          camera.far
-        )
+          camera.far,
+        ),
       );
     });
   });
@@ -156,7 +156,7 @@ describe(Frame, () => {
       new FrameImage(makeImageAttributes(1, 2), new Uint8Array()),
       {} as FrameScene,
       undefined,
-      undefined
+      undefined,
     );
 
     expect(frame.getId()).toEqual(frame.copy({}).getId());

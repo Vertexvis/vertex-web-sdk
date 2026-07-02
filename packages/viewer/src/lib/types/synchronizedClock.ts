@@ -24,7 +24,7 @@ type Milliseconds = number;
 export class SynchronizedClock {
   public constructor(
     public readonly knownRemoteTime: Date,
-    public readonly knownLocalTime = new Date()
+    public readonly knownLocalTime = new Date(),
   ) {}
 
   /**
@@ -72,7 +72,7 @@ export class SynchronizedClock {
   public remoteOffset(localTime: Date = new Date()): Milliseconds {
     return this.duration(
       this.remoteTime(this.knownLocalTime),
-      this.remoteTime(localTime)
+      this.remoteTime(localTime),
     );
   }
 

@@ -27,7 +27,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       });
 
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]',
       );
       expect(btn).toBeDefined();
     });
@@ -39,7 +39,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       });
 
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]',
       );
       btn?.dispatchEvent(new MouseEvent('click'));
 
@@ -49,7 +49,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       expect(cameraMock.render).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: { milliseconds: 1000 },
-        })
+        }),
       );
     });
 
@@ -64,7 +64,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       });
 
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]',
       );
       btn?.dispatchEvent(new MouseEvent('click'));
 
@@ -73,7 +73,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       expect(cameraMock.render).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: undefined,
-        })
+        }),
       );
     });
   });
@@ -85,7 +85,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
     });
 
     const toolbar = page.root?.shadowRoot?.querySelector(
-      'vertex-viewer-toolbar'
+      'vertex-viewer-toolbar',
     );
     expect(toolbar).toEqualAttribute('placement', 'top-left');
   });
@@ -97,7 +97,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
     });
 
     const toolbar = page.root?.shadowRoot?.querySelector(
-      'vertex-viewer-toolbar'
+      'vertex-viewer-toolbar',
     );
     expect(toolbar).toEqualAttribute('direction', 'vertical');
 

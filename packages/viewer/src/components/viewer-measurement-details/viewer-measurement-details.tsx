@@ -152,7 +152,7 @@ export class ViewerMeasurementDetails {
   protected handleMeasurementModelChanged(): void {
     this.onOutcomeChangedHandler?.dispose();
     this.onOutcomeChangedHandler = this.measurementModel?.onOutcomeChanged(
-      this.handleOutcomeChange
+      this.handleOutcomeChange,
     );
 
     this.updateStateFromModel();
@@ -175,7 +175,7 @@ export class ViewerMeasurementDetails {
     };
 
     const results = (this.measurementOutcome?.results ?? []).filter(
-      isFilteredResultType
+      isFilteredResultType,
     );
 
     return (
@@ -224,7 +224,7 @@ export class ViewerMeasurementDetails {
   }
 
   private handleShowOverlay = (
-    overlay: MeasurementOverlay | undefined
+    overlay: MeasurementOverlay | undefined,
   ): void => {
     this.overlay = overlay;
   };
@@ -245,8 +245,8 @@ export class ViewerMeasurementDetails {
     type: T,
     results: MeasurementResult[],
     render: (
-      result: Extract<MeasurementResult, { type: T }>
-    ) => h.JSX.IntrinsicElements | undefined
+      result: Extract<MeasurementResult, { type: T }>,
+    ) => h.JSX.IntrinsicElements | undefined,
   ): h.JSX.IntrinsicElements | undefined {
     const result = this.getResultForType(type, results);
     return result != null ? render(result) : undefined;
@@ -254,7 +254,7 @@ export class ViewerMeasurementDetails {
 
   private getResultForType<T extends MeasurementResult['type']>(
     type: T,
-    results: MeasurementResult[]
+    results: MeasurementResult[],
   ): Extract<MeasurementResult, { type: T }> | undefined {
     return results.find((result) => result.type === type) as Extract<
       MeasurementResult,
@@ -266,7 +266,7 @@ export class ViewerMeasurementDetails {
     return this.makeFormatter(
       (value) => this.distanceMeasurementUnits.convertWorldValueToReal(value),
       this.distanceMeasurementUnits.unit,
-      this.distanceFormatter
+      this.distanceFormatter,
     );
   }
 
@@ -274,7 +274,7 @@ export class ViewerMeasurementDetails {
     return this.makeFormatter(
       (value) => this.angleMeasurementUnits.convertTo(value),
       this.angleMeasurementUnits.unit,
-      this.angleFormatter
+      this.angleFormatter,
     );
   }
 
@@ -282,14 +282,14 @@ export class ViewerMeasurementDetails {
     return this.makeFormatter(
       (value) => this.areaMeasurementUnits.convertWorldValueToReal(value),
       this.areaMeasurementUnits.unit,
-      this.areaFormatter
+      this.areaFormatter,
     );
   }
 
   private makeFormatter(
     convert: (value: number) => number,
     units: Unit,
-    customFormatter: Formatter<number> | undefined
+    customFormatter: Formatter<number> | undefined,
   ): Formatter<number> {
     return (value) => {
       const v = convert(value);

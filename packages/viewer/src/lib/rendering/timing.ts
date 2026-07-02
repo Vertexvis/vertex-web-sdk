@@ -12,7 +12,7 @@ import { ifDrawFrame, ifRequestId } from './utils';
 const MUTE_WARNING_SECONDS = 1 * 60; // 1 minute
 
 function calculateSendToReceiveDuration(
-  clockProvider: () => SynchronizedClock | undefined
+  clockProvider: () => SynchronizedClock | undefined,
 ): (sentAt: Date) => google.protobuf.IDuration | undefined {
   let muteWarning = false;
 
@@ -28,7 +28,7 @@ function calculateSendToReceiveDuration(
       } else {
         if (!muteWarning) {
           console.warn(
-            `Possible erroneous send to receive timing. Muting for ${MUTE_WARNING_SECONDS}s. [sent-at=${sentAt.toISOString()}, received-at=${receivedAt.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`
+            `Possible erroneous send to receive timing. Muting for ${MUTE_WARNING_SECONDS}s. [sent-at=${sentAt.toISOString()}, received-at=${receivedAt.toISOString()}, remote-time=${clock.knownRemoteTime.toISOString()}]`,
           );
 
           muteWarning = true;
@@ -49,7 +49,7 @@ function calculateSendToReceiveDuration(
  */
 export function acknowledgeFrameRequests(
   api: StreamApi,
-  clockProvider: () => SynchronizedClock | undefined
+  clockProvider: () => SynchronizedClock | undefined,
 ): RequestMessageHandler {
   const sendToReceiveDuration = calculateSendToReceiveDuration(clockProvider);
   return ifRequestId((reqId) =>
@@ -62,6 +62,6 @@ export function acknowledgeFrameRequests(
           },
         });
       }
-    })
+    }),
   );
 }

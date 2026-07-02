@@ -9,7 +9,7 @@ export class ElementPool {
 
   public constructor(
     private container: Element,
-    private elementFactory: ElementFactory
+    private elementFactory: ElementFactory,
   ) {
     this.elements = [];
   }
@@ -56,7 +56,7 @@ export class ElementPool {
   }
 
   public iterateElements(
-    f: (element: HTMLElement, binding: Binding, index: number) => void
+    f: (element: HTMLElement, binding: Binding, index: number) => void,
   ): void {
     this.elements.forEach((el, i) => {
       const instance = this.instanceMap.get(el);

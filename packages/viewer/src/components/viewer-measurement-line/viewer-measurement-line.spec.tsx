@@ -71,11 +71,11 @@ describe('vertex-viewer-measurement-line', () => {
 
     expect(parseFloat(strokeStartCap.getAttribute('x1') ?? '')).toBeCloseTo(0);
     expect(parseFloat(strokeStartCap.getAttribute('y1') ?? '')).toBeCloseTo(
-      5.5
+      5.5,
     );
     expect(parseFloat(strokeStartCap.getAttribute('x2') ?? '')).toBeCloseTo(0);
     expect(parseFloat(strokeStartCap.getAttribute('y2') ?? '')).toBeCloseTo(
-      -5.5
+      -5.5,
     );
 
     expect(parseFloat(strokeEndCap.getAttribute('x1') ?? '')).toBeCloseTo(100);

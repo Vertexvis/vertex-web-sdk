@@ -152,7 +152,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   @Watch('matrix')
   protected handleMatrixChanged(
     newMatrix: Matrix4.Matrix4,
-    oldMatrix: Matrix4.Matrix4
+    oldMatrix: Matrix4.Matrix4,
   ): void {
     if (!Objects.isEqual(newMatrix, oldMatrix)) {
       this.propertyChange.emit();
@@ -266,7 +266,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   protected componentShouldUpdate(
     newValue: unknown,
     oldValue: unknown,
-    prop: string
+    prop: string,
   ): boolean {
     return prop === 'occluded';
   }
@@ -323,7 +323,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
         ? this.parseJson(
             'quaternionJson',
             this.quaternionJson,
-            Quaternion.fromJson
+            Quaternion.fromJson,
           )
         : this.quaternion;
   }
@@ -348,7 +348,7 @@ export class ViewerDomElement implements HTMLDomRendererPositionableElement {
   private parseJson<T>(
     propName: string,
     value: string,
-    parse: (str: string) => T
+    parse: (str: string) => T,
   ): T {
     try {
       return parse(value);

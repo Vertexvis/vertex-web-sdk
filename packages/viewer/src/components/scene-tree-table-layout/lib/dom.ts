@@ -11,7 +11,7 @@ export function getSceneTreeTableViewportWidth(el: HTMLElement): number {
 export function scrollToTop(
   el: HTMLElement,
   top: number,
-  options: Pick<DomScrollToOptions, 'behavior'>
+  options: Pick<DomScrollToOptions, 'behavior'>,
 ): void {
   el.scrollTo({ top, ...options });
 }

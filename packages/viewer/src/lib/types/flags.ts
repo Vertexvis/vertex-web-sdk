@@ -54,7 +54,7 @@ export const defaultFlags: Flags = {
 
 export function createFlags(
   features: Partial<Flags>,
-  fallbacks: Partial<Flags> = defaultFlags
+  fallbacks: Partial<Flags> = defaultFlags,
 ): Flags {
   return Objects.defaults(features, fallbacks, defaultFlags);
 }

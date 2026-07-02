@@ -170,7 +170,7 @@ describe(Matrix4.makeLookAtView, () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
     const m = Matrix4.toObject(
-      Matrix4.makeLookAtView(camera.position, camera.lookAt, camera.up)
+      Matrix4.makeLookAtView(camera.position, camera.lookAt, camera.up),
     );
 
     expect(m.m11).toBe(1);
@@ -188,7 +188,7 @@ describe(Matrix4.makeLookAt, () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
     const m = Matrix4.toObject(
-      Matrix4.makeLookAt(camera.position, camera.lookAt, camera.up)
+      Matrix4.makeLookAt(camera.position, camera.lookAt, camera.up),
     );
 
     expect(m.m11).toBe(1);
@@ -254,7 +254,7 @@ describe(Matrix4.lookAt, () => {
       i,
       Vector3.origin(),
       Vector3.right(),
-      Vector3.up()
+      Vector3.up(),
     );
     const r = Euler.fromRotationMatrix(m);
 

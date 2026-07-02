@@ -301,7 +301,7 @@ export class SceneTreeTableLayout {
   @Method()
   public async scrollToPosition(
     top: number,
-    options: Pick<DomScrollToOptions, 'behavior'>
+    options: Pick<DomScrollToOptions, 'behavior'>,
   ): Promise<void> {
     if (this.tableElement != null) {
       scrollToTop(this.tableElement, top, options);
@@ -380,7 +380,7 @@ export class SceneTreeTableLayout {
       const startIndex = Math.max(0, viewportStartIndex - this.overScanCount);
       const endIndex = Math.min(
         this.totalRows - 1,
-        viewportEndIndex + this.overScanCount
+        viewportEndIndex + this.overScanCount,
       );
 
       const rows = this.getViewportRows(startIndex, endIndex);
@@ -409,7 +409,7 @@ export class SceneTreeTableLayout {
     if (this.controller?.isConnected && this.totalRows > 0) {
       await this.controller.updateActiveRowRange(
         this.viewportStartIndex,
-        this.viewportEndIndex
+        this.viewportEndIndex,
       );
     }
   }
@@ -450,12 +450,10 @@ export class SceneTreeTableLayout {
     cell: HTMLElement,
     binding: Binding,
     rowIndex: number,
-    cellPaddingLeft: (depth: number) => string
+    cellPaddingLeft: (depth: number) => string,
   ): void => {
     cell.style.position = 'absolute';
-    cell.style.top = `${
-      (this.viewportStartIndex + rowIndex) * this.rowHeight
-    }px`;
+    cell.style.top = `${(this.viewportStartIndex + rowIndex) * this.rowHeight}px`;
     cell.style.boxSizing = 'border-box';
     cell.style.height = `${this.rowHeight}px`;
     cell.style.width = '100%';
@@ -487,7 +485,7 @@ export class SceneTreeTableLayout {
         this.stateMap.columnWidthPercentages.length
     ) {
       this.stateMap.columnWidths = this.stateMap.columnWidthPercentages.map(
-        (w) => w * layoutWidth
+        (w) => w * layoutWidth,
       );
 
       this.columnsResized.emit(this.stateMap.columnWidths);
@@ -502,28 +500,28 @@ export class SceneTreeTableLayout {
         this.stateMap.columnWidthPercentages.length
     ) {
       this.stateMap.columnWidthPercentages = this.stateMap.columnWidths.map(
-        (w) => w / layoutWidth
+        (w) => w / layoutWidth,
       );
     }
   };
 
   private computeInitialColumnWidths = (): void => {
     this.stateMap.columnWidths = this.columnElements.map(
-      (c) => c.initialWidth ?? 100
+      (c) => c.initialWidth ?? 100,
     );
 
     const layoutWidth = this.getLayoutWidth();
     if (layoutWidth != null) {
       const columnWidthSum = this.stateMap.columnWidths.reduce(
         (result, w) => result + w,
-        0
+        0,
       );
       const scaledColumnWidths = this.stateMap.columnWidths.map(
-        (w) => w * (layoutWidth / columnWidthSum)
+        (w) => w * (layoutWidth / columnWidthSum),
       );
 
       this.stateMap.columnWidthPercentages = scaledColumnWidths.map(
-        (w) => w / layoutWidth
+        (w) => w / layoutWidth,
       );
       this.stateMap.columnWidths = scaledColumnWidths;
     }
@@ -531,7 +529,7 @@ export class SceneTreeTableLayout {
 
   private updateColumnElements = (): void => {
     this.columnElements = Array.from(
-      this.hostEl.querySelectorAll('vertex-scene-tree-table-column')
+      this.hostEl.querySelectorAll('vertex-scene-tree-table-column'),
     ) as Array<HTMLVertexSceneTreeTableColumnElement>;
   };
 
@@ -541,9 +539,9 @@ export class SceneTreeTableLayout {
         (map, c) =>
           map.set(
             c,
-            new ElementPool(c, () => this.createColumnCellInstance(c))
+            new ElementPool(c, () => this.createColumnCellInstance(c)),
           ),
-        new WeakMap()
+        new WeakMap(),
       );
     }
   }
@@ -553,7 +551,7 @@ export class SceneTreeTableLayout {
       if (this.stateMap.columnElementPools?.get(c) == null) {
         this.stateMap.columnElementPools?.set(
           c,
-          new ElementPool(c, () => this.createColumnCellInstance(c))
+          new ElementPool(c, () => this.createColumnCellInstance(c)),
         );
       } else {
         this.stateMap.columnElementPools
@@ -567,8 +565,8 @@ export class SceneTreeTableLayout {
     f: (
       column: HTMLVertexSceneTreeTableColumnElement,
       pool: ElementPool,
-      index: number
-    ) => void
+      index: number,
+    ) => void,
   ): void {
     this.columnElements.forEach((column, i) => {
       const pool = this.stateMap.columnElementPools?.get(column);
@@ -582,7 +580,7 @@ export class SceneTreeTableLayout {
 
   private ensureDividerTemplateDefined(): void {
     const template = this.hostEl.querySelector(
-      'template[slot="divider"]'
+      'template[slot="divider"]',
     ) as HTMLTemplateElement;
     if (template == null) {
       const defaultDividerTemplate = document.createElement('template');
@@ -596,10 +594,10 @@ export class SceneTreeTableLayout {
   }
 
   private createHeaderInstance(
-    column: HTMLVertexSceneTreeTableColumnElement
+    column: HTMLVertexSceneTreeTableColumnElement,
   ): InstancedTemplate<HTMLElement> | undefined {
     const template = column.querySelector(
-      'template[slot="header"]'
+      'template[slot="header"]',
     ) as HTMLTemplateElement;
     if (template != null) {
       return generateInstanceFromTemplate(template);
@@ -608,7 +606,7 @@ export class SceneTreeTableLayout {
 
   private createDividerInstance(): InstancedTemplate<HTMLElement> {
     const template = this.hostEl.querySelector(
-      'template[slot="divider"]'
+      'template[slot="divider"]',
     ) as HTMLTemplateElement;
     if (template != null) {
       return generateInstanceFromTemplate(template);
@@ -618,10 +616,10 @@ export class SceneTreeTableLayout {
   }
 
   private createColumnCellInstance(
-    column: HTMLVertexSceneTreeTableColumnElement
+    column: HTMLVertexSceneTreeTableColumnElement,
   ): InstancedTemplate<HTMLElement> {
     const template = column.querySelector(
-      'template:not([slot="header"])'
+      'template:not([slot="header"])',
     ) as HTMLTemplateElement;
     if (template != null) {
       return generateInstanceFromTemplate(template);
@@ -653,7 +651,7 @@ export class SceneTreeTableLayout {
         data: {},
       };
       const { bindings, element } = this.createColumnCellInstance(
-        this.columnElements[0]
+        this.columnElements[0],
       );
       bindings.bind(dummyData);
       element.style.visibility = 'hidden';
@@ -685,7 +683,7 @@ export class SceneTreeTableLayout {
         this.headerElement?.getBoundingClientRect().height;
       this.hostEl.style.setProperty(
         '--header-height',
-        `${this.stateMap.headerHeight}px`
+        `${this.stateMap.headerHeight}px`,
       );
     }
   };
@@ -693,7 +691,7 @@ export class SceneTreeTableLayout {
   private computeColumnGridLayout = (): void => {
     if (this.stateMap.columnWidths.length === 0) {
       this.stateMap.columnWidths = this.columnElements.map(
-        (c) => c.initialWidth ?? 100
+        (c) => c.initialWidth ?? 100,
       );
     }
 
@@ -701,7 +699,7 @@ export class SceneTreeTableLayout {
     if (layoutWidth != null) {
       if (this.stateMap.columnWidthPercentages.length === 0) {
         this.stateMap.columnWidthPercentages = this.columnElements.map(
-          (c) => (c.initialWidth ?? 100) / layoutWidth
+          (c) => (c.initialWidth ?? 100) / layoutWidth,
         );
       }
     }
@@ -720,7 +718,7 @@ export class SceneTreeTableLayout {
 
     this.columnGridFixedLayout = `${this.stateMap.columnWidths.reduce(
       (res, w) => `${res} ${w}px`,
-      ''
+      '',
     )}`;
   };
 
@@ -803,7 +801,7 @@ export class SceneTreeTableLayout {
   }
 
   private createDividerPointerDownHandler = (
-    index: number
+    index: number,
   ): ((event: PointerEvent) => void) => {
     return (event: PointerEvent): void => {
       event.preventDefault();
@@ -811,11 +809,11 @@ export class SceneTreeTableLayout {
 
       this.lastDividerPointerPosition = Point.create(
         Math.floor(event.clientX),
-        Math.floor(event.clientY)
+        Math.floor(event.clientY),
       );
       this.resizingColumnIndex = index;
       this.stateMap.headerDividerInstances?.[index]?.element.classList.add(
-        'dragging'
+        'dragging',
       );
 
       window.addEventListener('pointermove', this.handleDividerPointerMove);
@@ -826,7 +824,7 @@ export class SceneTreeTableLayout {
   private handleDividerPointerMove = (event: PointerEvent): void => {
     const current = Point.create(
       Math.floor(event.clientX),
-      Math.floor(event.clientY)
+      Math.floor(event.clientY),
     );
 
     if (
@@ -838,12 +836,12 @@ export class SceneTreeTableLayout {
 
       if (Math.abs(diff.x) >= 1 && this.isValidResize(diff, resizingIndex)) {
         this.stateMap.columnWidths = this.stateMap.columnWidths.map((w, i) =>
-          i === resizingIndex ? w - diff.x : w
+          i === resizingIndex ? w - diff.x : w,
         );
 
         if (resizingIndex + 1 < this.stateMap.columnWidths.length) {
           this.stateMap.columnWidths = this.stateMap.columnWidths.map((w, i) =>
-            i === resizingIndex + 1 ? w + diff.x : w
+            i === resizingIndex + 1 ? w + diff.x : w,
           );
         }
 

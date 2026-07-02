@@ -14,7 +14,7 @@ describe(FlyToPartKeyInteraction, () => {
   const flyToPartKeyInteraction = new FlyToPartKeyInteraction(
     streamApi,
     () => ({ animation: { durationMs: 500 } }) as Config,
-    () => Point.create(1, 1)
+    () => Point.create(1, 1),
   );
 
   it('Returns true for its predicate with Command or Control pressed', () => {
@@ -22,16 +22,16 @@ describe(FlyToPartKeyInteraction, () => {
       flyToPartKeyInteraction.predicate({
         ctrlKey: true,
         altKey: false,
-      } as TapEventDetails)
+      } as TapEventDetails),
     ).toBe(false);
     expect(
       flyToPartKeyInteraction.predicate({
         metaKey: true,
         altKey: false,
-      } as TapEventDetails)
+      } as TapEventDetails),
     ).toBe(false);
     expect(
-      flyToPartKeyInteraction.predicate({ altKey: true } as TapEventDetails)
+      flyToPartKeyInteraction.predicate({ altKey: true } as TapEventDetails),
     ).toBe(true);
   });
 
@@ -40,7 +40,7 @@ describe(FlyToPartKeyInteraction, () => {
       flyToPartKeyInteraction.predicate({
         altKey: true,
         shiftKey: true,
-      } as TapEventDetails)
+      } as TapEventDetails),
     ).toBe(false);
   });
 
@@ -52,7 +52,7 @@ describe(FlyToPartKeyInteraction, () => {
       expect.objectContaining({
         point: position,
       }),
-      true
+      true,
     );
 
     expect(streamApi.flyTo).toHaveBeenCalled();

@@ -18,13 +18,13 @@ export type SceneViewStateIdentifier =
   | SceneViewStateSuppliedId;
 
 export function isSceneViewStateId(
-  identifier: SceneViewStateIdentifier
+  identifier: SceneViewStateIdentifier,
 ): identifier is SceneViewStateId {
   return (identifier as SceneViewStateId).id != null;
 }
 
 export function isSceneViewStateSuppliedId(
-  identifier: SceneViewStateIdentifier
+  identifier: SceneViewStateIdentifier,
 ): identifier is SceneViewStateSuppliedId {
   return (identifier as SceneViewStateSuppliedId).suppliedId != null;
 }

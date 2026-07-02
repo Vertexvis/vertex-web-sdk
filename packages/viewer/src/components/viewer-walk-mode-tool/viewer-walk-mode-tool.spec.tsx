@@ -60,10 +60,10 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
     const teleportTool = tool.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     expect(teleportTool.mode).toBe('teleport');
@@ -84,10 +84,10 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
     const teleportTool = tool.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     expect(teleportTool.mode).toBe('teleport-and-align');
@@ -108,10 +108,10 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
     const teleportTool = tool.querySelector(
-      'vertex-viewer-teleport-tool'
+      'vertex-viewer-teleport-tool',
     ) as HTMLVertexViewerTeleportToolElement;
 
     expect(teleportTool.mode).toBe('teleport-toward');
@@ -139,7 +139,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     await page.waitForChanges();
@@ -168,7 +168,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
             z: camera.lookAt.z - stepDistance,
           },
         }),
-      })
+      }),
     );
 
     streamSpy.mockClear();
@@ -195,7 +195,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
             z: camera.lookAt.z + stepDistance,
           },
         }),
-      })
+      }),
     );
   });
 
@@ -269,7 +269,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     await page.waitForChanges();
@@ -296,7 +296,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
             z: camera.lookAt.z,
           },
         }),
-      })
+      }),
     );
 
     streamSpy.mockClear();
@@ -319,7 +319,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
             z: camera.lookAt.z,
           },
         }),
-      })
+      }),
     );
   });
 
@@ -346,10 +346,10 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const canvas = viewer.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
@@ -369,7 +369,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
           }),
         }),
       }),
-      true
+      true,
     );
   });
 
@@ -400,11 +400,11 @@ describe('vertex-viewer-walk-mode-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
@@ -434,7 +434,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
             z: camera.lookAt.z - stepDistance,
           },
         }),
-      })
+      }),
     );
 
     streamSpy.mockClear();
@@ -459,7 +459,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
             z: camera.lookAt.z - stepDistance,
           },
         }),
-      })
+      }),
     );
   });
 
@@ -490,17 +490,17 @@ describe('vertex-viewer-walk-mode-tool', () => {
     const boundingBox = viewer.frame?.scene
       .boundingBox as BoundingBox.BoundingBox;
     const minLength = Math.min(
-      ...Vector3.toArray(BoundingBox.lengths(boundingBox))
+      ...Vector3.toArray(BoundingBox.lengths(boundingBox)),
     );
 
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
 
     tool.controller?.updateConfiguration({ teleportHeightPercentage: 10 });
     tool.controller?.replaceKeyBinding(
       ViewerWalkModeOperation.WALK_FORWARD,
-      '1'
+      '1',
     );
 
     await page.waitForChanges();
@@ -527,7 +527,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
             z: camera.lookAt.z - stepDistance,
           },
         }),
-      })
+      }),
     );
 
     streamSpy.mockClear();
@@ -569,11 +569,11 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await page.waitForChanges();
 
     input.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'w', bubbles: true })
+      new KeyboardEvent('keydown', { key: 'w', bubbles: true }),
     );
     await new Promise((resolve) => setTimeout(resolve, 25));
     input.dispatchEvent(
-      new KeyboardEvent('keyup', { key: 'w', bubbles: true })
+      new KeyboardEvent('keyup', { key: 'w', bubbles: true }),
     );
 
     await page.waitForChanges();
@@ -605,7 +605,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
 
     const div = viewer.querySelector('div') as HTMLDivElement;
@@ -615,7 +615,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await page.waitForChanges();
 
     div.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'w', bubbles: true })
+      new KeyboardEvent('keydown', { key: 'w', bubbles: true }),
     );
     await new Promise((resolve) => setTimeout(resolve, 25));
     div.dispatchEvent(new KeyboardEvent('keyup', { key: 'w', bubbles: true }));
@@ -650,7 +650,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
     const tool = viewer.querySelector(
-      'vertex-viewer-walk-mode-tool'
+      'vertex-viewer-walk-mode-tool',
     ) as HTMLVertexViewerWalkModeToolElement;
 
     const ignored = viewer.querySelector('#ignored') as HTMLDivElement;
@@ -661,11 +661,11 @@ describe('vertex-viewer-walk-mode-tool', () => {
     await page.waitForChanges();
 
     ignored.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'w', bubbles: true })
+      new KeyboardEvent('keydown', { key: 'w', bubbles: true }),
     );
     await new Promise((resolve) => setTimeout(resolve, 25));
     ignored.dispatchEvent(
-      new KeyboardEvent('keyup', { key: 'w', bubbles: true })
+      new KeyboardEvent('keyup', { key: 'w', bubbles: true }),
     );
 
     await page.waitForChanges();
@@ -673,11 +673,11 @@ describe('vertex-viewer-walk-mode-tool', () => {
     expect(streamSpy).not.toHaveBeenCalled();
 
     standard.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'w', bubbles: true })
+      new KeyboardEvent('keydown', { key: 'w', bubbles: true }),
     );
     await new Promise((resolve) => setTimeout(resolve, 25));
     standard.dispatchEvent(
-      new KeyboardEvent('keyup', { key: 'w', bubbles: true })
+      new KeyboardEvent('keyup', { key: 'w', bubbles: true }),
     );
 
     await page.waitForChanges();

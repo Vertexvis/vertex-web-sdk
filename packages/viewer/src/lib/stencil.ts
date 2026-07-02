@@ -15,7 +15,7 @@ export function writeDOM(task: () => void): void {
 
 export function debounceEvent<E>(
   event: EventEmitter<E>,
-  wait: number
+  wait: number,
 ): EventEmitterDisposable<E> {
   let timer: number | undefined = undefined;
   function debounce(value: E): void {

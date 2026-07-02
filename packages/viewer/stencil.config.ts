@@ -105,7 +105,7 @@ function resolveThreadsEsm(): Plugin {
       // points at index.mjs, which omits `expose`; the module build includes it.
       return path.resolve(
         process.cwd(),
-        '../../node_modules/threads/dist-esm/index.js'
+        '../../node_modules/threads/dist-esm/index.js',
       );
     },
   };

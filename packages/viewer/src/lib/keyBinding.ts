@@ -14,7 +14,7 @@ export class KeyBinding {
 
   private bindingMatches(
     keys: Record<string, boolean>,
-    binding: string
+    binding: string,
   ): boolean {
     const negated = binding.includes('!');
     const key = binding.replace('!', '');

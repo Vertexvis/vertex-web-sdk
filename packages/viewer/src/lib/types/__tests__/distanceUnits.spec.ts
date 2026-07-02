@@ -29,7 +29,7 @@ describe(DistanceUnits, () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new DistanceUnits(unitType);
         expect(measurementUnit.convertWorldValueToReal(worldUnit)).toEqual(
-          realUnit
+          realUnit,
         );
       }
     });
@@ -40,7 +40,7 @@ describe(DistanceUnits, () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new DistanceUnits(unitType);
         expect(measurementUnit.convertRealValueToWorld(realUnit)).toEqual(
-          worldUnit
+          worldUnit,
         );
       }
     });
@@ -53,7 +53,7 @@ describe(DistanceUnits, () => {
         const worldPt = Vector3.create(worldUnit, worldUnit, worldUnit);
         const realPt = Vector3.create(realUnit, realUnit, realUnit);
         expect(measurementUnit.convertWorldPointToReal(worldPt)).toEqual(
-          realPt
+          realPt,
         );
       }
     });
@@ -66,7 +66,7 @@ describe(DistanceUnits, () => {
         const worldPt = Vector3.create(worldUnit, worldUnit, worldUnit);
         const realPt = Vector3.create(realUnit, realUnit, realUnit);
         expect(measurementUnit.convertRealPointToWorld(realPt)).toEqual(
-          worldPt
+          worldPt,
         );
       }
     });
@@ -92,7 +92,7 @@ describe(AreaUnits, () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new AreaUnits(unitType);
         expect(measurementUnit.convertWorldValueToReal(worldUnit)).toEqual(
-          realUnit
+          realUnit,
         );
       }
     });
@@ -103,7 +103,7 @@ describe(AreaUnits, () => {
       for (const { unitType, realUnit, worldUnit } of tests) {
         const measurementUnit = new AreaUnits(unitType);
         expect(measurementUnit.convertRealValueToWorld(realUnit)).toEqual(
-          worldUnit
+          worldUnit,
         );
       }
     });

@@ -27,7 +27,7 @@ export class ListSceneItemMetadataResponseBuilder {
   }
 
   public withProperties(
-    properties: PropertyEntry[]
+    properties: PropertyEntry[],
   ): ListSceneItemMetadataResponseBuilder {
     this.response.setEntriesList(properties);
     return this;
@@ -78,7 +78,7 @@ export class PropertyKeyBuilder {
   }
 
   public withCategory(
-    value: PropertyCategoryMap[keyof PropertyCategoryMap]
+    value: PropertyCategoryMap[keyof PropertyCategoryMap],
   ): PropertyKeyBuilder {
     this.key.setCategory(value);
     return this;

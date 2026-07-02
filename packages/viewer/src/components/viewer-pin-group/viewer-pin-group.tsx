@@ -111,7 +111,7 @@ export class ViewerPinGroup {
    */
   @Listen('occlusionStateChanged')
   protected async handleOcclusionStateChanged(
-    event: CustomEvent<boolean>
+    event: CustomEvent<boolean>,
   ): Promise<void> {
     this.occluded = event.detail;
   }
@@ -121,7 +121,7 @@ export class ViewerPinGroup {
    */
   @Listen('detachedStateChanged')
   protected async handleDetachedStateChanged(
-    event: CustomEvent<boolean>
+    event: CustomEvent<boolean>,
   ): Promise<void> {
     this.detached = event.detail;
   }
@@ -206,26 +206,26 @@ export class ViewerPinGroup {
 
   private computeDefaultPinPoints(
     pin: Pin,
-    elementBounds: DOMRect
+    elementBounds: DOMRect,
   ): ComputedPoints {
     return {
       pinPoint: this.getFromWorldPosition(
         pin.worldPosition,
         this.projectionViewMatrix,
-        elementBounds
+        elementBounds,
       ),
     };
   }
 
   private computeTextPinPoints(
     pin: TextPin,
-    elementBounds: DOMRect
+    elementBounds: DOMRect,
   ): ComputedPoints {
     const { pinPoint } = this.computeDefaultPinPoints(pin, elementBounds);
 
     const screenPosition = translatePointToScreen(
       pin.label.point,
-      elementBounds
+      elementBounds,
     );
 
     const labelWidth = this.labelEl?.firstElementChild?.clientWidth || 0;
@@ -257,7 +257,7 @@ export class ViewerPinGroup {
   private getFromWorldPosition(
     pt: Vector3.Vector3,
     projectionViewMatrix: Matrix4.Matrix4,
-    dimensions: Dimensions.Dimensions
+    dimensions: Dimensions.Dimensions,
   ): Point.Point {
     const ndcPt = Vector3.transformMatrix(pt, projectionViewMatrix);
     return Viewport.fromDimensions(dimensions).transformVectorToViewport(ndcPt);

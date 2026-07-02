@@ -46,7 +46,7 @@ describe(InteractionApi, () => {
     () => Point.create(1, 1),
     Dimensions.create(50, 50),
     sceneId,
-    sceneViewId
+    sceneViewId,
   );
   const frameProvider = (): Frame | undefined => frame;
   const sceneProvider = async (): Promise<Scene> => scene;
@@ -57,7 +57,7 @@ describe(InteractionApi, () => {
   let api: InteractionApi;
 
   function createInteractionApi(
-    props: InteractionApiProps = {}
+    props: InteractionApiProps = {},
   ): InteractionApiPerspective {
     return new InteractionApiPerspective(
       props.streamApi ?? streamApi,
@@ -71,7 +71,7 @@ describe(InteractionApi, () => {
       props.longPressEmitter ?? { emit: emitLongPress },
       props.interactionStartedEmitter ?? { emit: emitInteractionStarted },
       props.interactionFinishedEmitter ?? { emit: emitInteractionFinished },
-      props.cameraChangedEmitter ?? { emit: emitCameraChanged }
+      props.cameraChangedEmitter ?? { emit: emitCameraChanged },
     );
   }
 
@@ -241,7 +241,7 @@ describe(InteractionApi, () => {
               },
             },
           },
-        })
+        }),
       );
       const closeFrameY = makePerspectiveFrame(
         copyDrawFramePayloadPerspective(drawFramePayloadPerspective, {
@@ -254,7 +254,7 @@ describe(InteractionApi, () => {
               },
             },
           },
-        })
+        }),
       );
       const closeFrameX = makePerspectiveFrame(
         copyDrawFramePayloadPerspective(drawFramePayloadPerspective, {
@@ -267,7 +267,7 @@ describe(InteractionApi, () => {
               },
             },
           },
-        })
+        }),
       );
       const apiCloseX = createInteractionApi({
         sceneProvider: async () =>
@@ -279,7 +279,7 @@ describe(InteractionApi, () => {
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
-            sceneViewId
+            sceneViewId,
           ),
         frameProvider: () => closeFrameX,
       });
@@ -302,7 +302,7 @@ describe(InteractionApi, () => {
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
-            sceneViewId
+            sceneViewId,
           ),
         frameProvider: () => closeFrameY,
       });
@@ -325,7 +325,7 @@ describe(InteractionApi, () => {
             () => Point.create(1, 1),
             Dimensions.create(50, 50),
             sceneId,
-            sceneViewId
+            sceneViewId,
           ),
         frameProvider: () => closeFrameZ,
       });
@@ -373,7 +373,7 @@ describe(InteractionApi, () => {
         Angle.toRadians(1),
         frame.scene.camera.lookAt,
         Vector3.left(),
-        frame.scene.camera.position
+        frame.scene.camera.position,
       );
 
       expect(streamApi.replaceCamera).toHaveBeenCalledWith(
@@ -383,7 +383,7 @@ describe(InteractionApi, () => {
               lookAt: expect.objectContaining(expectedLookAt),
             }),
           }),
-        })
+        }),
       );
     });
 
@@ -406,7 +406,7 @@ describe(InteractionApi, () => {
         { emit: emitDoubleTap },
         { emit: emitLongPress },
         { emit: emitInteractionStarted },
-        { emit: emitInteractionFinished }
+        { emit: emitInteractionFinished },
       );
     });
 

@@ -44,7 +44,7 @@ export function toProtoDuration(ms: number): google.protobuf.Duration;
  */
 export function toProtoDuration(
   start: Date,
-  end: Date
+  end: Date,
 ): google.protobuf.Duration;
 
 export function toProtoDuration(...args: unknown[]): google.protobuf.Duration {
@@ -70,7 +70,7 @@ export function toProtoDuration(...args: unknown[]): google.protobuf.Duration {
 export function protoToDate(time: DefinedTimestampOrDuration): Date;
 export function protoToDate(time: MaybeTimestampOrDuration): Date | undefined;
 export function protoToDate(
-  time: MaybeTimestampOrDuration | DefinedTimestampOrDuration
+  time: MaybeTimestampOrDuration | DefinedTimestampOrDuration,
 ): Date | undefined {
   if (time.seconds != null && time.nanos != null) {
     const seconds =

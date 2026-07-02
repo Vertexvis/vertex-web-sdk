@@ -284,7 +284,7 @@ export class SceneTree {
   @Method()
   public async scrollToIndex(
     index: number,
-    options: ScrollToOptions = {}
+    options: ScrollToOptions = {},
   ): Promise<void> {
     const { animate, position = 'middle' } = options;
     const i = Math.max(0, Math.min(index, this.totalRows));
@@ -307,7 +307,7 @@ export class SceneTree {
   @Method()
   public async scrollToItem(
     itemId: string,
-    options: ScrollToOptions = {}
+    options: ScrollToOptions = {},
   ): Promise<void> {
     const rowsBeforeExpand = this.totalRows;
     const index = await this.controller?.expandParentNodes(itemId);
@@ -455,7 +455,7 @@ export class SceneTree {
   @Method()
   public async selectItem(
     row: RowArg,
-    { recurseParent, ...options }: SelectItemOptions = {}
+    { recurseParent, ...options }: SelectItemOptions = {},
   ): Promise<void> {
     await this.performRowOperation(row, async ({ viewer, id }) => {
       const ancestors = (await this.controller?.fetchNodeAncestors(id)) || [];
@@ -599,7 +599,7 @@ export class SceneTree {
     const layoutEl = this.getLayoutElement();
     const top = layoutEl.layoutOffset;
     const index = Math.floor(
-      (clientY - top + layoutEl.scrollOffset) / layoutEl.rowHeight
+      (clientY - top + layoutEl.scrollOffset) / layoutEl.rowHeight,
     );
     return this.getRowAtIndex(index);
   }
@@ -617,7 +617,7 @@ export class SceneTree {
   @Method()
   public async filterItems(
     term: string,
-    options: FilterTreeOptions = {}
+    options: FilterTreeOptions = {},
   ): Promise<void> {
     const optionsAsFilterOptions: FilterOptions = {
       ...options,
@@ -641,7 +641,7 @@ export class SceneTree {
   @Method()
   public async selectFilteredItems(
     term: string,
-    options?: SceneTreeOperationOptions
+    options?: SceneTreeOperationOptions,
   ): Promise<void> {
     if (this.viewer != null) {
       const metadataSearchKeys =
@@ -668,7 +668,7 @@ export class SceneTree {
         {
           append: false,
           ...options,
-        }
+        },
       );
     }
   }
@@ -714,14 +714,14 @@ export class SceneTree {
           ? {
               transport: webSocketSubscriptionTransportFactory,
             }
-          : undefined
+          : undefined,
       );
       this.controller = new SceneTreeController(client, 100);
       this.controller?.setMetadataKeys(this.metadataKeys);
     }
 
     this.stateMap.onStateChangeDisposable = this.controller.onStateChange.on(
-      (state) => this.handleControllerStateChange(state)
+      (state) => this.handleControllerStateChange(state),
     );
 
     this.connectToViewer();
@@ -830,7 +830,7 @@ export class SceneTree {
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer: HTMLVertexViewerElement | undefined,
-    oldViewer: HTMLVertexViewerElement | undefined
+    oldViewer: HTMLVertexViewerElement | undefined,
   ): void {
     // StencilJS will invoke this callback even before the component has been
     // loaded. According to their docs, this shouldn't happen. Return if the
@@ -859,7 +859,7 @@ export class SceneTree {
     this.stateMap.onStateChangeDisposable?.dispose();
 
     this.stateMap.onStateChangeDisposable = newController.onStateChange.on(
-      (state) => this.handleControllerStateChange(state)
+      (state) => this.handleControllerStateChange(state),
     );
 
     newController.setMetadataKeys(this.metadataKeys);
@@ -900,7 +900,7 @@ export class SceneTree {
 
       this.viewer.addEventListener('sceneReady', handleSceneReady);
       this.stateMap.viewerDisposable = this.controller?.connectToViewer(
-        this.viewer
+        this.viewer,
       );
       this.stateMap.viewerSceneReadyDisposable = {
         dispose: () =>
@@ -918,7 +918,7 @@ export class SceneTree {
     if (this.viewer == null) {
       this.errorDetails = new SceneTreeErrorDetails(
         'MISSING_VIEWER',
-        SceneTreeErrorCode.MISSING_VIEWER
+        SceneTreeErrorCode.MISSING_VIEWER,
       );
     }
   }
@@ -967,7 +967,7 @@ export class SceneTree {
     } else if (state.connection.type === 'disconnected') {
       this.errorDetails = new SceneTreeErrorDetails(
         'DISCONNECTED',
-        SceneTreeErrorCode.DISCONNECTED
+        SceneTreeErrorCode.DISCONNECTED,
       );
     } else {
       this.errorDetails = undefined;
@@ -982,7 +982,7 @@ export class SceneTree {
   }
 
   private getNodeFromRowOrIndex(
-    rowOrIndex: number | Row | Node.AsObject
+    rowOrIndex: number | Row | Node.AsObject,
   ): Node.AsObject {
     const row =
       typeof rowOrIndex === 'number' ? this.rows[rowOrIndex] : rowOrIndex;
@@ -996,7 +996,7 @@ export class SceneTree {
 
   private async performRowOperation(
     rowOrIndex: number | Row | Node.AsObject,
-    op: OperationHandler
+    op: OperationHandler,
   ): Promise<void> {
     const node = this.getNodeFromRowOrIndex(rowOrIndex);
 
@@ -1006,7 +1006,7 @@ export class SceneTree {
 
     if (this.viewer == null) {
       throw new Error(
-        `Cannot perform scene tree operation. Cannot get reference to viewer.`
+        `Cannot perform scene tree operation. Cannot get reference to viewer.`,
       );
     }
 
@@ -1043,7 +1043,7 @@ export class SceneTree {
 
   private getScrollToPosition(
     index: number,
-    position: ScrollToOptions['position']
+    position: ScrollToOptions['position'],
   ): number {
     const layoutEl = this.getLayoutElement();
     const constrainedIndex = Math.max(0, Math.min(index, this.totalRows - 1));
@@ -1092,7 +1092,7 @@ export class SceneTree {
       layout.rowData = this.rowData;
     } else if (!this.stateMap.componentLoaded && this.totalRows > 0) {
       console.debug(
-        'Scene tree has rows, but the component has not yet rendered'
+        'Scene tree has rows, but the component has not yet rendered',
       );
     }
   }

@@ -26,7 +26,7 @@ describe(StencilBuffer, () => {
         bytes,
         new Uint8Array(png.data),
         png.channels,
-        depthBuffer
+        depthBuffer,
       );
     });
 

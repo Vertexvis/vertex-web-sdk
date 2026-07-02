@@ -102,7 +102,7 @@ export class WalkModeModel {
 
   public addKeyBinding(
     operation: ViewerWalkModeOperation,
-    keyBinding: KeyBinding
+    keyBinding: KeyBinding,
   ): void {
     this.keyBindings[operation] = [...this.keyBindings[operation], keyBinding];
     this.keyBindingsChanged.emit(this.keyBindings);
@@ -110,7 +110,7 @@ export class WalkModeModel {
 
   public replaceKeyBinding(
     operation: ViewerWalkModeOperation,
-    keyBinding: KeyBinding
+    keyBinding: KeyBinding,
   ): void {
     this.keyBindings[operation] = [keyBinding];
     this.keyBindingsChanged.emit(this.keyBindings);
@@ -154,10 +154,10 @@ export class WalkModeModel {
 
   public operationMatches(
     operation: ViewerWalkModeOperation,
-    state: Record<string, boolean>
+    state: Record<string, boolean>,
   ): boolean {
     return this.keyBindings[operation].some((binding) =>
-      binding.matches(state)
+      binding.matches(state),
     );
   }
 
@@ -170,19 +170,19 @@ export class WalkModeModel {
   }
 
   public onTeleportModeChange(
-    listener: Listener<ViewerTeleportMode | undefined>
+    listener: Listener<ViewerTeleportMode | undefined>,
   ): Disposable {
     return this.teleportModeChanged.on(listener);
   }
 
   public onConfigurationChange(
-    listener: Listener<ViewerWalkModeConfiguration>
+    listener: Listener<ViewerWalkModeConfiguration>,
   ): Disposable {
     return this.configurationChanged.on(listener);
   }
 
   public onKeyBindingsChange(
-    listener: Listener<ViewerWalkModeKeyBindings>
+    listener: Listener<ViewerWalkModeKeyBindings>,
   ): Disposable {
     return this.keyBindingsChanged.on(listener);
   }

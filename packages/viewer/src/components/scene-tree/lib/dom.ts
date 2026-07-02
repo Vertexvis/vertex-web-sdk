@@ -8,7 +8,7 @@ export function getSceneTreeOffsetTop(el: HTMLElement): number {
 
 export function getSceneTreeContainsElement(
   el: Element,
-  other: Element
+  other: Element,
 ): boolean {
   return el.contains(other);
 }

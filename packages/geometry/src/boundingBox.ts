@@ -13,7 +13,7 @@ export interface BoundingBox {
  */
 export const create = (
   min: Vector3.Vector3,
-  max: Vector3.Vector3
+  max: Vector3.Vector3,
 ): BoundingBox => {
   return { min, max };
 };
@@ -23,7 +23,7 @@ export const create = (
  * are contained by the bounding box.
  */
 export const fromVectors = (
-  vectors: Vector3.Vector3[]
+  vectors: Vector3.Vector3[],
 ): BoundingBox | undefined => {
   return union(...vectors.map((v) => create(v, v)));
 };
@@ -51,9 +51,9 @@ export const epsilon = (boundingBox: BoundingBox): number => {
     Math.max(
       Math.max(
         Vector3.magnitude(boundingBox.max),
-        Vector3.magnitude(boundingBox.min)
+        Vector3.magnitude(boundingBox.min),
       ),
-      Vector3.magnitude(diagonal(boundingBox))
+      Vector3.magnitude(diagonal(boundingBox)),
     ) * 1e-6
   );
 };
@@ -68,13 +68,13 @@ export function union(a: BoundingBox, b: BoundingBox): BoundingBox;
 export function union(
   a: BoundingBox,
   b: BoundingBox,
-  c: BoundingBox
+  c: BoundingBox,
 ): BoundingBox;
 export function union(
   a: BoundingBox,
   b: BoundingBox,
   c: BoundingBox,
-  d: BoundingBox
+  d: BoundingBox,
 ): BoundingBox;
 export function union(...boxes: BoundingBox[]): BoundingBox | undefined;
 export function union(box: BoundingBox, ...rest: BoundingBox[]): BoundingBox {
@@ -93,7 +93,7 @@ export const lengths = (box: BoundingBox): Vector3.Vector3 => {
   return Vector3.create(
     box.max.x - box.min.x,
     box.max.y - box.min.y,
-    box.max.z - box.min.z
+    box.max.z - box.min.z,
   );
 };
 

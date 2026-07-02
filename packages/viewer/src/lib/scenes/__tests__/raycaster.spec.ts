@@ -21,7 +21,7 @@ describe(Raycaster, () => {
         expect.objectContaining({
           point: Point.create(10, 10),
         }),
-        true
+        true,
       );
     });
 
@@ -32,7 +32,7 @@ describe(Raycaster, () => {
         expect.objectContaining({
           point: Point.create(50, 75),
         }),
-        true
+        true,
       );
     });
 
@@ -43,7 +43,7 @@ describe(Raycaster, () => {
           point: Point.create(10, 10),
           includeMetadata: true,
         }),
-        true
+        true,
       );
     });
   });

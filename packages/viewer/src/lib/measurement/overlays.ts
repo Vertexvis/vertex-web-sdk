@@ -25,7 +25,7 @@ export class MeasurementOverlayManager {
   private overlaysChanged = new EventDispatcher<MeasurementOverlay[]>();
 
   public addLineFromResult(
-    result: MinimumDistanceMeasurementResult
+    result: MinimumDistanceMeasurementResult,
   ): LineOverlay {
     return this.addLine(result.point1, result.point2);
   }
@@ -44,14 +44,14 @@ export class MeasurementOverlayManager {
   }
 
   public addDistanceVectorFromResult(
-    result: MinimumDistanceMeasurementResult
+    result: MinimumDistanceMeasurementResult,
   ): DistanceVectorOverlay {
     return this.addDistanceVector(result.point1, result.point2);
   }
 
   public addDistanceVector(
     start: Vector3.Vector3,
-    end: Vector3.Vector3
+    end: Vector3.Vector3,
   ): DistanceVectorOverlay {
     const id = UUID.create();
     const v = Vector3.subtract(start, end);
@@ -99,7 +99,7 @@ export class MeasurementOverlayManager {
   }
 
   public onOverlaysChanged(
-    listener: Listener<MeasurementOverlay[]>
+    listener: Listener<MeasurementOverlay[]>,
   ): Disposable {
     return this.overlaysChanged.on(listener);
   }

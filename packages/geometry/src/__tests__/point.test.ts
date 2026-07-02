@@ -79,7 +79,7 @@ describe(Point.normalizeVector, () => {
   it('returns the corresponding normal vector', () => {
     const a = Point.create(3, 4);
     expect(Point.normalizeVector(a)).toEqual(
-      Point.create(0.6000000000000001, 0.8)
+      Point.create(0.6000000000000001, 0.8),
     );
   });
 
@@ -94,7 +94,7 @@ describe(Point.normalDirectionVector, () => {
     const a = Point.create(3, 4);
     const b = Point.create(6, 8);
     expect(Point.normalDirectionVector(a, b)).toEqual(
-      Point.create(0.6000000000000001, 0.8)
+      Point.create(0.6000000000000001, 0.8),
     );
   });
 });
@@ -104,7 +104,7 @@ describe(Point.orthogonalVector, () => {
     const a = Point.create(3, 4);
     const b = Point.create(7, 7);
     expect(Point.orthogonalVector(a, b)).toEqual(
-      Point.create(0.5999999999999999, -0.8000000000000002)
+      Point.create(0.5999999999999999, -0.8000000000000002),
     );
   });
 
@@ -112,7 +112,7 @@ describe(Point.orthogonalVector, () => {
     const a = Point.create(3, 4);
     const b = Point.create(6, 8);
     expect(Point.orthogonalVector(a, b)).toEqual(
-      Point.create(-0.8000000000000002, 0.5999999999999999)
+      Point.create(-0.8000000000000002, 0.5999999999999999),
     );
   });
 

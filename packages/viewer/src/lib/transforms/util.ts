@@ -35,7 +35,7 @@ export function toRadiansTransform(transform: Transform): Transform {
   const rotation = Vector3.create(
     Angle.toRadians(r.x),
     Angle.toRadians(r.y),
-    Angle.toRadians(r.z)
+    Angle.toRadians(r.z),
   );
 
   return { position, rotation, scale };
@@ -51,7 +51,7 @@ export function toDegreesTransform(transform: Transform): Transform {
   const rotation = Vector3.create(
     Angle.toDegrees(r.x),
     Angle.toDegrees(r.y),
-    Angle.toDegrees(r.z)
+    Angle.toDegrees(r.z),
   );
   return { position, rotation, scale };
 }
@@ -88,7 +88,7 @@ export function toTransform(matrix: Matrix4.Matrix4): Transform {
  */
 export function toWorldTransform(
   localT: Transform,
-  parentWM: Matrix4.Matrix4
+  parentWM: Matrix4.Matrix4,
 ): Transform {
   const localM = toMatrix(toRadiansTransform(localT));
   const worldM = Matrix4.multiply(parentWM, localM);
@@ -103,7 +103,7 @@ export function toWorldTransform(
  */
 export function toLocalTransform(
   worldT: Transform,
-  parentWM: Matrix4.Matrix4
+  parentWM: Matrix4.Matrix4,
 ): Transform {
   const worldM = toMatrix(toRadiansTransform(worldT));
   const localM = Matrix4.multiply(Matrix4.invert(parentWM), worldM);

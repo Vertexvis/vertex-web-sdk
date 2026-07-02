@@ -30,14 +30,14 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
     private readonly markupEl: HTMLVertexViewerMarkupFreeformElement,
     private readonly interactionBegin: EventEmitter<void>,
     private readonly interactionEnd: EventEmitter<MarkupInteraction>,
-    scalingOptions?: MarkupInteractionHandlerScalingOptions
+    scalingOptions?: MarkupInteractionHandlerScalingOptions,
   ) {
     super(scalingOptions);
   }
 
   public editAnchor(
     anchor: BoundingBox2dAnchorPosition,
-    event: PointerEvent
+    event: PointerEvent,
   ): void {
     if (this.markupEl.mode === 'edit' && this.elementBounds != null) {
       this.resizeBounds = this.markupEl.bounds;
@@ -49,7 +49,7 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         this.scalingOptions.originatingViewport,
         this.scalingOptions.centeringBehavior,
         this.scalingOptions.scale,
-        this.scalingOptions.offset
+        this.scalingOptions.offset,
       );
 
       window.addEventListener('pointermove', this.handleResizeInteractionMove);
@@ -79,7 +79,7 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         this.scalingOptions.originatingViewport,
         this.scalingOptions.centeringBehavior,
         this.scalingOptions.scale,
-        this.scalingOptions.offset
+        this.scalingOptions.offset,
       );
       this.updateMinAndMax(position);
       this.markupEl.points = this.markupEl.points ?? [position];
@@ -102,7 +102,7 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         this.scalingOptions.originatingViewport,
         this.scalingOptions.centeringBehavior,
         this.scalingOptions.scale,
-        this.scalingOptions.offset
+        this.scalingOptions.offset,
       );
       this.updateMinAndMax(position);
       this.markupEl.points = [...this.markupEl.points, position];
@@ -119,7 +119,7 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
       ) {
         const screenPosition = getMouseClientPosition(
           event,
-          this.elementBounds
+          this.elementBounds,
         );
         const position = translatePointToRelative(
           screenPosition,
@@ -127,7 +127,7 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
           this.scalingOptions.originatingViewport,
           this.scalingOptions.centeringBehavior,
           this.scalingOptions.scale,
-          this.scalingOptions.offset
+          this.scalingOptions.offset,
         );
 
         this.updateMinAndMax(position);
@@ -159,7 +159,7 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         this.scalingOptions.originatingViewport,
         this.scalingOptions.centeringBehavior,
         this.scalingOptions.scale,
-        this.scalingOptions.offset
+        this.scalingOptions.offset,
       );
 
       const updatedBounds = transformRectangle(
@@ -167,13 +167,13 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
         this.resizeStartPosition,
         position,
         this.anchor,
-        event.shiftKey
+        event.shiftKey,
       );
 
       this.markupEl.points = translatePointsToBounds(
         this.resizePoints,
         this.resizeBounds,
-        updatedBounds
+        updatedBounds,
       );
       this.markupEl.bounds = updatedBounds;
     }
@@ -194,21 +194,21 @@ export class FreeformMarkupInteractionHandler extends MarkupInteractionHandler {
       this.min != null
         ? Point.create(
             Math.min(this.min.x, position.x),
-            Math.min(this.min.y, position.y)
+            Math.min(this.min.y, position.y),
           )
         : position;
     this.max =
       this.max != null
         ? Point.create(
             Math.max(this.max.x, position.x),
-            Math.max(this.max.y, position.y)
+            Math.max(this.max.y, position.y),
           )
         : position;
     this.markupEl.bounds = Rectangle.create(
       this.min.x,
       this.min.y,
       this.max.x - this.min.x,
-      this.max.y - this.min.y
+      this.max.y - this.min.y,
     );
   }
 }

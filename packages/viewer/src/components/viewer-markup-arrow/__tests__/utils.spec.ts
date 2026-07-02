@@ -20,7 +20,7 @@ describe('viewer-markup-arrow utils', () => {
       const points = arrowheadPointsToPolygonPoints(arrowheadPoints);
 
       expect(points).toBe(
-        `${arrowheadPoints.tip.x},${arrowheadPoints.tip.y} ${arrowheadPoints.arrowTriangle.rightPoint.x},${arrowheadPoints.arrowTriangle.rightPoint.y} ${arrowheadPoints.base.x},${arrowheadPoints.base.y} ${arrowheadPoints.arrowTriangle.leftPoint.x},${arrowheadPoints.arrowTriangle.leftPoint.y}`
+        `${arrowheadPoints.tip.x},${arrowheadPoints.tip.y} ${arrowheadPoints.arrowTriangle.rightPoint.x},${arrowheadPoints.arrowTriangle.rightPoint.y} ${arrowheadPoints.base.x},${arrowheadPoints.base.y} ${arrowheadPoints.arrowTriangle.leftPoint.x},${arrowheadPoints.arrowTriangle.leftPoint.y}`,
       );
     });
 
@@ -30,23 +30,23 @@ describe('viewer-markup-arrow utils', () => {
       const scaledRight = scalePointProportional(
         arrowheadPoints.tip,
         arrowheadPoints.arrowTriangle.rightPoint,
-        scale
+        scale,
       );
       const scaledBase = scalePointProportional(
         arrowheadPoints.tip,
         arrowheadPoints.base,
-        scale
+        scale,
       );
       const scaledLeft = scalePointProportional(
         arrowheadPoints.tip,
         arrowheadPoints.arrowTriangle.leftPoint,
-        scale
+        scale,
       );
 
       const points = arrowheadPointsToPolygonPoints(arrowheadPoints, scale);
 
       expect(points).toBe(
-        `${arrowheadPoints.tip.x},${arrowheadPoints.tip.y} ${scaledRight.x},${scaledRight.y} ${scaledBase.x},${scaledBase.y} ${scaledLeft.x},${scaledLeft.y}`
+        `${arrowheadPoints.tip.x},${arrowheadPoints.tip.y} ${scaledRight.x},${scaledRight.y} ${scaledBase.x},${scaledBase.y} ${scaledLeft.x},${scaledLeft.y}`,
       );
     });
   });
@@ -58,7 +58,7 @@ describe('viewer-markup-arrow utils', () => {
       const points = arrowheadPointsToPathPoints(arrowheadPoints);
 
       expect(points).toBe(
-        `M${arrowheadPoints.arrowLine.rightPoint.x} ${arrowheadPoints.arrowLine.rightPoint.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} L${arrowheadPoints.arrowLine.leftPoint.x} ${arrowheadPoints.arrowLine.leftPoint.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} Z`
+        `M${arrowheadPoints.arrowLine.rightPoint.x} ${arrowheadPoints.arrowLine.rightPoint.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} L${arrowheadPoints.arrowLine.leftPoint.x} ${arrowheadPoints.arrowLine.leftPoint.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} Z`,
       );
     });
 
@@ -68,18 +68,18 @@ describe('viewer-markup-arrow utils', () => {
       const scaledRight = scalePointProportional(
         arrowheadPoints.tip,
         arrowheadPoints.arrowLine.rightPoint,
-        scale
+        scale,
       );
       const scaledLeft = scalePointProportional(
         arrowheadPoints.tip,
         arrowheadPoints.arrowLine.leftPoint,
-        scale
+        scale,
       );
 
       const points = arrowheadPointsToPathPoints(arrowheadPoints, scale);
 
       expect(points).toBe(
-        `M${scaledRight.x} ${scaledRight.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} L${scaledLeft.x} ${scaledLeft.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} Z`
+        `M${scaledRight.x} ${scaledRight.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} L${scaledLeft.x} ${scaledLeft.y} L${arrowheadPoints.tip.x} ${arrowheadPoints.tip.y} Z`,
       );
     });
   });
@@ -104,12 +104,12 @@ describe('viewer-markup-arrow utils', () => {
       const scaledRight = scalePointProportional(
         arrowheadPoints.tip,
         arrowheadPoints.hash.rightPoint,
-        scale
+        scale,
       );
       const scaledLeft = scalePointProportional(
         arrowheadPoints.tip,
         arrowheadPoints.hash.leftPoint,
-        scale
+        scale,
       );
 
       const points = arrowheadPointsToHashPoints(arrowheadPoints, scale);

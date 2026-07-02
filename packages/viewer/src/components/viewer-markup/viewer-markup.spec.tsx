@@ -51,7 +51,7 @@ describe('vertex-viewer-markup', () => {
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const markupElement = (await el.addMarkup(
-        arrowMarkup
+        arrowMarkup,
       )) as HTMLVertexViewerMarkupArrowElement;
 
       expect(el.children).toHaveLength(1);
@@ -226,7 +226,7 @@ describe('vertex-viewer-markup', () => {
       expect(onMarkupAdded).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: markupEl,
-        })
+        }),
       );
     });
 
@@ -249,7 +249,7 @@ describe('vertex-viewer-markup', () => {
       expect(onMarkupAdded).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: el.firstElementChild,
-        })
+        }),
       );
       expect(el.selectedMarkupId).toBeUndefined();
     });
@@ -291,17 +291,17 @@ describe('vertex-viewer-markup', () => {
       const root = page.root as HTMLVertexViewerElement;
 
       const el = root.querySelector(
-        'vertex-viewer-markup'
+        'vertex-viewer-markup',
       ) as HTMLVertexViewerMarkupElement;
       const tool = el.querySelector(
-        'vertex-viewer-markup-tool'
+        'vertex-viewer-markup-tool',
       ) as HTMLVertexViewerMarkupToolElement;
       const arrow = tool.querySelector(
-        'vertex-viewer-markup-arrow'
+        'vertex-viewer-markup-arrow',
       ) as HTMLVertexViewerMarkupArrowElement;
       arrow.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
       window.dispatchEvent(
-        new MouseEvent('pointermove', { clientX: 100, clientY: 0 })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 0 }),
       );
       await page.waitForChanges();
 
@@ -318,11 +318,11 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
 
       const circle = tool.querySelector(
-        'vertex-viewer-markup-circle'
+        'vertex-viewer-markup-circle',
       ) as HTMLVertexViewerMarkupCircleElement;
       circle.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
       window.dispatchEvent(
-        new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 100 }),
       );
       await page.waitForChanges();
 
@@ -337,14 +337,14 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
 
       const freeform = tool.querySelector(
-        'vertex-viewer-markup-freeform'
+        'vertex-viewer-markup-freeform',
       ) as HTMLVertexViewerMarkupFreeformElement;
       freeform.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
       window.dispatchEvent(
-        new MouseEvent('pointermove', { clientX: 100, clientY: 0 })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 0 }),
       );
       window.dispatchEvent(
-        new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
+        new MouseEvent('pointermove', { clientX: 100, clientY: 100 }),
       );
       await page.waitForChanges();
 
@@ -389,7 +389,7 @@ describe('vertex-viewer-markup', () => {
       expect(onMarkupRemoved).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: markupEl,
-        })
+        }),
       );
     });
   });
@@ -412,13 +412,13 @@ describe('vertex-viewer-markup', () => {
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const arrow = el.querySelector(
-        'vertex-viewer-markup-arrow'
+        'vertex-viewer-markup-arrow',
       ) as HTMLVertexViewerMarkupArrowElement;
       const circle = el.querySelector(
-        'vertex-viewer-markup-circle'
+        'vertex-viewer-markup-circle',
       ) as HTMLVertexViewerMarkupCircleElement;
       const freeform = el.querySelector(
-        'vertex-viewer-markup-freeform'
+        'vertex-viewer-markup-freeform',
       ) as HTMLVertexViewerMarkupFreeformElement;
 
       el.scale = 2;
@@ -426,16 +426,16 @@ describe('vertex-viewer-markup', () => {
 
       [arrow, circle, freeform].forEach((el) => {
         expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe(
-          '-20%'
+          '-20%',
         );
         expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe(
-          '-20%'
+          '-20%',
         );
         expect(
-          el.shadowRoot?.querySelector('filter')?.getAttribute('width')
+          el.shadowRoot?.querySelector('filter')?.getAttribute('width'),
         ).toBe('240%');
         expect(
-          el.shadowRoot?.querySelector('filter')?.getAttribute('height')
+          el.shadowRoot?.querySelector('filter')?.getAttribute('height'),
         ).toBe('240%');
       });
     });
@@ -457,13 +457,13 @@ describe('vertex-viewer-markup', () => {
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const arrow = el.querySelector(
-        'vertex-viewer-markup-arrow'
+        'vertex-viewer-markup-arrow',
       ) as HTMLVertexViewerMarkupArrowElement;
       const circle = el.querySelector(
-        'vertex-viewer-markup-circle'
+        'vertex-viewer-markup-circle',
       ) as HTMLVertexViewerMarkupCircleElement;
       const freeform = el.querySelector(
-        'vertex-viewer-markup-freeform'
+        'vertex-viewer-markup-freeform',
       ) as HTMLVertexViewerMarkupFreeformElement;
 
       el.scale = 0.5;
@@ -471,16 +471,16 @@ describe('vertex-viewer-markup', () => {
 
       [arrow, circle, freeform].forEach((el) => {
         expect(el.shadowRoot?.querySelector('filter')?.getAttribute('x')).toBe(
-          '-10%'
+          '-10%',
         );
         expect(el.shadowRoot?.querySelector('filter')?.getAttribute('y')).toBe(
-          '-10%'
+          '-10%',
         );
         expect(
-          el.shadowRoot?.querySelector('filter')?.getAttribute('width')
+          el.shadowRoot?.querySelector('filter')?.getAttribute('width'),
         ).toBe('120%');
         expect(
-          el.shadowRoot?.querySelector('filter')?.getAttribute('height')
+          el.shadowRoot?.querySelector('filter')?.getAttribute('height'),
         ).toBe('120%');
       });
     });
@@ -561,7 +561,7 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl1.id);
       expect(selectionChangedListener).toHaveBeenCalledWith(
-        expect.objectContaining({ detail: markupEl1 })
+        expect.objectContaining({ detail: markupEl1 }),
       );
 
       // Should clear selection, markup does not have ID
@@ -572,7 +572,7 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
       expect(el.selectedMarkupId).toBeUndefined();
       expect(selectionChangedListener).toHaveBeenCalledWith(
-        expect.objectContaining({ detail: undefined })
+        expect.objectContaining({ detail: undefined }),
       );
 
       // Should select, markup has ID
@@ -583,7 +583,7 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
       expect(el.selectedMarkupId).toEqual(markupEl3.id);
       expect(selectionChangedListener).toHaveBeenCalledWith(
-        expect.objectContaining({ detail: markupEl3 })
+        expect.objectContaining({ detail: markupEl3 }),
       );
     });
 
@@ -619,17 +619,21 @@ describe('vertex-viewer-markup', () => {
           bubbles: true,
           clientX: 50,
           clientY: 50,
-        })
+        }),
       );
       await page.waitForChanges();
       window.dispatchEvent(
         new MouseEvent('pointermove', {
           clientX: 100,
           clientY: 100,
-        })
+        }),
       );
       markup?.dispatchEvent(
-        new MouseEvent('pointerup', { bubbles: true, clientX: 50, clientY: 50 })
+        new MouseEvent('pointerup', {
+          bubbles: true,
+          clientX: 50,
+          clientY: 50,
+        }),
       );
       await page.waitForChanges();
 
@@ -661,7 +665,7 @@ describe('vertex-viewer-markup', () => {
 
       const viewer = page.root as HTMLVertexViewerElement;
       const toolEl = viewer.querySelector(
-        'vertex-viewer-markup-tool'
+        'vertex-viewer-markup-tool',
       ) as HTMLVertexViewerMarkupToolElement;
 
       expect(toolEl.disabled).toBe(false);
@@ -690,10 +694,10 @@ describe('vertex-viewer-markup', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-markup'
+        'vertex-viewer-markup',
       ) as HTMLVertexViewerMarkupElement;
       const toolEl = el.querySelector(
-        'vertex-viewer-markup-tool'
+        'vertex-viewer-markup-tool',
       ) as HTMLVertexViewerMarkupToolElement;
 
       el.arrowTemplateId = 'my-arrow-template';
@@ -733,7 +737,7 @@ describe('vertex-viewer-markup', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-markup'
+        'vertex-viewer-markup',
       ) as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
 

@@ -40,7 +40,7 @@ describe(defineString, () => {
 describe(defineParams, () => {
   const builder = defineParams<{ foo: number; bar: number }>(
     defineNumber('param1', 'foo'),
-    defineNumber('param2', 'bar')
+    defineNumber('param2', 'bar'),
   );
 
   it('applies each definition', () => {

@@ -13,7 +13,7 @@ export function isGrpcServiceError(err: any): err is ServiceError {
 }
 
 export function webSocketSubscriptionTransportFactory(
-  options: TransportOptions
+  options: TransportOptions,
 ): Transport {
   if (
     options.methodDefinition.methodName === SceneTreeAPI.Subscribe.methodName

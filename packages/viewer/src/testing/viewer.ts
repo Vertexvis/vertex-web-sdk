@@ -40,7 +40,7 @@ export async function loadViewerStreamKey(
   {
     token = random.string({ alpha: true }),
     beforeConnected,
-  }: LoadViewerStreamKeyOptions = {}
+  }: LoadViewerStreamKeyOptions = {},
 ): Promise<void> {
   jest.spyOn(stream, 'startStream').mockResolvedValue(
     StreamFixtures.Responses.startStream({
@@ -50,14 +50,14 @@ export async function loadViewerStreamKey(
           expiresIn: new Date().getTime() + 10000,
         },
       },
-    }).response
+    }).response,
   );
   jest
     .spyOn(stream, 'syncTime')
     .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
 
   const connecting = stream.stateChanged.onceWhen(
-    (s) => s.type === 'connecting'
+    (s) => s.type === 'connecting',
   );
   const loaded = viewer.load(urn);
 
@@ -69,8 +69,8 @@ export async function loadViewerStreamKey(
     encode(
       StreamFixtures.Requests.drawFrame({
         payload: Fixtures.drawFramePayloadPerspective,
-      })
-    )
+      }),
+    ),
   );
   await loaded;
 }
@@ -81,7 +81,7 @@ interface GracefulReconnectOptions<T = void> {
 
 export async function gracefulReconnect<T = void>(
   { stream, ws }: ViewerStreamOperationCtx,
-  { beforeReconnect }: GracefulReconnectOptions<T> = {}
+  { beforeReconnect }: GracefulReconnectOptions<T> = {},
 ): Promise<T | undefined> {
   jest
     .spyOn(stream, 'reconnect')
@@ -91,7 +91,7 @@ export async function gracefulReconnect<T = void>(
     .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
 
   const connecting = stream.stateChanged.onceWhen(
-    (s) => s.type === 'reconnecting'
+    (s) => s.type === 'reconnecting',
   );
 
   ws.receiveMessage(encode(StreamFixtures.Requests.gracefulReconnect()));
@@ -104,8 +104,8 @@ export async function gracefulReconnect<T = void>(
     encode(
       StreamFixtures.Requests.drawFrame({
         payload: Fixtures.drawFramePayloadPerspective,
-      })
-    )
+      }),
+    ),
   );
 
   return result;
@@ -114,14 +114,14 @@ export async function gracefulReconnect<T = void>(
 export function receiveFrame(
   ws: WebSocketClientMock,
   transformPayload?: (
-    payload: vertexvis.protobuf.stream.IDrawFramePayload
-  ) => vertexvis.protobuf.stream.IDrawFramePayload
+    payload: vertexvis.protobuf.stream.IDrawFramePayload,
+  ) => vertexvis.protobuf.stream.IDrawFramePayload,
 ): void {
   ws.receiveMessage(
     encode(
       StreamFixtures.Requests.drawFrame({
         payload: transformPayload?.(Fixtures.drawFramePayloadPerspective),
-      })
-    )
+      }),
+    ),
   );
 }

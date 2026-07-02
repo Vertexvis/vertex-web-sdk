@@ -6,14 +6,14 @@ export function defineParams<S>(
   return (settings) => {
     return definitions.reduce(
       (result, def) => ({ ...result, ...def(settings) }),
-      {}
+      {},
     );
   };
 }
 
 export function defineBoolean<S, P extends keyof S = keyof S>(
   param: string,
-  prop: P
+  prop: P,
 ): ParamsBuilder<S> {
   return defineValue(param, prop, (v) => {
     if (typeof v === 'boolean') {
@@ -26,26 +26,26 @@ export function defineBoolean<S, P extends keyof S = keyof S>(
 
 export function defineNumber<S, P extends keyof S = keyof S>(
   param: string,
-  prop: P
+  prop: P,
 ): ParamsBuilder<S> {
   return defineValue(param, prop, (v) =>
-    typeof v === 'number' ? v.toString() : undefined
+    typeof v === 'number' ? v.toString() : undefined,
   );
 }
 
 export function defineString<S, P extends keyof S = keyof S>(
   param: string,
-  prop: P
+  prop: P,
 ): ParamsBuilder<S> {
   return defineValue(param, prop, (v) =>
-    typeof v === 'string' ? v : undefined
+    typeof v === 'string' ? v : undefined,
   );
 }
 
 function defineValue<S, P extends keyof S = keyof S>(
   param: string,
   prop: P,
-  f: (prop: unknown) => string | undefined
+  f: (prop: unknown) => string | undefined,
 ): ParamsBuilder<S> {
   return (settings) => {
     const value = f(settings[prop]);

@@ -17,17 +17,17 @@ export type Row = LoadedRow | undefined;
 export function fromNodeProto(
   index: number,
   node: Node,
-  columns: MetadataKey[]
+  columns: MetadataKey[],
 ): Row;
 export function fromNodeProto(
   index: number,
   nodes: Node[],
-  columns: MetadataKey[]
+  columns: MetadataKey[],
 ): Row[];
 export function fromNodeProto(
   index: number,
   nodes: Node | Node[],
-  columns: MetadataKey[]
+  columns: MetadataKey[],
 ): Row | Row[] {
   if (Array.isArray(nodes)) {
     return nodes.map((node, i) => fromNodeProto(index + i, node, columns));

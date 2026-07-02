@@ -147,7 +147,7 @@ export class ViewerDomRenderer {
   @Watch('viewer')
   protected handleViewerChange(
     newViewer: HTMLVertexViewerElement | undefined,
-    oldViewer: HTMLVertexViewerElement | undefined
+    oldViewer: HTMLVertexViewerElement | undefined,
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.handleViewerFrameDrawn);
     newViewer?.addEventListener('frameDrawn', this.handleViewerFrameDrawn);
@@ -174,7 +174,7 @@ export class ViewerDomRenderer {
    * @param newViewer
    */
   private handleEventPropagationToViewer(
-    newViewer: HTMLVertexViewerElement
+    newViewer: HTMLVertexViewerElement,
   ): void {
     this.interactionDisposables.forEach((disposable) => {
       disposable.dispose();

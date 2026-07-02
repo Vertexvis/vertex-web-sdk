@@ -295,7 +295,7 @@ export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
     Quaternion.create({
       w: 1 + dotAB,
       ...cross(normalizedA, normalizedB),
-    })
+    }),
   );
 
   return Euler.fromRotationMatrix(Matrix4.makeRotation(normalizedQ));
@@ -332,7 +332,7 @@ export function rotateAboutAxis(
   angle: number,
   point: Vector3,
   axisDirection: Vector3,
-  axisPosition: Vector3
+  axisPosition: Vector3,
 ): Vector3 {
   if (angle !== 0) {
     const { x, y, z } = point;
@@ -448,10 +448,10 @@ export function lerp(a: Vector3, b: Vector3, t: number): Vector3 {
 export function transformNdcToWorldSpace(
   ndc: Vector3,
   worldMatrix: Matrix4.Matrix4,
-  projectionMatrixInverse: Matrix4.Matrix4
+  projectionMatrixInverse: Matrix4.Matrix4,
 ): Vector3 {
   return transformMatrix(
     transformMatrix(ndc, projectionMatrixInverse),
-    worldMatrix
+    worldMatrix,
   );
 }

@@ -33,7 +33,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     doubleTapEmitter: EventEmitter<TapEventDetails>,
     longPressEmitter: EventEmitter<TapEventDetails>,
     interactionStartedEmitter: EventEmitter<void>,
-    interactionFinishedEmitter: EventEmitter<void>
+    interactionFinishedEmitter: EventEmitter<void>,
   ) {
     super(
       stream,
@@ -46,7 +46,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       doubleTapEmitter,
       longPressEmitter,
       interactionStartedEmitter,
-      interactionFinishedEmitter
+      interactionFinishedEmitter,
     );
   }
 
@@ -57,7 +57,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
    * @returns A 3D point in world space.
    */
   public async getWorldPointFromViewport(
-    point: Point.Point
+    point: Point.Point,
   ): Promise<Vector3.Vector3 | undefined> {
     const viewport = this.getViewport();
     const frame = this.getFrame();
@@ -94,7 +94,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       const yvec = Vector3.cross(normalizedViewVector, xvec);
       const offset = Vector3.add(
         Vector3.scale(epsilonX, xvec),
-        Vector3.scale(epsilonY, yvec)
+        Vector3.scale(epsilonY, yvec),
       );
 
       return camera.moveBy(offset);
@@ -121,16 +121,16 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         const ray = viewport.transformPointToRay(
           screenPt,
           frame.image,
-          startingCamera
+          startingCamera,
         );
         const hitPlane = Plane.fromNormalAndCoplanarPoint(
           direction,
-          camera.lookAt
+          camera.lookAt,
         );
         const hitPt = Ray.intersectPlane(ray, hitPlane);
         if (hitPt == null) {
           console.warn(
-            'Cannot determine fallback for pan. Ray does not intersect plane.'
+            'Cannot determine fallback for pan. Ray does not intersect plane.',
           );
           return camera;
         }
@@ -146,7 +146,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
         const ray = viewport.transformPointToRay(
           screenPt,
           frame.image,
-          startingCamera
+          startingCamera,
         );
         const movePt = Ray.intersectPlane(ray, hitPlane);
 
@@ -167,7 +167,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
 
   public async zoomCameraToPoint(
     point: Point.Point,
-    delta: number
+    delta: number,
   ): Promise<void> {
     return this.transformCamera(
       ({ camera, viewport, frame, depthBuffer, boundingBox }) => {
@@ -180,17 +180,17 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
           const ray = viewport.transformPointToRay(
             point,
             frame.image,
-            frameCam
+            frameCam,
           );
 
           const fallbackPlane = Plane.fromNormalAndCoplanarPoint(
             dir,
-            frameCam.lookAt
+            frameCam.lookAt,
           );
           const fallbackPt = Ray.intersectPlane(ray, fallbackPlane);
           if (fallbackPt == null) {
             console.warn(
-              'Cannot determine fallback point for zoom. Ray does not intersect plane.'
+              'Cannot determine fallback point for zoom. Ray does not intersect plane.',
             );
             return camera;
           }
@@ -225,7 +225,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
             Vector3.magnitude(BoundingBox.diagonal(boundingBox)) * 1e-5;
           const zoomedFovHeight = Math.max(
             minimumFovHeight,
-            camera.fovHeight * (1 - relativeDeltaToViewportHeight)
+            camera.fovHeight * (1 - relativeDeltaToViewportHeight),
           );
 
           // Calculate the vector to determine how to adjust the camera's look at point.
@@ -237,7 +237,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
             (camera.fovHeight - zoomedFovHeight) / camera.fovHeight;
           const lookAtChangeVector = Vector3.scale(
             fovHeightRelativeChange,
-            Vector3.subtract(hitPt, projectedLookAt)
+            Vector3.subtract(hitPt, projectedLookAt),
           );
 
           // Calculate the camera's new look at point
@@ -252,7 +252,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
           });
         }
         return camera;
-      }
+      },
     );
   }
 
@@ -267,7 +267,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
     return this.transformCamera(({ camera, viewport, boundingBox }) => {
       const upVector = Vector3.normalize(camera.up);
       const directionVector = Vector3.normalize(
-        Vector3.subtract(camera.lookAt, camera.position)
+        Vector3.subtract(camera.lookAt, camera.position),
       );
 
       const crossX = Vector3.cross(upVector, directionVector);
@@ -281,7 +281,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
 
       const rotationAxisDirection = Vector3.cross(
         mouseToWorld,
-        directionVector
+        directionVector,
       );
 
       // The 9.5 multiplier was chosen to match the desired rotation speed
@@ -296,7 +296,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       const updated = camera.rotateAroundAxisAtPoint(
         angle,
         rotationPoint,
-        rotationAxisDirection
+        rotationAxisDirection,
       );
 
       // Update the lookAt point to take the center of the model into account
@@ -305,7 +305,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
       const newLookAt = updateLookAtRelativeToBoundingBoxCenter(
         updated.lookAt,
         updated.viewVector,
-        BoundingBox.center(boundingBox)
+        BoundingBox.center(boundingBox),
       );
 
       // Update only the lookAt point. The rotationPoint should remain
@@ -319,7 +319,7 @@ export class InteractionApiOrthographic extends InteractionApi<OrthographicCamer
   protected getWorldPoint(
     point: Point.Point,
     depthBuffer: DepthBuffer,
-    fallbackPoint: Vector3.Vector3
+    fallbackPoint: Vector3.Vector3,
   ): Vector3.Vector3 {
     const viewport = this.getViewport();
     const framePt = viewport.transformPointToFrame(point, depthBuffer);

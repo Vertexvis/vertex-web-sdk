@@ -3,7 +3,7 @@ import { Range } from '@vertexvis/utils';
 
 export function constrainRelativePoint(
   pt: Point.Point,
-  range: Range.Range
+  range: Range.Range,
 ): Point.Point {
   const constrainedX = Math.max(range.start, Math.min(range.end, pt.x));
   const constrainedY = Math.max(range.start, Math.min(range.end, pt.y));
@@ -16,11 +16,11 @@ export function constrainRelativePoint(
  */
 export function translatePointToScreen(
   pt: Point.Point,
-  canvasDimensions: Dimensions.Dimensions
+  canvasDimensions: Dimensions.Dimensions,
 ): Point.Point {
   return Point.add(
     Point.scale(pt, canvasDimensions.width, canvasDimensions.height),
-    Dimensions.center(canvasDimensions)
+    Dimensions.center(canvasDimensions),
   );
 }
 
@@ -32,7 +32,7 @@ export function translatePointToRelative(
   canvasDimensions: Dimensions.Dimensions,
   includeOffset?: boolean,
   xOffset?: number,
-  yOffset?: number
+  yOffset?: number,
 ): Point.Point {
   const verticalScaleFactor = 1 / canvasDimensions.height;
   const horizontalScaleFactor = 1 / canvasDimensions.width;
@@ -41,14 +41,14 @@ export function translatePointToRelative(
   const point = Point.scale(
     Point.subtract(pt, canvasCenterPoint),
     horizontalScaleFactor,
-    verticalScaleFactor
+    verticalScaleFactor,
   );
 
   if (includeOffset) {
     const offset = Point.scale(
       Point.create(xOffset, yOffset),
       horizontalScaleFactor,
-      verticalScaleFactor
+      verticalScaleFactor,
     );
 
     // We want to place the label towards the center of the screen.
@@ -66,7 +66,7 @@ export function translatePointToRelative(
 
     const offsetPoint = Point.add(
       point,
-      Point.create(xOffsetCalculated, yOffsetCalculated)
+      Point.create(xOffsetCalculated, yOffsetCalculated),
     );
 
     return constrainRelativePoint(offsetPoint, Range.create(-0.5, 0.5));
