@@ -12,9 +12,9 @@
   /**
    * @prop --viewer-background:
    * A CSS color value used as the background painted behind the loaded PDF,
-   * visible in the negative space around the page. Defaults to #cccccc.
+   * visible in the negative space around the page. Defaults to #eeeeee.
    */
-  --viewer-background: #cccccc;
+  --viewer-background: #eeeeee;
 }
 
 .viewer-container {
