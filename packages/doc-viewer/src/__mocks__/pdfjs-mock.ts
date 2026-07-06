@@ -6,7 +6,8 @@ export class MockOptionalContentConfig extends Map {
 
 export const mockGetViewport = jest.fn(() => ({ width: 100, height: 100 }));
 
-export const mockPageRender = jest.fn(() => ({ promise: Promise.resolve() }));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const mockPageRender = jest.fn((args: any) => ({ promise: Promise.resolve() }));
 
 export const mockGetPage = jest.fn(() => ({
   getTextContent: jest.fn(() => ({

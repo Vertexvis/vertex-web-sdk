@@ -3,6 +3,7 @@ import { Disposable } from '@vertexvis/utils';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 import { DocumentRenderer } from '../document/renderer';
+import { createElement } from '../dom';
 import { PdfJsApi, PdfJsApiState } from './pdfjs-api';
 
 interface PdfJsRendererState {
@@ -21,7 +22,7 @@ export class PdfJsRenderer extends DocumentRenderer {
 
     // Render pages using an offscreen canvas to avoid flickering that can occur for
     // PDFs with annotations.
-    this.offscreenCanvas = document.createElement('canvas');
+    this.offscreenCanvas = createElement<HTMLCanvasElement>('canvas');
 
     this.handleStateChanged = this.handleStateChanged.bind(this);
 
@@ -76,10 +77,20 @@ export class PdfJsRenderer extends DocumentRenderer {
       this.offscreenCanvas.width = this.canvas.width;
       this.offscreenCanvas.height = this.canvas.height;
 
+      const offscreenCanvasCtx = this.offscreenCanvas.getContext('2d');
+
+      // Fill the offscreen canvas with a white background prior to rendering the page to give the content
+      // of the PDF a white background, but maintain the canvas it gets drawn to when copying to the main canvas.
+      if (offscreenCanvasCtx != null) {
+        offscreenCanvasCtx.fillStyle = '#ffffff';
+        offscreenCanvasCtx.fillRect(panOffset.x + centerOffsetX, panOffset.y, scaled.width, scaled.height);
+      }
+
       await page.render({
         canvas: this.offscreenCanvas,
         viewport: scaled,
         intent: 'display',
+        background: 'transparent',
         optionalContentConfigPromise: optionalContentConfig != null ? Promise.resolve(optionalContentConfig) : undefined,
       }).promise;
 
