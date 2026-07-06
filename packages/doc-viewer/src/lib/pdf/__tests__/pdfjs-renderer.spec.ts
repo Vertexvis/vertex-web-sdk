@@ -2,6 +2,10 @@ const mockOnStateChangeDispose = jest.fn();
 const mockOnStateChange = jest.fn((_handler: (state: PdfJsApiState) => Promise<void>) => ({
   dispose: mockOnStateChangeDispose,
 }));
+const mockCreateElement = jest.fn();
+jest.mock('../../dom', () => ({
+  createElement: mockCreateElement,
+}));
 jest.mock('../pdfjs-api', () => ({
   PdfJsApi: jest.fn().mockImplementation(() => ({
     onStateChanged: mockOnStateChange,
@@ -32,20 +36,21 @@ describe('PdfJsRenderer', () => {
 
   describe('renderPage', () => {
     it('renders the page', async () => {
+      const mockContext = { fillStyle: '#000000', fillRect: jest.fn() };
+
+      mockCreateElement.mockImplementation(() => ({ getContext: jest.fn().mockReturnValue(mockContext) }));
+
       new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
       const handler = mockOnStateChange.mock.calls[0][0];
 
       await handler({ document: mockPdfDocument, loadedPageNumber: 1, zoomPercentage: 100, panOffset: Point.create(0, 0) });
 
-      expect(mockPageRender).toHaveBeenCalledWith(
-        expect.objectContaining({
-          canvas: expect.any(HTMLCanvasElement),
-          viewport: expect.objectContaining({
-            width: 100,
-            height: 100,
-          }),
-        }),
-      );
+      const firstCall = mockPageRender.mock.calls[0][0];
+
+      // Expect the fill style to have been updated to `#ffffff` to give the page a white background.
+      expect(firstCall?.canvas.getContext('2d')?.fillStyle).toBe('#ffffff');
+      expect(firstCall?.viewport.width).toBe(100);
+      expect(firstCall?.viewport.height).toBe(100);
     });
 
     it('scales the page to fit within the viewport', async () => {

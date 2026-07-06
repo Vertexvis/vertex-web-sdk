@@ -1520,6 +1520,7 @@ export namespace Components {
         "fractionalDigits": number;
         /**
           * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
+          * @default new MeasurementModel()
          */
         "measurementModel"?: MeasurementModel;
         /**
@@ -4050,6 +4051,7 @@ declare namespace LocalJSX {
         "fractionalDigits"?: number;
         /**
           * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
+          * @default new MeasurementModel()
          */
         "measurementModel"?: MeasurementModel;
         /**
