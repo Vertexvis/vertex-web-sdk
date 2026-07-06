@@ -180,9 +180,12 @@ export class ZoomInteraction extends MouseInteraction {
     await api.endInteraction();
   }
 
-  private resetInteractionTimer(api: InteractionApi): void {
+  private resetInteractionTimer(
+    api: InteractionApi,
+    extraDelayMs?: number,
+  ): void {
     this.stopInteractionTimer();
-    this.startInteractionTimer(api);
+    this.startInteractionTimer(api, extraDelayMs);
   }
 
   private getDirectionalDelta(delta: number): number {
@@ -200,13 +203,13 @@ export class ZoomInteraction extends MouseInteraction {
     this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
 
   /**
-   * Will use configured mouseWheelInteractionEndDebounce delay
+   * Will use configured mouseWheelInteractionEndDebounce delay, certain interactions like wheel zoom benefit from extra delay
    */
-  private startInteractionTimer(api: InteractionApi): void {
+  private startInteractionTimer(api: InteractionApi, extraDelayMs = 0): void {
     this.interactionTimer = window.setTimeout(async () => {
       this.interactionTimer = undefined;
       await this.endInteraction(api);
-    }, this.getInteractionDelay());
+    }, extraDelayMs + this.getInteractionDelay());
   }
 
   private stopInteractionTimer(): void {
@@ -224,7 +227,7 @@ export class ZoomInteraction extends MouseInteraction {
       await this.beginInteraction(api);
     }
 
-    this.resetInteractionTimer(api);
+    this.resetInteractionTimer(api, 48); // extra delay of approx 3 frames at 60fps
     f();
   }
 }
