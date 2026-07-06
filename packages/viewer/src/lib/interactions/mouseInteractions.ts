@@ -154,15 +154,9 @@ export class ZoomInteraction extends MouseInteraction {
     this.startPt = undefined;
   }
 
-  public async zoom(
-    delta: number,
-    api: InteractionApi,
-    extraDelayMs?: number,
-  ): Promise<void> {
-    await this.runWheelZoomInteraction(
-      api,
-      () => api.zoomCamera(this.getDirectionalDelta(delta)),
-      extraDelayMs,
+  public async zoom(delta: number, api: InteractionApi): Promise<void> {
+    await this.runWheelZoomInteraction(api, () =>
+      api.zoomCamera(this.getDirectionalDelta(delta)),
     );
   }
 
@@ -170,12 +164,9 @@ export class ZoomInteraction extends MouseInteraction {
     pt: Point.Point,
     delta: number,
     api: InteractionApi,
-    extraDelayMs?: number,
   ): Promise<void> {
-    await this.runWheelZoomInteraction(
-      api,
-      () => api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta)),
-      extraDelayMs,
+    await this.runWheelZoomInteraction(api, () =>
+      api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta)),
     );
   }
 
@@ -189,12 +180,9 @@ export class ZoomInteraction extends MouseInteraction {
     await api.endInteraction();
   }
 
-  private resetInteractionTimer(
-    api: InteractionApi,
-    extraDelayMs?: number,
-  ): void {
+  private resetInteractionTimer(api: InteractionApi): void {
     this.stopInteractionTimer();
-    this.startInteractionTimer(api, extraDelayMs);
+    this.startInteractionTimer(api);
   }
 
   private getDirectionalDelta(delta: number): number {
@@ -204,20 +192,21 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   /**
-   * If this value gets too low, can cause animation jitter in certain scenarios
+   * the amount of delay until interaction is considered done or paused so final frames will be fetched
+   * If this value gets too low, can cause animation jitter in certain scenarios due to latency differences
+   * between partial and final frames
    */
-  private getInteractionDelay(): number {
-    return this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
-  }
+  private getInteractionDelay = (): number =>
+    this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
 
   /**
-   * Uses a configured interaction delay, but certain interactions like wheel zoom benefit from extra delay
+   * Will use configured mouseWheelInteractionEndDebounce delay
    */
-  private startInteractionTimer(api: InteractionApi, extraDelayMs = 0): void {
+  private startInteractionTimer(api: InteractionApi): void {
     this.interactionTimer = window.setTimeout(async () => {
       this.interactionTimer = undefined;
       await this.endInteraction(api);
-    }, extraDelayMs + this.getInteractionDelay());
+    }, this.getInteractionDelay());
   }
 
   private stopInteractionTimer(): void {
@@ -230,13 +219,12 @@ export class ZoomInteraction extends MouseInteraction {
   private async runWheelZoomInteraction(
     api: InteractionApi,
     f: () => void | Promise<void>,
-    extraDelayMs?: number,
   ): Promise<void> {
     if (!this.isTransforming) {
       await this.beginInteraction(api);
     }
 
-    this.resetInteractionTimer(api, extraDelayMs);
+    this.resetInteractionTimer(api);
     f();
   }
 }
