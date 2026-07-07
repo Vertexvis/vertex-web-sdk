@@ -27,6 +27,16 @@ describe(MouseInteractionHandler, () => {
   const twistInteraction = new TwistInteractionMock();
   const api = new InteractionApiMock();
 
+  class TestMouseInteractionHandler extends MouseInteractionHandler {
+    // expose wheelDeltaToPixels as public for testing sake
+    public wheelDeltaToPixelsForTest(
+      deltaY: number,
+      deltaMode: number,
+    ): number {
+      return this.wheelDeltaToPixels(deltaY, deltaMode);
+    }
+  }
+
   const div = document.createElement('div');
   const mouseDown = new MouseEvent('mousedown', {
     screenX: 100,
@@ -209,6 +219,25 @@ describe(MouseInteractionHandler, () => {
     await delay(50);
 
     expect(zoomInteraction.zoomToPoint).toHaveBeenCalled();
+  });
+
+  it('converts line-mode wheel deltas using computed line-height pixels', () => {
+    jest.spyOn(window, 'getComputedStyle').mockReturnValue({
+      getPropertyValue: (property: string) => {
+        if (property === 'fontSize') {
+          return '16px';
+        } else if (property === 'lineHeight') {
+          return '20px';
+        } else if (property === 'height') {
+          return '800px';
+        }
+        return '';
+      },
+    } as CSSStyleDeclaration);
+
+    const handler = new TestMouseInteractionHandler(() => config);
+
+    expect(handler.wheelDeltaToPixelsForTest(3, 1)).toBe(60);
   });
 
   it('ends zoom interaction on drag', async () => {
