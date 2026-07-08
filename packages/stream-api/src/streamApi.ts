@@ -278,9 +278,7 @@ export class StreamApi {
       const cameraIsValid = validateCamera(payload.camera);
 
       if (!cameraIsValid) {
-        console.warn(
-          'Invalid camera provided. Canceling flyTo operation.',
-        );
+        console.warn('Invalid camera provided. Canceling flyTo operation.');
         return Promise.resolve({});
       }
     }
