@@ -19,7 +19,7 @@ export class CanvasController {
   public constructor(
     private client: SceneViewAPIClient,
     private jwtProvider: JwtProvider,
-    private deviceIdProvider: () => string | undefined
+    private deviceIdProvider: () => string | undefined,
   ) {}
 
   public async getCanvas({
@@ -28,7 +28,7 @@ export class CanvasController {
   }: GetCanvasOptions): Promise<CanvasDocument> {
     if (canvasId != null && sceneViewStateId != null) {
       throw new Error(
-        'Invalid request. Only one lookup ID between `canvasId` and `sceneViewStateId` can be provided.'
+        'Invalid request. Only one lookup ID between `canvasId` and `sceneViewStateId` can be provided.',
       );
     }
 

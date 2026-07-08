@@ -23,7 +23,7 @@ export const BoundingBox1d: FunctionalComponent<BoundingBox1dProps> = ({
   onEndAnchorPointerDown,
 }) => {
   const angle = Angle.normalize(
-    Angle.toDegrees(Angle.fromPoints(start, end)) - 270
+    Angle.toDegrees(Angle.fromPoints(start, end)) - 270,
   );
   const center = Point.create((start.x + end.x) / 2, (start.y + end.y) / 2);
   const transform =

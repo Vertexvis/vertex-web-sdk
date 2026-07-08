@@ -3,7 +3,7 @@ import { UnaryResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/sce
 export function mockCancellableGrpcUnaryResult(
   result: unknown,
   timeout = 10,
-  onCancel?: VoidFunction
+  onCancel?: VoidFunction,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): (...args: any[]) => unknown {
   return (_, __, handler): UnaryResponse => {
@@ -22,7 +22,7 @@ export function mockCancellableGrpcUnaryResult(
 
 export function mockGrpcUnaryResult(
   result: unknown,
-  timeout = 10
+  timeout = 10,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): (...args: any[]) => unknown {
   return mockCancellableGrpcUnaryResult(result, timeout);
@@ -30,7 +30,7 @@ export function mockGrpcUnaryResult(
 
 export function mockGrpcUnaryError(
   error: unknown,
-  timeout = 10
+  timeout = 10,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): (...args: any[]) => unknown {
   return (_, __, handler) => {

@@ -1,5 +1,5 @@
 jest.mock(
-  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 jest.mock('@vertexvis/stream-api');
 
@@ -32,7 +32,7 @@ describe(MeasurementInteractionHandler, () => {
     model,
     client,
     () => 'token',
-    deviceId
+    deviceId,
   );
   const handler = new MeasurementInteractionHandler(controller, [
     EntityType.PRECISE_SURFACE,
@@ -51,7 +51,7 @@ describe(MeasurementInteractionHandler, () => {
     { emit: jest.fn() },
     { emit: jest.fn() },
     { emit: jest.fn() },
-    { emit: jest.fn() }
+    { emit: jest.fn() },
   );
 
   beforeEach(() => {
@@ -178,7 +178,7 @@ describe(MeasurementInteractionHandler, () => {
   }
 
   function mockMeasurableEntityAtPoint(
-    type = EntityType.PRECISE_SURFACE
+    type = EntityType.PRECISE_SURFACE,
   ): void {
     const getEntityTypeAtPoint = jest.spyOn(api, 'getEntityTypeAtPoint');
     getEntityTypeAtPoint.mockResolvedValue(type);
@@ -190,18 +190,18 @@ describe(MeasurementInteractionHandler, () => {
   }
 
   function mockMeasureResponse(
-    result: MeasurementResult = makeMinimumDistanceResult()
+    result: MeasurementResult = makeMinimumDistanceResult(),
   ): void {
     (client.measure as jest.Mock).mockImplementation(
-      mockGrpcUnaryResult(makeMeasureResponse(result))
+      mockGrpcUnaryResult(makeMeasureResponse(result)),
     );
   }
 
   async function tap(
-    assertion?: (outcome: MeasurementOutcome | undefined) => void
+    assertion?: (outcome: MeasurementOutcome | undefined) => void,
   ): Promise<void> {
     const onOutcomeChanged = new Promise<MeasurementOutcome | undefined>(
-      (resolve) => model.onOutcomeChanged(resolve)
+      (resolve) => model.onOutcomeChanged(resolve),
     );
 
     element.dispatchEvent(new MouseEvent('pointerdown'));

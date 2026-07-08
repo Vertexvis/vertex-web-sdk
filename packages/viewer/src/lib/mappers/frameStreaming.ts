@@ -34,7 +34,7 @@ export const fromPbPerspectiveCamera: M.Func<
     M.mapProp('position', M.compose(M.required('position'), fromPbVector3f)),
     M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
     M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
-    M.getProp('fovY')
+    M.getProp('fovY'),
   ),
   ([position, lookAt, up, fovY]) => {
     return {
@@ -43,7 +43,7 @@ export const fromPbPerspectiveCamera: M.Func<
       up,
       fovY: fovY?.value != null ? fovY.value : 45,
     };
-  }
+  },
 );
 
 export const fromPbOrthographicCamera: M.Func<
@@ -53,18 +53,18 @@ export const fromPbOrthographicCamera: M.Func<
   M.read(
     M.mapProp(
       'viewVector',
-      M.compose(M.required('viewVector'), fromPbVector3f)
+      M.compose(M.required('viewVector'), fromPbVector3f),
     ),
     M.mapProp('lookAt', M.compose(M.required('lookAt'), fromPbVector3f)),
     M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
-    M.mapProp('fovHeight', M.required('fovHeight'))
+    M.mapProp('fovHeight', M.required('fovHeight')),
   ),
   ([viewVector, lookAt, up, fovHeight]) => ({
     viewVector,
     lookAt,
     up,
     fovHeight,
-  })
+  }),
 );
 
 export const fromPbCamera: M.Func<
@@ -76,7 +76,7 @@ export const fromPbCamera: M.Func<
     M.mapProp('lookAt', M.ifDefined(fromPbVector3f)),
     M.mapProp('up', M.ifDefined(fromPbVector3f)),
     M.mapProp('perspective', M.ifDefined(fromPbPerspectiveCamera)),
-    M.mapProp('orthographic', M.ifDefined(fromPbOrthographicCamera))
+    M.mapProp('orthographic', M.ifDefined(fromPbOrthographicCamera)),
   ),
   ([position, lookAt, up, perspective, orthographic]) => {
     return (
@@ -88,7 +88,7 @@ export const fromPbCamera: M.Func<
         fovY: 45,
       }
     );
-  }
+  },
 );
 
 export const fromPbSectionPlane: M.Func<
@@ -97,9 +97,9 @@ export const fromPbSectionPlane: M.Func<
 > = M.defineMapper(
   M.read(
     M.mapProp('normal', M.compose(M.required('normal'), fromPbVector3f)),
-    M.requiredProp('offset')
+    M.requiredProp('offset'),
   ),
-  ([normal, offset]) => ({ normal, offset })
+  ([normal, offset]) => ({ normal, offset }),
 );
 
 const fromPbImageAttributes: M.Func<
@@ -109,16 +109,16 @@ const fromPbImageAttributes: M.Func<
   M.read(
     M.mapProp(
       'frameDimensions',
-      M.compose(M.required('frameDimensions'), fromPbDim)
+      M.compose(M.required('frameDimensions'), fromPbDim),
     ),
     M.mapProp('imageRect', M.compose(M.required('imageRect'), fromPbRect)),
-    M.mapProp('scaleFactor', M.required('scaleFactor'))
+    M.mapProp('scaleFactor', M.required('scaleFactor')),
   ),
   ([frameDimensions, imageRect, imageScale]) => ({
     frameDimensions,
     imageRect,
     imageScale,
-  })
+  }),
 );
 
 export const fromPbCrossSectioning: M.Func<
@@ -128,15 +128,15 @@ export const fromPbCrossSectioning: M.Func<
   M.read(
     M.mapProp(
       'sectionPlanes',
-      M.compose(M.required('sectionPlanes'), M.mapArray(fromPbSectionPlane))
+      M.compose(M.required('sectionPlanes'), M.mapArray(fromPbSectionPlane)),
     ),
-    M.mapProp('highlightColor', M.ifDefined(fromPbRGBi))
+    M.mapProp('highlightColor', M.ifDefined(fromPbRGBi)),
   ),
   ([sectionPlanes, highlightColor]) =>
     CrossSectioning.create({
       sectionPlanes,
       highlightColor: highlightColor || undefined,
-    })
+    }),
 );
 
 const fromPbItemSetSummary: M.Func<
@@ -145,12 +145,12 @@ const fromPbItemSetSummary: M.Func<
 > = M.defineMapper(
   M.read(
     M.requiredProp('count'),
-    M.mapProp('boundingBox', M.ifDefined(fromPbBoundingBox3f))
+    M.mapProp('boundingBox', M.ifDefined(fromPbBoundingBox3f)),
   ),
   ([count, boundingBox]) => ({
     count,
     boundingBox: boundingBox ?? undefined,
-  })
+  }),
 );
 
 const fromPbDisplayListSummary: M.Func<
@@ -159,13 +159,13 @@ const fromPbDisplayListSummary: M.Func<
 > = M.defineMapper(
   M.read(
     M.mapProp('visibleSummary', M.ifDefined(fromPbItemSetSummary)),
-    M.mapProp('selectedVisibleSummary', M.ifDefined(fromPbItemSetSummary))
+    M.mapProp('selectedVisibleSummary', M.ifDefined(fromPbItemSetSummary)),
   ),
   ([visibleSummary, selectedVisibleSummary]) =>
     SceneViewSummary.create({
       visibleSummary: visibleSummary ?? undefined,
       selectedVisibleSummary: selectedVisibleSummary ?? undefined,
-    })
+    }),
 );
 
 const fromPbItemModelView: M.Func<
@@ -174,13 +174,13 @@ const fromPbItemModelView: M.Func<
 > = M.defineMapper(
   M.read(
     M.mapProp('modelViewId', M.ifDefined(fromPbJsUuid)),
-    M.mapProp('sceneItemId', M.ifDefined(fromPbJsUuid))
+    M.mapProp('sceneItemId', M.ifDefined(fromPbJsUuid)),
   ),
   ([modelViewId, sceneItemId]) =>
     ItemModelView.create({
       modelViewId: modelViewId ?? undefined,
       sceneItemId: sceneItemId ?? undefined,
-    })
+    }),
 );
 
 const fromPbFrameImageAttributes: M.Func<
@@ -190,10 +190,10 @@ const fromPbFrameImageAttributes: M.Func<
   M.read(
     M.mapProp(
       'imageAttributes',
-      M.compose(M.required('imageAttributes'), fromPbImageAttributes)
-    )
+      M.compose(M.required('imageAttributes'), fromPbImageAttributes),
+    ),
   ),
-  ([imageAttr]) => imageAttr
+  ([imageAttr]) => imageAttr,
 );
 
 const fromPbFrameImage: M.Func<
@@ -201,7 +201,7 @@ const fromPbFrameImage: M.Func<
   FrameImage
 > = M.defineMapper(
   M.read(fromPbFrameImageAttributes, M.mapProp('image', M.required('image'))),
-  ([imageAttr, image]) => new FrameImage(imageAttr, image)
+  ([imageAttr, image]) => new FrameImage(imageAttr, image),
 );
 
 const fromPbSceneAttributes: M.Func<
@@ -223,7 +223,7 @@ const fromPbSceneAttributes: M.Func<
     M.requiredProp('hasChanged'),
     M.mapRequiredProp('displayListSummary', fromPbDisplayListSummary),
     M.mapProp('modelViewId', M.ifDefined(fromPbJsUuid2l)),
-    M.mapProp('itemModelView', M.ifDefined(fromPbItemModelView))
+    M.mapProp('itemModelView', M.ifDefined(fromPbItemModelView)),
   ),
   ([
     camera,
@@ -241,7 +241,7 @@ const fromPbSceneAttributes: M.Func<
     displayListSummary,
     modelViewId: modelViewId ?? undefined,
     itemModelView: itemModelView ?? undefined,
-  })
+  }),
 );
 
 const fromPbFrameSceneAttributes: M.Func<
@@ -259,10 +259,10 @@ const fromPbFrameSceneAttributes: M.Func<
   M.read(
     M.mapProp(
       'sceneAttributes',
-      M.compose(M.required('sceneAttributes'), fromPbSceneAttributes)
-    )
+      M.compose(M.required('sceneAttributes'), fromPbSceneAttributes),
+    ),
   ),
-  ([sceneAttr]) => sceneAttr
+  ([sceneAttr]) => sceneAttr,
 );
 
 const fromPbFrameCamera: M.Func<
@@ -274,12 +274,12 @@ const fromPbFrameCamera: M.Func<
     FrameCameraBase.fromBoundingBox(
       sceneAttr.camera,
       sceneAttr.boundingBox,
-      Dimensions.aspectRatio(imageAttr.frameDimensions)
-    )
+      Dimensions.aspectRatio(imageAttr.frameDimensions),
+    ),
 );
 
 function fromPbFrameScene(
-  worldOrientation: Orientation
+  worldOrientation: Orientation,
 ): M.Func<vertexvis.protobuf.stream.IDrawFramePayload, FrameScene> {
   return M.defineMapper(
     M.read(fromPbFrameSceneAttributes, fromPbFrameCamera),
@@ -292,13 +292,13 @@ function fromPbFrameScene(
         sceneAttr.hasChanged,
         sceneAttr.displayListSummary,
         sceneAttr.modelViewId,
-        sceneAttr.itemModelView
-      )
+        sceneAttr.itemModelView,
+      ),
   );
 }
 
 export function fromPbFrame(
-  worldOrientation: Orientation
+  worldOrientation: Orientation,
 ): M.Func<vertexvis.protobuf.stream.IDrawFramePayload, Frame> {
   return M.defineMapper(
     M.read(
@@ -310,12 +310,12 @@ export function fromPbFrame(
       M.mapProp('depthBuffer', fromPbBytesValue),
       M.mapProp('featureMap', fromPbBytesValue),
       M.mapProp('temporalRefinementCorrelationId', (id) =>
-        id != null ? fromPbJsUuid(id) : null
+        id != null ? fromPbJsUuid(id) : null,
       ),
-      M.mapProp('partialFrame', M.ifDefined(fromPbBoolValue))
+      M.mapProp('partialFrame', M.ifDefined(fromPbBoolValue)),
     ),
     ([cIds, seq, fd, s, i, db, fm, trci, pF]) =>
-      new Frame(cIds, trci || '', seq, fd, i, s, db, fm, pF ?? false)
+      new Frame(cIds, trci || '', seq, fd, i, s, db, fm, pF ?? false),
   );
 }
 
@@ -325,7 +325,7 @@ export type FrameDecoder = M.ThrowIfInvalidFunc<
 >;
 
 export function fromPbFrameOrThrow(
-  worldOrientation: Orientation
+  worldOrientation: Orientation,
 ): FrameDecoder {
   return M.ifInvalidThrow(fromPbFrame(worldOrientation));
 }
@@ -338,10 +338,10 @@ export const fromPbWorldOrientation: M.Func<
     M.required('orientation'),
     M.read(
       M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
-      M.mapProp('front', M.compose(M.required('front'), fromPbVector3f))
-    )
+      M.mapProp('front', M.compose(M.required('front'), fromPbVector3f)),
+    ),
   ),
-  ([up, front]) => new Orientation(up, front)
+  ([up, front]) => new Orientation(up, front),
 );
 
 export const fromPbWorldOrientationOrThrow: M.ThrowIfInvalidFunc<
@@ -362,19 +362,19 @@ const fromPbStencilBufferResult: M.Func<
     M.requiredProp('stencilBuffer'),
     M.mapRequiredProp(
       'depthBuffer',
-      M.compose(fromPbBytesValue, M.required('depthBuffer'))
-    )
+      M.compose(fromPbBytesValue, M.required('depthBuffer')),
+    ),
   ),
   ([imageAttributes, stencilBuffer, depthBuffer]) => ({
     imageAttributes,
     stencilBuffer,
     depthBuffer,
-  })
+  }),
 );
 
 export const fromPbStencilBuffer = fromPbStreamResponse(
   'stencilBuffer',
-  fromPbStencilBufferResult
+  fromPbStencilBufferResult,
 );
 
 export const fromPbStencilBufferOrThrow = M.ifInvalidThrow(fromPbStencilBuffer);
@@ -384,7 +384,7 @@ function fromPbStreamResponse<
   R,
 >(
   prop: P,
-  mapper: M.Func<NonNullable<vertexvis.protobuf.stream.IStreamResponse[P]>, R>
+  mapper: M.Func<NonNullable<vertexvis.protobuf.stream.IStreamResponse[P]>, R>,
 ): M.Func<vertexvis.protobuf.stream.IStreamResponse, R> {
   return M.mapRequiredProp(prop, mapper);
 }
@@ -392,7 +392,7 @@ function fromPbStreamResponse<
 export const fromPbToken: M.Func<vertexvis.protobuf.stream.IToken, Token> =
   M.defineMapper(
     M.read(M.requiredProp('token'), M.requiredProp('expiresIn')),
-    ([token, expiresIn]) => Token.create(token, expiresIn)
+    ([token, expiresIn]) => Token.create(token, expiresIn),
   );
 
 export const fromPbStartStreamResponse: M.Func<
@@ -409,28 +409,28 @@ export const fromPbStartStreamResponse: M.Func<
   M.read(
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('streamId', fromPbJsUuid)
+      M.mapRequiredProp('streamId', fromPbJsUuid),
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('sceneId', fromPbJsUuid)
+      M.mapRequiredProp('sceneId', fromPbJsUuid),
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('sceneViewId', fromPbJsUuid)
+      M.mapRequiredProp('sceneViewId', fromPbJsUuid),
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('sessionId', fromPbJsUuid)
+      M.mapRequiredProp('sessionId', fromPbJsUuid),
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('worldOrientation', fromPbWorldOrientation)
+      M.mapRequiredProp('worldOrientation', fromPbWorldOrientation),
     ),
     M.compose(
       M.requiredProp('startStream'),
-      M.mapRequiredProp('token', fromPbToken)
-    )
+      M.mapRequiredProp('token', fromPbToken),
+    ),
   ),
   ([streamId, sceneId, sceneViewId, sessionId, worldOrientation, token]) => ({
     streamId,
@@ -439,11 +439,11 @@ export const fromPbStartStreamResponse: M.Func<
     sessionId: sessionId,
     worldOrientation,
     token,
-  })
+  }),
 );
 
 export const fromPbStartStreamResponseOrThrow = M.ifInvalidThrow(
-  fromPbStartStreamResponse
+  fromPbStartStreamResponse,
 );
 
 export const fromPbReconnectResponse: M.Func<
@@ -453,14 +453,14 @@ export const fromPbReconnectResponse: M.Func<
   M.read(
     M.compose(
       M.requiredProp('reconnect'),
-      M.mapRequiredProp('token', fromPbToken)
-    )
+      M.mapRequiredProp('token', fromPbToken),
+    ),
   ),
-  ([token]) => ({ token })
+  ([token]) => ({ token }),
 );
 
 export const fromPbReconnectResponseOrThrow = M.ifInvalidThrow(
-  fromPbReconnectResponse
+  fromPbReconnectResponse,
 );
 
 export const fromPbRefreshTokenResponse: M.Func<
@@ -470,13 +470,13 @@ export const fromPbRefreshTokenResponse: M.Func<
   M.compose(
     M.requiredProp('refreshToken'),
     M.requiredProp('token'),
-    fromPbToken
+    fromPbToken,
   ),
-  (token) => token
+  (token) => token,
 );
 
 export const fromPbRefreshTokenResponseOrThrow = M.ifInvalidThrow(
-  fromPbRefreshTokenResponse
+  fromPbRefreshTokenResponse,
 );
 
 export const fromPbSyncTimeResponse: M.Func<
@@ -486,11 +486,11 @@ export const fromPbSyncTimeResponse: M.Func<
   M.compose(
     M.requiredProp('syncTime'),
     M.requiredProp('replyTime'),
-    M.read(M.requiredProp('seconds'), M.requiredProp('nanos'))
+    M.read(M.requiredProp('seconds'), M.requiredProp('nanos')),
   ),
-  ([seconds, nanos]) => protoToDate({ seconds, nanos })
+  ([seconds, nanos]) => protoToDate({ seconds, nanos }),
 );
 
 export const fromPbSyncTimeResponseOrThrow = M.ifInvalidThrow(
-  fromPbSyncTimeResponse
+  fromPbSyncTimeResponse,
 );

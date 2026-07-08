@@ -244,7 +244,7 @@ export class SceneTreeTableCell {
               class="expand-btn no-shrink"
               data-testid={'expand-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(
-                this.toggleExpansion
+                this.toggleExpansion,
               )}
             >
               {expansionIcon && (
@@ -295,7 +295,7 @@ export class SceneTreeTableCell {
               class="visibility-btn no-shrink"
               data-testid={'visibility-btn-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(
-                this.toggleVisibility
+                this.toggleVisibility,
               )}
             >
               {visibilityIcon && (
@@ -357,7 +357,7 @@ export class SceneTreeTableCell {
   };
 
   private createActionPointerUpHandler = (
-    action: (event: PointerEvent) => void
+    action: (event: PointerEvent) => void,
   ): ((event: PointerEvent) => void) => {
     return (event) => {
       // Blur the `hostEl` after a `preventDefault` to clear focus that
@@ -430,21 +430,21 @@ export class SceneTreeTableCell {
 
   private performDefaultVisibilityOperation = async (
     node: Node.AsObject,
-    tree: HTMLVertexSceneTreeElement
+    tree: HTMLVertexSceneTreeElement,
   ): Promise<void> => {
     await tree.toggleItemVisibility(node);
   };
 
   private performDefaultIsolateOperation = async (
     node: Node.AsObject,
-    tree: HTMLVertexSceneTreeElement
+    tree: HTMLVertexSceneTreeElement,
   ): Promise<void> => {
     await tree.isolateItem(node);
   };
 
   private performDefaultExpansionOperation = async (
     node: Node.AsObject,
-    tree: HTMLVertexSceneTreeElement
+    tree: HTMLVertexSceneTreeElement,
   ): Promise<void> => {
     await tree.toggleExpandItem(node);
   };
@@ -466,15 +466,15 @@ export class SceneTreeTableCell {
   private getBackgroundColorStyle(): string {
     const backgroundColorStyle = this.getCssVariableWithFallbacks(
       `--scene-tree-row-background-color-depth-${this.node?.depth}`,
-      '--scene-tree-row-background-color'
+      '--scene-tree-row-background-color',
     );
     const selectedBackgroundColorStyle = this.getCssVariableWithFallbacks(
       '--scene-tree-selected-row-background-color',
-      '--scene-tree-cell-background-selected'
+      '--scene-tree-cell-background-selected',
     );
     const hoveredBackgroundColorStyle = this.getCssVariableWithFallbacks(
       '--scene-tree-hovered-row-background-color',
-      '--scene-tree-cell-background-hover'
+      '--scene-tree-cell-background-hover',
     );
 
     if (!!this.node?.selected) {
@@ -493,7 +493,7 @@ export class SceneTreeTableCell {
 
     return [...sequencedFallbacks, variable].reduce(
       (res, s) => `var(${s}, ${res})`,
-      'unset'
+      'unset',
     );
   }
 

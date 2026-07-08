@@ -15,7 +15,7 @@ export const fromPbJsUuid2l: M.Func<
     const m = BigInt(typeof msb === 'number' ? msb : msb.toString());
     const l = BigInt(typeof lsb === 'number' ? lsb : lsb.toString());
     return UUID.fromMsbLsb(m, l);
-  }
+  },
 );
 
 export const toPbJsUuid2l: M.Func<string, vertexvis.protobuf.core.IUuid2l> =
@@ -24,8 +24,8 @@ export const toPbJsUuid2l: M.Func<string, vertexvis.protobuf.core.IUuid2l> =
       (str) => UUID.toMsbLsb(str),
       M.read(
         M.mapProp('msb', Long.fromString),
-        M.mapProp('lsb', Long.fromString)
-      )
+        M.mapProp('lsb', Long.fromString),
+      ),
     ),
-    ([msb, lsb]) => ({ msb, lsb })
+    ([msb, lsb]) => ({ msb, lsb }),
   );

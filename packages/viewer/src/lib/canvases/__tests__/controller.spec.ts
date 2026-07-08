@@ -1,5 +1,5 @@
 jest.mock(
-  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service'
+  '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
@@ -35,7 +35,7 @@ describe(CanvasController, () => {
       const expected = makeGetCanvasResponse();
 
       (client.getCanvas as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(expected)
+        mockGrpcUnaryResult(expected),
       );
 
       const res = await controller.getCanvas({ canvasId: UUID.create() });
@@ -69,29 +69,29 @@ describe(CanvasController, () => {
         accentColor,
       });
       const expected = makeGetCanvasResponse(
-        makeCanvas(undefined, [line, oval, freeform, pin, callout])
+        makeCanvas(undefined, [line, oval, freeform, pin, callout]),
       );
 
       (client.getCanvas as jest.Mock).mockImplementationOnce(
-        mockGrpcUnaryResult(expected)
+        mockGrpcUnaryResult(expected),
       );
 
       const res = await controller.getCanvas({ canvasId: UUID.create() });
 
       expect(res.items.find((i) => i.type === 'line-2d')).toMatchObject(
-        mapCanvasItem(line.toObject()) as LineItem2d
+        mapCanvasItem(line.toObject()) as LineItem2d,
       );
       expect(res.items.find((i) => i.type === 'oval-2d')).toMatchObject(
-        mapCanvasItem(oval.toObject()) as OvalItem2d
+        mapCanvasItem(oval.toObject()) as OvalItem2d,
       );
       expect(res.items.find((i) => i.type === 'freeform-2d')).toMatchObject(
-        mapCanvasItem(freeform.toObject()) as FreeformItem2d
+        mapCanvasItem(freeform.toObject()) as FreeformItem2d,
       );
       expect(res.items.find((i) => i.type === 'pin-2d')).toMatchObject(
-        mapCanvasItem(pin.toObject()) as PinItem2d
+        mapCanvasItem(pin.toObject()) as PinItem2d,
       );
       expect(res.items.find((i) => i.type === 'callout')).toMatchObject(
-        mapCanvasItem(callout.toObject()) as CalloutItem
+        mapCanvasItem(callout.toObject()) as CalloutItem,
       );
     });
 
@@ -102,14 +102,14 @@ describe(CanvasController, () => {
         controller.getCanvas({
           canvasId: UUID.create(),
           sceneViewStateId: UUID.create(),
-        })
+        }),
       ).rejects.toThrowError();
     });
   });
 
   function makeCanvasController(
     jwt: string,
-    deviceId: string
+    deviceId: string,
   ): {
     controller: CanvasController;
     client: SceneViewAPIClient;
@@ -120,7 +120,7 @@ describe(CanvasController, () => {
       controller: new CanvasController(
         client,
         () => jwt,
-        () => deviceId
+        () => deviceId,
       ),
     };
   }

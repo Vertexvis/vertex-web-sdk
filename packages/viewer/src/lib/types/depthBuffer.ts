@@ -31,7 +31,7 @@ export class DepthBuffer implements FrameImageLike {
   public constructor(
     public readonly camera: FrameCameraBase,
     public readonly imageAttr: ImageAttributesLike,
-    public readonly pixels: Uint16Array
+    public readonly pixels: Uint16Array,
   ) {}
 
   /**
@@ -46,7 +46,7 @@ export class DepthBuffer implements FrameImageLike {
   public static fromPng(
     png: Pick<DecodedPng, 'data'>,
     camera: FrameCameraBase,
-    imageAttr: ImageAttributesLike
+    imageAttr: ImageAttributesLike,
   ): DepthBuffer {
     if (png.data instanceof Uint16Array) {
       return new DepthBuffer(camera, imageAttr, png.data);
@@ -72,14 +72,14 @@ export class DepthBuffer implements FrameImageLike {
    */
   public getDepthAtPoint(
     point: Point.Point,
-    fallbackNormalizedDepth?: number
+    fallbackNormalizedDepth?: number,
   ): number {
     const { near, far } = this.camera;
     const isPerspectiveCamera = this.camera.isPerspective();
 
     const depth = this.getNormalizedDepthAtPoint(
       point,
-      fallbackNormalizedDepth
+      fallbackNormalizedDepth,
     );
 
     if (isPerspectiveCamera) {
@@ -124,7 +124,7 @@ export class DepthBuffer implements FrameImageLike {
    */
   public getNormalizedDepthAtPoint(
     point: Point.Point,
-    fallbackNormalizedDepth?: number
+    fallbackNormalizedDepth?: number,
   ): number {
     const { width, height } = this.imageAttr.imageRect;
 
@@ -174,7 +174,7 @@ export class DepthBuffer implements FrameImageLike {
   public getWorldPoint(
     point: Point.Point,
     ray: Ray.Ray,
-    fallbackNormalizedDepth?: number
+    fallbackNormalizedDepth?: number,
   ): Vector3.Vector3 {
     const distance = this.getDepthAtPoint(point, fallbackNormalizedDepth);
 
@@ -221,14 +221,14 @@ export class DepthBuffer implements FrameImageLike {
    */
   public depthOfClosestGeometry(
     worldPt: Vector3.Vector3,
-    viewport: Viewport
+    viewport: Viewport,
   ): number {
     const { projectionViewMatrix } = this.camera;
 
     // Find the screen point corresponding to the world point for the current camera
     const screenPt = viewport.transformWorldToViewport(
       worldPt,
-      projectionViewMatrix
+      projectionViewMatrix,
     );
     const scaledPt = viewport.transformPointToFrame(screenPt, this);
 
@@ -251,7 +251,7 @@ export class DepthBuffer implements FrameImageLike {
     // Find the depth of the closest geometry at the same point on the screen
     const depthOfClosestGeometry = this.depthOfClosestGeometry(
       worldPt,
-      viewport
+      viewport,
     );
 
     // Allow for a small rounding error
@@ -280,7 +280,7 @@ export class DepthBuffer implements FrameImageLike {
     // Find the depth of the closest geometry at the same point on the screen
     const depthOfClosestGeometry = this.depthOfClosestGeometry(
       worldPt,
-      viewport
+      viewport,
     );
 
     // If distanceFromClosestGeometryToPoint is 0, then the point is directly on the surface of the

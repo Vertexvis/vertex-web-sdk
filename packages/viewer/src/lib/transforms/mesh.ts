@@ -10,7 +10,7 @@ export class MeshPoints implements DrawablePoints {
     public valid: boolean,
     public world: Vector3.Vector3[],
     public screen: Point.Point[],
-    private computeShortestDistance?: (vector: Vector3.Vector3) => number
+    private computeShortestDistance?: (vector: Vector3.Vector3) => number,
   ) {}
 
   public shortestDistanceFrom(vector: Vector3.Vector3): number {
@@ -37,7 +37,7 @@ export class Mesh extends Drawable<MeshPoints> {
     points: MeshPoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
-    shapeProps: Partial<ShapeProps> = {}
+    shapeProps: Partial<ShapeProps> = {},
   ) {
     super(
       createShape,
@@ -47,7 +47,7 @@ export class Mesh extends Drawable<MeshPoints> {
         ? outlineColor
         : Color.toHexString(outlineColor),
       typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
-      shapeProps
+      shapeProps,
     );
   }
 }
@@ -62,7 +62,7 @@ export class TriangleMeshPoints implements DrawablePoints {
     public base: Point.Point,
     public left: Point.Point,
     public right: Point.Point,
-    public tip: Point.Point
+    public tip: Point.Point,
   ) {}
 
   public shortestDistanceFrom(vector: Vector3.Vector3): number {
@@ -88,7 +88,7 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
     shapeProps: Partial<ShapeProps> = {},
-    public disabled: boolean = false
+    public disabled: boolean = false,
   ) {
     super(
       createShape,
@@ -98,7 +98,7 @@ export class TriangleMesh extends Drawable<TriangleMeshPoints> {
         ? outlineColor
         : Color.toHexString(outlineColor),
       typeof fillColor === 'string' ? fillColor : Color.toHexString(fillColor),
-      shapeProps
+      shapeProps,
     );
   }
 

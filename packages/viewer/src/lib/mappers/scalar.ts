@@ -18,7 +18,7 @@ function toPbScalarWrapper<T>(): M.Func<
 > {
   return M.defineMapper(
     (value) => (value != null ? { value } : undefined),
-    (value) => value
+    (value) => value,
   );
 }
 
@@ -28,6 +28,6 @@ function fromPbScalarWrapper<T>(): M.Func<
 > {
   return M.defineMapper(
     (value) => value?.value || undefined,
-    (value) => value
+    (value) => value,
   );
 }

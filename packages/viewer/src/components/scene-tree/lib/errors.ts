@@ -16,7 +16,7 @@ export class SceneTreeErrorDetails {
   public constructor(
     public readonly name: keyof typeof SceneTreeErrorCode,
     public readonly code: SceneTreeErrorCode,
-    public readonly link?: string
+    public readonly link?: string,
   ) {
     this.message = getSceneTreeErrorMessage(code);
   }

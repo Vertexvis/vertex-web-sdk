@@ -58,7 +58,7 @@ describe(StreamApi, () => {
         vertexvis.protobuf.stream.StreamMessage.encode({
           sentAtTime: { seconds: 0, nanos: 0 },
           response: { requestId: { value: requestId }, endInteraction: {} },
-        }).finish()
+        }).finish(),
       );
       await request;
       expect(ws.nextSent((d) => decode(d as Uint8Array))).toMatchObject({
@@ -81,7 +81,7 @@ describe(StreamApi, () => {
         vertexvis.protobuf.stream.StreamMessage.encode({
           sentAtTime: { seconds: 0, nanos: 0 },
           response: { requestId: { value: requestId } },
-        }).finish()
+        }).finish(),
       );
 
       const resp = await result;
@@ -98,7 +98,7 @@ describe(StreamApi, () => {
         vertexvis.protobuf.stream.StreamMessage.encode({
           sentAtTime: { seconds: 0, nanos: 0 },
           response: { requestId: { value: requestId }, error: {} },
-        }).finish()
+        }).finish(),
       );
 
       await expect(result).rejects.toThrowError();
@@ -138,7 +138,7 @@ describe(StreamApi, () => {
         vertexvis.protobuf.stream.StreamMessage.encode({
           sentAtTime: { seconds: 0, nanos: 0 },
           request: { drawFrame: {} },
-        }).finish()
+        }).finish(),
       );
       expect(handler).toHaveBeenCalled();
     });
@@ -168,7 +168,7 @@ describe(StreamApi, () => {
             },
           },
         },
-        true
+        true,
       );
 
       expect(send).toHaveBeenCalled();
@@ -197,7 +197,7 @@ describe(StreamApi, () => {
             },
           },
         },
-        true
+        true,
       );
 
       expect(send).not.toHaveBeenCalled();
@@ -217,7 +217,7 @@ describe(StreamApi, () => {
             zmin: 1,
           },
         },
-        true
+        true,
       );
 
       expect(send).toHaveBeenCalled();
@@ -235,7 +235,7 @@ describe(StreamApi, () => {
             zmin: 1,
           },
         },
-        true
+        true,
       );
 
       expect(send).not.toHaveBeenCalled();
@@ -264,7 +264,7 @@ describe(StreamApi, () => {
             },
           },
         },
-        true
+        true,
       );
 
       expect(send).toHaveBeenCalled();
@@ -293,7 +293,7 @@ describe(StreamApi, () => {
             },
           },
         },
-        true
+        true,
       );
 
       expect(send).not.toHaveBeenCalled();
@@ -323,7 +323,7 @@ describe(StreamApi, () => {
           },
         },
       },
-      true
+      true,
     );
 
     expect(send).toHaveBeenCalled();
@@ -352,7 +352,7 @@ describe(StreamApi, () => {
           },
         },
       },
-      true
+      true,
     );
 
     expect(send).not.toHaveBeenCalled();
@@ -367,7 +367,7 @@ describe(StreamApi, () => {
             width: 5,
           },
         },
-        true
+        true,
       );
 
       expect(send).toHaveBeenCalled();
@@ -381,7 +381,7 @@ describe(StreamApi, () => {
             width: Number.NaN,
           },
         },
-        true
+        true,
       );
 
       expect(send).not.toHaveBeenCalled();
@@ -397,7 +397,7 @@ describe(StreamApi, () => {
             y: 5,
           },
         },
-        true
+        true,
       );
 
       expect(send).toHaveBeenCalled();
@@ -411,7 +411,7 @@ describe(StreamApi, () => {
             y: Number.NaN,
           },
         },
-        true
+        true,
       );
 
       expect(send).not.toHaveBeenCalled();
@@ -435,7 +435,7 @@ describe(StreamApi, () => {
             ],
           },
         },
-        true
+        true,
       );
 
       expect(send).toHaveBeenCalled();
@@ -457,7 +457,7 @@ describe(StreamApi, () => {
             ],
           },
         },
-        true
+        true,
       );
 
       expect(send).not.toHaveBeenCalled();
@@ -479,7 +479,7 @@ describe(StreamApi, () => {
             ],
           },
         },
-        true
+        true,
       );
 
       expect(send).not.toHaveBeenCalled();

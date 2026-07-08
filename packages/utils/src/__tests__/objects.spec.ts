@@ -38,7 +38,7 @@ describe(Objects.isPlainObject, () => {
 
   it('returns true if input is created with default object prototype', () => {
     expect(Objects.isPlainObject(Object.create(Object.prototype))).toEqual(
-      true
+      true,
     );
   });
 

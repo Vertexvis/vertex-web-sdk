@@ -109,7 +109,7 @@ export type MeasurementResult =
  */
 export function makeMinimumDistanceResult(
   point1: Vector3.Vector3,
-  point2: Vector3.Vector3
+  point2: Vector3.Vector3,
 ): MinimumDistanceMeasurementResult {
   return {
     type: 'minimum-distance',

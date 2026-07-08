@@ -37,9 +37,9 @@ describe(acknowledgeFrameRequests, () => {
       encode(
         Fixtures.Requests.drawFrame(
           { requestId: 'req-id', payload: { sequenceNumber: 1 } },
-          { sentAtTime: toProtoTimestamp(remoteTime) }
-        )
-      )
+          { sentAtTime: toProtoTimestamp(remoteTime) },
+        ),
+      ),
     );
 
     const frame = mockWs.nextSent((d) => decode(d as Uint8Array));
@@ -62,9 +62,9 @@ describe(acknowledgeFrameRequests, () => {
       encode(
         Fixtures.Requests.drawFrame(
           { payload: { sequenceNumber: 1 } },
-          { sentAtTime: toProtoTimestamp(remoteTime) }
-        )
-      )
+          { sentAtTime: toProtoTimestamp(remoteTime) },
+        ),
+      ),
     );
 
     expect(mockWs.hasNextSent()).toBe(false);

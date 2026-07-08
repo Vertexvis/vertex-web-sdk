@@ -120,7 +120,7 @@ export class ViewerViewCube {
   @Watch('viewer')
   protected handleViewerChanged(
     newViewer?: HTMLVertexViewerElement,
-    oldViewer?: HTMLVertexViewerElement
+    oldViewer?: HTMLVertexViewerElement,
   ): void {
     oldViewer?.removeEventListener('frameDrawn', this.updateMatrices);
     newViewer?.addEventListener('frameDrawn', this.updateMatrices);
@@ -135,7 +135,7 @@ export class ViewerViewCube {
       this.triadPosition = Vector3.create(
         -halfLength - 5,
         -halfLength - 5,
-        -halfLength - 5
+        -halfLength - 5,
       );
 
       // Used to scale the camera position so the cube is the same size as the
@@ -151,7 +151,7 @@ export class ViewerViewCube {
         0.1,
         100,
         1,
-        fovY
+        fovY,
       );
 
       this.worldOrientation = this.viewer.frame.scene.worldOrientation;
@@ -170,7 +170,7 @@ export class ViewerViewCube {
               ? { animation: { milliseconds: this.animationDuration } }
               : {};
           const worldStandardView = standardView.transformMatrix(
-            this.worldOrientation.matrix
+            this.worldOrientation.matrix,
           );
 
           // Check to see if any geometry is visible. If not, don't perform viewAll
@@ -431,7 +431,7 @@ export class ViewerViewCube {
               face3Side="left"
               face3Corner="top-right"
               onPointerDown={this.handleStandardView(
-                StandardView.TOP_FRONT_RIGHT
+                StandardView.TOP_FRONT_RIGHT,
               )}
               disabled={this.standardViewsOff}
             />
@@ -444,7 +444,7 @@ export class ViewerViewCube {
               face3Side="right"
               face3Corner="top-left"
               onPointerDown={this.handleStandardView(
-                StandardView.TOP_FRONT_LEFT
+                StandardView.TOP_FRONT_LEFT,
               )}
               disabled={this.standardViewsOff}
             />
@@ -457,7 +457,7 @@ export class ViewerViewCube {
               face3Side="right"
               face3Corner="bottom-left"
               onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_FRONT_LEFT
+                StandardView.BOTTOM_FRONT_LEFT,
               )}
               disabled={this.standardViewsOff}
             />
@@ -470,7 +470,7 @@ export class ViewerViewCube {
               face3Side="left"
               face3Corner="bottom-right"
               onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_FRONT_RIGHT
+                StandardView.BOTTOM_FRONT_RIGHT,
               )}
               disabled={this.standardViewsOff}
             />
@@ -483,7 +483,7 @@ export class ViewerViewCube {
               face3Side="right"
               face3Corner="top-right"
               onPointerDown={this.handleStandardView(
-                StandardView.TOP_BACK_LEFT
+                StandardView.TOP_BACK_LEFT,
               )}
               disabled={this.standardViewsOff}
             />
@@ -496,7 +496,7 @@ export class ViewerViewCube {
               face3Side="left"
               face3Corner="top-left"
               onPointerDown={this.handleStandardView(
-                StandardView.TOP_BACK_RIGHT
+                StandardView.TOP_BACK_RIGHT,
               )}
               disabled={this.standardViewsOff}
             />
@@ -509,7 +509,7 @@ export class ViewerViewCube {
               face3Side="left"
               face3Corner="bottom-left"
               onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_BACK_RIGHT
+                StandardView.BOTTOM_BACK_RIGHT,
               )}
               disabled={this.standardViewsOff}
             />
@@ -522,7 +522,7 @@ export class ViewerViewCube {
               face3Side="right"
               face3Corner="bottom-right"
               onPointerDown={this.handleStandardView(
-                StandardView.BOTTOM_BACK_LEFT
+                StandardView.BOTTOM_BACK_LEFT,
               )}
               disabled={this.standardViewsOff}
             />

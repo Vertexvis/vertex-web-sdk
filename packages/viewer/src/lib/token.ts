@@ -7,7 +7,7 @@ export class Token {
   public constructor(
     public readonly token: string,
     public readonly expiresIn: number,
-    public readonly expiresAt: Date
+    public readonly expiresAt: Date,
   ) {}
 
   public static create(token: string, expiresIn: number): Token {
@@ -22,7 +22,7 @@ export class Token {
   public remainingTimeInMs(offsetInSeconds: number): number {
     return differenceInMilliseconds(
       sub(this.expiresAt, { seconds: offsetInSeconds }),
-      new Date()
+      new Date(),
     );
   }
 }

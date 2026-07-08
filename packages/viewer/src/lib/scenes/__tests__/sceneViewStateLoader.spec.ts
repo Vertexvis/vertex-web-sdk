@@ -19,7 +19,7 @@ describe('SceneViewStateLoader', () => {
     fromPbFrameOrThrow(Orientation.DEFAULT),
     cameraTypeMapper,
     sceneId,
-    sceneViewId
+    sceneViewId,
   );
 
   describe('applySceneViewState', () => {
@@ -39,7 +39,7 @@ describe('SceneViewStateLoader', () => {
             hex: sceneViewStateId,
           },
         }),
-        true
+        true,
       );
       expect(streamApi.flyTo).not.toHaveBeenCalled();
     });
@@ -55,7 +55,7 @@ describe('SceneViewStateLoader', () => {
             hex: sceneViewStateId,
           },
         }),
-        true
+        true,
       );
       expect(streamApi.flyTo).not.toHaveBeenCalled();
     });
@@ -73,7 +73,7 @@ describe('SceneViewStateLoader', () => {
             value: sceneViewStateSuppliedId,
           },
         }),
-        true
+        true,
       );
       expect(streamApi.flyTo).not.toHaveBeenCalled();
     });
@@ -126,7 +126,7 @@ describe('SceneViewStateLoader', () => {
             },
           },
         }),
-        true
+        true,
       );
       expect(streamApi.onEvent).toHaveBeenCalled();
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -135,7 +135,7 @@ describe('SceneViewStateLoader', () => {
             hex: sceneViewStateId,
           },
         }),
-        true
+        true,
       );
     });
 
@@ -168,7 +168,7 @@ describe('SceneViewStateLoader', () => {
             },
           },
         }),
-        true
+        true,
       );
       expect(streamApi.onEvent).not.toHaveBeenCalled();
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -177,7 +177,7 @@ describe('SceneViewStateLoader', () => {
             hex: sceneViewStateId,
           },
         }),
-        true
+        true,
       );
     });
   });
@@ -203,7 +203,7 @@ describe('SceneViewStateLoader', () => {
               .SCENE_VIEW_STATE_FEATURE_SELECTION,
           ],
         }),
-        true
+        true,
       );
       expect(streamApi.flyTo).not.toHaveBeenCalled();
     });
@@ -225,7 +225,7 @@ describe('SceneViewStateLoader', () => {
               .SCENE_VIEW_STATE_FEATURE_SELECTION,
           ],
         }),
-        true
+        true,
       );
       expect(streamApi.flyTo).not.toHaveBeenCalled();
     });
@@ -237,7 +237,7 @@ describe('SceneViewStateLoader', () => {
         {
           suppliedId: sceneViewStateSuppliedId,
         },
-        ['selection']
+        ['selection'],
       );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -250,7 +250,7 @@ describe('SceneViewStateLoader', () => {
               .SCENE_VIEW_STATE_FEATURE_SELECTION,
           ],
         }),
-        true
+        true,
       );
       expect(streamApi.flyTo).not.toHaveBeenCalled();
     });
@@ -287,7 +287,7 @@ describe('SceneViewStateLoader', () => {
               .SCENE_VIEW_STATE_FEATURE_SELECTION,
           ],
         }),
-        true
+        true,
       );
     });
 
@@ -332,7 +332,7 @@ describe('SceneViewStateLoader', () => {
           animation: {
             milliseconds: 1000,
           },
-        }
+        },
       );
 
       expect(streamApi.flyTo).toHaveBeenCalledWith(
@@ -343,7 +343,7 @@ describe('SceneViewStateLoader', () => {
             },
           },
         }),
-        true
+        true,
       );
       expect(streamApi.onEvent).toHaveBeenCalled();
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -358,7 +358,7 @@ describe('SceneViewStateLoader', () => {
               .SCENE_VIEW_STATE_FEATURE_CAMERA,
           ],
         }),
-        true
+        true,
       );
     });
 
@@ -384,7 +384,7 @@ describe('SceneViewStateLoader', () => {
             milliseconds: 1000,
           },
           waitForAnimation: false,
-        }
+        },
       );
 
       expect(streamApi.flyTo).toHaveBeenCalledWith(
@@ -395,7 +395,7 @@ describe('SceneViewStateLoader', () => {
             },
           },
         }),
-        true
+        true,
       );
       expect(streamApi.onEvent).not.toHaveBeenCalled();
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -410,7 +410,7 @@ describe('SceneViewStateLoader', () => {
               .SCENE_VIEW_STATE_FEATURE_CAMERA,
           ],
         }),
-        true
+        true,
       );
     });
   });

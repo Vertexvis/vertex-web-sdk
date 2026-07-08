@@ -1520,6 +1520,7 @@ export namespace Components {
         "fractionalDigits": number;
         /**
           * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
+          * @default new MeasurementModel()
          */
         "measurementModel"?: MeasurementModel;
         /**
@@ -1584,7 +1585,7 @@ export namespace Components {
         "labelFormatter"?: Formatter<number | undefined>;
         /**
           * The length of the caps at each end of the distance measurement.
-          * @default MEASUREMENT_LINE_CAP_LENGTH
+          * @default 10
          */
         "lineCapLength": number;
         /**
@@ -1610,7 +1611,7 @@ export namespace Components {
         "showAxisReferenceLines": boolean;
         /**
           * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-          * @default MEASUREMENT_SNAP_DISTANCE
+          * @default 16
          */
         "snapDistance": number;
         /**
@@ -4050,6 +4051,7 @@ declare namespace LocalJSX {
         "fractionalDigits"?: number;
         /**
           * The `MeasurementModel` that should be reflected in these details. If not specified, a new `MeasurementModel` will be created, which can then be used to update the display.
+          * @default new MeasurementModel()
          */
         "measurementModel"?: MeasurementModel;
         /**
@@ -4110,7 +4112,7 @@ declare namespace LocalJSX {
         "labelFormatter"?: Formatter<number | undefined>;
         /**
           * The length of the caps at each end of the distance measurement.
-          * @default MEASUREMENT_LINE_CAP_LENGTH
+          * @default 10
          */
         "lineCapLength"?: number;
         /**
@@ -4144,7 +4146,7 @@ declare namespace LocalJSX {
         "showAxisReferenceLines"?: boolean;
         /**
           * The distance, in pixels, between the mouse and nearest snappable edge. A value of 0 disables snapping.
-          * @default MEASUREMENT_SNAP_DISTANCE
+          * @default 16
          */
         "snapDistance"?: number;
         /**

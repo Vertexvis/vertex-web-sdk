@@ -40,7 +40,7 @@ function request(req: Request, meta?: Metadata): RequestMessage {
 
 export function drawFrame(
   req: DrawFrameRequest = {},
-  meta?: Metadata
+  meta?: Metadata,
 ): RequestMessage {
   const def: DrawFramePayload = {
     sequenceNumber: 1,
@@ -83,13 +83,13 @@ export function drawFrame(
       requestId: req.requestId,
       payload: { drawFrame: Objects.defaults(req.payload, def) },
     },
-    meta
+    meta,
   );
 }
 
 export function gracefulReconnect(
   req: GracefulReconnectRequest = {},
-  meta?: Metadata
+  meta?: Metadata,
 ): RequestMessage {
   const def: GracefulReconnectPayload = {
     streamId: { hex: UUID.create() },
@@ -100,6 +100,6 @@ export function gracefulReconnect(
       requestId: req.requestId,
       payload: { gracefulReconnection: Objects.defaults(req.payload, def) },
     },
-    meta
+    meta,
   );
 }

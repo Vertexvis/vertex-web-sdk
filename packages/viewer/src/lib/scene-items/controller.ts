@@ -26,13 +26,13 @@ export class SceneItemController {
   public constructor(
     private readonly client: SceneViewAPIClient,
     private readonly jwtProvider: JwtProvider,
-    private readonly deviceIdProvider: () => string | undefined
+    private readonly deviceIdProvider: () => string | undefined,
   ) {}
 
   public async getSceneViewItem(
     itemId: UUID.UUID,
     viewId: UUID.UUID,
-    getOptions: GetSceneViewItemOptions
+    getOptions: GetSceneViewItemOptions,
   ): Promise<SceneViewItem | undefined> {
     const res: GetSceneViewItemResponse = await requestUnary(
       async (handler) => {
@@ -59,14 +59,14 @@ export class SceneItemController {
         req.setAdditionalFields(additionalFields);
 
         this.client.getSceneViewItem(req, meta, handler);
-      }
+      },
     );
     return mapGetSceneViewItemResponseOrThrow(res.toObject());
   }
 
   public async listSceneItemMetadata(
     itemId: UUID.UUID,
-    listByOptions: ListSceneItemMetadataOptions
+    listByOptions: ListSceneItemMetadataOptions,
   ): Promise<SceneItemMetadataResponse> {
     const res: ListSceneItemMetadataResponse = await requestUnary(
       async (handler) => {
@@ -86,7 +86,7 @@ export class SceneItemController {
         req.setPager(pager);
 
         this.client.listSceneItemMetadata(req, meta, handler);
-      }
+      },
     );
     return mapListSceneItemMetadataResponseOrThrow(res.toObject());
   }

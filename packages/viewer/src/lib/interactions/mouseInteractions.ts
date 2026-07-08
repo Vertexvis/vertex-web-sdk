@@ -25,7 +25,7 @@ export abstract class MouseInteraction {
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
-    element: HTMLElement
+    element: HTMLElement,
   ): void {
     // noop
   }
@@ -52,7 +52,7 @@ export class RotateInteraction extends MouseInteraction {
   public beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
-    api: InteractionApi
+    api: InteractionApi,
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
@@ -83,7 +83,7 @@ export class RotatePointInteraction extends MouseInteraction {
   public beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
-    api: InteractionApi
+    api: InteractionApi,
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
@@ -110,12 +110,12 @@ export class RotatePointInteraction extends MouseInteraction {
 export class ZoomInteraction extends MouseInteraction {
   public type: InteractionType = 'zoom';
 
-  private didTransformBegin = false;
+  private isTransforming = false;
   private interactionTimer: number | undefined;
   private startPt?: Point.Point;
 
   public constructor(
-    private interactionConfigProvider: InteractionConfigProvider
+    private interactionConfigProvider: InteractionConfigProvider,
   ) {
     super();
   }
@@ -124,7 +124,7 @@ export class ZoomInteraction extends MouseInteraction {
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
-    element: HTMLElement
+    element: HTMLElement,
   ): Promise<void> {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.clientX, event.clientY);
@@ -150,39 +150,51 @@ export class ZoomInteraction extends MouseInteraction {
   public endDrag(event: MouseEvent, api: InteractionApi): void {
     super.endDrag(event, api);
     this.stopInteractionTimer();
-    this.didTransformBegin = false;
+    this.isTransforming = false;
     this.startPt = undefined;
   }
 
-  public async zoom(delta: number, api: InteractionApi): Promise<void> {
-    await this.operateWithTimer(api, () =>
-      api.zoomCamera(this.getDirectionalDelta(delta))
+  public async zoom(
+    delta: number,
+    api: InteractionApi,
+    extraDelayMs?: number,
+  ): Promise<void> {
+    await this.runWheelZoomInteraction(
+      api,
+      () => api.zoomCamera(this.getDirectionalDelta(delta)),
+      extraDelayMs,
     );
   }
 
   public async zoomToPoint(
     pt: Point.Point,
     delta: number,
-    api: InteractionApi
+    api: InteractionApi,
+    extraDelayMs?: number,
   ): Promise<void> {
-    await this.operateWithTimer(api, () =>
-      api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta))
+    await this.runWheelZoomInteraction(
+      api,
+      () => api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta)),
+      extraDelayMs,
     );
   }
 
   private async beginInteraction(api: InteractionApi): Promise<void> {
-    this.didTransformBegin = true;
+    this.isTransforming = true;
     await api.beginInteraction();
   }
 
   private async endInteraction(api: InteractionApi): Promise<void> {
-    this.didTransformBegin = false;
+    this.isTransforming = false;
     await api.endInteraction();
   }
 
-  private resetInteractionTimer(api: InteractionApi): void {
+  private resetInteractionTimer(
+    api: InteractionApi,
+    extraDelayMs?: number,
+  ): void {
     this.stopInteractionTimer();
-    this.startInteractionTimer(api);
+    this.startInteractionTimer(api, extraDelayMs);
   }
 
   private getDirectionalDelta(delta: number): number {
@@ -191,15 +203,21 @@ export class ZoomInteraction extends MouseInteraction {
       : delta;
   }
 
+  /**
+   * If this value gets too low, can cause animation jitter in certain scenarios
+   */
   private getInteractionDelay(): number {
     return this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
   }
 
-  private startInteractionTimer(api: InteractionApi): void {
+  /**
+   * Uses a configured interaction delay, but certain interactions like wheel zoom benefit from extra delay
+   */
+  private startInteractionTimer(api: InteractionApi, extraDelayMs = 0): void {
     this.interactionTimer = window.setTimeout(async () => {
       this.interactionTimer = undefined;
       await this.endInteraction(api);
-    }, this.getInteractionDelay());
+    }, extraDelayMs + this.getInteractionDelay());
   }
 
   private stopInteractionTimer(): void {
@@ -209,15 +227,16 @@ export class ZoomInteraction extends MouseInteraction {
     }
   }
 
-  private async operateWithTimer(
+  private async runWheelZoomInteraction(
     api: InteractionApi,
-    f: () => void | Promise<void>
+    f: () => void | Promise<void>,
+    extraDelayMs?: number,
   ): Promise<void> {
-    if (!this.didTransformBegin) {
+    if (!this.isTransforming) {
       await this.beginInteraction(api);
     }
 
-    this.resetInteractionTimer(api);
+    this.resetInteractionTimer(api, extraDelayMs);
     f();
   }
 }
@@ -231,7 +250,7 @@ export class PanInteraction extends MouseInteraction {
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
-    element: HTMLElement
+    element: HTMLElement,
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
@@ -262,7 +281,7 @@ export class TwistInteraction extends MouseInteraction {
     event: MouseEvent,
     canvasPosition: Point.Point,
     api: InteractionApi,
-    element: HTMLElement
+    element: HTMLElement,
   ): void {
     this.currentPosition = Point.create(event.offsetX, event.offsetY);
     this.canvasRect = element.getBoundingClientRect();
@@ -287,7 +306,7 @@ export class PivotInteraction extends MouseInteraction {
   public beginDrag(
     event: MouseEvent,
     canvasPosition: Point.Point,
-    api: InteractionApi
+    api: InteractionApi,
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);

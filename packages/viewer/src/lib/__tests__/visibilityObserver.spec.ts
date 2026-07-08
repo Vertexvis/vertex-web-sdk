@@ -99,35 +99,35 @@ describe('VisibilityObserver', () => {
         expect.objectContaining({
           attributes: true,
           attributeFilter: ['style', 'class', 'hidden'],
-        })
+        }),
       );
       expect(mutationObserve).toHaveBeenCalledWith(
         mockElement2,
         expect.objectContaining({
           attributes: true,
           attributeFilter: ['style', 'class', 'hidden'],
-        })
+        }),
       );
       expect(mutationObserve).toHaveBeenCalledWith(
         mockElement3,
         expect.objectContaining({
           attributes: true,
           attributeFilter: ['style', 'class', 'hidden'],
-        })
+        }),
       );
       expect(mutationObserve).toHaveBeenCalledWith(
         mockElement4,
         expect.objectContaining({
           attributes: true,
           attributeFilter: ['style', 'class', 'hidden'],
-        })
+        }),
       );
       expect(mutationObserve).toHaveBeenCalledWith(
         mockElement5,
         expect.objectContaining({
           attributes: true,
           attributeFilter: ['style', 'class', 'hidden'],
-        })
+        }),
       );
     });
 

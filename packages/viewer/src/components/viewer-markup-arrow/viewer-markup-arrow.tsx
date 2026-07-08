@@ -198,7 +198,7 @@ export class ViewerMarkupArrow {
       offset: this.offset,
       originatingViewport: this.originatingViewport,
       centeringBehavior: this.centeringBehavior,
-    }
+    },
   );
 
   private registeredInteraction?: Disposable;
@@ -248,7 +248,7 @@ export class ViewerMarkupArrow {
     if (newViewer != null) {
       this.registeredInteraction =
         await newViewer.registerBasicInteractionHandler(
-          this.interactionHandler
+          this.interactionHandler,
         );
     }
   }
@@ -288,7 +288,7 @@ export class ViewerMarkupArrow {
     writeDOM(() => {
       this.hostEl.style.setProperty(
         '--viewer-markup-arrow-scale',
-        this.scale?.toString() ?? '1'
+        this.scale?.toString() ?? '1',
       );
     });
   }
@@ -305,7 +305,7 @@ export class ViewerMarkupArrow {
 
   private renderLineAnchorStyle(
     anchorStyle: LineAnchorStyle,
-    arrowheadPoints: LineAnchorStylePoints
+    arrowheadPoints: LineAnchorStylePoints,
   ): h.JSX.IntrinsicElements {
     if (anchorStyle === 'arrow-triangle') {
       return (
@@ -326,14 +326,14 @@ export class ViewerMarkupArrow {
     } else if (anchorStyle === 'hash') {
       const hashPoints = arrowheadPointsToHashPoints(
         arrowheadPoints,
-        this.scale
+        this.scale,
       );
 
       return <line id="line-anchor-hash" class="head" {...hashPoints} />;
     } else if (anchorStyle === 'dot') {
       const circlePoints = arrowheadPointsToCirclePoints(
         arrowheadPoints,
-        this.scale
+        this.scale,
       );
 
       return <circle id="line-anchor-circle" class="head" {...circlePoints} />;
@@ -358,24 +358,24 @@ export class ViewerMarkupArrow {
         elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        this.scale
+        this.scale,
       );
       const screenEnd = translatePointToScreen(
         this.end,
         elementBounds,
         this.originatingViewport,
         this.centeringBehavior,
-        this.scale
+        this.scale,
       );
 
       if (isValidPointData(screenStart, screenEnd)) {
         const arrowheadStartPoints = createLineAnchorStylePoints(
           screenEnd,
-          screenStart
+          screenStart,
         );
         const arrowheadEndPoints = createLineAnchorStylePoints(
           screenStart,
-          screenEnd
+          screenEnd,
         );
 
         return (
@@ -390,7 +390,7 @@ export class ViewerMarkupArrow {
               >
                 {this.renderLineAnchorStyle(
                   this.startLineAnchorStyle,
-                  arrowheadStartPoints
+                  arrowheadStartPoints,
                 )}
                 <line
                   id="arrow-line"
@@ -402,7 +402,7 @@ export class ViewerMarkupArrow {
                 />
                 {this.renderLineAnchorStyle(
                   this.endLineAnchorStyle,
-                  arrowheadEndPoints
+                  arrowheadEndPoints,
                 )}
               </g>
               {this.mode === 'edit' && (

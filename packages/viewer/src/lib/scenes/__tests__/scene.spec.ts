@@ -71,7 +71,7 @@ describe(Scene, () => {
     imageScaleProvider,
     viewport,
     sceneId,
-    sceneViewId
+    sceneViewId,
   );
 
   afterEach(() => {
@@ -217,9 +217,9 @@ describe(Scene, () => {
               q.withSceneTreeRange({
                 start: 0,
                 end: 19,
-              })
+              }),
             )
-            .select()
+            .select(),
         )
         .execute();
 
@@ -255,7 +255,9 @@ describe(Scene, () => {
     it('should support passing metadata queries', () => {
       scene
         .items((op) =>
-          op.where((q) => q.withMetadata('foo', ['bar', 'baz'], false)).select()
+          op
+            .where((q) => q.withMetadata('foo', ['bar', 'baz'], false))
+            .select(),
         )
         .execute();
 
@@ -574,7 +576,7 @@ describe(Scene, () => {
 
       scene
         .elements((op) =>
-          op.annotations.where((q) => q.withAnnotationId(annotationId)).hide()
+          op.annotations.where((q) => q.withAnnotationId(annotationId)).hide(),
         )
         .execute();
       expect(streamApi.createSceneAlteration).toHaveBeenCalledWith({
@@ -692,9 +694,9 @@ describe(Scene, () => {
               q.withSceneTreeRange({
                 start: 0,
                 end: 19,
-              })
+              }),
             )
-            .select()
+            .select(),
         )
         .execute();
 
@@ -732,7 +734,7 @@ describe(Scene, () => {
         .elements((op) =>
           op.items
             .where((q) => q.withMetadata('foo', ['bar', 'baz'], false))
-            .select()
+            .select(),
         )
         .execute();
 
@@ -1030,7 +1032,7 @@ describe(Scene, () => {
           frameCorrelationId: { value: 'foo' },
           includeCamera: undefined,
         },
-        true
+        true,
       );
     });
 
@@ -1042,7 +1044,7 @@ describe(Scene, () => {
           frameCorrelationId: { value: 'foo' },
           includeCamera: true,
         },
-        true
+        true,
       );
     });
 
@@ -1060,7 +1062,7 @@ describe(Scene, () => {
           cameraType:
             vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
-        true
+        true,
       );
     });
 
@@ -1078,7 +1080,7 @@ describe(Scene, () => {
           cameraType:
             vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_PERSPECTIVE,
         },
-        true
+        true,
       );
     });
   });
@@ -1095,7 +1097,7 @@ describe(Scene, () => {
           sceneViewStateId: { hex: mockSceneViewStateId },
           frameCorrelationId: { value: 'foo' },
         },
-        true
+        true,
       );
     });
 
@@ -1113,7 +1115,7 @@ describe(Scene, () => {
           cameraType:
             vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
-        true
+        true,
       );
     });
 
@@ -1122,7 +1124,7 @@ describe(Scene, () => {
         { suppliedId: 'supplied-id' },
         {
           suppliedCorrelationId: 'foo',
-        }
+        },
       );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -1130,7 +1132,7 @@ describe(Scene, () => {
           sceneViewStateSuppliedId: { value: 'supplied-id' },
           frameCorrelationId: { value: 'foo' },
         },
-        true
+        true,
       );
     });
 
@@ -1140,7 +1142,7 @@ describe(Scene, () => {
         { id: mockSceneViewStateId },
         {
           suppliedCorrelationId: 'foo',
-        }
+        },
       );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -1148,7 +1150,7 @@ describe(Scene, () => {
           sceneViewStateId: { hex: mockSceneViewStateId },
           frameCorrelationId: { value: 'foo' },
         },
-        true
+        true,
       );
     });
   });
@@ -1169,7 +1171,7 @@ describe(Scene, () => {
               .SCENE_VIEW_STATE_FEATURE_CAMERA,
           ],
         },
-        true
+        true,
       );
     });
 
@@ -1191,7 +1193,7 @@ describe(Scene, () => {
           cameraType:
             vertexvis.protobuf.stream.CameraType.CAMERA_TYPE_ORTHOGRAPHIC,
         },
-        true
+        true,
       );
     });
 
@@ -1201,7 +1203,7 @@ describe(Scene, () => {
         ['camera'],
         {
           suppliedCorrelationId: 'foo',
-        }
+        },
       );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -1213,7 +1215,7 @@ describe(Scene, () => {
               .SCENE_VIEW_STATE_FEATURE_CAMERA,
           ],
         },
-        true
+        true,
       );
     });
 
@@ -1224,7 +1226,7 @@ describe(Scene, () => {
         ['camera'],
         {
           suppliedCorrelationId: 'foo',
-        }
+        },
       );
 
       expect(streamApi.loadSceneViewState).toHaveBeenCalledWith(
@@ -1236,7 +1238,7 @@ describe(Scene, () => {
               .SCENE_VIEW_STATE_FEATURE_CAMERA,
           ],
         },
-        true
+        true,
       );
     });
   });

@@ -46,7 +46,7 @@ export const parse = (uri: string): Uri => {
  */
 export const parseAndAddParams = (
   baseStr: string,
-  params?: Record<string, unknown>
+  params?: Record<string, unknown>,
 ): Uri => {
   const base = parse(baseStr);
   return params ? addQueryParams(params, base) : base;
@@ -105,7 +105,7 @@ export const addQueryEntries = (entries: QueryEntry[], uri: Uri): Uri => {
 export const addQueryParams = (params: Record<string, any>, uri: Uri): Uri => {
   return mapAsEntries(params).reduce(
     (result, entry) => addQueryEntry(entry, result),
-    uri
+    uri,
   );
 };
 
@@ -132,7 +132,7 @@ const stringAsQueryArray = (queryString: string): QueryEntry[] => {
   return queryString
     .split('&')
     .map((param) =>
-      param.split('=').map((value) => decodeURIComponent(value))
+      param.split('=').map((value) => decodeURIComponent(value)),
     ) as QueryEntry[];
 };
 

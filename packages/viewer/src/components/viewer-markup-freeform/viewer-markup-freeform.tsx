@@ -183,7 +183,7 @@ export class ViewerMarkupFreeform {
       offset: this.offset,
       originatingViewport: this.originatingViewport,
       centeringBehavior: this.centeringBehavior,
-    }
+    },
   );
 
   private registeredInteraction?: Disposable;
@@ -231,7 +231,7 @@ export class ViewerMarkupFreeform {
     if (newViewer != null) {
       this.registeredInteraction =
         await newViewer.registerBasicInteractionHandler(
-          this.interactionHandler
+          this.interactionHandler,
         );
     }
   }
@@ -263,7 +263,7 @@ export class ViewerMarkupFreeform {
     writeDOM(() => {
       this.hostEl.style.setProperty(
         '--viewer-markup-freeform-scale',
-        this.scale.toString()
+        this.scale.toString(),
       );
     });
   }
@@ -311,7 +311,7 @@ export class ViewerMarkupFreeform {
                 class="path"
                 d={this.screenPoints.reduce(
                   (d, pt) => `${d}L${pt.x},${pt.y}`,
-                  `M${this.screenPoints[0].x},${this.screenPoints[0].y}`
+                  `M${this.screenPoints[0].x},${this.screenPoints[0].y}`,
                 )}
                 fill="none"
               />
@@ -324,7 +324,7 @@ export class ViewerMarkupFreeform {
                 this.elementBounds,
                 this.originatingViewport,
                 this.centeringBehavior,
-                this.scale
+                this.scale,
               )}
               offset={{ x: offsetX, y: offsetY }}
               onTopLeftAnchorPointerDown={(e) =>
@@ -395,8 +395,8 @@ export class ViewerMarkupFreeform {
           elementBounds,
           this.originatingViewport,
           this.centeringBehavior,
-          this.scale
-        )
+          this.scale,
+        ),
       );
     }
   }

@@ -39,7 +39,7 @@ export const isEqual = (a: Dimensions, b: Dimensions): boolean => {
 export const scale = (
   scaleX: number,
   scaleY: number,
-  dimensions: Dimensions
+  dimensions: Dimensions,
 ): Dimensions => {
   return {
     width: dimensions.width * scaleX,
@@ -52,7 +52,7 @@ export const scale = (
  */
 export const proportionalScale = (
   scaleFactor: number,
-  dimensions: Dimensions
+  dimensions: Dimensions,
 ): Dimensions => {
   return scale(scaleFactor, scaleFactor, dimensions);
 };
@@ -77,11 +77,11 @@ export const trim = (to: Dimensions, dimensions: Dimensions): Dimensions => {
  */
 export const containFit = (
   to: Dimensions,
-  dimensions: Dimensions
+  dimensions: Dimensions,
 ): Dimensions => {
   const { width, height } = Rectangle.containFit(
     toRectangle(to),
-    toRectangle(dimensions)
+    toRectangle(dimensions),
   );
   return { width, height };
 };
@@ -96,7 +96,7 @@ export const containFit = (
 export const cropFit = (to: Dimensions, dimensions: Dimensions): Dimensions => {
   const { width, height } = Rectangle.cropFit(
     toRectangle(to),
-    toRectangle(dimensions)
+    toRectangle(dimensions),
   );
   return { width, height };
 };
@@ -164,7 +164,7 @@ export const area = ({ width, height }: Dimensions): number => {
  */
 export const fitToRatio = (
   ratio: number,
-  dimensions: Dimensions
+  dimensions: Dimensions,
 ): Dimensions => {
   if (dimensions.width >= dimensions.height * ratio) {
     return create(dimensions.height * ratio, dimensions.height);
@@ -178,7 +178,7 @@ export const fitToRatio = (
  */
 export function toRectangle(
   dimensions: Dimensions,
-  position: Point.Point = Point.create()
+  position: Point.Point = Point.create(),
 ): Rectangle.Rectangle {
   return Rectangle.fromPointAndDimensions(position, dimensions);
 }

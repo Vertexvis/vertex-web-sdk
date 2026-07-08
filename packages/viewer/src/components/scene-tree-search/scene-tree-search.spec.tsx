@@ -17,7 +17,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
 
     expect(input).toEqualAttributes({
@@ -33,10 +33,10 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
     const button = page.root?.shadowRoot?.querySelector(
-      '.clear-btn'
+      '.clear-btn',
     ) as HTMLButtonElement;
 
     expect(input).toHaveAttribute('disabled');
@@ -50,7 +50,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.overlay-clear'
+      '.overlay-clear',
     ) as HTMLInputElement;
 
     expect(input).not.toHaveClass('show');
@@ -63,7 +63,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.overlay-clear'
+      '.overlay-clear',
     ) as HTMLInputElement;
 
     expect(input).toHaveClass('show');
@@ -76,7 +76,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
     input.dispatchEvent(new Event('focus'));
 
@@ -92,7 +92,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
 
     expect(input).toHaveClass('background');
@@ -105,7 +105,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
 
     input.dispatchEvent(new Event('focus'));
@@ -124,7 +124,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const button = page.root?.shadowRoot?.querySelector(
-      '.clear-btn'
+      '.clear-btn',
     ) as HTMLButtonElement;
     button.dispatchEvent(new MouseEvent('mousedown'));
 
@@ -142,7 +142,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
     input.value = 'text';
     input.dispatchEvent(new Event('input'));
@@ -154,7 +154,7 @@ describe('vertex-scene-tree-search', () => {
     expect(onSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: 'text',
-      })
+      }),
     );
   });
 
@@ -167,7 +167,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
     input.value = 'text';
     input.dispatchEvent(new Event('input'));
@@ -188,7 +188,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
     input.value = 'text';
     input.dispatchEvent(new Event('input'));
@@ -202,7 +202,7 @@ describe('vertex-scene-tree-search', () => {
     expect(onSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: 'text',
-      })
+      }),
     );
   });
 
@@ -215,7 +215,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
     input.value = 'text';
     input.dispatchEvent(new Event('input'));
@@ -229,7 +229,7 @@ describe('vertex-scene-tree-search', () => {
     expect(onSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: 'text',
-      })
+      }),
     );
   });
 
@@ -242,7 +242,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const input = page.root?.shadowRoot?.querySelector(
-      '.input'
+      '.input',
     ) as HTMLInputElement;
     input.value = 'text';
     input.dispatchEvent(new Event('input'));
@@ -255,7 +255,7 @@ describe('vertex-scene-tree-search', () => {
     expect(onSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: 'text',
-      })
+      }),
     );
 
     input.dispatchEvent(new Event('blur'));
@@ -275,7 +275,7 @@ describe('vertex-scene-tree-search', () => {
     });
 
     const button = page.root?.shadowRoot?.querySelector(
-      '.clear-btn'
+      '.clear-btn',
     ) as HTMLButtonElement;
     button.dispatchEvent(new MouseEvent('mousedown'));
 
@@ -284,7 +284,7 @@ describe('vertex-scene-tree-search', () => {
     expect(onSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         detail: '',
-      })
+      }),
     );
   });
 });

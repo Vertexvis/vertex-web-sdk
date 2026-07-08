@@ -91,7 +91,7 @@ export abstract class ReglComponent implements Disposable {
           el?.draw({
             fill: el.fillColor,
             opacity: !!el.disabled ? 0.2 : 1,
-          })
+          }),
         );
       });
     }
@@ -123,12 +123,12 @@ export abstract class ReglComponent implements Disposable {
 
   protected computeTriangleSize(
     position: Vector3.Vector3,
-    frame: Frame
+    frame: Frame,
   ): number {
     const baseTriangleSize = frame.scene.camera.isOrthographic()
       ? frame.scene.camera.fovHeight * DEFAULT_ORTHOGRAPHIC_MESH_SCALAR
       : Vector3.magnitude(
-          Vector3.subtract(position, frame.scene.camera.position)
+          Vector3.subtract(position, frame.scene.camera.position),
         ) * DEFAULT_PERSPECTIVE_MESH_SCALAR;
 
     // Increase the triangle size for small viewers
@@ -148,7 +148,7 @@ export abstract class ReglComponent implements Disposable {
     const sizeAdjustment = Math.max(
       canvasAreaAdjustment,
       canvasHeightAdjustment,
-      1
+      1,
     );
 
     return baseTriangleSize * sizeAdjustment;

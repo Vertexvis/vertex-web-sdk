@@ -21,7 +21,7 @@ export class CollectionBinding implements Binding {
 export abstract class NodeBinding<N extends Node> implements Binding {
   protected constructor(
     protected node: N,
-    protected expr: string
+    protected expr: string,
   ) {}
 
   public abstract bind<T extends BindingDataMap>(data: T): void;
@@ -44,7 +44,7 @@ export class AttributeBinding extends NodeBinding<Element> {
   public constructor(
     node: Element,
     expr: string,
-    private readonly attr: string
+    private readonly attr: string,
   ) {
     super(node, expr);
   }
@@ -62,7 +62,7 @@ export class PropertyBinding extends NodeBinding<Element> {
   public constructor(
     node: Element,
     expr: string,
-    private prop: string
+    private prop: string,
   ) {
     super(node, expr);
   }
@@ -84,7 +84,7 @@ export class EventHandlerBinding extends NodeBinding<Element> {
   public constructor(
     node: Element,
     expr: string,
-    private eventName: string
+    private eventName: string,
   ) {
     super(node, expr);
   }
@@ -119,7 +119,7 @@ export function generateBindings(node: Node): Binding[] {
         bindings.push(new EventHandlerBinding(el, attr.value, eventName));
       } else if (attr.name.startsWith('attr:')) {
         bindings.push(
-          new AttributeBinding(el, attr.value, attr.name.replace('attr:', ''))
+          new AttributeBinding(el, attr.value, attr.name.replace('attr:', '')),
         );
       } else if (attr.name.startsWith('prop:')) {
         const propName = camelCase(attr.name.replace('prop:', ''));
@@ -143,7 +143,7 @@ export function generateBindings(node: Node): Binding[] {
 
 function getBindableAttributes(element: Element): Attr[] {
   return Array.from(element.attributes).filter((attr) =>
-    bindingRegEx.test(attr.value)
+    bindingRegEx.test(attr.value),
   );
 }
 
@@ -176,7 +176,7 @@ function replaceBinding(data: BindingDataMap, expr: string): any {
 function getBindableValue(
   data: BindingDataMap,
   path: string,
-  isHead = false
+  isHead = false,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   const [head, ...tail] = path.split('.');

@@ -29,7 +29,7 @@ export function create(values: Partial<Plane> = {}): Plane {
  */
 export function fromNormalAndCoplanarPoint(
   normal: Vector3.Vector3,
-  point: Vector3.Vector3
+  point: Vector3.Vector3,
 ): Plane {
   const constant = -Vector3.dot(point, normal);
   return create({ normal, constant });
@@ -57,7 +57,7 @@ export function distanceToPoint(plane: Plane, point: Vector3.Vector3): number {
  */
 export function intersectLine(
   plane: Plane,
-  line: Line3.Line3
+  line: Line3.Line3,
 ): Vector3.Vector3 | undefined {
   const direction = Line3.direction(line);
   const denominator = Vector3.dot(plane.normal, direction);
@@ -88,7 +88,7 @@ export function intersectLine(
  */
 export function projectPoint(
   plane: Plane,
-  point: Vector3.Vector3
+  point: Vector3.Vector3,
 ): Vector3.Vector3 {
   const d = distanceToPoint(plane, point);
   return Vector3.add(point, Vector3.scale(-d, plane.normal));

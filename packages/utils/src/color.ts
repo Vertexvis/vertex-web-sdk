@@ -46,7 +46,7 @@ export const fromNumber = (num: number): Color => {
   return create(
     (normalized >> 16) & 0xff,
     (normalized >> 8) & 0xff,
-    normalized & 0xff
+    normalized & 0xff,
   );
   // tslint:enable:no-bitwise
 };
@@ -74,7 +74,7 @@ export const fromCss = (css: string): Color | undefined => {
     return create(
       parseInt(rgbMatch[1]),
       parseInt(rgbMatch[2]),
-      parseInt(rgbMatch[3])
+      parseInt(rgbMatch[3]),
     );
   }
 
@@ -84,7 +84,7 @@ export const fromCss = (css: string): Color | undefined => {
       parseInt(rgbaMatch[1]),
       parseInt(rgbaMatch[2]),
       parseInt(rgbaMatch[3]),
-      Math.floor(parseFloat(rgbaMatch[4]) * 255)
+      Math.floor(parseFloat(rgbaMatch[4]) * 255),
     );
   }
 
@@ -121,7 +121,7 @@ export const isOpaque = (color: Color): boolean => {
  */
 export const toHexString = (color: Omit<Color, 'a'>): string => {
   return `#${componentToHex(color.r)}${componentToHex(color.g)}${componentToHex(
-    color.b
+    color.b,
   )}`;
 };
 

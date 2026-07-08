@@ -13,7 +13,7 @@ describe('vertex-viewer-measurement-details', () => {
     const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
 
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+      comp.shadowRoot?.querySelector('div.measurement-details-entry'),
     ).toBeNull();
 
     model.setOutcome({
@@ -37,7 +37,7 @@ describe('vertex-viewer-measurement-details', () => {
     await page.waitForChanges();
 
     const entries = comp.shadowRoot?.querySelectorAll(
-      'div.measurement-details-entry'
+      'div.measurement-details-entry',
     ) as NodeListOf<HTMLDivElement>;
 
     expect(entries[0].innerText).toMatch('Parallel Dist:1.00 mm');
@@ -62,20 +62,63 @@ describe('vertex-viewer-measurement-details', () => {
 
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain('~100.00 mm');
 
     comp.distanceUnits = 'centimeters';
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain('~10.00 cm');
 
     comp.distanceFormatter = () => 'formatted distance';
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain('formatted distance');
+  });
+
+  it('creates a default measurement model', async () => {
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      template: () => <vertex-viewer-measurement-details />,
+    });
+
+    const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
+    expect(comp.measurementModel).toBeInstanceOf(MeasurementModel);
+  });
+
+  it('renders with initial distance units', async () => {
+    const model = new MeasurementModel();
+    model.setOutcome({
+      isApproximate: true,
+      results: [
+        {
+          type: 'minimum-distance',
+          point1: Vector3.create(0, 0, 0),
+          point2: Vector3.create(0, 0, 25.4),
+          distance: 25.4,
+        },
+      ],
+    });
+
+    const page = await newSpecPage({
+      components: [ViewerMeasurementDetails],
+      template: () => (
+        <vertex-viewer-measurement-details
+          distanceUnits="inches"
+          measurementModel={model}
+        />
+      ),
+    });
+
+    expect(
+      page.root?.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
+    ).toContain('~1.00 in');
   });
 
   it('displays planar angle', async () => {
@@ -98,19 +141,22 @@ describe('vertex-viewer-measurement-details', () => {
     await page.waitForChanges();
 
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain('90.00 deg');
 
     comp.angleUnits = 'radians';
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain(`${angle.toFixed(2)} rad`);
 
     comp.angleFormatter = () => 'formatted angle';
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain('formatted angle');
   });
 
@@ -128,13 +174,15 @@ describe('vertex-viewer-measurement-details', () => {
     comp.distanceUnits = 'centimeters';
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain('1.00 cm²');
 
     comp.areaFormatter = () => 'formatted area';
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelector('div.measurement-details-entry')?.innerHTML
+      comp.shadowRoot?.querySelector('div.measurement-details-entry')
+        ?.innerHTML,
     ).toContain('formatted area');
   });
 
@@ -173,7 +221,7 @@ describe('vertex-viewer-measurement-details', () => {
     await page.waitForChanges();
 
     const entries = comp.shadowRoot?.querySelectorAll(
-      'div.measurement-details-entry'
+      'div.measurement-details-entry',
     ) as NodeListOf<HTMLDivElement>;
 
     expect(entries.length).toBe(1);
@@ -208,14 +256,14 @@ describe('vertex-viewer-measurement-details', () => {
 
     await page.waitForChanges();
     const entries = comp.shadowRoot?.querySelectorAll(
-      'div.measurement-details-entry'
+      'div.measurement-details-entry',
     ) as NodeListOf<HTMLDivElement>;
     expect(entries[0].innerText).toContain('Dist:10.00 mm');
 
     comp.resultTypes = ['planar-angle'];
     await page.waitForChanges();
     expect(
-      comp.shadowRoot?.querySelectorAll('div.measurement-details-entry')
+      comp.shadowRoot?.querySelectorAll('div.measurement-details-entry'),
     ).toHaveLength(0);
   });
 

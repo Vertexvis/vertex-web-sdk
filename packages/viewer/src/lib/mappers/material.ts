@@ -6,14 +6,14 @@ import { Color3 } from '../../interfaces';
 export const fromPbRGBi: M.Func<vertexvis.protobuf.core.IRGBi, Color.Color> =
   M.defineMapper(
     M.read(M.requiredProp('r'), M.requiredProp('g'), M.requiredProp('b')),
-    ([r, g, b]) => Color.create(r, g, b)
+    ([r, g, b]) => Color.create(r, g, b),
   );
 
 export const toPbRGBi: M.Func<Color3, vertexvis.protobuf.core.IRGBi> =
   M.defineMapper(
     (color) => {
       function createRGBi(
-        color: Omit<Color.Color, 'a'>
+        color: Omit<Color.Color, 'a'>,
       ): vertexvis.protobuf.core.IRGBi {
         return { r: color.r, g: color.g, b: color.b };
       }
@@ -29,5 +29,5 @@ export const toPbRGBi: M.Func<Color3, vertexvis.protobuf.core.IRGBi> =
         return createRGBi(color);
       }
     },
-    (color) => color
+    (color) => color,
   );

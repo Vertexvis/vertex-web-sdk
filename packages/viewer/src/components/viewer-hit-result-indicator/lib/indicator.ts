@@ -51,7 +51,7 @@ export class HitIndicator extends ReglComponent {
   public constructor(
     canvasElement: HTMLCanvasElement,
     colors: DrawableElementColors = {},
-    opacities: DrawableElementOpacities = {}
+    opacities: DrawableElementOpacities = {},
   ) {
     super(canvasElement);
 
@@ -63,7 +63,7 @@ export class HitIndicator extends ReglComponent {
 
   public updateTransformAndNormal(
     transform?: Matrix4.Matrix4,
-    normal?: Vector3.Vector3
+    normal?: Vector3.Vector3,
   ): void {
     this.transform = transform;
     this.normal = normal;
@@ -110,7 +110,7 @@ export class HitIndicator extends ReglComponent {
   private createElements(
     transform: Matrix4.Matrix4,
     normal: Vector3.Vector3,
-    frame: Frame
+    frame: Frame,
   ): void {
     this.reglCommand = regl({
       canvas: this.canvasElement,
@@ -120,7 +120,7 @@ export class HitIndicator extends ReglComponent {
 
     const triangleSize = this.computeTriangleSize(
       Vector3.fromMatrixPosition(transform),
-      frame
+      frame,
     );
 
     this.arrow = new TriangleMesh(
@@ -130,10 +130,10 @@ export class HitIndicator extends ReglComponent {
         transform,
         frame.scene.camera,
         normal,
-        triangleSize
+        triangleSize,
       ),
       this.outlineColor,
-      this.arrowFillColor
+      this.arrowFillColor,
     );
     this.plane = new Mesh(
       createShape,
@@ -142,14 +142,14 @@ export class HitIndicator extends ReglComponent {
         transform,
         frame.scene.camera,
         normal,
-        triangleSize * DEFAULT_PLANE_SIZE_SCALAR
+        triangleSize * DEFAULT_PLANE_SIZE_SCALAR,
       ),
       this.outlineColor,
       this.planeFillColor,
       {
         opacity: this.getPlaneOpacity(),
         depth: 0.5,
-      }
+      },
     );
     this.point = new Mesh(
       createShape,
@@ -158,21 +158,21 @@ export class HitIndicator extends ReglComponent {
         transform,
         frame.scene.camera,
         normal,
-        triangleSize * DEFAULT_POINT_SIZE_SCALAR
+        triangleSize * DEFAULT_POINT_SIZE_SCALAR,
       ),
       this.outlineColor,
       this.outlineColor,
       {
         join: 'round' as JoinStyle,
         depth: 1,
-      }
+      },
     );
     this.axis = new AxisLine(
       createShape,
       'hit-normal-axis',
       axisPositions(transform, frame.scene.camera, this.arrow),
       this.outlineColor,
-      this.arrowFillColor
+      this.arrowFillColor,
     );
 
     this.availableElements = [this.arrow, this.point, this.plane, this.axis];
@@ -181,11 +181,11 @@ export class HitIndicator extends ReglComponent {
   private updateElements(
     transform: Matrix4.Matrix4,
     normal: Vector3.Vector3,
-    frame: Frame
+    frame: Frame,
   ): void {
     const triangleSize = this.computeTriangleSize(
       Vector3.fromMatrixPosition(transform),
-      frame
+      frame,
     );
 
     if (this.arrow != null) {
@@ -194,11 +194,11 @@ export class HitIndicator extends ReglComponent {
           transform,
           frame.scene.camera,
           normal,
-          triangleSize
-        )
+          triangleSize,
+        ),
       );
       this.axis?.updatePoints(
-        axisPositions(transform, frame.scene.camera, this.arrow)
+        axisPositions(transform, frame.scene.camera, this.arrow),
       );
     }
     if (this.plane != null) {
@@ -207,8 +207,8 @@ export class HitIndicator extends ReglComponent {
           transform,
           frame.scene.camera,
           normal,
-          triangleSize * DEFAULT_PLANE_SIZE_SCALAR
-        )
+          triangleSize * DEFAULT_PLANE_SIZE_SCALAR,
+        ),
       );
     }
     if (this.point != null) {
@@ -217,8 +217,8 @@ export class HitIndicator extends ReglComponent {
           transform,
           frame.scene.camera,
           normal,
-          triangleSize * DEFAULT_POINT_SIZE_SCALAR
-        )
+          triangleSize * DEFAULT_POINT_SIZE_SCALAR,
+        ),
       );
     }
   }

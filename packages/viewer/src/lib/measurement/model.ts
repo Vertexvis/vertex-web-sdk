@@ -132,7 +132,7 @@ export class MeasurementModel {
    * @returns A disposable that can be used to remove the listener.
    */
   public onOutcomeChanged(
-    listener: Listener<MeasurementOutcome | undefined>
+    listener: Listener<MeasurementOutcome | undefined>,
   ): Disposable {
     return this.outcomeChanged.on(listener);
   }
@@ -145,7 +145,7 @@ export class MeasurementModel {
    * @returns A disposable that can be used to remove the listener.
    */
   public onEntitiesChanged(
-    listener: Listener<MeasurementEntity[]>
+    listener: Listener<MeasurementEntity[]>,
   ): Disposable {
     return this.entitiesChanged.on(listener);
   }

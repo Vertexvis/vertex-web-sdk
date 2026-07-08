@@ -2,12 +2,14 @@ const dispose = jest.fn();
 const mockRegisterAdditionalElement = jest.fn();
 jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
   const { MultiElementInteractionHandler } = jest.requireActual(
-    '../../lib/interactions/multiElementInteractionHandler'
+    '../../lib/interactions/multiElementInteractionHandler',
   );
   return {
     PointerInteractionHandler: class extends MultiElementInteractionHandler {
       public registerAdditionalElement =
-        mockRegisterAdditionalElement.mockReturnValue({ dispose });
+        mockRegisterAdditionalElement.mockReturnValue({
+          dispose,
+        });
     },
   };
 });
@@ -39,7 +41,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       fovY: 45,
     },
     BoundingBox.create({ x: -1, y: -1, z: -1 }, { x: 1, y: 1, z: 1 }),
-    1
+    1,
   );
   const depthBuffer = new DepthBuffer(
     camera,
@@ -48,7 +50,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       imageRect: Rectangle.create(0, 0, 100, 100),
       imageScale: 1,
     },
-    makeDepthImageBytes(100, 100, 0)
+    makeDepthImageBytes(100, 100, 0),
   );
 
   beforeEach(() => jest.resetAllMocks());
@@ -67,7 +69,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.style.transform).toContain('translate(-50%, -50%)');
     });
@@ -90,7 +92,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
@@ -113,7 +115,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBe('');
     });
@@ -136,7 +138,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
@@ -156,7 +158,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.style.transform).toContain('translate(-50%, -50%)');
       expect(el.style.transform).toContain('matrix3d');
@@ -173,7 +175,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.style.transform).toContain('translate(-50%, -50%)');
       expect(el.style.transform).toContain('matrix3d');
@@ -199,7 +201,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
@@ -222,7 +224,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBe('');
     });
@@ -245,7 +247,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('occluded')).toBeNull();
     });
@@ -272,7 +274,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('detached')).toBeNull();
     });
@@ -297,7 +299,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('detached')).toBe('');
     });
@@ -320,7 +322,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       });
 
       const el = page.root?.querySelector(
-        'vertex-viewer-dom-element'
+        'vertex-viewer-dom-element',
       ) as HTMLElement;
       expect(el.getAttribute('detached')).toBeNull();
     });
@@ -373,7 +375,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
       expect(addEventListener).toHaveBeenCalledWith(
         'frameDrawn',
-        expect.any(Function)
+        expect.any(Function),
       );
       expect(el.camera).toMatchObject(camera);
 

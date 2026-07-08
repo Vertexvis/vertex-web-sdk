@@ -15,7 +15,7 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
     private stream: StreamApi,
     private configProvider: ConfigProvider,
     private imageScaleProvider: ImageScaleProvider,
-    private sceneProvider: SceneProvider
+    private sceneProvider: SceneProvider,
   ) {}
 
   public predicate(e: TapEventDetails): boolean {
@@ -28,7 +28,7 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
       {
         point: Point.scale(e.position, scale?.x || 1, scale?.y || 1),
       },
-      true
+      true,
     );
 
     if (
@@ -49,12 +49,12 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
         const hitPoint = Vector3.create(
           hit.hitPoint.x,
           hit.hitPoint.y,
-          hit.hitPoint.z
+          hit.hitPoint.z,
         );
         const newLookAt = await this.getLookAtPoint(
           scene,
           hitPoint,
-          camera.viewVector
+          camera.viewVector,
         );
 
         await this.stream.flyTo({
@@ -64,22 +64,22 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
                 lookAt: newLookAt,
                 rotationPoint: newLookAt,
               })
-              .toFrameCamera()
+              .toFrameCamera(),
           ),
           animation: {
             duration: toProtoDuration(
-              this.configProvider().animation.durationMs
+              this.configProvider().animation.durationMs,
             ),
           },
         });
       } else {
         console.debug(
-          `No hit position found for fly to position [position={x: ${e.position.x}, y: ${e.position.y}}, hit-id={${hit.itemId?.hex}}]`
+          `No hit position found for fly to position [position={x: ${e.position.x}, y: ${e.position.y}}, hit-id={${hit.itemId?.hex}}]`,
         );
       }
     } else {
       console.debug(
-        `No hit results found for fly to position [position={x: ${e.position.x}, y: ${e.position.y}}]`
+        `No hit results found for fly to position [position={x: ${e.position.x}, y: ${e.position.y}}]`,
       );
     }
   }
@@ -87,7 +87,7 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
   protected getLookAtPoint(
     scene: Scene,
     hitPoint: Vector3.Vector3,
-    viewVector: Vector3.Vector3
+    viewVector: Vector3.Vector3,
   ): Vector3.Vector3 {
     if (scene.isOrthographic()) {
       // Update the lookAt point to take the center of the model into account
@@ -96,7 +96,7 @@ export class FlyToPositionKeyInteraction implements KeyInteraction<TapEventDetai
       return updateLookAtRelativeToBoundingBoxCenter(
         hitPoint,
         viewVector,
-        BoundingBox.center(scene.boundingBox())
+        BoundingBox.center(scene.boundingBox()),
       );
     } else {
       // For perspective, just return the hit point

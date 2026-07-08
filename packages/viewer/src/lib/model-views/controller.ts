@@ -30,7 +30,7 @@ export class ModelViewController {
     private client: SceneViewAPIClient,
     private stream: StreamApi,
     private jwtProvider: JwtProvider,
-    private deviceIdProvider: () => string | undefined
+    private deviceIdProvider: () => string | undefined,
   ) {}
 
   /**
@@ -43,7 +43,7 @@ export class ModelViewController {
    */
   public async listByItem(
     itemId: UUID.UUID,
-    { hasAnnotations, cursor, size = 50 }: ListByItemOptions = {}
+    { hasAnnotations, cursor, size = 50 }: ListByItemOptions = {},
   ): Promise<ModelViewListResponse> {
     const res: ListItemModelViewsResponse = await requestUnary(
       async (handler) => {
@@ -68,7 +68,7 @@ export class ModelViewController {
         req.setPage(page);
 
         this.client.listItemModelViews(req, meta, handler);
-      }
+      },
     );
 
     return mapListItemModelViewsResponseOrThrow(res.toObject());
@@ -82,7 +82,7 @@ export class ModelViewController {
    */
   public async load(
     sceneItemId: UUID.UUID,
-    modelViewId: UUID.UUID
+    modelViewId: UUID.UUID,
   ): Promise<void> {
     const itemModelView = mapItemModelViewOrThrow({ modelViewId, sceneItemId });
     this.stream.updateModelView({ itemModelView }, true);

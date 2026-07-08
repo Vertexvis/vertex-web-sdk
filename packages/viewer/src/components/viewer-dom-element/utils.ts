@@ -1,5 +1,5 @@
 export function isVertexViewerDomElement(
-  el: unknown
+  el: unknown,
 ): el is HTMLVertexViewerDomElementElement {
   return (
     el instanceof HTMLElement &&

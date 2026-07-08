@@ -11,7 +11,7 @@ describe(appendSettingsToUrl, () => {
 
   it('appends each setting as url param to input url', () => {
     expect(appendSettingsToUrl(url, settings)).toBe(
-      'wss://example.com?frame-delivery.rate-limit-enabled=on&frame-delivery.packet-loss-threshold=1'
+      'wss://example.com?frame-delivery.rate-limit-enabled=on&frame-delivery.packet-loss-threshold=1',
     );
   });
 

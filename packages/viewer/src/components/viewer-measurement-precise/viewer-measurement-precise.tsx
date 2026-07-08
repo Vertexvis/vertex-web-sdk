@@ -116,7 +116,7 @@ export class ViewerMeasurementPrecise {
   /**
    * @ignore
    */
-  @Watch('measurementModel')
+  @Watch('measurementModel', { immediate: true })
   protected handleMeasurementModelChanged(): void {
     this.setupController();
   }
@@ -150,7 +150,7 @@ export class ViewerMeasurementPrecise {
       this.measurementModel,
       client,
       () => this.viewer?.token,
-      this.viewer?.deviceId
+      this.viewer?.deviceId,
     );
   }
 
@@ -167,8 +167,8 @@ export class ViewerMeasurementPrecise {
         this.viewer?.registerInteractionHandler(
           new MeasurementInteractionHandler(
             this.measurementController,
-            this.measurableEntityTypes
-          )
+            this.measurableEntityTypes,
+          ),
         );
     }
   }

@@ -48,7 +48,7 @@ export class AnnotationController {
   public constructor(
     private client: SceneViewAPIClient,
     private jwtProvider: JwtProvider,
-    private deviceIdProvider: () => string | undefined
+    private deviceIdProvider: () => string | undefined,
   ) {}
 
   /**
@@ -111,7 +111,7 @@ export class AnnotationController {
   public async fetch(
     opts: {
       signal?: AbortSignal;
-    } = {}
+    } = {},
   ): Promise<AnnotationState> {
     const sets = await this.fetchAnnotationSetsAsArray();
     const annotations = await this.fetchAnnotationsAsArray(sets);
@@ -120,7 +120,7 @@ export class AnnotationController {
       (state, [set, annotations]) => ({
         annotations: { ...state.annotations, [set.id]: annotations },
       }),
-      { annotations: {} } as AnnotationState
+      { annotations: {} } as AnnotationState,
     );
 
     if (opts.signal == null || !opts.signal.aborted) {
@@ -190,7 +190,7 @@ export class AnnotationController {
 
         this.client.listSceneViewAnnotationSets(req, meta, handler);
       },
-      (res) => res.toObject().nextCursor?.next
+      (res) => res.toObject().nextCursor?.next,
     );
   }
 
@@ -201,7 +201,7 @@ export class AnnotationController {
   }
 
   private fetchAnnotations(
-    setId: UUID.UUID
+    setId: UUID.UUID,
   ): AsyncGenerator<ListSceneAnnotationsResponse, void> {
     return requestPaged(
       (cursor) => async (handler) => {
@@ -222,12 +222,12 @@ export class AnnotationController {
 
         this.client.listSceneAnnotations(req, meta, handler);
       },
-      (res) => res.toObject().nextCursor?.next
+      (res) => res.toObject().nextCursor?.next,
     );
   }
 
   private fetchAnnotationsAsArray(
-    sets: AnnotationSet[]
+    sets: AnnotationSet[],
   ): Promise<[AnnotationSet, Annotation[]][]> {
     const annotations = sets.map(async (set) => {
       const annotations = (await Async.asArray(this.fetchAnnotations(set.id)))

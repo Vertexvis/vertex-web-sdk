@@ -12,7 +12,7 @@ export class PointToPointHitTester {
     private stencil: StencilBuffer | undefined,
     private depthBuffer: DepthBuffer,
     private viewport: Viewport,
-    private camera?: FrameCameraBase
+    private camera?: FrameCameraBase,
   ) {}
 
   public hitTest(pt: Point.Point): boolean {
@@ -37,7 +37,7 @@ export class PointToPointHitTester {
 
   public transformPointToWorld(
     pt: Point.Point,
-    { ignoreHitTest = false }: { ignoreHitTest?: boolean } = {}
+    { ignoreHitTest = false }: { ignoreHitTest?: boolean } = {},
   ): Vector3.Vector3 | undefined {
     const buffer = this.pickDepthBuffer(pt);
 

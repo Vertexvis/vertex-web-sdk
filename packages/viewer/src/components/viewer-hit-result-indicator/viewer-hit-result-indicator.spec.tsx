@@ -66,10 +66,10 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const indicator = page.body.querySelector(
-      'vertex-viewer-hit-result-indicator'
+      'vertex-viewer-hit-result-indicator',
     ) as HTMLVertexViewerHitResultIndicatorElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -85,7 +85,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
 
     expect(mockIndicator.updateTransformAndNormal).toHaveBeenCalledWith(
       Matrix4.makeTranslation(indicator.position),
-      indicator.normal
+      indicator.normal,
     );
     expect(mockIndicator.updateFrame).toHaveBeenCalledWith(frame);
   });
@@ -102,10 +102,10 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
     });
 
     const viewer = page.body.querySelector(
-      'vertex-viewer'
+      'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const indicator = page.body.querySelector(
-      'vertex-viewer-hit-result-indicator'
+      'vertex-viewer-hit-result-indicator',
     ) as HTMLVertexViewerHitResultIndicatorElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });

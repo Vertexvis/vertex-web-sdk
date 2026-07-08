@@ -10,7 +10,7 @@ describe(append, () => {
     const res = append(container, el, data);
 
     expect(res.element.querySelector('#id')?.getAttribute('title')).toBe(
-      'title'
+      'title',
     );
   });
 });

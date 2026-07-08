@@ -12,12 +12,12 @@ export class StreamApiEventDispatcher<T> {
   public constructor(
     private stream: StreamApi,
     private predicate: (
-      msg: vertexvis.protobuf.stream.IStreamMessage
+      msg: vertexvis.protobuf.stream.IStreamMessage,
     ) => boolean,
     private transform: (
-      msg: vertexvis.protobuf.stream.IStreamMessage
+      msg: vertexvis.protobuf.stream.IStreamMessage,
     ) => T | undefined,
-    private timeout: number = DEFAULT_TIMEOUT_IN_MS
+    private timeout: number = DEFAULT_TIMEOUT_IN_MS,
   ) {
     this.handleMessage = this.handleMessage.bind(this);
   }
@@ -47,7 +47,7 @@ export class StreamApiEventDispatcher<T> {
         };
 
         this.on(handler);
-      })
+      }),
     ).finally(() => {
       this.off(handler);
     });

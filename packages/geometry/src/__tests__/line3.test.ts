@@ -11,7 +11,7 @@ describe(Line3.create, () => {
   it('creates a default line at origin', () => {
     const line = Line3.create();
     expect(line).toEqual(
-      Line3.create({ start: Vector3.origin(), end: Vector3.origin() })
+      Line3.create({ start: Vector3.origin(), end: Vector3.origin() }),
     );
   });
 });

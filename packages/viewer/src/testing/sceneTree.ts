@@ -55,7 +55,7 @@ export class ResponseStreamMock<T> implements ResponseStream<T> {
 export function createGetTreeResponse(
   itemCount: number,
   totalCount: number | null,
-  transform?: (node: Node) => void
+  transform?: (node: Node) => void,
 ): GetTreeResponse {
   const nodes = Array.from({ length: itemCount }).map((_, i) => {
     const id = new Uuid();
@@ -86,21 +86,21 @@ export function createGetTreeResponse(
 
 export function createFilterTreeResponse(
   resultCount: number,
-  partialResults = false
+  partialResults = false,
 ): FilterResponse {
   const res = new FilterResponse();
   res.setNumberOfResults(resultCount);
   res.setIndexingStatus(
     partialResults
       ? IndexingStatus.INDEXING_STATUS_INDEXING
-      : IndexingStatus.INDEXING_STATUS_READY
+      : IndexingStatus.INDEXING_STATUS_READY,
   );
 
   return res;
 }
 
 export function createSubscribeResponse(
-  change: TreeChangeType
+  change: TreeChangeType,
 ): SubscribeResponse {
   const res = new SubscribeResponse();
   res.setChange(change);

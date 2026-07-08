@@ -1,5 +1,6 @@
 jest.mock('../viewer/viewer');
 
+import { h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 import {
@@ -26,7 +27,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       });
 
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]',
       );
       expect(btn).toBeDefined();
     });
@@ -34,14 +35,11 @@ describe('<vertex-viewer-default-toolbar>', () => {
     it('performs fit all with animation when fit all button is clicked', async () => {
       const page = await newSpecPage({
         components: [ViewerDefaultToolbar],
-        html: `<vertex-viewer-default-toolbar></vertex-viewer-default-toolbar>`,
+        template: () => h('vertex-viewer-default-toolbar', { viewer }),
       });
 
-      page.rootInstance.viewer = viewer;
-      await page.waitForChanges();
-
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]',
       );
       btn?.dispatchEvent(new MouseEvent('click'));
 
@@ -51,21 +49,22 @@ describe('<vertex-viewer-default-toolbar>', () => {
       expect(cameraMock.render).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: { milliseconds: 1000 },
-        })
+        }),
       );
     });
 
     it('performs fit all without animation if disabled', async () => {
       const page = await newSpecPage({
         components: [ViewerDefaultToolbar],
-        html: `<vertex-viewer-default-toolbar animations-disabled></vertex-viewer-default-toolbar>`,
+        template: () =>
+          h('vertex-viewer-default-toolbar', {
+            animationsDisabled: true,
+            viewer,
+          }),
       });
 
-      page.rootInstance.viewer = viewer;
-      await page.waitForChanges();
-
       const btn = page.root?.shadowRoot?.querySelector(
-        '[data-testid="fit-all-btn"]'
+        '[data-testid="fit-all-btn"]',
       );
       btn?.dispatchEvent(new MouseEvent('click'));
 
@@ -74,7 +73,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
       expect(cameraMock.render).toHaveBeenCalledWith(
         expect.objectContaining({
           animation: undefined,
-        })
+        }),
       );
     });
   });
@@ -86,7 +85,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
     });
 
     const toolbar = page.root?.shadowRoot?.querySelector(
-      'vertex-viewer-toolbar'
+      'vertex-viewer-toolbar',
     );
     expect(toolbar).toEqualAttribute('placement', 'top-left');
   });
@@ -98,7 +97,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
     });
 
     const toolbar = page.root?.shadowRoot?.querySelector(
-      'vertex-viewer-toolbar'
+      'vertex-viewer-toolbar',
     );
     expect(toolbar).toEqualAttribute('direction', 'vertical');
 

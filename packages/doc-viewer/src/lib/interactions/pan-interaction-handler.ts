@@ -45,7 +45,7 @@ export class PanInteractionHandler implements Disposable {
   }
 
   private handlePointerDown(event: PointerEvent): void {
-    if (event.button !== 0) {
+    if (event.button !== 2) {
       return;
     }
 

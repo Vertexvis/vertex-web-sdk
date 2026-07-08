@@ -57,7 +57,7 @@ describe(Mapper.getProp, () => {
 
 describe(Mapper.mapProp, () => {
   const mapper = Mapper.mapProp<{ foo: string }, 'foo', number>('foo', (str) =>
-    parseInt(str)
+    parseInt(str),
   );
 
   it('returns result of mapper', () => {
@@ -68,7 +68,7 @@ describe(Mapper.mapProp, () => {
 
 describe(Mapper.mapArray, () => {
   const mapper = Mapper.mapArray<string | null, number>(
-    Mapper.compose(Mapper.required(''), (str) => parseInt(str))
+    Mapper.compose(Mapper.required(''), (str) => parseInt(str)),
   );
 
   it('returns empty array if input is empty', () => {
@@ -86,7 +86,7 @@ describe(Mapper.mapArray, () => {
     expect(res).toEqual(
       expect.objectContaining({
         errors: expect.arrayContaining([expect.anything(), expect.anything()]),
-      })
+      }),
     );
   });
 });
@@ -94,7 +94,7 @@ describe(Mapper.mapArray, () => {
 describe(Mapper.mapRequiredProp, () => {
   const mapper = Mapper.mapRequiredProp<{ foo: string | null }, 'foo', number>(
     'foo',
-    (str) => parseInt(str)
+    (str) => parseInt(str),
   );
 
   it('invokes mapping function if prop is defined', () => {
@@ -107,7 +107,7 @@ describe(Mapper.mapRequiredProp, () => {
     expect(res).toEqual(
       expect.objectContaining({
         errors: expect.arrayContaining([expect.anything()]),
-      })
+      }),
     );
   });
 });
@@ -128,7 +128,7 @@ describe(Mapper.ifInvalidThrow, () => {
 describe(Mapper.read, () => {
   const mapper = Mapper.read<string | null, string, number>(
     Mapper.compose(Mapper.required(''), (str) => str),
-    Mapper.compose(Mapper.required(''), (str) => parseInt(str))
+    Mapper.compose(Mapper.required(''), (str) => parseInt(str)),
   );
 
   it('returns mapped values as array', () => {
@@ -150,7 +150,7 @@ describe(Mapper.read, () => {
 describe(Mapper.compose, () => {
   const mapper = Mapper.compose<string | null, string, number>(
     Mapper.required(''),
-    (str) => parseInt(str.toString())
+    (str) => parseInt(str.toString()),
   );
 
   it('returns composed value', () => {
@@ -169,7 +169,7 @@ describe(Mapper.compose, () => {
 describe(Mapper.defineMapper, () => {
   const mapper = Mapper.defineMapper<string | null, [string], number>(
     Mapper.read(Mapper.required('')),
-    ([str]) => parseInt(str)
+    ([str]) => parseInt(str),
   );
 
   it('returns result from builder if valid', () => {
@@ -200,7 +200,7 @@ describe(Mapper.pickFirst, () => {
       } else {
         return undefined;
       }
-    }
+    },
   );
 
   it('returns first defined result', () => {

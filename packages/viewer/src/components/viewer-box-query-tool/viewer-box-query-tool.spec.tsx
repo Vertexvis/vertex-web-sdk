@@ -65,7 +65,7 @@ describe('vertex-viewer-box-query-tool', () => {
     expect(bounds).not.toBeNull();
 
     expect(bounds?.getAttribute('style')).toMatch(
-      'left: 5px; top: 5px; width: 10px; height: 10px;'
+      'left: 5px; top: 5px; width: 10px; height: 10px;',
     );
 
     window.dispatchEvent(pointerUpEvent);
@@ -145,7 +145,7 @@ describe('vertex-viewer-box-query-tool', () => {
             }),
           },
         ]),
-      })
+      }),
     );
   });
 
@@ -197,7 +197,7 @@ describe('vertex-viewer-box-query-tool', () => {
             }),
           },
         ]),
-      })
+      }),
     );
   });
 
@@ -249,7 +249,7 @@ describe('vertex-viewer-box-query-tool', () => {
             }),
           },
         ]),
-      })
+      }),
     );
   });
 
@@ -317,7 +317,7 @@ describe('vertex-viewer-box-query-tool', () => {
             }),
           },
         ]),
-      })
+      }),
     );
   });
 
@@ -383,7 +383,7 @@ describe('vertex-viewer-box-query-tool', () => {
             }),
           },
         ]),
-      })
+      }),
     );
     expect(streamSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -409,14 +409,14 @@ describe('vertex-viewer-box-query-tool', () => {
             }),
           },
         ]),
-      })
+      }),
     );
   });
 });
 
 async function drawExclusiveBox(
   page: SpecPage,
-  viewer: HTMLVertexViewerElement
+  viewer: HTMLVertexViewerElement,
 ): Promise<void> {
   const canvas = viewer.shadowRoot?.querySelector('canvas');
 
@@ -438,7 +438,7 @@ async function drawExclusiveBox(
 
 async function drawInclusiveBox(
   page: SpecPage,
-  viewer: HTMLVertexViewerElement
+  viewer: HTMLVertexViewerElement,
 ): Promise<void> {
   const canvas = viewer.shadowRoot?.querySelector('canvas');
 

@@ -49,29 +49,29 @@ describe('vertex-viewer-markup-freeform', () => {
 
     const el = page.root as HTMLVertexViewerMarkupFreeformElement;
     const leftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-left-anchor'
+      'bounding-box-2d-left-anchor',
     );
     const rightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-right-anchor'
+      'bounding-box-2d-right-anchor',
     );
     const topEl = el?.shadowRoot?.getElementById('bounding-box-2d-top-anchor');
     const bottomEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-anchor'
+      'bounding-box-2d-bottom-anchor',
     );
     const topLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-left-anchor'
+      'bounding-box-2d-top-left-anchor',
     );
     const topRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-right-anchor'
+      'bounding-box-2d-top-right-anchor',
     );
     const bottomLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-left-anchor'
+      'bounding-box-2d-bottom-left-anchor',
     );
     const bottomRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-right-anchor'
+      'bounding-box-2d-bottom-right-anchor',
     );
     const centerEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-center-anchor'
+      'bounding-box-2d-center-anchor',
     );
 
     /**
@@ -118,32 +118,32 @@ describe('vertex-viewer-markup-freeform', () => {
 
     const root = page.root as HTMLVertexViewerElement;
     const el = root.querySelector(
-      'vertex-viewer-markup-freeform'
+      'vertex-viewer-markup-freeform',
     ) as HTMLVertexViewerMarkupFreeformElement;
     const leftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-left-anchor'
+      'bounding-box-2d-left-anchor',
     );
     const rightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-right-anchor'
+      'bounding-box-2d-right-anchor',
     );
     const topEl = el?.shadowRoot?.getElementById('bounding-box-2d-top-anchor');
     const bottomEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-anchor'
+      'bounding-box-2d-bottom-anchor',
     );
     const topLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-left-anchor'
+      'bounding-box-2d-top-left-anchor',
     );
     const topRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-top-right-anchor'
+      'bounding-box-2d-top-right-anchor',
     );
     const bottomLeftEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-left-anchor'
+      'bounding-box-2d-bottom-left-anchor',
     );
     const bottomRightEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-bottom-right-anchor'
+      'bounding-box-2d-bottom-right-anchor',
     );
     const centerEl = el?.shadowRoot?.getElementById(
-      'bounding-box-2d-center-anchor'
+      'bounding-box-2d-center-anchor',
     );
 
     /**
@@ -153,7 +153,7 @@ describe('vertex-viewer-markup-freeform', () => {
      */
     rightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 75, clientY: 0 })
+      new MouseEvent('pointermove', { clientX: 75, clientY: 0 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -162,7 +162,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     bottomRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
+      new MouseEvent('pointermove', { clientX: 100, clientY: 100 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -171,7 +171,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     topRightEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 90, clientY: 10 })
+      new MouseEvent('pointermove', { clientX: 90, clientY: 10 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -180,7 +180,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     leftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -189,7 +189,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     topLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 60, clientY: 20 })
+      new MouseEvent('pointermove', { clientX: 60, clientY: 20 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -198,7 +198,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     bottomLeftEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 40, clientY: 90 })
+      new MouseEvent('pointermove', { clientX: 40, clientY: 90 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -207,7 +207,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     topEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 30 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 30 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -216,7 +216,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     bottomEl?.dispatchEvent(new MouseEvent('pointerdown'));
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 80 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 80 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -229,10 +229,10 @@ describe('vertex-viewer-markup-freeform', () => {
      */
 
     centerEl?.dispatchEvent(
-      new MouseEvent('pointerdown', { clientX: 65, clientY: 55 })
+      new MouseEvent('pointerdown', { clientX: 65, clientY: 55 }),
     );
     window.dispatchEvent(
-      new MouseEvent('pointermove', { clientX: 50, clientY: 50 })
+      new MouseEvent('pointermove', { clientX: 50, clientY: 50 }),
     );
     window.dispatchEvent(new MouseEvent('pointerup'));
     await page.waitForChanges();
@@ -288,14 +288,14 @@ describe('vertex-viewer-markup-freeform', () => {
     });
 
     const el = page.root?.querySelector(
-      'vertex-viewer-markup-freeform'
+      'vertex-viewer-markup-freeform',
     ) as HTMLVertexViewerMarkupFreeformElement;
     const svg = el.shadowRoot?.querySelector('.svg') as SVGElement;
     const groupEl = svg.querySelector('g') as SVGElement;
 
     expect(groupEl.getAttribute('transform')).toContain(`translate(25 25)`);
     expect(groupEl.querySelector('path')?.getAttribute('d')).toBe(
-      'M25,25L25,25L25,0L0,25'
+      'M25,25L25,25L25,0L0,25',
     );
   });
 
@@ -312,23 +312,23 @@ describe('vertex-viewer-markup-freeform', () => {
     });
 
     const el = page.root?.querySelector(
-      'vertex-viewer-markup-freeform'
+      'vertex-viewer-markup-freeform',
     ) as HTMLVertexViewerMarkupFreeformElement;
 
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-freeform-scale: 1'
+      '--viewer-markup-freeform-scale: 1',
     );
 
     el.scale = 2;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-freeform-scale: 2'
+      '--viewer-markup-freeform-scale: 2',
     );
 
     el.scale = 0.5;
     await page.waitForChanges();
     expect(el.getAttribute('style')).toContain(
-      '--viewer-markup-freeform-scale: 0.5'
+      '--viewer-markup-freeform-scale: 0.5',
     );
   });
 
@@ -356,7 +356,7 @@ describe('vertex-viewer-markup-freeform', () => {
     expect(
       page.root
         ?.querySelector('vertex-viewer-markup-freeform')
-        ?.shadowRoot?.querySelector('svg')
+        ?.shadowRoot?.querySelector('svg'),
     ).toBeNull();
   });
 
@@ -375,12 +375,12 @@ describe('vertex-viewer-markup-freeform', () => {
     const root = page.root as HTMLVertexViewerElement;
 
     const canvas = root.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
 
     const el = root.querySelector(
-      'vertex-viewer-markup-freeform'
+      'vertex-viewer-markup-freeform',
     ) as HTMLVertexViewerMarkupFreeformElement;
 
     el.viewer = page.doc.createElement('vertex-viewer');
@@ -388,7 +388,7 @@ describe('vertex-viewer-markup-freeform', () => {
 
     expect(removeEventListener).toHaveBeenCalledWith(
       'pointerdown',
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -407,19 +407,19 @@ describe('vertex-viewer-markup-freeform', () => {
     const root = page.root as HTMLVertexViewerElement;
 
     const canvas = root.shadowRoot?.querySelector(
-      'canvas'
+      'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
 
     const el = root.querySelector(
-      'vertex-viewer-markup-freeform'
+      'vertex-viewer-markup-freeform',
     ) as HTMLVertexViewerMarkupFreeformElement;
     el.dispose();
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
       'pointerdown',
-      expect.anything()
+      expect.anything(),
     );
   });
 });
