@@ -267,7 +267,7 @@ export class StreamApi {
 
       if (!validBoundingBox) {
         console.warn(
-          'Invalid bounding box provided. Canceling flyTo operation. WHAT?!',
+          'Invalid bounding box provided. Canceling flyTo operation.',
         );
         return Promise.resolve({});
       }
@@ -279,7 +279,7 @@ export class StreamApi {
 
       if (!cameraIsValid) {
         console.warn(
-          'Invalid camera provided. Canceling flyTo operation. Forget it ok!',
+          'Invalid camera provided. Canceling flyTo operation.',
         );
         return Promise.resolve({});
       }
@@ -291,7 +291,7 @@ export class StreamApi {
 
       if (!baseCameraIsValid) {
         console.warn(
-          'Invalid base camera provided. Canceling flyTo operation. No way ok!',
+          'Invalid base camera provided. Canceling flyTo operation.',
         );
         return Promise.resolve({});
       }

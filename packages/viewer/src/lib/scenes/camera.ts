@@ -69,10 +69,12 @@ export class FlyToExecutor {
   }
 
   public withCamera(camera: FrameCamera.FrameCamera): TerminalFlyToExecutor {
-    const flyTo = isValidFrameCamera(camera)
-      ? ({ flyTo: { type: 'camera', data: camera } } as FlyTo.FlyToOptions)
-      : undefined;
-    return new TerminalFlyToExecutor(flyTo);
+    if (isValidFrameCamera(camera)) {
+      return new TerminalFlyToExecutor({
+        flyTo: { type: 'camera', data: camera },
+      });
+    }
+    throw new Error('Camera frame detected as invalid.');
   }
 
   public withBoundingBox(
@@ -225,14 +227,8 @@ export abstract class Camera {
     paramsOrQuery: FlyToParams | ((q: FlyToExecutor) => TerminalFlyToExecutor),
   ): Camera {
     if (typeof paramsOrQuery !== 'function') {
-      // try {
-      console.log('new PMI cam or query!', paramsOrQuery);
       const flyToType = this.buildFlyToType(paramsOrQuery);
       return this.updateFlyToOptions({ flyTo: flyToType });
-      // } catch (e) {
-      //   console.error('camera position invalid', e);
-      //   return this;
-      // }
     } else {
       return this.updateFlyToOptions(
         paramsOrQuery(new FlyToExecutor()).build(),
@@ -713,9 +709,6 @@ export class PerspectiveCamera
   protected updateFlyToOptions(
     flyToOptions?: FlyTo.FlyToOptions,
   ): PerspectiveCamera {
-    if (!flyToOptions) {
-      console.log('nothing to see?', this);
-    }
     return new PerspectiveCamera(
       this.stream,
       this.aspect,
@@ -899,10 +892,6 @@ export class OrthographicCamera
   protected updateFlyToOptions(
     flyToOptions?: FlyTo.FlyToOptions,
   ): OrthographicCamera {
-    if (!flyToOptions) {
-      console.log('nowhere to fly?', this);
-      return this;
-    }
     return new OrthographicCamera(
       this.stream,
       this.aspect,

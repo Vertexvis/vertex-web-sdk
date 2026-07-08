@@ -431,41 +431,23 @@ describe(PerspectiveCamera, () => {
       );
     });
 
-    it('does not fly to an invalid camera param', async () => {
+    it('should throw when flyTo an invalid camera param', async () => {
       const data = FrameCamera.createPerspective({
         position: Vector3.create(1, 2, Infinity),
       });
 
-      await camera.flyTo({ camera: data }).render();
-
-      expect(stream.flyTo).not.toHaveBeenCalled();
-      expect(stream.replaceCamera).toHaveBeenCalledWith(
-        expect.objectContaining({
-          camera: expect.objectContaining({
-            perspective: expect.objectContaining({
-              position: Vector3.forward(),
-            }),
-          }),
-        }),
+      expect(() => camera.flyTo({ camera: data })).toThrow(
+        'Camera frame detected as invalid.',
       );
     });
 
-    it('does not fly to an invalid camera from the query builder', async () => {
+    it('should throw if flyTo an invalid camera from the query builder', async () => {
       const data = FrameCamera.createPerspective({
         position: Vector3.create(1, 2, Infinity),
       });
 
-      await camera.flyTo((q) => q.withCamera(data)).render();
-
-      expect(stream.flyTo).not.toHaveBeenCalled();
-      expect(stream.replaceCamera).toHaveBeenCalledWith(
-        expect.objectContaining({
-          camera: expect.objectContaining({
-            perspective: expect.objectContaining({
-              position: Vector3.forward(),
-            }),
-          }),
-        }),
+      expect(() => camera.flyTo((q) => q.withCamera(data))).toThrow(
+        'Camera frame detected as invalid.',
       );
     });
 
@@ -945,18 +927,17 @@ describe(OrthographicCamera, () => {
       );
     });
 
-    it('does not fly to an invalid camera param', async () => {
+    it('should throw if flyTo an invalid camera param', async () => {
       const data = FrameCamera.createOrthographic({
         viewVector: Vector3.create(1, 2, Infinity),
       });
 
-      await camera.flyTo({ camera: data }).render();
-
-      expect(stream.flyTo).not.toHaveBeenCalled();
-      expect(stream.replaceCamera).not.toHaveBeenCalled();
+      expect(() => camera.flyTo({ camera: data })).toThrow(
+        'Camera frame detected as invalid.',
+      );
     });
 
-    it('Throws if try to flyTo an empty orthographic model view camera', async () => {
+    it('should throw if try to flyTo an empty orthographic model view camera', async () => {
       const data = FrameCamera.createOrthographic({
         fovHeight: 0,
         lookAt: Vector3.origin(),
@@ -964,28 +945,18 @@ describe(OrthographicCamera, () => {
         viewVector: Vector3.origin(),
       });
 
-      await camera.flyTo({ camera: data }).render();
-
-      expect(stream.flyTo).not.toHaveBeenCalled();
-      expect(stream.replaceCamera).not.toHaveBeenCalled();
+      expect(() => camera.flyTo({ camera: data })).toThrow(
+        'Camera frame detected as invalid.',
+      );
     });
 
-    it('does not fly to an invalid camera from the query builder', async () => {
+    it('should throw if flyTo an invalid camera from the query builder', async () => {
       const data = FrameCamera.createOrthographic({
         viewVector: Vector3.create(1, 2, Infinity),
       });
 
-      await camera.flyTo((q) => q.withCamera(data)).render();
-
-      expect(stream.flyTo).not.toHaveBeenCalled();
-      expect(stream.replaceCamera).toHaveBeenCalledWith(
-        expect.objectContaining({
-          camera: expect.objectContaining({
-            orthographic: expect.objectContaining({
-              viewVector: Vector3.forward(),
-            }),
-          }),
-        }),
+      expect(() => camera.flyTo((q) => q.withCamera(data))).toThrow(
+        'Camera frame detected as invalid.',
       );
     });
 
