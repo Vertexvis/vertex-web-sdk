@@ -30,14 +30,14 @@ export function isValidFrameCamera(camera: Partial<FrameCamera>): boolean {
     const lookAtValid = isValidVector(camera.lookAt);
     const positionValid = isValidVector(camera.position);
     const upValid = isValidNonZeroVector(camera.up);
-    const viewVectorValid =
+    return (
       lookAtValid &&
       positionValid &&
+      upValid &&
       Vector3.magnitudeSquared(
         Vector3.subtract(camera.lookAt, camera.position),
-      ) > 0;
-
-    return lookAtValid && positionValid && upValid && viewVectorValid;
+      ) > 0
+    );
   } else {
     const asOrthographic = camera as OrthographicFrameCamera;
 
@@ -58,9 +58,7 @@ function isValidVector(vector?: Vector3.Vector3): boolean {
 // Zero could be valid, but usually represents a missing value, and will end up pointing the camera at nothing.
 function isValidNonZeroVector(vector?: Vector3.Vector3): boolean {
   return (
-    vector != null &&
-    Vector3.isValid(vector) &&
-    Vector3.magnitudeSquared(vector) > 0
+    vector != null && Vector3.isValid(vector) && !Vector3.isAllZero(vector)
   );
 }
 

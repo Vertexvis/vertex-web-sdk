@@ -47,6 +47,14 @@ describe(FrameCamera.isValidFrameCamera, () => {
     expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(false);
   });
 
+  it('returns true for a perspective camera with an axis-aligned up vector', () => {
+    const perspective = FrameCamera.createPerspective({
+      up: Vector3.up(),
+    });
+
+    expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(true);
+  });
+
   it('returns false for a perspective camera with a zero view vector', () => {
     const perspective = FrameCamera.createPerspective({
       position: Vector3.origin(),
@@ -86,6 +94,15 @@ describe(FrameCamera.isValidFrameCamera, () => {
     expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(false);
   });
 
+  it('returns true for an orthographic camera with axis-aligned view and up vectors', () => {
+    const orthographic = FrameCamera.createOrthographic({
+      viewVector: Vector3.back(),
+      up: Vector3.up(),
+    });
+
+    expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(true);
+  });
+
   it('returns false for an orthographic camera with zero fov height', () => {
     const orthographic = FrameCamera.createOrthographic({
       fovHeight: 0,
@@ -103,5 +120,13 @@ describe(FrameCamera.isValidFrameCamera, () => {
     });
 
     expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(false);
+  });
+
+  it('returns false for a partial camera with missing vector fields', () => {
+    expect(
+      FrameCamera.isValidFrameCamera({
+        position: Vector3.create(1, 2, 3),
+      }),
+    ).toEqual(false);
   });
 });

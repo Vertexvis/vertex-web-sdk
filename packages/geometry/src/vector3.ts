@@ -64,6 +64,10 @@ export function isValid({ x, y, z }: Vector3): boolean {
   return [x, y, z].every((v) => isFinite(v) && !isNaN(v));
 }
 
+export function isAllZero({ x, y, z }: Vector3): boolean {
+  return [x, y, z].every((v) => v === 0);
+}
+
 /**
  * Returns a vector representing the scale elements of `matrix`.
  */
