@@ -254,7 +254,7 @@ describe(Vector3.multiplyByTransformMatrixRowMajor, () => {
     /* eslint-enable prettier/prettier */
     const transformed = Vector3.multiplyByTransformMatrixRowMajor(
       Vector3.create(2, 2, 2),
-      values
+      values,
     );
     expect(transformed).toEqual(Vector3.create(5, 3, 2));
   });

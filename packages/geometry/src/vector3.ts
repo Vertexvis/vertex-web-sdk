@@ -296,13 +296,13 @@ export function eulerTo(a: Vector3, b: Vector3): Euler.Euler {
     Quaternion.create({
       w: 1 + dotAB,
       ...cross(normalizedA, normalizedB),
-    })
+    }),
   );
 
   return Euler.fromRotationMatrix(
     Matrix4.makeRotation(normalizedQ),
     'xyz',
-    false
+    false,
   );
 }
 
@@ -337,7 +337,7 @@ export function rotateAboutAxis(
   angle: number,
   point: Vector3,
   axisDirection: Vector3,
-  axisPosition: Vector3
+  axisPosition: Vector3,
 ): Vector3 {
   if (angle !== 0) {
     const { x, y, z } = point;
@@ -373,7 +373,7 @@ export function rotateAboutAxis(
  */
 export function multiplyByTransformMatrixColumnMajor(
   vector: Vector3,
-  m: Matrix4.Matrix4
+  m: Matrix4.Matrix4,
 ): Vector3 {
   const { x, y, z } = vector;
   const w = 1 / (m[3] * x + m[7] * y + m[11] * z + m[15]);
@@ -389,7 +389,7 @@ export function multiplyByTransformMatrixColumnMajor(
  */
 export function multiplyByTransformMatrixRowMajor(
   vector: Vector3,
-  m: Matrix4.Matrix4
+  m: Matrix4.Matrix4,
 ): Vector3 {
   const { x, y, z } = vector;
   const w = 1 / (m[12] * x + m[13] * y + m[14] * z + m[15]);
@@ -472,10 +472,10 @@ export function lerp(a: Vector3, b: Vector3, t: number): Vector3 {
 export function transformNdcToWorldSpace(
   ndc: Vector3,
   worldMatrix: Matrix4.Matrix4,
-  projectionMatrixInverse: Matrix4.Matrix4
+  projectionMatrixInverse: Matrix4.Matrix4,
 ): Vector3 {
   return multiplyByTransformMatrixColumnMajor(
     multiplyByTransformMatrixColumnMajor(ndc, projectionMatrixInverse),
-    worldMatrix
+    worldMatrix,
   );
 }

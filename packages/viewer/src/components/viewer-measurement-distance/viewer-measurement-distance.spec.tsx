@@ -44,11 +44,11 @@ describe('vertex-viewer-measurement-distance', () => {
 
   const startNdc = Vector3.multiplyByTransformMatrixColumnMajor(
     start,
-    projectionViewMatrix
+    projectionViewMatrix,
   );
   const endNdc = Vector3.multiplyByTransformMatrixColumnMajor(
     end,
-    projectionViewMatrix
+    projectionViewMatrix,
   );
 
   const depthBuffer = Fixtures.makeDepthBuffer(100, 100, 0);
@@ -200,11 +200,11 @@ describe('vertex-viewer-measurement-distance', () => {
 
     const newStartNdc = Vector3.multiplyByTransformMatrixColumnMajor(
       newStart,
-      projectionViewMatrix
+      projectionViewMatrix,
     );
     const newEndNdc = Vector3.multiplyByTransformMatrixColumnMajor(
       newEnd,
-      projectionViewMatrix
+      projectionViewMatrix,
     );
     const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
     measurement.start = newStart;

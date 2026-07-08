@@ -17,7 +17,7 @@ export class TransformController {
   }
 
   public async beginTransform(
-    delta: Matrix4.Matrix4 = Matrix4.makeIdentity()
+    delta: Matrix4.Matrix4 = Matrix4.makeIdentity(),
   ): Promise<void> {
     this.clearEndInteractionTimeout();
 
@@ -31,12 +31,15 @@ export class TransformController {
         transform: {
           delta: this.toDeltaTransform(delta),
         },
+        transformMatrixCorrected: {
+          value: true,
+        },
       });
     }
   }
 
   public async updateTransformController(
-    delta: Matrix4.Matrix4
+    delta: Matrix4.Matrix4,
   ): Promise<void> {
     this.currentDelta = delta;
 
@@ -59,7 +62,7 @@ export class TransformController {
 
   public async endTransformDebounced(
     startCallback?: VoidFunction,
-    endCallback?: VoidFunction
+    endCallback?: VoidFunction,
   ): Promise<void> {
     if (this.isTransforming) {
       this.restartEndInteractionTimeout(startCallback, endCallback);
@@ -102,6 +105,9 @@ export class TransformController {
       transform: {
         delta: this.toDeltaTransform(this.currentDelta),
       },
+      transformMatrixCorrected: {
+        value: true,
+      },
     });
     this.isTransforming = false;
     this.currentDelta = Matrix4.makeIdentity();
@@ -109,7 +115,7 @@ export class TransformController {
 
   private restartEndInteractionTimeout(
     startCallback?: VoidFunction,
-    endCallback?: VoidFunction
+    endCallback?: VoidFunction,
   ): void {
     this.clearEndInteractionTimeout();
 
@@ -128,7 +134,7 @@ export class TransformController {
   }
 
   private toDeltaTransform(
-    delta: Matrix4.Matrix4
+    delta: Matrix4.Matrix4,
   ): vertexvis.protobuf.core.IAffineMatrix4f {
     const asObject = Matrix4.toObjectColumnMajor(delta);
 

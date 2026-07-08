@@ -261,7 +261,7 @@ export class ViewerPinGroup {
   ): Point.Point {
     const ndcPt = Vector3.multiplyByTransformMatrixColumnMajor(
       pt,
-      projectionViewMatrix
+      projectionViewMatrix,
     );
     return Viewport.fromDimensions(dimensions).transformVectorToViewport(ndcPt);
   }

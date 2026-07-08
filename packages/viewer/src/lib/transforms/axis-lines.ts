@@ -7,7 +7,7 @@ import { TriangleMesh } from './mesh';
 export function axisPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
-  arrowMesh: TriangleMesh
+  arrowMesh: TriangleMesh,
 ): AxisLinePoints {
   const position = Vector3.fromMatrixPosition(widgetTransform);
   return new AxisLinePoints(
@@ -16,9 +16,9 @@ export function axisPositions(
     arrowMesh.points.worldBase,
     Vector3.multiplyByTransformMatrixColumnMajor(
       position,
-      camera.projectionViewMatrix
+      camera.projectionViewMatrix,
     ),
-    arrowMesh.points.base
+    arrowMesh.points.base,
   );
 }
 
@@ -26,16 +26,16 @@ export function rotationAxisPositions(
   camera: FrameCameraBase,
   rotationMesh?: TriangleMesh,
   towardPoint?: Vector3.Vector3,
-  triangleSize = 3
+  triangleSize = 3,
 ): RotationLinePoints | undefined {
   if (rotationMesh != null && towardPoint != null) {
     const baseDistance = Vector3.distance(
       rotationMesh.points.worldBase,
-      towardPoint
+      towardPoint,
     );
     const tipDistance = Vector3.distance(
       rotationMesh.points.worldTip,
-      towardPoint
+      towardPoint,
     );
 
     const origin =
@@ -49,8 +49,8 @@ export function rotationAxisPositions(
       direction: Vector3.normalize(
         Vector3.subtract(
           rotationMesh.points.worldRight,
-          rotationMesh.points.worldLeft
-        )
+          rotationMesh.points.worldLeft,
+        ),
       ),
     });
 
@@ -59,8 +59,8 @@ export function rotationAxisPositions(
         origin,
         Ray.at(centerPointRay, triangleSize * 2),
         towardPoint,
-        v
-      )
+        v,
+      ),
     );
 
     return new RotationLinePoints(
@@ -69,9 +69,9 @@ export function rotationAxisPositions(
       worldPoints.map((p) =>
         Vector3.multiplyByTransformMatrixColumnMajor(
           p,
-          camera.projectionViewMatrix
-        )
-      )
+          camera.projectionViewMatrix,
+        ),
+      ),
     );
   }
   return undefined;
@@ -81,7 +81,7 @@ function computeQuadraticBezierCurvePoint(
   start: Vector3.Vector3,
   control: Vector3.Vector3,
   end: Vector3.Vector3,
-  distance: number
+  distance: number,
 ): Vector3.Vector3 {
   const distanceInverse = 1 - distance;
   const startScalar = distanceInverse * distanceInverse;
@@ -91,6 +91,6 @@ function computeQuadraticBezierCurvePoint(
   return Vector3.create(
     startScalar * start.x + controlScalar * control.x + endScalar * end.x,
     startScalar * start.y + controlScalar * control.y + endScalar * end.y,
-    startScalar * start.z + controlScalar * control.z + endScalar * end.z
+    startScalar * start.z + controlScalar * control.z + endScalar * end.z,
   );
 }

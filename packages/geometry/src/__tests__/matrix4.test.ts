@@ -109,7 +109,7 @@ describe(Matrix4.makePerspective, () => {
 describe(Matrix4.makeOrthographic, () => {
   it('returns projection matrix for uniform horizontal and vertical clipping planes', () => {
     const m = Matrix4.toObjectColumnMajor(
-      Matrix4.makeOrthographic(-2, 2, -2, 2, 0, 10)
+      Matrix4.makeOrthographic(-2, 2, -2, 2, 0, 10),
     );
 
     expect(m.m11).toBeCloseTo(0.5);
@@ -123,7 +123,7 @@ describe(Matrix4.makeOrthographic, () => {
 
   it('returns projection matrix for non-uniform horizontal and vertical clipping planes', () => {
     const m = Matrix4.toObjectColumnMajor(
-      Matrix4.makeOrthographic(-8, 2, -8, 2, 0, 10)
+      Matrix4.makeOrthographic(-8, 2, -8, 2, 0, 10),
     );
 
     expect(m.m11).toBeCloseTo(0.2);
@@ -141,7 +141,7 @@ describe(Matrix4.makeLookAtView, () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
     const m = Matrix4.toObjectColumnMajor(
-      Matrix4.makeLookAtView(camera.position, camera.lookAt, camera.up)
+      Matrix4.makeLookAtView(camera.position, camera.lookAt, camera.up),
     );
 
     expect(m.m11).toBe(1);
@@ -159,7 +159,7 @@ describe(Matrix4.makeLookAt, () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
     const m = Matrix4.toObjectColumnMajor(
-      Matrix4.makeLookAt(camera.position, camera.lookAt, camera.up)
+      Matrix4.makeLookAt(camera.position, camera.lookAt, camera.up),
     );
 
     expect(m.m11).toBe(1);
@@ -225,7 +225,7 @@ describe(Matrix4.lookAt, () => {
       i,
       Vector3.origin(),
       Vector3.right(),
-      Vector3.up()
+      Vector3.up(),
     );
     const r = Euler.fromRotationMatrix(m);
 

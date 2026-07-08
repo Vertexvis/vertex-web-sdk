@@ -86,15 +86,15 @@ function updateElement(
   } else {
     const originalViewMatrixAsColumnMajor = camera.viewMatrix;
     const originalViewMatrixAsRowMajor = Matrix4.transpose(
-      originalViewMatrixAsColumnMajor
+      originalViewMatrixAsColumnMajor,
     );
     const viewMatrixWithUpdatedPosition = Matrix4.position(
       originalViewMatrixAsRowMajor,
-      worldMatrix
+      worldMatrix,
     );
     const viewMatrixWithUpdatedPositionAndScale = Matrix4.scale(
       viewMatrixWithUpdatedPosition,
-      element.scale
+      element.scale,
     );
 
     viewMatrixWithUpdatedPositionAndScale[3] = 0;
@@ -103,7 +103,7 @@ function updateElement(
     viewMatrixWithUpdatedPositionAndScale[15] = 1;
 
     element.style.transform = getElementCssMatrix(
-      viewMatrixWithUpdatedPositionAndScale
+      viewMatrixWithUpdatedPositionAndScale,
     );
   }
 

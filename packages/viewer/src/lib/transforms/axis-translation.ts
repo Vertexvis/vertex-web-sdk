@@ -7,14 +7,14 @@ export function xAxisArrowPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3,
-  sizeScalar = 1
+  sizeScalar = 1,
 ): TriangleMeshPoints {
   return computeArrowNdcValues(
     widgetTransform,
     camera,
     Vector3.right(),
     triangleSize,
-    sizeScalar
+    sizeScalar,
   );
 }
 
@@ -22,14 +22,14 @@ export function yAxisArrowPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3,
-  sizeScalar = 1
+  sizeScalar = 1,
 ): TriangleMeshPoints {
   return computeArrowNdcValues(
     widgetTransform,
     camera,
     Vector3.up(),
     triangleSize,
-    sizeScalar
+    sizeScalar,
   );
 }
 
@@ -37,14 +37,14 @@ export function zAxisArrowPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3,
-  sizeScalar = 1
+  sizeScalar = 1,
 ): TriangleMeshPoints {
   return computeArrowNdcValues(
     widgetTransform,
     camera,
     Vector3.back(),
     triangleSize,
-    sizeScalar
+    sizeScalar,
   );
 }
 
@@ -53,21 +53,21 @@ export function computeArrowNdcValues(
   camera: FrameCameraBase,
   direction: Vector3.Vector3,
   triangleSize: number,
-  sizeScalar = 1
+  sizeScalar = 1,
 ): TriangleMeshPoints {
   const transformedDirection = Vector3.multiplyByTransformMatrixRowMajor(
     direction,
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform)),
   );
 
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(
     basePosition,
-    Vector3.scale(triangleSize * 9, transformedDirection)
+    Vector3.scale(triangleSize * 9, transformedDirection),
   );
 
   const worldX = Vector3.normalize(
-    Vector3.cross(transformedDirection, Vector3.normalize(camera.viewVector))
+    Vector3.cross(transformedDirection, Vector3.normalize(camera.viewVector)),
   );
   const xRay = Ray.create({
     origin: position,
@@ -90,20 +90,20 @@ export function computeArrowNdcValues(
     up,
     Vector3.multiplyByTransformMatrixColumnMajor(
       position,
-      camera.projectionViewMatrix
+      camera.projectionViewMatrix,
     ),
     Vector3.multiplyByTransformMatrixColumnMajor(
       left,
-      camera.projectionViewMatrix
+      camera.projectionViewMatrix,
     ),
     Vector3.multiplyByTransformMatrixColumnMajor(
       right,
-      camera.projectionViewMatrix
+      camera.projectionViewMatrix,
     ),
     Vector3.multiplyByTransformMatrixColumnMajor(
       up,
-      camera.projectionViewMatrix
-    )
+      camera.projectionViewMatrix,
+    ),
   );
 }
 
@@ -111,7 +111,7 @@ export function xyAxisTranslationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3,
-  rotationSizeScalar = 1
+  rotationSizeScalar = 1,
 ): TriangleMeshPoints {
   return computeTwoAxisTranslationNdcValues(
     widgetTransform,
@@ -119,7 +119,7 @@ export function xyAxisTranslationPositions(
     Vector3.right(),
     Vector3.up(),
     triangleSize,
-    rotationSizeScalar
+    rotationSizeScalar,
   );
 }
 
@@ -127,7 +127,7 @@ export function xzAxisTranslationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3,
-  rotationSizeScalar = 1
+  rotationSizeScalar = 1,
 ): TriangleMeshPoints {
   return computeTwoAxisTranslationNdcValues(
     widgetTransform,
@@ -135,7 +135,7 @@ export function xzAxisTranslationPositions(
     Vector3.right(),
     Vector3.back(),
     triangleSize,
-    rotationSizeScalar
+    rotationSizeScalar,
   );
 }
 
@@ -143,7 +143,7 @@ export function yzAxisTranslationPositions(
   widgetTransform: Matrix4.Matrix4,
   camera: FrameCameraBase,
   triangleSize = 3,
-  rotationSizeScalar = 1
+  rotationSizeScalar = 1,
 ): TriangleMeshPoints {
   return computeTwoAxisTranslationNdcValues(
     widgetTransform,
@@ -151,7 +151,7 @@ export function yzAxisTranslationPositions(
     Vector3.back(),
     Vector3.up(),
     triangleSize,
-    rotationSizeScalar
+    rotationSizeScalar,
   );
 }
 
@@ -161,25 +161,25 @@ function computeTwoAxisTranslationNdcValues(
   xDirection: Vector3.Vector3,
   yDirection: Vector3.Vector3,
   triangleSize: number,
-  rotationSizeScalar = 1
+  rotationSizeScalar = 1,
 ): TriangleMeshPoints {
   const transformedDirection = Vector3.multiplyByTransformMatrixRowMajor(
     Vector3.add(xDirection, yDirection),
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform)),
   );
   const transformedX = Vector3.multiplyByTransformMatrixRowMajor(
     xDirection,
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform)),
   );
   const transformedY = Vector3.multiplyByTransformMatrixRowMajor(
     yDirection,
-    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform))
+    Matrix4.makeRotation(Quaternion.fromMatrixRotation(widgetTransform)),
   );
 
   const basePosition = Vector3.fromMatrixPosition(widgetTransform);
   const position = Vector3.add(
     basePosition,
-    Vector3.scale(triangleSize * 2.5, transformedDirection)
+    Vector3.scale(triangleSize * 2.5, transformedDirection),
   );
 
   const xRay = Ray.create({
@@ -196,25 +196,25 @@ function computeTwoAxisTranslationNdcValues(
     Angle.toRadians(45),
     Ray.at(yRay, -(triangleSize * rotationSizeScalar)),
     rotationAxis,
-    position
+    position,
   );
   const right = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(xRay, triangleSize * rotationSizeScalar),
     rotationAxis,
-    position
+    position,
   );
   const up = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(yRay, triangleSize * rotationSizeScalar),
     rotationAxis,
-    position
+    position,
   );
   const left = Vector3.rotateAboutAxis(
     Angle.toRadians(45),
     Ray.at(xRay, -(triangleSize * rotationSizeScalar)),
     rotationAxis,
-    position
+    position,
   );
 
   return new TriangleMeshPoints(
@@ -226,19 +226,19 @@ function computeTwoAxisTranslationNdcValues(
     up,
     Vector3.multiplyByTransformMatrixColumnMajor(
       base,
-      camera.projectionViewMatrix
+      camera.projectionViewMatrix,
     ),
     Vector3.multiplyByTransformMatrixColumnMajor(
       left,
-      camera.projectionViewMatrix
+      camera.projectionViewMatrix,
     ),
     Vector3.multiplyByTransformMatrixColumnMajor(
       right,
-      camera.projectionViewMatrix
+      camera.projectionViewMatrix,
     ),
     Vector3.multiplyByTransformMatrixColumnMajor(
       up,
-      camera.projectionViewMatrix
-    )
+      camera.projectionViewMatrix,
+    ),
   );
 }

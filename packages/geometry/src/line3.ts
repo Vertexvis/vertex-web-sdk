@@ -47,7 +47,7 @@ export function center(line: Line3): Vector3.Vector3 {
 export function transformMatrix(line: Line3, matrix: Matrix4.Matrix4): Line3 {
   const start = Vector3.multiplyByTransformMatrixColumnMajor(
     line.start,
-    matrix
+    matrix,
   );
   const end = Vector3.multiplyByTransformMatrixColumnMajor(line.end, matrix);
   return { start, end };

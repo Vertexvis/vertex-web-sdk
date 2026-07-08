@@ -234,7 +234,7 @@ export class StandardView {
   public transformMatrix(matrix: Matrix4.Matrix4): StandardView {
     const newPosition = Vector3.multiplyByTransformMatrixColumnMajor(
       this.position,
-      matrix
+      matrix,
     );
     const newUp = Vector3.multiplyByTransformMatrixColumnMajor(this.up, matrix);
     return new StandardView(newPosition, newUp);

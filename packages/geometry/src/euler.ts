@@ -66,7 +66,7 @@ export function fromDegrees(value: Partial<Euler> = {}): Euler {
 export function fromRotationMatrix(
   matrix: Matrix4.Matrix4,
   order: EulerOrder = 'xyz',
-  matrixIsColumnMajor = true
+  matrixIsColumnMajor = true,
 ): Euler {
   const m = matrixIsColumnMajor
     ? Matrix4.toObjectColumnMajor(matrix)

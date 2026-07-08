@@ -116,7 +116,7 @@ function getScreenPosition(
 ): Point.Point {
   const ndcPt = Vector3.multiplyByTransformMatrixColumnMajor(
     pt,
-    projectionViewMatrix
+    projectionViewMatrix,
   );
   return viewport.transformVectorToViewport(ndcPt);
 }
