@@ -39,6 +39,23 @@ describe(FrameCamera.isValidFrameCamera, () => {
     expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(false);
   });
 
+  it('returns false for a perspective camera with a zero up vector', () => {
+    const perspective = FrameCamera.createPerspective({
+      up: Vector3.origin(),
+    });
+
+    expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(false);
+  });
+
+  it('returns false for a perspective camera with a zero view vector', () => {
+    const perspective = FrameCamera.createPerspective({
+      position: Vector3.origin(),
+      lookAt: Vector3.origin(),
+    });
+
+    expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(false);
+  });
+
   it('returns true for a valid orthographic camera', () => {
     const orthographic = FrameCamera.createOrthographic();
     expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(true);
@@ -51,5 +68,40 @@ describe(FrameCamera.isValidFrameCamera, () => {
       viewVector: invalidViewVector,
     });
     expect(FrameCamera.isValidFrameCamera(perspective)).toEqual(false);
+  });
+
+  it('returns false for an orthographic camera with a zero view vector', () => {
+    const orthographic = FrameCamera.createOrthographic({
+      viewVector: Vector3.origin(),
+    });
+
+    expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(false);
+  });
+
+  it('returns false for an orthographic camera with a zero up vector', () => {
+    const orthographic = FrameCamera.createOrthographic({
+      up: Vector3.origin(),
+    });
+
+    expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(false);
+  });
+
+  it('returns false for an orthographic camera with zero fov height', () => {
+    const orthographic = FrameCamera.createOrthographic({
+      fovHeight: 0,
+    });
+
+    expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(false);
+  });
+
+  it('returns false for an empty orthographic model view camera', () => {
+    const orthographic = FrameCamera.createOrthographic({
+      fovHeight: 0,
+      lookAt: Vector3.origin(),
+      up: Vector3.origin(),
+      viewVector: Vector3.origin(),
+    });
+
+    expect(FrameCamera.isValidFrameCamera(orthographic)).toEqual(false);
   });
 });

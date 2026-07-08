@@ -431,6 +431,44 @@ describe(PerspectiveCamera, () => {
       );
     });
 
+    it('does not fly to an invalid camera param', async () => {
+      const data = FrameCamera.createPerspective({
+        position: Vector3.create(1, 2, Infinity),
+      });
+
+      await camera.flyTo({ camera: data }).render();
+
+      expect(stream.flyTo).not.toHaveBeenCalled();
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            perspective: expect.objectContaining({
+              position: Vector3.forward(),
+            }),
+          }),
+        }),
+      );
+    });
+
+    it('does not fly to an invalid camera from the query builder', async () => {
+      const data = FrameCamera.createPerspective({
+        position: Vector3.create(1, 2, Infinity),
+      });
+
+      await camera.flyTo((q) => q.withCamera(data)).render();
+
+      expect(stream.flyTo).not.toHaveBeenCalled();
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            perspective: expect.objectContaining({
+              position: Vector3.forward(),
+            }),
+          }),
+        }),
+      );
+    });
+
     it('should go to the visible bounding box on a viewAll', async () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(1, 1, 1),
@@ -904,6 +942,50 @@ describe(OrthographicCamera, () => {
           camera: FrameCamera.toProtobuf(data),
         }),
         true,
+      );
+    });
+
+    it('does not fly to an invalid camera param', async () => {
+      const data = FrameCamera.createOrthographic({
+        viewVector: Vector3.create(1, 2, Infinity),
+      });
+
+      await camera.flyTo({ camera: data }).render();
+
+      expect(stream.flyTo).not.toHaveBeenCalled();
+      expect(stream.replaceCamera).not.toHaveBeenCalled();
+    });
+
+    it('Throws if try to flyTo an empty orthographic model view camera', async () => {
+      const data = FrameCamera.createOrthographic({
+        fovHeight: 0,
+        lookAt: Vector3.origin(),
+        up: Vector3.origin(),
+        viewVector: Vector3.origin(),
+      });
+
+      await camera.flyTo({ camera: data }).render();
+
+      expect(stream.flyTo).not.toHaveBeenCalled();
+      expect(stream.replaceCamera).not.toHaveBeenCalled();
+    });
+
+    it('does not fly to an invalid camera from the query builder', async () => {
+      const data = FrameCamera.createOrthographic({
+        viewVector: Vector3.create(1, 2, Infinity),
+      });
+
+      await camera.flyTo((q) => q.withCamera(data)).render();
+
+      expect(stream.flyTo).not.toHaveBeenCalled();
+      expect(stream.replaceCamera).toHaveBeenCalledWith(
+        expect.objectContaining({
+          camera: expect.objectContaining({
+            orthographic: expect.objectContaining({
+              viewVector: Vector3.forward(),
+            }),
+          }),
+        }),
       );
     });
 

@@ -27,21 +27,41 @@ export type FrameCamera = PerspectiveFrameCamera | OrthographicFrameCamera;
 
 export function isValidFrameCamera(camera: Partial<FrameCamera>): boolean {
   if (isPerspectiveFrameCamera(camera)) {
-    const lookAtValid = Vector3.isValid(camera.lookAt);
-    const positionValid = Vector3.isValid(camera.position);
-    const upValid = Vector3.isValid(camera.up);
+    const lookAtValid = isValidVector(camera.lookAt);
+    const positionValid = isValidVector(camera.position);
+    const upValid = isValidNonZeroVector(camera.up);
+    const viewVectorValid =
+      lookAtValid &&
+      positionValid &&
+      Vector3.magnitudeSquared(
+        Vector3.subtract(camera.lookAt, camera.position),
+      ) > 0;
 
-    return lookAtValid && positionValid && upValid;
+    return lookAtValid && positionValid && upValid && viewVectorValid;
   } else {
     const asOrthographic = camera as OrthographicFrameCamera;
 
-    const viewVectorValid = Vector3.isValid(asOrthographic.viewVector);
-    const lookAtValid = Vector3.isValid(asOrthographic.lookAt);
-    const upValid = Vector3.isValid(asOrthographic.up);
-    const fovHeightValid = Number.isFinite(asOrthographic.fovHeight);
+    const viewVectorValid = isValidNonZeroVector(asOrthographic.viewVector);
+    const lookAtValid = isValidVector(asOrthographic.lookAt);
+    const upValid = isValidNonZeroVector(asOrthographic.up);
+    const fovHeightValid =
+      Number.isFinite(asOrthographic.fovHeight) && asOrthographic.fovHeight > 0;
 
     return viewVectorValid && lookAtValid && upValid && fovHeightValid;
   }
+}
+
+function isValidVector(vector?: Vector3.Vector3): boolean {
+  return vector != null && Vector3.isValid(vector);
+}
+
+// Zero could be valid, but usually represents a missing value, and will end up pointing the camera at nothing.
+function isValidNonZeroVector(vector?: Vector3.Vector3): boolean {
+  return (
+    vector != null &&
+    Vector3.isValid(vector) &&
+    Vector3.magnitudeSquared(vector) > 0
+  );
 }
 
 export function isPerspectiveFrameCamera(

@@ -26,7 +26,10 @@ import {
   FramePerspectiveCamera,
   StandardView,
 } from '../types';
-import { withPositionAndViewVector } from '../types/frameCamera';
+import {
+  isValidFrameCamera,
+  withPositionAndViewVector,
+} from '../types/frameCamera';
 import { CameraRenderResult } from './cameraRenderResult';
 import { buildFlyToOperation } from './mapper';
 import ISceneItemQueryExpression = vertexvis.protobuf.stream.ISceneItemQueryExpression;
@@ -66,12 +69,10 @@ export class FlyToExecutor {
   }
 
   public withCamera(camera: FrameCamera.FrameCamera): TerminalFlyToExecutor {
-    return new TerminalFlyToExecutor({
-      flyTo: {
-        type: 'camera',
-        data: camera,
-      },
-    });
+    const flyTo = isValidFrameCamera(camera)
+      ? ({ flyTo: { type: 'camera', data: camera } } as FlyTo.FlyToOptions)
+      : undefined;
+    return new TerminalFlyToExecutor(flyTo);
   }
 
   public withBoundingBox(
@@ -224,9 +225,14 @@ export abstract class Camera {
     paramsOrQuery: FlyToParams | ((q: FlyToExecutor) => TerminalFlyToExecutor),
   ): Camera {
     if (typeof paramsOrQuery !== 'function') {
-      return this.updateFlyToOptions({
-        flyTo: this.buildFlyToType(paramsOrQuery),
-      });
+      // try {
+      console.log('new PMI cam or query!', paramsOrQuery);
+      const flyToType = this.buildFlyToType(paramsOrQuery);
+      return this.updateFlyToOptions({ flyTo: flyToType });
+      // } catch (e) {
+      //   console.error('camera position invalid', e);
+      //   return this;
+      // }
     } else {
       return this.updateFlyToOptions(
         paramsOrQuery(new FlyToExecutor()).build(),
@@ -438,7 +444,11 @@ export abstract class Camera {
     if (options.boundingBox != null) {
       return { type: 'bounding-box', data: options.boundingBox };
     } else if (options.camera != null) {
-      return { type: 'camera', data: options.camera };
+      if (isValidFrameCamera(options.camera)) {
+        return { type: 'camera', data: options.camera };
+      }
+      console.error('camera detected as invalid', options.camera);
+      throw new Error('Camera frame detected as invalid.');
     } else if (options.itemId != null) {
       return { type: 'internal', data: options.itemId };
     } else if (options.itemSuppliedId != null) {
@@ -703,6 +713,9 @@ export class PerspectiveCamera
   protected updateFlyToOptions(
     flyToOptions?: FlyTo.FlyToOptions,
   ): PerspectiveCamera {
+    if (!flyToOptions) {
+      console.log('nothing to see?', this);
+    }
     return new PerspectiveCamera(
       this.stream,
       this.aspect,
@@ -886,6 +899,10 @@ export class OrthographicCamera
   protected updateFlyToOptions(
     flyToOptions?: FlyTo.FlyToOptions,
   ): OrthographicCamera {
+    if (!flyToOptions) {
+      console.log('nowhere to fly?', this);
+      return this;
+    }
     return new OrthographicCamera(
       this.stream,
       this.aspect,
