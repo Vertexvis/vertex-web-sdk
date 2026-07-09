@@ -26,10 +26,7 @@ import {
   FramePerspectiveCamera,
   StandardView,
 } from '../types';
-import {
-  isValidFrameCamera,
-  withPositionAndViewVector,
-} from '../types/frameCamera';
+import { withPositionAndViewVector } from '../types/frameCamera';
 import { CameraRenderResult } from './cameraRenderResult';
 import { buildFlyToOperation } from './mapper';
 import ISceneItemQueryExpression = vertexvis.protobuf.stream.ISceneItemQueryExpression;
@@ -69,12 +66,9 @@ export class FlyToExecutor {
   }
 
   public withCamera(camera: FrameCamera.FrameCamera): TerminalFlyToExecutor {
-    if (isValidFrameCamera(camera)) {
-      return new TerminalFlyToExecutor({
-        flyTo: { type: 'camera', data: camera },
-      });
-    }
-    throw new Error('Camera frame detected as invalid.');
+    return new TerminalFlyToExecutor({
+      flyTo: { type: 'camera', data: camera },
+    });
   }
 
   public withBoundingBox(
@@ -440,11 +434,7 @@ export abstract class Camera {
     if (options.boundingBox != null) {
       return { type: 'bounding-box', data: options.boundingBox };
     } else if (options.camera != null) {
-      if (isValidFrameCamera(options.camera)) {
-        return { type: 'camera', data: options.camera };
-      }
-      console.error('camera detected as invalid', options.camera);
-      throw new Error('Camera frame detected as invalid.');
+      return { type: 'camera', data: options.camera };
     } else if (options.itemId != null) {
       return { type: 'internal', data: options.itemId };
     } else if (options.itemSuppliedId != null) {
