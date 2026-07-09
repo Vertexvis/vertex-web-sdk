@@ -64,7 +64,11 @@ export function isValid({ x, y, z }: Vector3): boolean {
   return [x, y, z].every((v) => isFinite(v) && !isNaN(v));
 }
 
-export function isAllZero({ x, y, z }: Vector3): boolean {
+/**
+ * Checks if every component of the given vector is zero.
+ * Useful for detecting potentially problematic camera vectors, for example.
+ */
+export function isZeroVector({ x, y, z }: Vector3): boolean {
   return [x, y, z].every((v) => v === 0);
 }
 
