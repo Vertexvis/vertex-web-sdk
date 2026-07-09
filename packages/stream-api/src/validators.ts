@@ -76,11 +76,11 @@ function validatePositiveNumber(number: number | null | undefined): boolean {
   return validateNumber(number) && number > 0;
 }
 
-function validateOptionalFovY(number: number | null | undefined): boolean {
-  return (
-    number == null || (validateNumber(number) && number >= 1 && number <= 179)
-  );
+/*
+function validateFovY(number: number | null | undefined): boolean {
+  return validateNumber(number) && number >= 1 && number <= 179;
 }
+*/
 
 export function validatePoint(
   point: vertexvis.protobuf.stream.IPoint | null | undefined,
