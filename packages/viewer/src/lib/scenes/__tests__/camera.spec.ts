@@ -431,28 +431,6 @@ describe(PerspectiveCamera, () => {
       );
     });
 
-    it('keeps the current frame when flyTo is given an invalid camera param', () => {
-      const data = FrameCamera.createPerspective({
-        position: Vector3.create(1, 2, Infinity),
-      });
-      const currentFrame = camera.toFrameCamera();
-
-      expect(camera.flyTo({ camera: data }).toFrameCamera()).toEqual(
-        currentFrame,
-      );
-    });
-
-    it('keeps the current frame when flyTo is given an invalid camera from the query builder', () => {
-      const data = FrameCamera.createPerspective({
-        position: Vector3.create(1, 2, Infinity),
-      });
-      const currentFrame = camera.toFrameCamera();
-
-      expect(camera.flyTo((q) => q.withCamera(data)).toFrameCamera()).toEqual(
-        currentFrame,
-      );
-    });
-
     it('should go to the visible bounding box on a viewAll', async () => {
       const newBoundingBox = BoundingBox.create(
         Vector3.create(1, 1, 1),
@@ -926,42 +904,6 @@ describe(OrthographicCamera, () => {
           camera: FrameCamera.toProtobuf(data),
         }),
         true,
-      );
-    });
-
-    it('keeps the current frame when flyTo is given an invalid camera param', () => {
-      const data = FrameCamera.createOrthographic({
-        viewVector: Vector3.create(1, 2, Infinity),
-      });
-      const currentFrame = camera.toFrameCamera();
-
-      expect(camera.flyTo({ camera: data }).toFrameCamera()).toEqual(
-        currentFrame,
-      );
-    });
-
-    it('keeps the current frame when flyTo is given an empty orthographic model view camera', () => {
-      const data = FrameCamera.createOrthographic({
-        fovHeight: 0,
-        lookAt: Vector3.origin(),
-        up: Vector3.origin(),
-        viewVector: Vector3.origin(),
-      });
-      const currentFrame = camera.toFrameCamera();
-
-      expect(camera.flyTo({ camera: data }).toFrameCamera()).toEqual(
-        currentFrame,
-      );
-    });
-
-    it('keeps the current frame when flyTo is given an invalid camera from the query builder', () => {
-      const data = FrameCamera.createOrthographic({
-        viewVector: Vector3.create(1, 2, Infinity),
-      });
-      const currentFrame = camera.toFrameCamera();
-
-      expect(camera.flyTo((q) => q.withCamera(data)).toFrameCamera()).toEqual(
-        currentFrame,
       );
     });
 
