@@ -50,7 +50,7 @@ export function validateOrthographicCamera(
   camera: vertexvis.protobuf.stream.IOrthographicCamera,
 ): boolean {
   return (
-    validateNumber(camera.fovHeight) &&
+    validatePositiveNumber(camera.fovHeight) &&
     validateVector(camera.lookAt, false) &&
     validateVector(camera.viewVector, false) &&
     validateVector(camera.up, true)
@@ -60,18 +60,26 @@ export function validateOrthographicCamera(
 export function validateDimensions(
   dimensions: vertexvis.protobuf.stream.IDimensions,
 ): boolean {
-  const heightValid =
-    validateNumber(dimensions?.height) &&
-    (dimensions as { height: number }).height > 0;
-  const widthValid =
-    validateNumber(dimensions?.width) &&
-    (dimensions as { width: number }).width > 0;
-
-  return heightValid && widthValid;
+  return (
+    validatePositiveNumber(dimensions?.height) &&
+    validatePositiveNumber(dimensions?.width)
+  );
 }
 
-export function validateNumber(number: number | null | undefined): boolean {
+export function validateNumber(
+  number: number | null | undefined,
+): number is number {
   return typeof number === 'number' && Number.isFinite(number);
+}
+
+function validatePositiveNumber(number: number | null | undefined): boolean {
+  return validateNumber(number) && number > 0;
+}
+
+function validateOptionalFovY(number: number | null | undefined): boolean {
+  return (
+    number == null || (validateNumber(number) && number >= 1 && number <= 179)
+  );
 }
 
 export function validatePoint(
@@ -84,7 +92,7 @@ export function validateVector(
   vector: vertexvis.protobuf.core.IVector3f | null | undefined,
   verifyNonZeroLength: boolean,
 ): boolean {
-  if (vector == null || vector === undefined) {
+  if (vector == null) {
     return false;
   }
 
