@@ -34,6 +34,7 @@ import ISceneItemQueryExpression = vertexvis.protobuf.stream.ISceneItemQueryExpr
 export interface CameraRenderOptions {
   correlationId?: string;
   animation?: Animation.Animation;
+  skipCameraValidation?: boolean;
 }
 
 export class TerminalFlyToExecutor {
@@ -106,6 +107,8 @@ export interface FlyToParams {
  * a new instance of the class with the updated properties.
  */
 export abstract class Camera {
+  private readonly hasValidFrameCamera: boolean;
+
   public constructor(
     protected stream: StreamApi,
     protected aspect: number,
@@ -113,7 +116,9 @@ export abstract class Camera {
     protected boundingBox: BoundingBox.BoundingBox,
     protected decodeFrame: FrameDecoder,
     protected flyToOptions?: FlyTo.FlyToOptions,
-  ) {}
+  ) {
+    this.hasValidFrameCamera = FrameCamera.isValidFrameCamera(data);
+  }
 
   /**
    * Updates the position of the camera such that the given bounding box will
@@ -251,6 +256,9 @@ export abstract class Camera {
   /**
    * Queues the rendering for a new frame using this camera. The returned
    * promise will resolve when a frame is received that contains this camera.
+   * Certain render loops, like dragging and zooming, can safely assume the
+   * updated camera is valid and skip revalidating it. For safety and backwards
+   * compatibility, validation remains enabled by default.
    */
   public async render(
     renderOptions: CameraRenderOptions = {},
@@ -272,6 +280,7 @@ export abstract class Camera {
           this.flyToOptions,
           renderOptions.animation,
           this.toFrameCamera(),
+          this.hasValidFrameCamera && renderOptions.skipCameraValidation,
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
 

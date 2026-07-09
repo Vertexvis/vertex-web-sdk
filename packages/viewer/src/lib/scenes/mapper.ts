@@ -297,8 +297,9 @@ export function buildFlyToOperation(
   options: FlyTo.FlyToOptions,
   animation?: Animation.Animation,
   baseCamera?: FrameCamera.FrameCamera,
+  skipCameraValidation = false,
 ): vertexvis.protobuf.stream.IFlyToPayload {
-  const flyTo = options.flyTo;
+  const { type: flyType, data: flyData } = options.flyTo;
   const payload: vertexvis.protobuf.stream.IFlyToPayload = {
     frameCorrelationId: { value: frameCorrelationId },
   };
@@ -309,31 +310,35 @@ export function buildFlyToOperation(
     };
   }
 
-  if (baseCamera != null && isValidFrameCamera(baseCamera)) {
-    payload.baseCamera = FrameCamera.toProtobuf(baseCamera);
+  if (baseCamera != null) {
+    if (skipCameraValidation) {
+      payload.baseCamera = FrameCamera.toProtobuf(baseCamera);
+    } else if (isValidFrameCamera(baseCamera)) {
+      payload.baseCamera = FrameCamera.toProtobuf(baseCamera);
+    }
   }
 
-  switch (flyTo.type) {
+  switch (flyType) {
     case 'supplied':
-      payload.itemSuppliedId = flyTo.data;
+      payload.itemSuppliedId = flyData;
       break;
     case 'internal':
-      payload.itemId = new vertexvis.protobuf.core.Uuid({ hex: flyTo.data });
+      payload.itemId = new vertexvis.protobuf.core.Uuid({ hex: flyData });
       break;
     case 'camera':
-      payload.camera = FrameCamera.toProtobuf(flyTo.data);
+      payload.camera = FrameCamera.toProtobuf(flyData);
       break;
     case 'scene-item-query':
-      payload.sceneItemQueryExpression = flyTo.data;
+      payload.sceneItemQueryExpression = flyData;
       break;
     case 'bounding-box':
       payload.boundingBox = {
-        xmin: flyTo.data.min.x,
-        xmax: flyTo.data.max.x,
-        ymin: flyTo.data.min.y,
-        ymax: flyTo.data.max.y,
-        zmin: flyTo.data.min.z,
-        zmax: flyTo.data.max.z,
+        xmin: flyData.min.x,
+        xmax: flyData.max.x,
+        ymin: flyData.min.y,
+        ymax: flyData.max.y,
+        zmin: flyData.min.z,
+        zmax: flyData.max.z,
       };
       break;
   }
