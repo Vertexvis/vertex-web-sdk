@@ -114,7 +114,6 @@ describe('FrameCamera.isValidFrameCamera Perspective', () => {
       }),
     ).toEqual(false);
   });
-
 });
 
 describe('FrameCamera.isValidFrameCamera Orthographic', () => {
