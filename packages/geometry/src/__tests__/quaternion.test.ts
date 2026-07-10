@@ -54,7 +54,7 @@ describe(Quaternion.fromAxisAngle, () => {
   it('rotates quaternion around axis', () => {
     const q = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
     const m = Matrix4.makeRotation(q);
-    const e = Euler.fromRotationMatrix(m);
+    const e = Euler.fromRotationMatrix(m, 'xyz', false);
 
     expect(e.y).toBeCloseTo(Angle.toRadians(90));
   });
@@ -68,7 +68,7 @@ describe(Quaternion.fromMatrixRotation, () => {
     );
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
-      x: Math.sin(angle / 2),
+      x: -Math.sin(angle / 2),
       w: Math.cos(angle / 2),
     });
 
@@ -84,7 +84,7 @@ describe(Quaternion.fromMatrixRotation, () => {
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
       x: Math.sin(angle / 2),
-      w: Math.cos(angle / 2),
+      w: -Math.cos(angle / 2),
     });
 
     expect(q.x).toBeCloseTo(expected.x);
@@ -99,7 +99,7 @@ describe(Quaternion.fromMatrixRotation, () => {
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
       y: Math.sin(angle / 2),
-      w: Math.cos(angle / 2),
+      w: -Math.cos(angle / 2),
     });
 
     expect(q.y).toBeCloseTo(expected.y);
@@ -114,7 +114,7 @@ describe(Quaternion.fromMatrixRotation, () => {
     const q = Quaternion.fromMatrixRotation(m);
     const expected = Quaternion.create({
       z: Math.sin(angle / 2),
-      w: Math.cos(angle / 2),
+      w: -Math.cos(angle / 2),
     });
 
     expect(q.z).toBeCloseTo(expected.z);
