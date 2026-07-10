@@ -31,17 +31,15 @@ export function isValidFrameCamera(camera: Partial<FrameCamera>): boolean {
     const positionValid = isValidVector(camera.position);
     const upValid = isValidNonZeroVector(camera.up);
     const viewVectorValid =
-      camera.lookAt != null &&
-      camera.position != null &&
+      lookAtValid &&
+      positionValid &&
       isValidNonZeroVector(Vector3.subtract(camera.lookAt, camera.position));
     const fovYValid =
       camera.fovY != null &&
       Number.isFinite(camera.fovY) &&
       camera.fovY >= 1 &&
       camera.fovY <= 179;
-    return (
-      lookAtValid && positionValid && upValid && viewVectorValid && fovYValid
-    );
+    return upValid && viewVectorValid && fovYValid;
   } else {
     const asOrthographic = camera as OrthographicFrameCamera;
 
@@ -55,15 +53,13 @@ export function isValidFrameCamera(camera: Partial<FrameCamera>): boolean {
   }
 }
 
-function isValidVector(vector?: Vector3.Vector3): boolean {
+function isValidVector(vector?: Vector3.Vector3): vector is Vector3.Vector3 {
   return vector != null && Vector3.isValid(vector);
 }
 
 // Zero could be valid, but often represents a default from a missing value
 function isValidNonZeroVector(vector?: Vector3.Vector3): boolean {
-  return (
-    vector != null && Vector3.isValid(vector) && !Vector3.isZeroVector(vector)
-  );
+  return isValidVector(vector) && !Vector3.isZeroVector(vector);
 }
 
 export function isPerspectiveFrameCamera(
