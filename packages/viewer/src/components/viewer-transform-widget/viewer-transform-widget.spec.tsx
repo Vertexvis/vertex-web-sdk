@@ -114,7 +114,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     const frame = makePerspectiveFrame();
-    viewer.dispatchFrameDrawn(frame);
+    await viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(1, 1, 1);
 

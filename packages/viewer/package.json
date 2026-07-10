@@ -75,7 +75,7 @@
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
     "@stencil/core": "^4.43.5",
-    "@vertexvis/frame-streaming-protos": "^0.18.4",
+    "@vertexvis/frame-streaming-protos": "^0.18.6",
     "@vertexvis/geometry": "1.0.1",
     "@vertexvis/html-templates": "1.0.1",
     "@vertexvis/scene-tree-protos": "^0.1.29",
