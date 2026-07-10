@@ -33,6 +33,7 @@ import {
   fromPbStartStreamResponseOrThrow,
   fromPbSyncTimeResponseOrThrow,
   toPbCameraType,
+  toPbFloatValue,
   toPbRGBi,
   toPbStreamAttributes,
 } from '../mappers';
@@ -186,7 +187,10 @@ export class ViewerStream extends StreamApi {
     ) {
       this.dimensions = fields.dimensions;
       this.ifState('connected', () =>
-        this.updateDimensions({ dimensions: this.getDimensions() }),
+        this.updateDimensions({
+          dimensions: this.getDimensions(),
+          resolution: toPbFloatValueOrThrow(this.getResolution()),
+        }),
       );
     }
 
@@ -497,6 +501,7 @@ export class ViewerStream extends StreamApi {
       await this.startStream({
         streamKey: { value: resource.resource.id },
         dimensions: this.getDimensions(),
+        resolution: toPbFloatValueOrThrow(this.getResolution()),
         frameBackgroundColor: toPbColorOrThrow(this.frameBgColor),
         clientSupportsTemporalRefinement: this.enableTemporalRefinement,
         streamAttributes: toPbStreamAttributesOrThrow(this.streamAttributes),
@@ -704,6 +709,18 @@ export class ViewerStream extends StreamApi {
     return this.dimensions;
   }
 
+  // Calculate the resolution of the image on the client in dots per CSS inch (dpi)
+  private getResolution(): number {
+    if (window.devicePixelRatio != null) {
+      // A CSS inch is defined as 96 pixels. Further, window.devicePixelRatio returns a
+      // value in dots per pixel. Therefore, the resolution in dots per CSS inch
+      // can be calculated by multiplying 96 by the devicePixelRatio.
+      return 96 * window.devicePixelRatio;
+    } else {
+      return 96;
+    }
+  }
+
   private ifState<T>(
     state: ViewerStreamState['type'],
     f: () => T,
@@ -721,6 +738,7 @@ export class ViewerStream extends StreamApi {
 const toPbStreamAttributesOrThrow = Mapper.ifInvalidThrow(toPbStreamAttributes);
 const toPbColorOrThrow = Mapper.ifInvalidThrow(toPbRGBi);
 const toPbCameraTypeOrThrow = Mapper.ifInvalidThrow(toPbCameraType);
+const toPbFloatValueOrThrow = Mapper.ifInvalidThrow(toPbFloatValue);
 
 function getStreamSettings(config: Config): Settings {
   return {
