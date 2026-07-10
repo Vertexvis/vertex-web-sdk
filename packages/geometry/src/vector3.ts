@@ -370,6 +370,19 @@ export function rotateAboutAxis(
 
 /**
  * Returns a vector that is multiplied with a matrix in column-major form.
+ * @param vector A Vector3 item.
+ * @param m A Matrix4 item written in column-major form.
+ *
+ * @deprecated Use {@link multiplyByTransformMatrixColumnMajor} or {@link multiplyByTransformMatrixRowMajor} instead.
+ */
+export function transformMatrix(vector: Vector3, m: Matrix4.Matrix4): Vector3 {
+  return multiplyByTransformMatrixColumnMajor(vector, m);
+}
+
+/**
+ * Returns a vector that is multiplied with a matrix in column-major form.
+ * @param vector A Vector3 item.
+ * @param m A Matrix4 item written in column-major form.
  */
 export function multiplyByTransformMatrixColumnMajor(
   vector: Vector3,
@@ -386,6 +399,8 @@ export function multiplyByTransformMatrixColumnMajor(
 
 /**
  * Returns a vector that is multiplied with a matrix in row-major form.
+ * @param vector A Vector3 item.
+ * @param m A Matrix4 item written in row-major form.
  */
 export function multiplyByTransformMatrixRowMajor(
   vector: Vector3,

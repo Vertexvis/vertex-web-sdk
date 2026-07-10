@@ -38,9 +38,7 @@ export class TransformController {
     }
   }
 
-  public async updateTransformController(
-    delta: Matrix4.Matrix4,
-  ): Promise<void> {
+  public async updateTransform(delta: Matrix4.Matrix4): Promise<void> {
     this.currentDelta = delta;
 
     await this.stream.updateInteraction({
@@ -84,7 +82,7 @@ export class TransformController {
       console.debug(`Undo of previous transform [delta-applied=${undoDelta}]`);
 
       await this.beginTransform();
-      await this.updateTransformController(undoDelta);
+      await this.updateTransform(undoDelta);
       await this.endTransform();
 
       this.previousDelta = undefined;

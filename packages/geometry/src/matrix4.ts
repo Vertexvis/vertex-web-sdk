@@ -75,6 +75,20 @@ export function fromValues(
 }
 
 /**
+ * Creates a `Matrix4` from an object representation.
+ */
+export function fromObject(obj: Matrix4AsObject): Matrix4 {
+  /* eslint-disable prettier/prettier */
+  return fromValues(
+      obj.m11, obj.m12, obj.m13, obj.m14,
+      obj.m21, obj.m22, obj.m23, obj.m24,
+      obj.m31, obj.m32, obj.m33, obj.m34,
+      obj.m41, obj.m42, obj.m43, obj.m44
+  );
+  /* eslint-enable prettier/prettier */
+}
+
+/**
  * Returns a new [identity matrix](https://en.wikipedia.org/wiki/Identity_matrix).
  */
 export function makeIdentity(): Matrix4 {
@@ -184,14 +198,13 @@ export function makeScale(scale: Vector3.Vector3): Matrix4 {
  * @param translation The translation applied to the matrix.
  * @param rotation The rotation applied to the matrix.
  * @param scale The scale applied to the matrix.
- * @returns A transformed matrix.
+ * @returns A transformed matrix in column-major form.
  */
 export function makeTRS(
   translation: Vector3.Vector3,
   rotation: Quaternion.Quaternion,
   scale: Vector3.Vector3,
 ): Matrix4 {
-  // T is row-major and r is column-major. Why does this work?
   const t = makeTranslation(translation);
   const r = transpose(makeRotation(rotation));
   const s = makeScale(scale);
@@ -620,6 +633,17 @@ export function isIdentity(matrix: Matrix4): boolean {
 
 /**
  * Returns an object representation of a `Matrix4`.
+ * @param m A Matrix4 item written in column-major form.
+ *
+ * @deprecated Use {@link toObjectColumnMajor} or {@link toObjectRowMajor} instead.
+ */
+export function toObject(m: Matrix4): Matrix4AsObject {
+  return toObjectColumnMajor(m);
+}
+
+/**
+ * Returns an object representation of a `Matrix4`.
+ * @param m A Matrix4 item written in column-major form.
  */
 export function toObjectColumnMajor(m: Matrix4): Matrix4AsObject {
   /* eslint-disable prettier/prettier */
@@ -634,6 +658,7 @@ export function toObjectColumnMajor(m: Matrix4): Matrix4AsObject {
 
 /**
  * Returns an object representation of a `Matrix4`.
+ * @param m A Matrix4 item written in row-major form.
  */
 export function toObjectRowMajor(m: Matrix4): Matrix4AsObject {
   /* eslint-disable prettier/prettier */

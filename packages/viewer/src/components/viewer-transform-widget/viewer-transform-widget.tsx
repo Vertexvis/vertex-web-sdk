@@ -882,7 +882,7 @@ export class ViewerTransformWidget {
 
       await this.controller?.beginTransform();
       this.getTransformWidget().updateTransform(this.currentTransform);
-      await this.controller?.updateTransformController(
+      await this.controller?.updateTransform(
         Matrix4.multiply(
           Matrix4.invert(this.startingTransform),
           this.currentTransform,
@@ -930,7 +930,7 @@ export class ViewerTransformWidget {
       );
 
       this.getTransformWidget().updateTransform(this.currentTransform);
-      this.controller?.updateTransformController(
+      this.controller?.updateTransform(
         Matrix4.multiply(
           Matrix4.invert(this.startingTransform),
           this.currentTransform,

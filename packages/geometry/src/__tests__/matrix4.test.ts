@@ -10,6 +10,29 @@ const camera = {
   up: Vector3.create(0, 1, 0),
 };
 
+describe(Matrix4.fromObject, () => {
+  it('returns Matrix4 from object representation', () => {
+    /* eslint-disable prettier/prettier */
+    const obj = Matrix4.toObjectColumnMajor(Matrix4.fromValues(
+        1, 1, 1, 1,
+        2, 2, 2, 2,
+        3, 3, 3, 3,
+        4, 4, 4, 4,
+    ));
+    /* eslint-enable prettier/prettier */
+    const m = Matrix4.fromObject(obj);
+
+    /* eslint-disable prettier/prettier */
+    expect(m).toEqual([
+      1, 2, 3, 4,
+      1, 2, 3, 4,
+      1, 2, 3, 4,
+      1, 2, 3, 4,
+    ])
+    /* eslint-enable prettier/prettier */
+  });
+});
+
 describe(Matrix4.makeZero, () => {
   it('returns zero matrix', () => {
     /* eslint-disable prettier/prettier */
