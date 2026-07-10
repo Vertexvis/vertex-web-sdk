@@ -1,42 +1,38 @@
 export type ParamsBuilder<S> = (settings: S) => Record<string, string>;
 
 export function defineParams<S>(
-  ...definitions: ParamsBuilder<S>[]
+  ...definitions: Array<ParamsBuilder<S>>
 ): ParamsBuilder<S> {
-  return (settings) => {
-    return definitions.reduce(
-      (result, def) => ({ ...result, ...def(settings) }),
-      {},
-    );
-  };
+  return (settings) =>
+    Object.assign({}, ...definitions.map((def) => def(settings)));
 }
 
-export function defineBoolean<S, P extends keyof S = keyof S>(
-  param: string,
-  prop: P,
-): ParamsBuilder<S> {
-  return defineValue(param, prop, (v) => {
-    if (typeof v === 'boolean') {
-      return v ? 'on' : 'off';
-    } else {
-      return undefined;
-    }
-  });
-}
+type KeysOfType<S, V> = {
+  [K in keyof S]-?: NonNullable<S[K]> extends V ? K : never;
+}[keyof S];
 
-export function defineNumber<S, P extends keyof S = keyof S>(
-  param: string,
-  prop: P,
-): ParamsBuilder<S> {
+export function defineBoolean<
+  S,
+  P extends KeysOfType<S, boolean> = KeysOfType<S, boolean>,
+>(param: string, prop: P): ParamsBuilder<S> {
   return defineValue(param, prop, (v) =>
-    typeof v === 'number' ? v.toString() : undefined,
+    typeof v === 'boolean' ? (v ? 'on' : 'off') : undefined,
   );
 }
 
-export function defineString<S, P extends keyof S = keyof S>(
-  param: string,
-  prop: P,
-): ParamsBuilder<S> {
+export function defineNumber<
+  S,
+  P extends KeysOfType<S, number> = KeysOfType<S, number>,
+>(param: string, prop: P): ParamsBuilder<S> {
+  return defineValue(param, prop, (v) =>
+    typeof v === 'number' ? String(v) : undefined,
+  );
+}
+
+export function defineString<
+  S,
+  P extends KeysOfType<S, string> = KeysOfType<S, string>,
+>(param: string, prop: P): ParamsBuilder<S> {
   return defineValue(param, prop, (v) =>
     typeof v === 'string' ? v : undefined,
   );
