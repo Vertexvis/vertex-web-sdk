@@ -91,7 +91,6 @@ export function computeInputDeltaTransform(
   angleUnit: AngleUnitType,
 ): Matrix4.Matrix4 {
   return Matrix4.multiply(
-    current,
     computeInputGlobalTransform(
       identifier,
       value,
@@ -99,6 +98,7 @@ export function computeInputDeltaTransform(
       distanceUnit,
       angleUnit,
     ),
+    current,
   );
 }
 
@@ -124,16 +124,22 @@ function computeInputGlobalTransform(
     case 'z-translate':
       return Matrix4.makeTranslation(Vector3.create(0, 0, position()));
     case 'x-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.left(), rotation()),
+      return Matrix4.transpose(
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.left(), rotation()),
+        ),
       );
     case 'y-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.down(), rotation()),
+      return Matrix4.transpose(
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.down(), rotation()),
+        ),
       );
     case 'z-rotate':
-      return Matrix4.makeRotation(
-        Quaternion.fromAxisAngle(Vector3.forward(), rotation()),
+      return Matrix4.transpose(
+        Matrix4.makeRotation(
+          Quaternion.fromAxisAngle(Vector3.forward(), rotation()),
+        ),
       );
     default:
       return Matrix4.makeIdentity();
@@ -165,16 +171,19 @@ export function computeInputDisplayValue(
 
   const rotation = (): Matrix4.Matrix4 =>
     Matrix4.makeRotation(Quaternion.fromMatrixRotation(current));
+
   const transformDiff = (): Matrix4.Matrix4 =>
-    Matrix4.multiply(current, Matrix4.invert(start));
+    Matrix4.multiply(Matrix4.invert(start), current);
+
   const relativeTranslationDiff = (): Vector3.Vector3 =>
-    Vector3.transformMatrix(
+    Vector3.multiplyByTransformMatrixColumnMajor(
       Vector3.fromMatrixPosition(transformDiff()),
-      Matrix4.invert(rotation()),
+      rotation(),
     );
+
   const relativeRotationDiff = (): Euler.Euler =>
     Euler.fromRotationMatrix(
-      Matrix4.multiply(Matrix4.invert(rotation()), start),
+      Matrix4.multiply(start, rotation()),
       eulerOrderForIdentifier(identifier),
     );
 
@@ -301,9 +310,11 @@ export function performRotationAroundAxis(
     worldRotationAxis,
     rotationAngle,
   );
-  const worldRotationMatrix = Matrix4.makeRotation(worldRotationQuaternion);
+  const worldRotationMatrix = Matrix4.transpose(
+    Matrix4.makeRotation(worldRotationQuaternion),
+  );
 
-  return Matrix4.multiply(currentTransformationMatrix, worldRotationMatrix);
+  return Matrix4.multiply(worldRotationMatrix, currentTransformationMatrix);
 }
 
 export function computeRotationAxis(
@@ -314,11 +325,11 @@ export function computeRotationAxis(
   const changeOfBasisToWorld = Matrix4.makeRotation(
     Quaternion.fromMatrixRotation(currentTransformationMatrix),
   );
-  const worldRotationAxis = Vector3.transformMatrix(
+  const worldRotationAxis = Vector3.multiplyByTransformMatrixRowMajor(
     localRotationAxis,
     changeOfBasisToWorld,
   );
-  const worldNegatedRotationAxis = Vector3.transformMatrix(
+  const worldNegatedRotationAxis = Vector3.multiplyByTransformMatrixRowMajor(
     Vector3.negate(localRotationAxis),
     changeOfBasisToWorld,
   );
@@ -342,7 +353,7 @@ export function performTranslationConstrainedToAxis(
   const changeOfBasisToWorld = Matrix4.makeRotation(
     Quaternion.fromMatrixRotation(currentTransformationMatrix),
   );
-  const constrainToWorldAxis = Vector3.transformMatrix(
+  const constrainToWorldAxis = Vector3.multiplyByTransformMatrixRowMajor(
     constrainToLocalAxisUnitVector,
     changeOfBasisToWorld,
   );
@@ -360,7 +371,7 @@ export function performTranslationConstrainedToAxis(
 
   // Multiply the translation matrix with the current transformation matrix to
   // determine the new transformation matrix
-  return Matrix4.multiply(translationMatrix, currentTransformationMatrix);
+  return Matrix4.multiply(currentTransformationMatrix, translationMatrix);
 }
 
 export function performTranslationConstrainedToPlane(
@@ -377,7 +388,7 @@ export function performTranslationConstrainedToPlane(
   const changeOfBasisToWorld = Matrix4.makeRotation(
     Quaternion.fromMatrixRotation(currentTransformationMatrix),
   );
-  const worldNormalVectorToPlane = Vector3.transformMatrix(
+  const worldNormalVectorToPlane = Vector3.multiplyByTransformMatrixRowMajor(
     localNormalVectorToPlaneUnitVector,
     changeOfBasisToWorld,
   );
@@ -410,7 +421,7 @@ export function performTranslationConstrainedToPlane(
   const translationMatrix = Matrix4.makeTranslation(
     constrainedTranslationVector,
   );
-  return Matrix4.multiply(translationMatrix, currentTransformationMatrix);
+  return Matrix4.multiply(currentTransformationMatrix, translationMatrix);
 }
 
 export function computeInputPosition(
