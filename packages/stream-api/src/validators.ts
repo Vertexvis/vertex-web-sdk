@@ -95,22 +95,16 @@ export function validateVector(
   if (vector == null) {
     return false;
   }
-
+  const { x, y, z } = vector;
   const vectorComponentsValid =
-    validateNumber(vector.x) &&
-    validateNumber(vector.y) &&
-    validateNumber(vector.z);
+    validateNumber(x) && validateNumber(y) && validateNumber(z);
 
   if (verifyNonZeroLength) {
     if (!vectorComponentsValid) {
       return false;
     }
 
-    const x = vector.x as number;
-    const y = vector.y as number;
-    const z = vector.z as number;
     const vectorMagnitudeSquared = x * x + y * y + z * z;
-
     return vectorMagnitudeSquared !== 0;
   }
 
