@@ -107,7 +107,7 @@ export interface FlyToParams {
  * a new instance of the class with the updated properties.
  */
 export abstract class Camera {
-  private readonly hasValidFrameCamera: boolean;
+  private readonly hasInitiallyValidFrameCamera: boolean;
 
   public constructor(
     protected stream: StreamApi,
@@ -117,7 +117,7 @@ export abstract class Camera {
     protected decodeFrame: FrameDecoder,
     protected flyToOptions?: FlyTo.FlyToOptions,
   ) {
-    this.hasValidFrameCamera = FrameCamera.isValidFrameCamera(data);
+    this.hasInitiallyValidFrameCamera = FrameCamera.isValidFrameCamera(data);
   }
 
   /**
@@ -280,7 +280,8 @@ export abstract class Camera {
           this.flyToOptions,
           renderOptions.animation,
           this.toFrameCamera(),
-          this.hasValidFrameCamera && renderOptions.skipCameraValidation,
+          this.hasInitiallyValidFrameCamera &&
+            renderOptions.skipCameraValidation,
         );
         const flyToResponse = await this.stream.flyTo(payload, true);
 
