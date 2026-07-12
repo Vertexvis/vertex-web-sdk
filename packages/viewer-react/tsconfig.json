@@ -2,8 +2,9 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@vertexwebsdk/build/tsconfig-web",
   "compilerOptions": {
+    "useDefineForClassFields": false,
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
   },
-  "exclude": ["dist", "node_modules"]
 }

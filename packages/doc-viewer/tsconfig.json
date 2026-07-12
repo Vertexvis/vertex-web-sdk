@@ -4,10 +4,9 @@
   "compilerOptions": {
     "inlineSources": false,
     "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "jsx": "react",
     "jsxFactory": "h",
-    "target": "ES2019",
   },
   "include": ["src", "types/*.d.ts", "src/components.d.ts"],
-  "exclude": ["dist", "node_modules"],
 }

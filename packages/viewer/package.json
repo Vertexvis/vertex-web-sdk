@@ -15,7 +15,7 @@
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/esm/index.js",
-  "es2019": "dist/esm/index.js",
+  "es2022": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
@@ -27,7 +27,6 @@
       "require": "./dist/index.cjs",
       "default": "./dist/esm/index.js"
     },
-    "./viewer.css": "./dist/viewer/viewer.css",
     "./dist/*": "./dist/*",
     "./dist/components": {
       "import": "./dist/components/index.js",
