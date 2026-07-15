@@ -302,16 +302,17 @@ describe(SceneTreeController, () => {
 
     it('retries GetTree with backoff while the view is not ready', async () => {
       jest.useFakeTimers();
+      const warn = jest.spyOn(console, 'warn').mockImplementation();
 
       try {
         const { controller, client } = createController(10);
-        const notFound: ServiceError = {
-          code: grpc.Code.NotFound,
+        const failedPrecondition: ServiceError = {
+          code: grpc.Code.FailedPrecondition,
           metadata: new grpc.Metadata({}),
           message: 'Tree view is not ready',
         };
         (client.getTree as jest.Mock)
-          .mockImplementationOnce(mockGrpcUnaryError(notFound, 0))
+          .mockImplementationOnce(mockGrpcUnaryError(failedPrecondition, 0))
           .mockImplementationOnce(
             mockGrpcUnaryResult(createGetTreeResponse(10, 100), 0),
           );
@@ -321,7 +322,13 @@ describe(SceneTreeController, () => {
 
         await expect(connect).resolves.toBeUndefined();
         expect(client.getTree).toHaveBeenCalledTimes(2);
+        expect(warn).toHaveBeenCalledWith(
+          expect.stringContaining(
+            'GetTree failed because the view is not ready',
+          ),
+        );
       } finally {
+        warn.mockRestore();
         jest.useRealTimers();
       }
     });
@@ -1051,7 +1058,7 @@ describe(SceneTreeController, () => {
 
     it('marks page as not loaded if request fails', async () => {
       const error: ServiceError = {
-        code: grpc.Code.FailedPrecondition,
+        code: grpc.Code.Aborted,
         metadata: new grpc.Metadata({}),
         message: 'Failed',
       };
@@ -1062,7 +1069,7 @@ describe(SceneTreeController, () => {
       );
 
       await expect(controller.connect(jwtProvider)).rejects.toMatchObject({
-        code: grpc.Code.FailedPrecondition,
+        code: grpc.Code.Aborted,
       });
 
       expect(controller.isPageLoaded(0)).toBe(false);

@@ -157,7 +157,8 @@ export class SceneTreeController {
   private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
   private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
   private static MAX_SUBSCRIPTION_RETRY_COUNT = 2;
-  private static GET_TREE_RETRY_DELAYS_IN_MS = [100, 200, 400, 800, 1600, 3200];
+  private static MAX_GET_TREE_ATTEMPTS = 6;
+  private static GET_TREE_RETRY_DELAYS_IN_MS = [1000, 2000, 4000, 8000, 15000];
 
   private nextPageId = 0;
   private pages = new Map<number, Page>();
@@ -1225,8 +1226,9 @@ export class SceneTreeController {
     jwt: string,
   ): Promise<GetTreeResponse> {
     let attempt = 0;
+    const maxAttempts = SceneTreeController.MAX_GET_TREE_ATTEMPTS;
 
-    while (true) {
+    while (attempt < maxAttempts) {
       try {
         return await this.requestUnary(jwt, (metadata, handler) => {
           const pager = new OffsetPager();
@@ -1241,19 +1243,24 @@ export class SceneTreeController {
           this.client.getTree(req, metadata, handler);
         });
       } catch (error) {
-        const delay = SceneTreeController.GET_TREE_RETRY_DELAYS_IN_MS[attempt];
         if (
           !isGrpcServiceError(error) ||
-          error.code !== grpc.Code.NotFound ||
-          delay == null
+          error.code !== grpc.Code.FailedPrecondition ||
+          attempt === maxAttempts - 1
         ) {
           throw error;
         }
 
+        const delay = SceneTreeController.GET_TREE_RETRY_DELAYS_IN_MS[attempt];
+        console.warn(
+          `GetTree failed because the view is not ready. Retrying in ${delay}ms (attempt ${attempt + 2}/${maxAttempts}).`,
+        );
         attempt += 1;
         await Async.delay(delay);
       }
     }
+
+    throw new Error('GetTree retry attempts were exhausted.');
   }
 
   // TODO(dan): used shared grpc lib
