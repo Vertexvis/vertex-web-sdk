@@ -187,13 +187,19 @@ describe('<vertex-scene-tree>', () => {
       expect(rowData).toHaveBeenCalled();
     });
 
-    it('emits error if tree is not enabled', (done) => {
-      async function test(): Promise<void> {
+    it('emits error if tree is not enabled', async () => {
+      const restoreRetryDelays = mockGetTreeRetryDelays();
+
+      try {
         const client = mockSceneTreeClient();
         mockGetTreeError(client, grpc.Code.FailedPrecondition);
 
         const { stream, ws } = makeViewerStream();
         const controller = new SceneTreeController(client, 100);
+        let resolveConnectionError: VoidFunction;
+        const connectionError = new Promise<void>((resolve) => {
+          resolveConnectionError = resolve;
+        });
         const { viewer } = await newSceneTreeSpec({
           controller,
           stream,
@@ -201,7 +207,7 @@ describe('<vertex-scene-tree>', () => {
             <div>
               <vertex-scene-tree
                 controller={controller}
-                onConnectionError={() => done()}
+                onConnectionError={() => resolveConnectionError()}
                 viewerSelector="#viewer"
               ></vertex-scene-tree>
               <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
@@ -209,22 +215,38 @@ describe('<vertex-scene-tree>', () => {
           ),
         });
         await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+        await connectionError;
+      } finally {
+        restoreRetryDelays();
       }
-
-      test();
     });
 
     it('renders message if load failed', async () => {
+      const restoreRetryDelays = mockGetTreeRetryDelays();
       const client = mockSceneTreeClient();
       mockGetTreeError(client, grpc.Code.FailedPrecondition);
 
-      const { stream, ws } = makeViewerStream();
-      const controller = new SceneTreeController(client, 100);
-      const { tree, viewer } = await newSceneTreeSpec({ controller, stream });
-      await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+      try {
+        const { stream, ws } = makeViewerStream();
+        const controller = new SceneTreeController(client, 100);
+        const { tree, viewer, page } = await newSceneTreeSpec({
+          controller,
+          stream,
+        });
+        const connectionError = new Promise<void>((resolve) => {
+          tree.addEventListener('connectionError', () => resolve(), {
+            once: true,
+          });
+        });
+        await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
+        await connectionError;
+        await page.waitForChanges();
 
-      const errorEl = tree.shadowRoot?.querySelector('.error');
-      expect(errorEl).toBeDefined();
+        const errorEl = tree.shadowRoot?.querySelector('.error');
+        expect(errorEl).not.toBeNull();
+      } finally {
+        restoreRetryDelays();
+      }
     });
 
     it('renders message if viewer not found', async () => {
@@ -1740,9 +1762,19 @@ function mockGetTreeError(client: SceneTreeAPIClient, code: grpc.Code): void {
     message: 'Scene tree test error',
     metadata: new grpc.Metadata({}),
   };
-  (client.getTree as jest.Mock).mockImplementationOnce(
-    mockGrpcUnaryError(error),
-  );
+  (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryError(error));
+}
+
+function mockGetTreeRetryDelays(): VoidFunction {
+  const controller = SceneTreeController as unknown as {
+    GET_TREE_RETRY_DELAYS_IN_MS: number[];
+  };
+  const retryDelays = controller.GET_TREE_RETRY_DELAYS_IN_MS;
+  controller.GET_TREE_RETRY_DELAYS_IN_MS = retryDelays.map(() => 0);
+
+  return () => {
+    controller.GET_TREE_RETRY_DELAYS_IN_MS = retryDelays;
+  };
 }
 
 function mockFilterTree(
