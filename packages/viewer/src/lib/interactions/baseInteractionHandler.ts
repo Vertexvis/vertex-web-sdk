@@ -25,7 +25,7 @@ export type InteractionType =
   | 'pivot';
 
 const DEFAULT_FONT_SIZE = 16;
-const DEFAULT_LINE_HEIGHT = 1.2;
+const DEFAULT_FONT_TO_LINE_HEIGHT_MULTIPLIER = 1.2;
 
 export abstract class BaseInteractionHandler implements InteractionHandler {
   protected interactionApi?: InteractionApi;
@@ -44,8 +44,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   protected disableIndividualInteractions = false;
 
   private bodyStyleCache?: {
-    fontSize: number;
-    lineHeight: number;
+    lineHeightPixels: number;
     height: number;
   };
 
@@ -353,13 +352,13 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     // is very unlikely to change frequently or while doing wheel movements.
     if (this.bodyStyleCache == null) {
       const bodyStyle = window.getComputedStyle(document.body);
+      const fontSize =
+        parseFloat(bodyStyle.getPropertyValue('fontSize')) || DEFAULT_FONT_SIZE;
+      const lineHeight = parseFloat(bodyStyle.getPropertyValue('lineHeight'));
       this.bodyStyleCache = {
-        fontSize:
-          parseFloat(bodyStyle.getPropertyValue('fontSize')) ||
-          DEFAULT_FONT_SIZE,
-        lineHeight:
-          parseFloat(bodyStyle.getPropertyValue('lineHeight')) ||
-          DEFAULT_LINE_HEIGHT,
+        lineHeightPixels: Number.isFinite(lineHeight)
+          ? lineHeight
+          : fontSize * DEFAULT_FONT_TO_LINE_HEIGHT_MULTIPLIER,
         height:
           parseFloat(bodyStyle.getPropertyValue('height')) ||
           window.innerHeight,
@@ -371,9 +370,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
 
     if (deltaMode === 1) {
       // deltaMode 1 corresponds to DOM_DELTA_LINE, which computes deltas in lines
-      return (
-        deltaY * (this.bodyStyleCache.fontSize * this.bodyStyleCache.lineHeight)
-      );
+      return deltaY * this.bodyStyleCache.lineHeightPixels;
     } else if (deltaMode === 2) {
       // deltaMode 2 corresponds to DOM_DELTA_PAGE, which computes deltas in pages
       return deltaY * this.bodyStyleCache.height;
