@@ -1225,10 +1225,10 @@ export class SceneTreeController {
     limit: number,
     jwt: string,
   ): Promise<GetTreeResponse> {
-    let attempt = 0;
+    let currentAttempt = 1;
     const maxAttempts = SceneTreeController.MAX_GET_TREE_ATTEMPTS;
 
-    while (attempt < maxAttempts) {
+    while (currentAttempt <= maxAttempts) {
       try {
         return await this.requestUnary(jwt, (metadata, handler) => {
           const pager = new OffsetPager();
@@ -1246,16 +1246,18 @@ export class SceneTreeController {
         if (
           !isGrpcServiceError(error) ||
           error.code !== grpc.Code.FailedPrecondition ||
-          attempt === maxAttempts - 1
+          currentAttempt === maxAttempts
         ) {
           throw error;
         }
 
-        const delay = SceneTreeController.GET_TREE_RETRY_DELAYS_IN_MS[attempt];
+        const delay =
+          SceneTreeController.GET_TREE_RETRY_DELAYS_IN_MS[currentAttempt - 1];
+        const nextAttempt = currentAttempt + 1;
         console.warn(
-          `GetTree failed because the view is not ready. Retrying in ${delay}ms (attempt ${attempt + 2}/${maxAttempts}).`,
+          `GetTree failed because the view is not ready. Retrying in ${delay}ms (attempt ${nextAttempt}/${maxAttempts}).`,
         );
-        attempt += 1;
+        currentAttempt = nextAttempt;
         await Async.delay(delay);
       }
     }
