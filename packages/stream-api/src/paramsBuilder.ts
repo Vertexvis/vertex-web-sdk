@@ -11,12 +11,27 @@ type KeysOfType<S, V> = {
   [K in keyof S]-?: NonNullable<S[K]> extends V ? K : never;
 }[keyof S];
 
+function transformValue<T, R>({
+  guard,
+  transform,
+}: {
+  guard: (v: unknown) => v is T;
+  transform: (v: T) => R;
+}): (v: unknown) => R | undefined {
+  return (v) => (guard(v) ? transform(v) : undefined);
+}
+
 export function defineBoolean<
   S,
   P extends KeysOfType<S, boolean> = KeysOfType<S, boolean>,
 >(param: string, prop: P): ParamsBuilder<S> {
-  return defineValue(param, prop, (v) =>
-    typeof v === 'boolean' ? (v ? 'on' : 'off') : undefined,
+  return defineValue(
+    param,
+    prop,
+    transformValue({
+      guard: (v) => typeof v === 'boolean',
+      transform: (v) => (v ? 'on' : 'off'),
+    }),
   );
 }
 
@@ -24,8 +39,13 @@ export function defineNumber<
   S,
   P extends KeysOfType<S, number> = KeysOfType<S, number>,
 >(param: string, prop: P): ParamsBuilder<S> {
-  return defineValue(param, prop, (v) =>
-    typeof v === 'number' ? String(v) : undefined,
+  return defineValue(
+    param,
+    prop,
+    transformValue({
+      guard: (v) => typeof v === 'number',
+      transform: (v) => v.toString(),
+    }),
   );
 }
 
