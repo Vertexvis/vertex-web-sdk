@@ -112,7 +112,7 @@ Type: `Promise<void>`
 
 | Name                  | Description                                                                                                                                 |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--viewer-background` | A CSS color value used as the background painted behind the loaded PDF, visible in the negative space around the page. Defaults to #cccccc. |
+| `--viewer-background` | A CSS color value used as the background painted behind the loaded PDF, visible in the negative space around the page. Defaults to #eeeeee. |
 
 
 ----------------------------------------------

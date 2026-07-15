@@ -298,6 +298,35 @@ describe(StreamApi, () => {
 
       expect(send).not.toHaveBeenCalled();
     });
+
+    it('does not send the request for a camera with a zero-length up vector', () => {
+      streamApi.flyTo(
+        {
+          camera: {
+            perspective: {
+              lookAt: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              position: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              up: {
+                x: 0,
+                y: 0,
+                z: 0,
+              },
+            },
+          },
+        },
+        true,
+      );
+
+      expect(send).not.toHaveBeenCalled();
+    });
   });
 
   it('sends the request for a valid base camera', () => {
@@ -348,6 +377,35 @@ describe(StreamApi, () => {
               x: 1,
               y: 2,
               z: 3,
+            },
+          },
+        },
+      },
+      true,
+    );
+
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it('does not send the request for a base camera with a zero-length up vector', () => {
+    streamApi.flyTo(
+      {
+        baseCamera: {
+          perspective: {
+            lookAt: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+            position: {
+              x: 1,
+              y: 2,
+              z: 3,
+            },
+            up: {
+              x: 0,
+              y: 0,
+              z: 0,
             },
           },
         },

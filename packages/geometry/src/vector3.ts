@@ -65,6 +65,14 @@ export function isValid({ x, y, z }: Vector3): boolean {
 }
 
 /**
+ * Checks if every component of the given vector is zero.
+ * Useful for detecting potentially problematic camera vectors, for example.
+ */
+export function isZeroVector({ x, y, z }: Vector3): boolean {
+  return [x, y, z].every((v) => v === 0);
+}
+
+/**
  * Returns a vector representing the scale elements of `matrix`.
  */
 export function fromMatrixScale(matrix: Matrix4.Matrix4): Vector3 {
