@@ -311,9 +311,7 @@ export function buildFlyToOperation(
   }
 
   if (baseCamera != null) {
-    if (skipCameraValidation) {
-      payload.baseCamera = FrameCamera.toProtobuf(baseCamera);
-    } else if (isValidFrameCamera(baseCamera)) {
+    if (skipCameraValidation || isValidFrameCamera(baseCamera)) {
       payload.baseCamera = FrameCamera.toProtobuf(baseCamera);
     }
   }
