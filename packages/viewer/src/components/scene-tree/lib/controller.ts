@@ -29,7 +29,7 @@ import {
   ServiceError,
   UnaryResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import { Async, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import { MetadataKey } from '../types';
 import {
@@ -157,6 +157,7 @@ export class SceneTreeController {
   private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
   private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
   private static MAX_SUBSCRIPTION_RETRY_COUNT = 2;
+  private static GET_TREE_RETRY_DELAYS_IN_MS = [100, 200, 400, 800, 1600, 3200];
 
   private nextPageId = 0;
   private pages = new Map<number, Page>();
@@ -1223,17 +1224,36 @@ export class SceneTreeController {
     limit: number,
     jwt: string,
   ): Promise<GetTreeResponse> {
-    return this.requestUnary(jwt, (metadata, handler) => {
-      const pager = new OffsetPager();
-      pager.setOffset(offset);
-      pager.setLimit(limit);
+    let attempt = 0;
 
-      const req = new GetTreeRequest();
-      req.setPager(pager);
-      req.setAdditionalColumnKeysList(this.metadataKeys);
+    while (true) {
+      try {
+        return await this.requestUnary(jwt, (metadata, handler) => {
+          const pager = new OffsetPager();
+          pager.setOffset(offset);
+          pager.setLimit(limit);
 
-      this.client.getTree(req, metadata, handler);
-    });
+          const req = new GetTreeRequest();
+          req.setPager(pager);
+          req.setAdditionalColumnKeysList(this.metadataKeys);
+          req.setRequireViewReady(true);
+
+          this.client.getTree(req, metadata, handler);
+        });
+      } catch (error) {
+        const delay = SceneTreeController.GET_TREE_RETRY_DELAYS_IN_MS[attempt];
+        if (
+          !isGrpcServiceError(error) ||
+          error.code !== grpc.Code.NotFound ||
+          delay == null
+        ) {
+          throw error;
+        }
+
+        attempt += 1;
+        await Async.delay(delay);
+      }
+    }
   }
 
   // TODO(dan): used shared grpc lib

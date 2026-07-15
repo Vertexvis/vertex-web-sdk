@@ -2100,10 +2100,10 @@
     eslint-plugin-simple-import-sort "^10.0.0"
     prettier "^3.0.3"
 
-"@vertexvis/frame-streaming-protos@^0.18.6":
-  version "0.18.6"
-  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.18.6.tgz#27098c430845e32804053bbecc6c6fdb55ac45c8"
-  integrity sha512-iu+tHlkuW/Y9r8q7Z9e72Vms1YobvHeORSIQaGufXKMO2Bc9lMHWf/uzjZ7WvLlZwaODsSG876FrpLU12LwsMw==
+"@vertexvis/frame-streaming-protos@^0.18.7":
+  version "0.18.7"
+  resolved "https://registry.yarnpkg.com/@vertexvis/frame-streaming-protos/-/frame-streaming-protos-0.18.7.tgz#4e0fea4fc80313975e29543a3d0be7f82bec6281"
+  integrity sha512-wbR/vxRjxc3u7FVwfesDDBvSfFd6v5jWTd9w1aWnjufaiiUr0INieXFu1Mhvr4RpCqlYhc1KHVkrjS8/QDT6fQ==
 
 "@vertexvis/jest-config-vertexvis@^0.5.4":
   version "0.5.5"
@@ -2117,15 +2117,15 @@
   resolved "https://registry.yarnpkg.com/@vertexvis/rollup-plugin-web-workers/-/rollup-plugin-web-workers-0.2.0.tgz#f67b850049545a291c287d5b4f5f682b83b11098"
   integrity sha512-KPjUlnGhsWvPwhvNzO0awelsKt2NeKHsk8u+S4DfPJLxvZtiXq8cBgLBE8gIdkG99a8OAJRM3oXZvOMLsJ6jVg==
 
-"@vertexvis/scene-tree-protos@^0.1.29":
-  version "0.1.30"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.30.tgz#c7431956966de69ce1a28c1b4aba8cb973e87186"
-  integrity sha512-OnqltRaTF8zWJkFo8RALC4UztsB170JXqG+1Yz+cTINv7ZE/gjiKa6aHuomxUUtHjn+MKQM7nQMzhS+eBrNpBg==
+"@vertexvis/scene-tree-protos@^0.1.33":
+  version "0.1.33"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-tree-protos/-/scene-tree-protos-0.1.33.tgz#a9eaa354f08032a2ae339cddf88f1ac44a8f5638"
+  integrity sha512-Ezi6TlCq5IUcU/oSEe8s5Q4pOTsrtb/PSGofGEBQ0oNxNJXghO2EkQd6PYCIl1Ro3SimBYY0e18oWNIyfO/ZZA==
 
-"@vertexvis/scene-view-protos@^0.8.2":
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.8.3.tgz#2a71ac98135b1008e14f02d6f6a2d38d107aa7d9"
-  integrity sha512-/riDe+vbPTBPggMqM5YozeLZzF6punqtmVHWFrFiJPsOT7I4//+cqSm8S+Q5hVukINtaY6rUkr7/jeGoERScYA==
+"@vertexvis/scene-view-protos@^0.8.4":
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/@vertexvis/scene-view-protos/-/scene-view-protos-0.8.4.tgz#ffef0c0f97072ff3593fc2a08a56bc4b5f6410e5"
+  integrity sha512-n9BJngp6yfb0arrwVcjPFigBUhKbzcmArsffxMEQBjejomLF96ZaLKazPqtwBGEKIVqo8FVqwqVAtlJoz8jAjA==
 
 "@vertexvis/typescript-config-vertexvis@1.1.0":
   version "1.1.0"

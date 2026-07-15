@@ -300,6 +300,32 @@ describe(SceneTreeController, () => {
       );
     });
 
+    it('retries GetTree with backoff while the view is not ready', async () => {
+      jest.useFakeTimers();
+
+      try {
+        const { controller, client } = createController(10);
+        const notFound: ServiceError = {
+          code: grpc.Code.NotFound,
+          metadata: new grpc.Metadata({}),
+          message: 'Tree view is not ready',
+        };
+        (client.getTree as jest.Mock)
+          .mockImplementationOnce(mockGrpcUnaryError(notFound, 0))
+          .mockImplementationOnce(
+            mockGrpcUnaryResult(createGetTreeResponse(10, 100), 0),
+          );
+
+        const connect = controller.connect(jwtProvider);
+        await jest.runAllTimersAsync();
+
+        await expect(connect).resolves.toBeUndefined();
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+
     it('does not throw an error if the controller is cancelled before a connection completes', async () => {
       const { controller, client } = createController(10);
       const getTree = createGetTreeResponse(10, 100, (node) =>
@@ -973,6 +999,7 @@ describe(SceneTreeController, () => {
 
       const req = new GetTreeRequest();
       req.setPager(pager);
+      req.setRequireViewReady(true);
 
       expect(client.getTree).toHaveBeenCalledWith(
         req,
@@ -1073,6 +1100,7 @@ describe(SceneTreeController, () => {
 
       const req = new GetTreeRequest();
       req.setPager(pager);
+      req.setRequireViewReady(true);
 
       expect(client.getTree).toHaveBeenCalledWith(
         req,
@@ -1103,9 +1131,11 @@ describe(SceneTreeController, () => {
 
       const req1 = new GetTreeRequest();
       req1.setPager(pager1);
+      req1.setRequireViewReady(true);
 
       const req2 = new GetTreeRequest();
       req2.setPager(pager2);
+      req2.setRequireViewReady(true);
 
       expect(client.getTree).toHaveBeenCalledWith(
         req1,
@@ -1371,12 +1401,14 @@ describe(SceneTreeController, () => {
       page1.setLimit(10);
       const expectedReq1 = new GetTreeRequest();
       expectedReq1.setPager(page1);
+      expectedReq1.setRequireViewReady(true);
 
       const page2 = new OffsetPager();
       page2.setOffset(10);
       page2.setLimit(10);
       const expectedReq2 = new GetTreeRequest();
       expectedReq2.setPager(page2);
+      expectedReq2.setRequireViewReady(true);
 
       expect(client.getTree).toHaveBeenCalledWith(
         expectedReq1,
