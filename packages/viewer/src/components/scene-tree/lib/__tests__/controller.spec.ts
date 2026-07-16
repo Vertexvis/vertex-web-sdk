@@ -306,13 +306,13 @@ describe(SceneTreeController, () => {
 
       try {
         const { controller, client } = createController(10);
-        const failedPrecondition: ServiceError = {
-          code: grpc.Code.FailedPrecondition,
+        const unavailable: ServiceError = {
+          code: grpc.Code.Unavailable,
           metadata: new grpc.Metadata({}),
           message: 'Tree view is not ready',
         };
         (client.getTree as jest.Mock)
-          .mockImplementationOnce(mockGrpcUnaryError(failedPrecondition, 0))
+          .mockImplementationOnce(mockGrpcUnaryError(unavailable, 0))
           .mockImplementationOnce(
             mockGrpcUnaryResult(createGetTreeResponse(10, 100), 0),
           );

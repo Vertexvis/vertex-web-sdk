@@ -1240,13 +1240,12 @@ export class SceneTreeController {
           req.setAdditionalColumnKeysList(this.metadataKeys);
           req.setRequireViewReady(true);
 
-          console.log('GetTree request:', req.toObject());
           this.client.getTree(req, metadata, handler);
         });
       } catch (error) {
         if (
           !isGrpcServiceError(error) ||
-          error.code !== grpc.Code.FailedPrecondition ||
+          error.code !== grpc.Code.Unavailable ||
           currentAttempt === maxAttempts
         ) {
           throw error;
