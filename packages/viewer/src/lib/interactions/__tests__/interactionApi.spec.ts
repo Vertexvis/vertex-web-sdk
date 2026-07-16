@@ -186,6 +186,20 @@ describe(InteractionApi, () => {
       expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
     });
 
+    it('reuses the same correlation ID for render option clones', async () => {
+      await api.beginInteraction();
+      await api.zoomCameraToPoint(Point.create(10, 10), 1);
+      await api.zoomCameraToPoint(Point.create(10, 10), 1);
+      await api.endInteraction();
+
+      const correlationIds = (streamApi.replaceCamera as jest.Mock).mock.calls
+        .map(([payload]) => payload.frameCorrelationId?.value)
+        .filter((id) => id != null);
+
+      expect(correlationIds).toHaveLength(2);
+      expect(new Set(correlationIds).size).toBe(1);
+    });
+
     it('prevents zooming past the hit point when configured', async () => {
       const configuredApi = createInteractionApi({
         interactionConfigProvider: () => ({
