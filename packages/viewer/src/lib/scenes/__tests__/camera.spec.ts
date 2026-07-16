@@ -68,8 +68,92 @@ describe(PerspectiveCamera, () => {
 
       expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
-          animation: undefined,
           boundingBox: boundingBoxToProto(updatedBoundingBox),
+        }),
+        true,
+      );
+    });
+
+    it('does not include baseCamera when current camera is invalid', async () => {
+      const camera = new PerspectiveCamera(
+        stream,
+        0.5,
+        { ...data, up: Vector3.origin() },
+        boundingBox,
+        jest.fn(),
+      );
+
+      await camera.fitToBoundingBox(boundingBox).render();
+
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          baseCamera: expect.anything(),
+        }),
+        true,
+      );
+    });
+
+    it('validates the base camera during render by default', async () => {
+      const camera = new PerspectiveCamera(
+        stream,
+        0.5,
+        data,
+        boundingBox,
+        jest.fn(),
+      );
+      const flyToCamera = camera.fitToBoundingBox(boundingBox);
+      const isValidFrameCamera = jest.spyOn(FrameCamera, 'isValidFrameCamera');
+
+      await flyToCamera.render();
+
+      expect(isValidFrameCamera).toHaveBeenCalledTimes(1);
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseCamera: expect.anything(),
+        }),
+        true,
+      );
+    });
+
+    it('skips render-time base camera validation when explicitly requested', async () => {
+      const camera = new PerspectiveCamera(
+        stream,
+        0.5,
+        data,
+        boundingBox,
+        jest.fn(),
+      );
+      const flyToCamera = camera.fitToBoundingBox(boundingBox);
+      const isValidFrameCamera = jest.spyOn(FrameCamera, 'isValidFrameCamera');
+
+      await flyToCamera.render({ skipCameraValidation: true });
+
+      expect(isValidFrameCamera).not.toHaveBeenCalled();
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseCamera: expect.anything(),
+        }),
+        true,
+      );
+    });
+
+    it('does not skip render-time validation when cached camera state is invalid', async () => {
+      const camera = new PerspectiveCamera(
+        stream,
+        0.5,
+        { ...data, up: Vector3.origin() },
+        boundingBox,
+        jest.fn(),
+      );
+      const flyToCamera = camera.fitToBoundingBox(boundingBox);
+      const isValidFrameCamera = jest.spyOn(FrameCamera, 'isValidFrameCamera');
+
+      await flyToCamera.render({ skipCameraValidation: true });
+
+      expect(isValidFrameCamera).toHaveBeenCalledTimes(1);
+      expect(stream.flyTo).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          baseCamera: expect.anything(),
         }),
         true,
       );
@@ -585,7 +669,6 @@ describe(OrthographicCamera, () => {
 
       expect(stream.flyTo).toHaveBeenCalledWith(
         expect.objectContaining({
-          animation: undefined,
           boundingBox: boundingBoxToProto(updatedBoundingBox),
         }),
         true,

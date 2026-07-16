@@ -183,6 +183,18 @@ describe(Vector3.isValid, () => {
   });
 });
 
+describe('Vector3.isZeroVector', () => {
+  it('returns true if all components are zero', () => {
+    const a = Vector3.create(0, 0, 0);
+    expect(Vector3.isZeroVector(a)).toEqual(true);
+  });
+
+  it('returns false if any component is non-zero', () => {
+    const a = Vector3.create(0, 1, 0);
+    expect(Vector3.isZeroVector(a)).toEqual(false);
+  });
+});
+
 describe(Vector3.multiply, () => {
   it('returns a vector with each component multiplied by the given vector', () => {
     const a = Vector3.create(2, 3, 4);

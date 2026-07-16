@@ -47,6 +47,7 @@ export * from './lib/transforms';
 export {
   CrossSectioning,
   EntityType,
+  FrameCamera,
   FrameCameraBase,
   LoadableResource,
   Orientation,

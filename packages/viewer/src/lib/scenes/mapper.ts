@@ -297,66 +297,51 @@ export function buildFlyToOperation(
   options: FlyTo.FlyToOptions,
   animation?: Animation.Animation,
   baseCamera?: FrameCamera.FrameCamera,
+  skipCameraValidation = false,
 ): vertexvis.protobuf.stream.IFlyToPayload {
-  const payload = {
-    frameCorrelationId: {
-      value: frameCorrelationId,
-    },
-    animation: animation
-      ? {
-          duration: toProtoDuration(animation.milliseconds),
-        }
-      : undefined,
-    baseCamera:
-      baseCamera != null && isValidFrameCamera(baseCamera)
-        ? FrameCamera.toProtobuf(baseCamera)
-        : undefined,
+  const { type: flyType, data: flyData } = options.flyTo;
+  const payload: vertexvis.protobuf.stream.IFlyToPayload = {
+    frameCorrelationId: { value: frameCorrelationId },
   };
 
-  switch (options.flyTo.type) {
-    case 'supplied': {
-      return {
-        ...payload,
-        itemSuppliedId: options.flyTo.data,
-      };
-    }
-    case 'internal': {
-      return {
-        ...payload,
-        itemId: new vertexvis.protobuf.core.Uuid({
-          hex: options.flyTo.data,
-        }),
-      };
-    }
-    case 'camera': {
-      return {
-        ...payload,
-        camera: FrameCamera.toProtobuf(options.flyTo.data),
-      };
-    }
-
-    case 'scene-item-query':
-      return {
-        ...payload,
-        sceneItemQueryExpression: options.flyTo.data,
-      };
-
-    case 'bounding-box': {
-      return {
-        ...payload,
-        boundingBox: {
-          xmin: options.flyTo.data.min.x,
-          xmax: options.flyTo.data.max.x,
-          ymin: options.flyTo.data.min.y,
-          ymax: options.flyTo.data.max.y,
-          zmin: options.flyTo.data.min.z,
-          zmax: options.flyTo.data.max.z,
-        },
-      };
-    }
-    default:
-      return {};
+  if (animation != null) {
+    payload.animation = {
+      duration: toProtoDuration(animation.milliseconds),
+    };
   }
+
+  if (baseCamera != null) {
+    if (skipCameraValidation || isValidFrameCamera(baseCamera)) {
+      payload.baseCamera = FrameCamera.toProtobuf(baseCamera);
+    }
+  }
+
+  switch (flyType) {
+    case 'supplied':
+      payload.itemSuppliedId = flyData;
+      break;
+    case 'internal':
+      payload.itemId = new vertexvis.protobuf.core.Uuid({ hex: flyData });
+      break;
+    case 'camera':
+      payload.camera = FrameCamera.toProtobuf(flyData);
+      break;
+    case 'scene-item-query':
+      payload.sceneItemQueryExpression = flyData;
+      break;
+    case 'bounding-box':
+      payload.boundingBox = {
+        xmin: flyData.min.x,
+        xmax: flyData.max.x,
+        ymin: flyData.min.y,
+        ymax: flyData.max.y,
+        zmin: flyData.min.z,
+        zmax: flyData.max.z,
+      };
+      break;
+  }
+
+  return payload;
 }
 
 function buildOperationTypes(
