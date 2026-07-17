@@ -1265,7 +1265,7 @@ describe('vertex-viewer-transform-widget', () => {
       Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Vector3.create(2, 2, 2),
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2)),
     );
 
     widget.shadowRoot

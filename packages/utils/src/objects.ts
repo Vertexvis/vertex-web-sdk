@@ -87,7 +87,6 @@ export function isEqual(a: unknown, b: unknown): boolean {
 }
 
 /* eslint-disable padding-line-between-statements */
-/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /**
@@ -116,7 +115,6 @@ export function toPairs(obj: any): Array<[string, any]> {
   }
 }
 /* eslint-enable padding-line-between-statements */
-/* eslint-enable @typescript-eslint/ban-types */
 /* eslint-enable @typescript-eslint/no-explicit-any */
 /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 
