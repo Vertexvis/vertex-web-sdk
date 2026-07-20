@@ -51,6 +51,7 @@
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
+    "@vertexvis/build-tools": "^0.11.1",
     "@vertexvis/typescript-config-vertexvis": "1.3.1",
     "tslib": "^2.4.0",
     "typescript": "^5.2.0"
