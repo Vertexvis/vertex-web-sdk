@@ -4,7 +4,7 @@
   "nextVersionBump": "patch",
   "devDependencies": {
     "eslint": "^8.57.1",
-    "lerna": "^6.6.2",
+    "lerna": "^9.0.7",
     "prettier": "^3.8.4",
     "rollup": "^4.62.2",
     "semver": "^7.8.4",
@@ -44,7 +44,6 @@
     ]
   },
   "resolutions": {
-    "minimatch": "^6.2.3",
     "semver": "^7.8.4"
   },
   "engines": {
