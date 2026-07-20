@@ -316,12 +316,16 @@ describe(SceneTreeController, () => {
           .mockImplementationOnce(
             mockGrpcUnaryResult(createGetTreeResponse(10, 100), 0),
           );
+        const retryingJwtProvider = jest
+          .fn<ReturnType<typeof jwtProvider>, Parameters<typeof jwtProvider>>()
+          .mockReturnValue(jwt);
 
-        const connect = controller.connect(jwtProvider);
+        const connect = controller.connect(retryingJwtProvider);
         await jest.runAllTimersAsync();
 
         await expect(connect).resolves.toBeUndefined();
         expect(client.getTree).toHaveBeenCalledTimes(2);
+        expect(retryingJwtProvider).toHaveBeenCalledTimes(4);
         expect(warn).toHaveBeenCalledWith(
           expect.stringContaining(
             'GetTree failed because the view is not ready',
