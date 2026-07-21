@@ -1,6 +1,6 @@
-const jestConfig = require('@vertexvis/jest-config-vertexvis/jest.config');
+import jestConfig from '@vertexvis/jest-config-vertexvis';
 
-module.exports = {
+export default {
   ...jestConfig,
   setupFilesAfterEnv: [
     ...(jestConfig.setupFilesAfterEnv || []),
