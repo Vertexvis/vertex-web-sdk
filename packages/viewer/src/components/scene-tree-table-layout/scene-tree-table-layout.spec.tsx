@@ -742,6 +742,9 @@ function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
     partiallyVisible: false,
     columnsList: [],
     filterHit: false,
+    phantom: false,
+    endItem: false,
+    hasGeometry: false,
     ...values,
   };
 }

@@ -52,7 +52,7 @@ describe(InteractionApiOrthographic, () => {
     sceneViewId,
   );
   const frameProvider = (): Frame | undefined => frame;
-  const sceneProvider = (): Scene => scene;
+  const sceneProvider = async (): Promise<Scene> => scene;
   const viewportProvider = (): Viewport => viewport;
   const interactionConfigProvider = (): Interactions.InteractionConfig =>
     Interactions.defaultInteractionConfig;
@@ -75,7 +75,6 @@ describe(InteractionApiOrthographic, () => {
       { emit: emitLongPress },
       { emit: emitInteractionStarted },
       { emit: emitInteractionFinished },
-      { emit: emitCameraChanged },
     );
   });
 

@@ -71,7 +71,6 @@ describe(InteractionApi, () => {
       props.longPressEmitter ?? { emit: emitLongPress },
       props.interactionStartedEmitter ?? { emit: emitInteractionStarted },
       props.interactionFinishedEmitter ?? { emit: emitInteractionFinished },
-      props.cameraChangedEmitter ?? { emit: emitCameraChanged },
     );
   }
 

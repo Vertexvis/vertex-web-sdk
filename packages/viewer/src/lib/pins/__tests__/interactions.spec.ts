@@ -38,7 +38,7 @@ describe('PinsInteractionHandler', () => {
   };
 
   const element = document.createElement('div');
-  const handler = new PinsInteractionHandler(controller);
+  const handler = new PinsInteractionHandler(controller, 0, 0);
 
   beforeEach(() => {
     handler.dispose();

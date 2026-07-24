@@ -803,7 +803,7 @@ describe('vertex-viewer-measurement-distance', () => {
       expect(measurement.end).not.toEqual(end);
 
       // snap end anchor
-      await viewer.stencilBuffer.latestAfterInteraction();
+      await viewer.stencilBuffer!.latestAfterInteraction();
       window.dispatchEvent(new MouseEvent('pointermove', snapEvent));
       await page.waitForChanges();
       expect(measurement.end).toEqual(snapPt);
