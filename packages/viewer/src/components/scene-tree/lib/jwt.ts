@@ -1,4 +1,4 @@
-import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { jwtDecode, type JwtPayload } from 'jwt-decode';
 
 export interface SceneTreeJwtToken extends JwtPayload {
   view: string;
