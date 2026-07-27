@@ -7,7 +7,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { BoundingBox, Vector3 } from '@vertexvis/geometry';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
-import { FrameCameraBase, Orientation } from '../../lib/types';
+import { FramePerspectiveCamera, Orientation } from '../../lib/types';
 import {
   key1,
   loadViewerStreamKey,
@@ -116,7 +116,7 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   it('orients cube and triad based on camera', async () => {
-    const camera = new FrameCameraBase(
+    const camera = new FramePerspectiveCamera(
       Vector3.right(),
       Vector3.origin(),
       Vector3.down(),
@@ -178,6 +178,8 @@ import {
 } from '../viewer/__mocks__/mocks';
 
 describe('vertex-viewer-view-cube interactions', () => {
+  const viewerElement = viewer as unknown as HTMLVertexViewerElement;
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
@@ -191,7 +193,9 @@ describe('vertex-viewer-view-cube interactions', () => {
   it('performs standard view when side clicked', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube viewer={viewer} />,
+      template: () => (
+        <vertex-viewer-view-cube viewer={viewerElement} />
+      ),
     });
 
     const frontEl = page.root?.shadowRoot?.querySelector(
@@ -221,7 +225,7 @@ describe('vertex-viewer-view-cube interactions', () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
       template: () => (
-        <vertex-viewer-view-cube viewer={viewer} viewAll={false} />
+        <vertex-viewer-view-cube viewer={viewerElement} viewAll={false} />
       ),
     });
 
@@ -255,7 +259,9 @@ describe('vertex-viewer-view-cube interactions', () => {
 
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube viewer={viewer} />,
+      template: () => (
+        <vertex-viewer-view-cube viewer={viewerElement} />
+      ),
     });
 
     const frontEl = page.root?.shadowRoot?.querySelector(
@@ -285,7 +291,7 @@ describe('vertex-viewer-view-cube interactions', () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
       template: () => (
-        <vertex-viewer-view-cube viewer={viewer} animationDuration={0} />
+        <vertex-viewer-view-cube viewer={viewerElement} animationDuration={0} />
       ),
     });
 
@@ -303,7 +309,7 @@ describe('vertex-viewer-view-cube interactions', () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
       template: () => (
-        <vertex-viewer-view-cube viewer={viewer} standardViewsOff />
+        <vertex-viewer-view-cube viewer={viewerElement} standardViewsOff />
       ),
     });
 

@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "./internal/build/tsconfig-web.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "jsxFactory": "h"
+  },
+  "include": [
+    "packages/**/*.spec.ts",
+    "packages/**/*.spec.tsx",
+    "packages/**/src/components.d.ts",
+    "packages/**/types/**/*.d.ts",
+    "packages/**/src/regl-shape.d.ts"
+  ],
+  "exclude": ["**/dist", "**/node_modules"]
+}

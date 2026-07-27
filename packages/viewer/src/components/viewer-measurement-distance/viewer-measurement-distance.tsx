@@ -837,7 +837,7 @@ export class ViewerMeasurementDistance {
   }
 
   private async getStencilBuffer(): Promise<void> {
-    const stencil = await this.viewer?.stencilBuffer.latestAfterInteraction();
+    const stencil = await this.viewer?.stencilBuffer!.latestAfterInteraction();
     this.stateMap.stencil = stencil;
   }
 

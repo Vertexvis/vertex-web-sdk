@@ -153,9 +153,11 @@ function updateFrameCameraPosition(
       baseFrame.scene.hasChanged,
       baseFrame.scene.sceneViewSummary,
       baseFrame.scene.modelViewId,
+      baseFrame.scene.itemModelView,
     ),
     makeDepthImagePng(100, 50),
     makeFeatureMapBytes(100, 50, (pt) => Color.create(0, 0, 0)),
+    baseFrame.partialFrame,
   );
 }
 
@@ -616,7 +618,7 @@ describe(TransformWidget, () => {
     };
     const unscaled = new TransformWidget(canvas);
     const scaled = new TransformWidget(canvas, {
-      sizes,
+      scalars: sizes,
     });
 
     const frame = makePerspectiveFrame();

@@ -33,6 +33,7 @@ import { Async } from '@vertexvis/utils';
 import { Viewport } from '../..';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { TriangleMesh, TriangleMeshPoints } from '../../lib/transforms/mesh';
+import { StencilBufferManager } from '../../lib/types';
 import { makePerspectiveFrame } from '../../testing/fixtures';
 import {
   key1,
@@ -60,6 +61,9 @@ function dispatchKeydownEvent(
 }
 
 describe('vertex-viewer-transform-widget', () => {
+  const stencilBuffer = new StencilBufferManager(
+    document.createElement('vertex-viewer'),
+  );
   const mockTransformWidget = new TransformWidget(
     document.createElement('canvas'),
   );
@@ -96,7 +100,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -131,7 +135,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -181,7 +185,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -296,7 +300,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -398,7 +402,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -516,7 +520,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -614,7 +618,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -732,7 +736,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -863,7 +867,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget
             position={position}
           ></vertex-viewer-transform-widget>
@@ -911,7 +915,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget
             position={position}
           ></vertex-viewer-transform-widget>
@@ -959,7 +963,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget
             position={position}
           ></vertex-viewer-transform-widget>
@@ -1086,7 +1090,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget
             xRotationDisabled={true}
             yRotationDisabled={true}
@@ -1170,7 +1174,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -1213,7 +1217,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -1265,7 +1269,7 @@ describe('vertex-viewer-transform-widget', () => {
       Vector3.create(1, 1, 1),
     );
     (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
-      Vector3.create(2, 2, 2),
+      Matrix4.makeTranslation(Vector3.create(2, 2, 2)),
     );
 
     widget.shadowRoot
@@ -1292,7 +1296,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),
@@ -1339,7 +1343,7 @@ describe('vertex-viewer-transform-widget', () => {
     const page = await newSpecPage({
       components: [Viewer, ViewerTransformWidget],
       template: () => (
-        <vertex-viewer stream={stream}>
+        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
           <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
         </vertex-viewer>
       ),

@@ -358,7 +358,7 @@ export class Viewer implements BasicViewer {
    * @internal
    */
   @Prop({ mutable: true })
-  public stencilBuffer!: StencilBufferManager;
+  public stencilBuffer?: StencilBufferManager;
 
   /**
    * Represents the current viewport of the viewer. The viewport represents the
