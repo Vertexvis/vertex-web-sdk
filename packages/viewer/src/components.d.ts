@@ -815,7 +815,7 @@ export namespace Components {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertex:scene:<sceneid>`
          */
         "src"?: string;
-        "stencilBuffer": StencilBufferManager;
+        "stencilBuffer"?: StencilBufferManager;
         "stream"?: ViewerStream;
         /**
           * A token that can be used to make API calls to other Vertex services.
@@ -3307,7 +3307,7 @@ declare namespace LocalJSX {
           * A URN of the scene resource to load when the component is mounted in the DOM tree. The specified resource is a URN in the following format:   * `urn:vertex:scene:<sceneid>`
          */
         "src"?: string;
-        "stencilBuffer": StencilBufferManager;
+        "stencilBuffer"?: StencilBufferManager;
         "stream"?: ViewerStream;
         /**
           * A token that can be used to make API calls to other Vertex services.

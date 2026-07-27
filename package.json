@@ -23,6 +23,7 @@
     "test": "lerna run test",
     "test:ci": "lerna run test:ci",
     "test:coverage": "lerna run test:coverage",
+    "typecheck:spec": "tsc -p tsconfig.spec.json",
     "lint": "lerna run lint",
     "format:prettier": "prettier --write --list-different .",
     "format": "lerna run format && lerna run format:prettier",

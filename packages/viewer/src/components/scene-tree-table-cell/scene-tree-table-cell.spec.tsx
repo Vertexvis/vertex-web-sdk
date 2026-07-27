@@ -710,6 +710,7 @@ function createNode(values: Partial<Node.AsObject> = {}): Node.AsObject {
     filterHit: false,
     phantom: false,
     endItem: false,
+    hasGeometry: false,
     ...values,
   };
 }
