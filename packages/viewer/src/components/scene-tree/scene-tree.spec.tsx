@@ -188,10 +188,10 @@ describe('<vertex-scene-tree>', () => {
     });
 
     it('emits error if tree is not enabled', (done) => {
-      async function test(): Promise<void> {
-        const client = mockSceneTreeClient();
-        mockGetTreeError(client, grpc.Code.FailedPrecondition);
+      const client = mockSceneTreeClient();
+      mockGetTreeError(client, grpc.Code.FailedPrecondition);
 
+      async function test(): Promise<void> {
         const { stream, ws } = makeViewerStream();
         const controller = new SceneTreeController(client, 100);
         const { viewer } = await newSceneTreeSpec({

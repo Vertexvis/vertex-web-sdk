@@ -29,7 +29,7 @@ import {
   ServiceError,
   UnaryResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-import { Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import { Async, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
 
 import { MetadataKey } from '../types';
 import {
@@ -157,6 +157,8 @@ export class SceneTreeController {
   private static IDLE_RECONNECT_IN_SECONDS = 4 * 60;
   private static LOST_CONNECTION_RECONNECT_IN_SECONDS = 2;
   private static MAX_SUBSCRIPTION_RETRY_COUNT = 2;
+  private static MAX_GET_TREE_ATTEMPTS = 6;
+  private static GET_TREE_RETRY_DELAYS_IN_MS = [1000, 2000, 4000, 8000, 15000];
 
   private nextPageId = 0;
   private pages = new Map<number, Page>();
@@ -622,28 +624,28 @@ export class SceneTreeController {
    * @param index A 0 based index to fetch.
    */
   public async fetchPage(index: number): Promise<void> {
-    return this.ifConnectionHasJwt(async (jwt) => {
-      if (index < 0 || index > this.maxPages - 1) {
-        return;
-      }
+    if (index < 0 || index > this.maxPages - 1) {
+      return;
+    }
 
-      if (!this.pages.has(index)) {
-        const offset = index * this.rowLimit;
-        this.log('Scene tree fetching page', index, offset);
-        const res = this.fetchTree(offset, this.rowLimit, jwt);
-        const id = this.nextPageId++;
-        const page: Page = { id, res, index, metadataKeys: this.metadataKeys };
-        this.pages.set(index, page);
-        page.done = this.handlePageResult(page);
-      }
+    if (!this.pages.has(index)) {
+      const offset = index * this.rowLimit;
+      this.log('Scene tree fetching page', index, offset);
+      const res = this.fetchTree(offset, this.rowLimit, () =>
+        this.ifConnectionHasJwt((jwt) => jwt),
+      );
+      const id = this.nextPageId++;
+      const page: Page = { id, res, index, metadataKeys: this.metadataKeys };
+      this.pages.set(index, page);
+      page.done = this.handlePageResult(page);
+    }
 
-      const page = this.pages.get(index);
-      const [resResult] = await Promise.allSettled([page?.res, page?.done]);
+    const page = this.pages.get(index);
+    const [resResult] = await Promise.allSettled([page?.res, page?.done]);
 
-      if (resResult?.status === 'rejected') {
-        throw resResult.reason;
-      }
-    });
+    if (resResult?.status === 'rejected') {
+      throw resResult.reason;
+    }
   }
 
   /**
@@ -1221,19 +1223,46 @@ export class SceneTreeController {
   private async fetchTree(
     offset: number,
     limit: number,
-    jwt: string,
+    jwtProvider: () => Promise<string>,
+    currentAttempt = 1,
   ): Promise<GetTreeResponse> {
-    return this.requestUnary(jwt, (metadata, handler) => {
-      const pager = new OffsetPager();
-      pager.setOffset(offset);
-      pager.setLimit(limit);
+    const maxAttempts = SceneTreeController.MAX_GET_TREE_ATTEMPTS;
 
-      const req = new GetTreeRequest();
-      req.setPager(pager);
-      req.setAdditionalColumnKeysList(this.metadataKeys);
+    try {
+      const jwt = await jwtProvider();
+      return await this.requestUnary(jwt, (metadata, handler) => {
+        const pager = new OffsetPager();
+        pager.setOffset(offset);
+        pager.setLimit(limit);
 
-      this.client.getTree(req, metadata, handler);
-    });
+        const req = new GetTreeRequest();
+        req.setPager(pager);
+        req.setAdditionalColumnKeysList(this.metadataKeys);
+        req.setRequireViewReady(true);
+
+        this.client.getTree(req, metadata, handler);
+      });
+    } catch (error) {
+      if (!isGrpcServiceError(error) || error.code !== grpc.Code.Unavailable) {
+        throw error;
+      }
+
+      if (currentAttempt >= maxAttempts) {
+        throw new Error(
+          `Failed to retrieve scene tree after ${maxAttempts} attempts.`,
+        );
+      }
+
+      const delay =
+        SceneTreeController.GET_TREE_RETRY_DELAYS_IN_MS[currentAttempt - 1];
+      const nextAttempt = currentAttempt + 1;
+      console.warn(
+        `GetTree failed because the view is not ready. Retrying in ${delay}ms (attempt ${nextAttempt}/${maxAttempts}).`,
+      );
+      await Async.delay(delay);
+
+      return this.fetchTree(offset, limit, jwtProvider, nextAttempt);
+    }
   }
 
   // TODO(dan): used shared grpc lib
