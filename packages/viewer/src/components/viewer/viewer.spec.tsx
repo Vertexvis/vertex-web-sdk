@@ -392,6 +392,66 @@ describe('vertex-viewer', () => {
     });
   });
 
+  describe('connection failure behavior', () => {
+    it('displays a connection error with a retry button that reloads the viewer', async () => {
+      const reload = jest.spyOn(Viewer.prototype, 'reload').mockResolvedValue();
+      const { stream } = makeViewerStream();
+      const { page, viewer } = await newViewerSpecWithPage({
+        template: () => <vertex-viewer stream={stream} />,
+      });
+
+      stream.stateChanged.emit({
+        type: 'connection-failed',
+        message: 'Unable to connect.',
+      });
+      await page.waitForChanges();
+
+      expect(viewer.shadowRoot?.querySelector('.error-message')).toEqualText(
+        'Unable to connect.',
+      );
+      expect(
+        viewer.shadowRoot?.querySelector('slot[name="retry"]'),
+      ).not.toBeNull();
+      expect(
+        viewer.shadowRoot?.querySelector('button.button.button-secondary'),
+      ).not.toBeNull();
+
+      const retry = viewer.shadowRoot?.querySelector(
+        'button.button.button-secondary',
+      ) as HTMLButtonElement;
+
+      retry.click();
+
+      expect(reload).toHaveBeenCalled();
+    });
+
+    it('allows overriding the default retry button behavior', async () => {
+      const reload = jest.spyOn(Viewer.prototype, 'reload').mockResolvedValue();
+      const customRetryHandler = jest.fn();
+      const { stream } = makeViewerStream();
+      const { page, viewer } = await newViewerSpecWithPage({
+        template: () => (
+          <vertex-viewer stream={stream}>
+            <button slot="retry" onClick={customRetryHandler}>Try again</button>
+          </vertex-viewer>
+        ),
+      });
+      const retry = viewer.querySelector('[slot="retry"]') as HTMLButtonElement;
+
+      stream.stateChanged.emit({
+        type: 'connection-failed',
+        message: 'Unable to connect.',
+      });
+      await page.waitForChanges();
+
+      retry.dispatchEvent(
+        new MouseEvent('click'),
+      );
+      expect(customRetryHandler).toHaveBeenCalled();
+      expect(reload).not.toHaveBeenCalled();
+    });
+  });
+
   describe('disconnect behavior', () => {
     it('should pause the stream and close the websocket when disconnected', async () => {
       const { stream, ws } = makeViewerStream();

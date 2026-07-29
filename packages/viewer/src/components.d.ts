@@ -526,6 +526,9 @@ export namespace Components {
     }
     interface VertexSceneTreeToolbarGroup {
     }
+    /**
+     * @see {@link Viewer.reload } for reloading the viewer.
+     */
     interface VertexViewer {
         /**
           * Adds a cursor to the viewer, and displays it if the cursor has the highest priority.
@@ -2335,6 +2338,9 @@ declare global {
         "deviceIdChange": string;
         "dimensionschange": Dimensions.Dimensions;
     }
+    /**
+     * @see {@link Viewer.reload } for reloading the viewer.
+     */
     interface HTMLVertexViewerElement extends Components.VertexViewer, HTMLStencilElement {
         addEventListener<K extends keyof HTMLVertexViewerElementEventMap>(type: K, listener: (this: HTMLVertexViewerElement, ev: VertexViewerCustomEvent<HTMLVertexViewerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -3086,6 +3092,9 @@ declare namespace LocalJSX {
     }
     interface VertexSceneTreeToolbarGroup {
     }
+    /**
+     * @see {@link Viewer.reload } for reloading the viewer.
+     */
     interface VertexViewer {
         /**
           * The annotation controller for accessing annotations associated with the scene view.
@@ -4979,6 +4988,9 @@ declare module "@stencil/core" {
             "vertex-scene-tree-table-resize-divider": LocalJSX.IntrinsicElements["vertex-scene-tree-table-resize-divider"] & JSXBase.HTMLAttributes<HTMLVertexSceneTreeTableResizeDividerElement>;
             "vertex-scene-tree-toolbar": LocalJSX.IntrinsicElements["vertex-scene-tree-toolbar"] & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarElement>;
             "vertex-scene-tree-toolbar-group": LocalJSX.IntrinsicElements["vertex-scene-tree-toolbar-group"] & JSXBase.HTMLAttributes<HTMLVertexSceneTreeToolbarGroupElement>;
+            /**
+             * @see {@link Viewer.reload } for reloading the viewer.
+             */
             "vertex-viewer": LocalJSX.IntrinsicElements["vertex-viewer"] & JSXBase.HTMLAttributes<HTMLVertexViewerElement>;
             "vertex-viewer-annotation-callout": LocalJSX.IntrinsicElements["vertex-viewer-annotation-callout"] & JSXBase.HTMLAttributes<HTMLVertexViewerAnnotationCalloutElement>;
             /**
