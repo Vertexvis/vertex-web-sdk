@@ -1,5 +1,6 @@
 /**
  * @module Viewer
+ * @document component-readmes.md
  */
 import * as ColorMaterial from './lib/scenes/colorMaterial';
 

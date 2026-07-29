@@ -155,9 +155,9 @@ export type ConnectionStatus =
 /**
  * @slot retry - A slot that replaces the default Retry button displayed when
  * the viewer fails to connect. If slotted, the element is expected to handle
- * the retry logic. @see {@link Viewer.reload} for reloading the viewer.
+ * the logic to reload the viewer.
  * 
- * @slot '' - Children to be rendered as a sibling of the rendered canvas for the viewer.
+ * @slot - Children to be rendered as a sibling of the rendered canvas for the viewer.
  */
 @Component({
   tag: 'vertex-viewer',

@@ -1,0 +1,6 @@
+.component-properties-table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
