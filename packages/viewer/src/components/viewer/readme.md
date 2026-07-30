@@ -244,6 +244,14 @@ Type: `Promise<void>`
 
 
 
+## Slots
+
+| Slot      | Description                                                                                                                                                             |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|           | Children to be rendered as a sibling of the rendered canvas for the viewer.                                                                                             |
+| `"retry"` | A slot that replaces the default Retry button displayed when the viewer fails to connect. If slotted, the element is expected to handle the logic to reload the viewer. |
+
+
 ## CSS Custom Properties
 
 | Name                  | Description                                                                                                                                                                 |

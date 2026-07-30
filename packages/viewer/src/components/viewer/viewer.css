@@ -1,3 +1,5 @@
+@import url('../../css/button.css');
+
 :host {
   /**
    * @prop --image-background: The background color of the rendered image.
@@ -42,10 +44,18 @@
   overflow: hidden;
 }
 
-.error-message {
+.error-message-wrapper {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   position: absolute;
   top: 50%;
   width: 100%;
   transform: translateY(-50%);
   text-align: center;
+}
+
+.error-message {
+  font-size: 0.875rem;
 }

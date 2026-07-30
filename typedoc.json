@@ -4,7 +4,8 @@
     "./packages/geometry/src/index.ts",
     "./packages/stream-api/src/index.ts",
     "./packages/utils/src/index.ts",
-    "./packages/viewer/src/index.ts"
+    "./packages/viewer/src/index.ts",
+    "./packages/doc-viewer/src/index.ts"
   ],
   "excludePrivate": true,
   "excludeProtected": true,
@@ -12,6 +13,7 @@
   "includeVersion": false,
   "gitRevision": "master",
   "hideGenerator": true,
+  "customCss": "./typedoc.css",
   "readme": "none",
   "out": "docs"
 }
