@@ -152,6 +152,13 @@ export type ConnectionStatus =
   | DisconnectedStatus
   | ConnectionFailedStatus;
 
+/**
+ * @slot retry - A slot that replaces the default Retry button displayed when
+ * the viewer fails to connect. If slotted, the element is expected to handle
+ * the logic to reload the viewer.
+ * 
+ * @slot - Children to be rendered as a sibling of the rendered canvas for the viewer.
+ */
 @Component({
   tag: 'vertex-viewer',
   styleUrl: 'viewer.css',
@@ -689,7 +696,18 @@ export class Viewer implements BasicViewer {
               class="canvas"
             ></canvas>
             {this.errorMessage != null ? (
-              <div class="error-message">{this.errorMessage}</div>
+              <div class="error-message-wrapper" role="alert">
+                <span class="error-message">{this.errorMessage}</span>
+                <slot name="retry">
+                  <button
+                    class="button button-secondary"
+                    type="button"
+                    onClick={this.handleRetry}
+                  >
+                    Retry
+                  </button>
+                </slot>
+              </div>
             ) : null}
           </div>
           <slot></slot>
@@ -1382,6 +1400,12 @@ export class Viewer implements BasicViewer {
       this.emitConnectionChange({ status: 'disconnected' });
     }
   }
+
+  private handleRetry = (): void => {
+    this.reload().catch((e) => {
+      console.error('Error reloading scene', e);
+    });
+  };
 
   private updateDimensions(dimensions?: Dimensions.Dimensions): void {
     this.stream?.update({ dimensions });

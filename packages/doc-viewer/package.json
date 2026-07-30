@@ -78,6 +78,7 @@
     "test:ci": "stencil test --spec --coverage --runInBand",
     "test:coverage": "stencil test --spec --coverage --runInBand",
     "generate": "stencil generate",
+    "generate:docs": "../../scripts/generate_docs.sh",
     "release:stage": "yarn generate:docs"
   },
   "devDependencies": {
