@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/doc-viewer-vue",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Vue bindings for the Vertex Document Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
@@ -43,11 +43,11 @@
   },
   "dependencies": {
     "@stencil/vue-output-target": "^0.13.1",
-    "@vertexvis/doc-viewer": "1.0.1"
+    "@vertexvis/doc-viewer": "1.1.0"
   },
   "devDependencies": {
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.1",
-    "@vertexwebsdk/build": "1.0.1",
+    "@vertexwebsdk/build": "1.1.0",
     "eslint": "^8.57.1",
     "rollup": "^4.62.2",
     "tslib": "^2.4.0",
