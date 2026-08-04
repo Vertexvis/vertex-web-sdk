@@ -6,4 +6,5 @@ function get_version {
 
 function npx_ignore_scripts {
   npx --ignore-scripts "$@"
+  return $?
 }
