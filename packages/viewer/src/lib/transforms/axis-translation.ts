@@ -83,7 +83,7 @@ export function computeArrowNdcValues(
   const up = Ray.at(yRay, triangleSize * sizeScalar * 3);
 
   return new TriangleMeshPoints(
-    !isNaN(worldX.x),
+    !Number.isNaN(worldX.x),
     position,
     left,
     right,

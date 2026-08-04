@@ -73,10 +73,10 @@ export const TransformWidgetInput: FunctionalComponent<
 }) => {
   const handleChange = (event: Event): void => {
     if (event.target != null) {
-      const parsed = parseFloat((event.target as HTMLInputElement).value);
+      const parsed = Number.parseFloat((event.target as HTMLInputElement).value);
 
-      if (!isNaN(parsed)) {
-        onChange?.(parseFloat((event.target as HTMLInputElement).value));
+      if (!Number.isNaN(parsed)) {
+        onChange?.(Number.parseFloat((event.target as HTMLInputElement).value));
       }
     }
   };

@@ -353,14 +353,14 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     if (this.bodyStyleCache == null) {
       const bodyStyle = window.getComputedStyle(document.body);
       const fontSize =
-        parseFloat(bodyStyle.getPropertyValue('fontSize')) || DEFAULT_FONT_SIZE;
-      const lineHeight = parseFloat(bodyStyle.getPropertyValue('lineHeight'));
+        Number.parseFloat(bodyStyle.getPropertyValue('fontSize')) || DEFAULT_FONT_SIZE;
+      const lineHeight = Number.parseFloat(bodyStyle.getPropertyValue('lineHeight'));
       this.bodyStyleCache = {
         lineHeightPixels: Number.isFinite(lineHeight)
           ? lineHeight
           : fontSize * DEFAULT_FONT_TO_LINE_HEIGHT_MULTIPLIER,
         height:
-          parseFloat(bodyStyle.getPropertyValue('height')) ||
+          Number.parseFloat(bodyStyle.getPropertyValue('height')) ||
           window.innerHeight,
       };
       window.setTimeout(() => {

@@ -26,15 +26,15 @@ export abstract class MouseInteraction {
     canvasPosition: Point.Point,
     api: InteractionApi,
     element: HTMLElement,
-  ): void {
+  ): void | Promise<void> {
     // noop
   }
 
-  public drag(event: MouseEvent, api: InteractionApi): void {
+  public drag(event: MouseEvent, api: InteractionApi): void | Promise<void> {
     // noop
   }
 
-  public endDrag(event: MouseEvent, api: InteractionApi): void {
+  public endDrag(event: MouseEvent, api: InteractionApi): void | Promise<void> {
     if (this.currentPosition != null) {
       api.endInteraction();
       this.currentPosition = undefined;

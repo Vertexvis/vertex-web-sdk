@@ -323,7 +323,7 @@ export function isVertexViewerMarkupElement(
 }
 
 export function isValidPointData(...points: Point.Point[]): boolean {
-  return points.every((pt) => !isNaN(pt.x) && !isNaN(pt.y));
+  return points.every((pt) => !Number.isNaN(pt.x) && !Number.isNaN(pt.y));
 }
 
 export function isValidStartEvent(event: PointerEvent): boolean {

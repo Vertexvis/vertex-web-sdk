@@ -13,7 +13,7 @@ version=`jq -r '.version' lerna.json`
 next_version=`npx_ignore_scripts semver "$version" --increment "$next_bump"`
 published_canary_versions=`npm view @vertexvis/viewer --json versions | jq --arg version "$next_version-" -r '.[] | select(contains($version) and contains("canary"))'`
 
-if test -n "$published_canary_versions"
+if [[ -n "$published_canary_versions" ]]
 then
   published_version=`npx_ignore_scripts semver $(echo "$published_canary_versions") | tail -1`
   echo "Detected published canary version $published_version"

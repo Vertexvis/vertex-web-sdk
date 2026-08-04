@@ -4,21 +4,21 @@ set -e
 
 . "$(pwd)"/scripts/utils.sh
 
-if test "$(git rev-parse --abbrev-ref HEAD)" != "master"
+if [[ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]]
 then
   echo "Cannot release from non-master branch"
   exit 1
 fi
 
 # Check if the local repo is clean
-if test -n "$(git status --porcelain --untracked-files=no)"
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]
 then
   echo "Working directory contains uncommitted changes."
   exit 1
 fi
 
 # Check if upstream has changes
-if test -n "$(git status -sb --porcelain origin | grep "\[behind")"
+if [[ -n "$(git status -sb --porcelain origin | grep "\[behind")" ]]
 then
   echo "Working directory is behind upstream. Pull upstream and try again."
   exit 1
@@ -30,7 +30,7 @@ local_branch=release-temp/$timestamp
 git checkout --track=direct -b $local_branch
 
 # Bump version and generate docs with updated versions
-if test -n "$ASK_VERSION"
+if [[ -n "$ASK_VERSION" ]]
 then
   npx_ignore_scripts lerna version --no-push --no-git-tag-version --exact
 else

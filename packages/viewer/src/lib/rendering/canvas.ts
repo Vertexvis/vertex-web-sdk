@@ -91,7 +91,7 @@ export function measureCanvasRenderer(
         }
 
         const avgFps =
-          fpsHistory.reduce((res, num) => res + num) / fpsHistory.length;
+          fpsHistory.reduce((res, num) => res + num, 0) / fpsHistory.length;
         console.debug(`Paint rate: ${fpsFrameCount}fps`);
         console.debug(`Paint rate (avg): ${avgFps}`);
         fpsFrameCount = undefined;

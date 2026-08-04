@@ -13,7 +13,7 @@ version=`jq -r '.version' lerna.json`
 next_version=`npx_ignore_scripts semver "$version" --increment "$next_bump"`
 published_testing_versions=`npm view @vertexvis/viewer --json versions | jq --arg version "$next_version-" -r '.[] | select(contains($version) and contains("testing"))'`
 
-if test -n "$published_testing_versions"
+if [[ -n "$published_testing_versions" ]]
 then
   published_version=`npx_ignore_scripts semver $(echo "$published_testing_versions") | tail -1`
   echo "Detected published testing version $published_version"

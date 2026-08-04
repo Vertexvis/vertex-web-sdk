@@ -58,7 +58,7 @@ export function computePlaneNdcValues(
   const world = [bottomLeft, topLeft, topRight, bottomRight];
 
   return new MeshPoints(
-    !isNaN(worldX.x),
+    !Number.isNaN(worldX.x),
     [bottomLeft, topLeft, topRight, bottomRight],
     world.map((v) =>
       Vector3.multiplyByTransformMatrixColumnMajor(

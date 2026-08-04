@@ -164,7 +164,7 @@ export class SceneTreeController {
   private pages = new Map<number, Page>();
   private activeRowRange = [0, 0];
   private metadataKeys: MetadataKey[] = [];
-  private debugLogs = false;
+  private debugLogs = true;
   private pendingFilterGrpcRes?: UnaryResponse;
 
   private reconnectTimer?: number;

@@ -59,7 +59,7 @@ export const fromNumber = (num: number): Color => {
 export const fromHexString = (str: string): Color | undefined => {
   const match = hexRegex.exec(str);
   if (match != null) {
-    return fromNumber(parseInt(match[2], 16));
+    return fromNumber(Number.parseInt(match[2], 16));
   }
 };
 
@@ -72,19 +72,19 @@ export const fromCss = (css: string): Color | undefined => {
   const rgbMatch = rgbRegex.exec(css);
   if (rgbMatch != null) {
     return create(
-      parseInt(rgbMatch[1]),
-      parseInt(rgbMatch[2]),
-      parseInt(rgbMatch[3]),
+      Number.parseInt(rgbMatch[1]),
+      Number.parseInt(rgbMatch[2]),
+      Number.parseInt(rgbMatch[3]),
     );
   }
 
   const rgbaMatch = rgbaRegex.exec(css);
   if (rgbaMatch != null) {
     return create(
-      parseInt(rgbaMatch[1]),
-      parseInt(rgbaMatch[2]),
-      parseInt(rgbaMatch[3]),
-      Math.floor(parseFloat(rgbaMatch[4]) * 255),
+      Number.parseInt(rgbaMatch[1]),
+      Number.parseInt(rgbaMatch[2]),
+      Number.parseInt(rgbaMatch[3]),
+      Math.floor(Number.parseFloat(rgbaMatch[4]) * 255),
     );
   }
 
