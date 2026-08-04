@@ -40,6 +40,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
   private lastMoveEvent?: BaseEvent;
   private interactionTimer?: number;
   private keyboardControls = false;
+  private pendingWheelZoom: { point: Point.Point; delta: number } | null = null;
 
   protected disableIndividualInteractions = false;
 
@@ -85,6 +86,7 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     this.element?.removeEventListener('mousedown', this.handleDoubleClick);
     this.element?.removeEventListener('wheel', this.handleMouseWheel);
     this.element = undefined;
+    this.pendingWheelZoom = null;
   }
 
   public onPrimaryInteractionTypeChange(listener: Listener<void>): Disposable {
@@ -313,38 +315,27 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     ) {
       const delta =
         -this.wheelDeltaToPixels(event.deltaY, event.deltaMode) / 10;
-      const rect = this.element.getBoundingClientRect();
-      const point = getMouseClientPosition(event, rect);
-      const scrollSize = Math.abs(event.deltaY);
 
-      if (scrollSize < 12) {
-        // For small wheel movements, send a single zoom event.
-        void this.zoomInteraction.zoomToPoint(
-          point,
-          delta,
-          this.interactionApi,
-        );
+      if (this.pendingWheelZoom) {
+        // Accumulate wheel input and process on next frame for smooth zooming
+        // assumed that mouse position is not meaningfully changing during rapid wheel zoom
+        this.pendingWheelZoom.delta += delta;
       } else {
-        const divisions = Math.min(10, Math.ceil(scrollSize / 12));
-        const zoomDelta = delta / divisions;
-        // For larger wheel movements, divide the delta into multiple zoom events with increasing delay
-        // which approximates a smooth zoom deceleration curve for the end user.
-        for (let i = 1; i <= divisions; i++) {
-          const delayMs = i * 5;
-          window.setTimeout(() => {
-            if (this.interactionApi != null) {
-              this.zoomInteraction.zoomToPoint(
-                point,
-                zoomDelta,
-                this.interactionApi,
-                delayMs,
-              );
-            }
-          }, delayMs);
-        }
+        const rect = this.element.getBoundingClientRect();
+        const point = getMouseClientPosition(event, rect);
+        this.pendingWheelZoom = { point, delta };
+        requestAnimationFrame(this.processWheelZoom);
       }
     }
   }
+
+  private processWheelZoom = (): void => {
+    if (this.pendingWheelZoom && this.interactionApi) {
+      const { point, delta } = this.pendingWheelZoom;
+      this.pendingWheelZoom = null;
+      void this.zoomInteraction.zoomToPoint(point, delta, this.interactionApi);
+    }
+  };
 
   protected wheelDeltaToPixels(deltaY: number, deltaMode: number): number {
     // Cached values are an optimization we can use given mouseWheel

@@ -270,8 +270,10 @@ describe(ZoomInteraction, () => {
         mouseWheelInteractionEndDebounce: timeoutDelay,
       };
     };
-    function delay(): Promise<void> {
-      return new Promise((resolve) => setTimeout(resolve, timeoutDelay + 10));
+    function delay(extraDelayMs = 0): Promise<void> {
+      return new Promise((resolve) =>
+        setTimeout(resolve, timeoutDelay + extraDelayMs + 10),
+      );
     }
 
     it('only begins interaction once within interaction timeout', async () => {
@@ -286,7 +288,7 @@ describe(ZoomInteraction, () => {
     it('ends interaction after interaction timeout', async () => {
       const interaction = new ZoomInteraction(interactionConfigProvider);
       interaction.zoom(1, api);
-      await delay();
+      await delay(48); // zoom has extra delay of approx 3 frames at 60fp
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
     });
   });
