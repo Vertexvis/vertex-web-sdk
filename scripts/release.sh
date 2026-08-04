@@ -32,10 +32,10 @@ git checkout --track=direct -b $local_branch
 # Bump version and generate docs with updated versions
 if test -n "$ASK_VERSION"
 then
-  npx lerna version --no-push --no-git-tag-version --exact
+  npx_ignore_scripts lerna version --no-push --no-git-tag-version --exact
 else
   next_bump=`jq -r '.nextVersionBump' package.json`
-  npx lerna version --no-push --no-git-tag-version --exact "$next_bump"
+  npx_ignore_scripts lerna version --no-push --no-git-tag-version --exact "$next_bump"
 fi
 
 yarn install

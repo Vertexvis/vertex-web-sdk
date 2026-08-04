@@ -16,7 +16,7 @@ install_mo() {
 
   if ! test -x ./.lib/mo
   then
-    curl -sSL https://git.io/get-mo -o mo
+    curl --proto '=https' --tlsv1.2 -sSL https://git.io/get-mo -o mo
     chmod +x mo
     mv mo ./.lib/mo
   fi

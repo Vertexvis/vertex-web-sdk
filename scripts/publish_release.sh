@@ -11,7 +11,7 @@ version="v$(get_version)"
 notes="$(get_release_notes)"
 sha="$(git rev-parse HEAD)"
 
-npx lerna publish from-package --yes
+npx_ignore_scripts lerna publish from-package --yes
 
 curl -s -X POST https://api.github.com/repos/$REPOSITORY/releases \
 -H "Authorization: token $GITHUB_TOKEN" \

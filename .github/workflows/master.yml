@@ -23,7 +23,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install --frozen-lockfile"
+        run: "yarn install --ignore-scripts --frozen-lockfile"
       - name: "Build"
         run: "yarn build"
       - name: "Test"
@@ -78,7 +78,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install"
+        run: "yarn install --ignore-scripts"
       - name: "Publish Canary to NPM"
         env:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
@@ -116,7 +116,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install"
+        run: "yarn install --ignore-scripts"
       - name: "Publish Release to NPM"
         env:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
@@ -147,7 +147,7 @@ jobs:
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - name: "Install"
-        run: "yarn install"
+        run: "yarn install --ignore-scripts"
       - name: "Generate docs"
         run: "yarn generate:docs"
       - name: "Upload docs as pages artifact"
