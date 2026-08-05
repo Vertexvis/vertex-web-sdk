@@ -24,7 +24,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install --frozen-lockfile"
+        run: "yarn install --ignore-scripts --frozen-lockfile"
       - name: "Build"
         run: "yarn build"
       - name: "Upload build artifacts"

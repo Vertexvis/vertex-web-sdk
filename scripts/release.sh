@@ -38,7 +38,7 @@ else
   npx_ignore_scripts lerna version --no-push --no-git-tag-version --exact "$next_bump"
 fi
 
-yarn install
+yarn install --ignore-scripts
 yarn generate:docs
 
 # Set the next version bump back to patch
