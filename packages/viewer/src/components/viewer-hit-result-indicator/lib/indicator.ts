@@ -226,7 +226,7 @@ export class HitIndicator extends ReglComponent {
   private getPlaneOpacity(): number {
     if (this.planeOpacity != null) {
       return typeof this.planeOpacity === 'string'
-        ? parseFloat(this.planeOpacity)
+        ? Number.parseFloat(this.planeOpacity)
         : this.planeOpacity;
     }
     return DEFAULT_PLANE_OPACITY;

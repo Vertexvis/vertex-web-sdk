@@ -71,7 +71,7 @@ export function computePointNdcValues(
   ];
 
   return new MeshPoints(
-    !isNaN(worldX.x),
+    !Number.isNaN(worldX.x),
     world,
     world.map((v) =>
       Vector3.multiplyByTransformMatrixColumnMajor(

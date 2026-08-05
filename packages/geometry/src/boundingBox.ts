@@ -78,10 +78,9 @@ export function union(
 ): BoundingBox;
 export function union(...boxes: BoundingBox[]): BoundingBox | undefined;
 export function union(box: BoundingBox, ...rest: BoundingBox[]): BoundingBox {
-  const boxes = [box, ...rest];
-  return boxes.reduce((a, b) => {
+  return rest.reduce((a, b) => {
     return create(Vector3.min(a.min, b.min), Vector3.max(a.max, b.max));
-  });
+  }, box);
 }
 /* eslint-enable padding-line-between-statements */
 

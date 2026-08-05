@@ -91,7 +91,7 @@ export function testTriangle(
     // if in orthographic to correctly return hit results when close
     // to the camera.
     // TODO: revisit with https://vertexvis.atlassian.net/browse/PLAT-1549
-    return !isNaN(r) && (r > 0 || frame.scene.camera.isOrthographic());
+    return !Number.isNaN(r) && (r > 0 || frame.scene.camera.isOrthographic());
   }
   return false;
 }

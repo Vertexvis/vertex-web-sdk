@@ -54,7 +54,7 @@ export const readUtf8String = (
   length: number,
   reader: BinaryReader,
 ): BinaryReaderValue<string> => {
-  const value = String.fromCharCode.apply(
+  const value = String.fromCodePoint.apply(
     null,
     Array.from(new Uint8Array(reader.data.buffer, reader.offset, length)),
   );

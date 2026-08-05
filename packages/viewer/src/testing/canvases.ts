@@ -150,31 +150,32 @@ export function makeCallout(value: Partial<CalloutItem> = {}): CanvasItem {
 }
 
 export function makeLineEndShape(
-  shape: ArrowEndShape | CircleEndShape | DashEndShape = {
-    type: 'arrow-end',
-    width: 1,
-    filled: true,
-  },
+  shape?: ArrowEndShape | CircleEndShape | DashEndShape,
 ): ApiEndShape {
   const s = new ApiEndShape();
+  const effectiveShape = shape ?? {
+    type: 'arrow-end',
+    filled: true,
+    width: 1,
+  };
 
-  if (shape.type === 'arrow-end') {
+  if (effectiveShape.type === 'arrow-end') {
     const a = new ApiArrowEndShape();
-    a.setFilled(shape.filled);
-    a.setWidth(shape.width);
+    a.setFilled(effectiveShape.filled);
+    a.setWidth(effectiveShape.width);
     s.setArrow(a);
   }
 
-  if (shape.type === 'circle-end') {
+  if (effectiveShape.type === 'circle-end') {
     const c = new ApiCircleEndShape();
-    c.setFilled(shape.filled);
-    c.setDiameter(shape.diameter);
+    c.setFilled(effectiveShape.filled);
+    c.setDiameter(effectiveShape.diameter);
     s.setCircle(c);
   }
 
-  if (shape.type === 'dash-end') {
+  if (effectiveShape.type === 'dash-end') {
     const d = new ApiDashEndShape();
-    d.setWidth(shape.width);
+    d.setWidth(effectiveShape.width);
     s.setDash(d);
   }
 

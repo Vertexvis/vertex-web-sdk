@@ -17,7 +17,7 @@ export function requestUnary<R, E = unknown>(
   return new Promise((resolve, reject) => {
     caller((err, res) => {
       if (err != null) {
-        reject(err);
+        reject(err instanceof Error ? err : new Error(String(err)));
       } else if (res != null) {
         resolve(res);
       } else {

@@ -23,7 +23,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install --frozen-lockfile"
+        run: "yarn install --ignore-scripts --frozen-lockfile"
       - name: "Build"
         run: "yarn build"
       - name: "Upload build artifacts"
@@ -61,7 +61,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install"
+        run: "yarn install --ignore-scripts"
       - name: "Publish Testing build to NPM"
         env:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"

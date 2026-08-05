@@ -25,9 +25,10 @@ function __read_summary() {
 function get_release_notes() {
   PR_NUMBER=$(git log -1 | grep -oE '(\(#)([0-9]*)[)]' | grep -oE '[0-9]*')
 
-  if [ ! -z "$PR_NUMBER" ]; then
+  if [[ -n "$PR_NUMBER" ]]; then
     DESC=$(
-      curl -L https://api.github.com/repos/$REPOSITORY/pulls/$PR_NUMBER \
+      curl --proto '=https' --tlsv1.2 \
+        -L https://api.github.com/repos/$REPOSITORY/pulls/$PR_NUMBER \
         -H "Accept: application/vnd.github+json" \
         -H "Authorization: token $GITHUB_TOKEN" \
         | jq '.body'

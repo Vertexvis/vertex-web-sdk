@@ -5,6 +5,12 @@ import { JoinStyle, ShapeProps } from 'regl-shape';
 import { CreateShape } from '../../lib/transforms/shape';
 import { Drawable, DrawablePoints } from './drawable';
 
+const DEFAULT_AXIS_LINE_SHAPE_PROPS: Partial<ShapeProps> = { thickness: 3 };
+
+const DEFAULT_ROTATION_LINE_SHAPE_PROPS: Partial<ShapeProps> = {
+  join: 'round' as JoinStyle,
+};
+
 export class AxisLinePoints implements DrawablePoints {
   public constructor(
     public valid: boolean,
@@ -36,7 +42,7 @@ export class AxisLine extends Drawable<AxisLinePoints> {
     points: AxisLinePoints,
     outlineColor: Color.Color | string = '#000000',
     fillColor: Color.Color | string = '#000000',
-    shapeProps: Partial<ShapeProps> = { thickness: 3 },
+    shapeProps: Partial<ShapeProps> = DEFAULT_AXIS_LINE_SHAPE_PROPS,
   ) {
     super(
       createShape,
@@ -79,9 +85,7 @@ export class RotationLine extends Drawable<RotationLinePoints> {
     identifier: string,
     points: RotationLinePoints,
     outlineColor: Color.Color | string = '#000000',
-    shapeProps: Partial<ShapeProps> = {
-      join: 'round' as JoinStyle,
-    },
+    shapeProps: Partial<ShapeProps> = DEFAULT_ROTATION_LINE_SHAPE_PROPS,
     public disabled: boolean = false,
   ) {
     super(

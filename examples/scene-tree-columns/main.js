@@ -40,7 +40,7 @@ async function main() {
     // Get array of selected metadata keys
     const selectedMetadataKeys = Array.from(selectedColumns);
 
-    if (!searchInput || !selectedColumns.size === 0) {
+    if (!searchInput) {
       console.warn('No search input currently, resetting phantom state')
       // If no search value, reset phantom state
       await scene.elements((op) => [op.items.where((q) => q.all()).clearPhantom()]).execute();

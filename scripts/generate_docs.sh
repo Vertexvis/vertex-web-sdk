@@ -1,11 +1,11 @@
-#/bin/sh
+#!/bin/bash
 #
 # Script to generate SDK documentation.
 
 set -e
 
 create_lib_dir() {
-  if ! test -d ./.lib
+  if [[ ! -d ./.lib ]]
   then
     mkdir ./.lib
   fi
@@ -14,9 +14,9 @@ create_lib_dir() {
 install_mo() {
   create_lib_dir
 
-  if ! test -x ./.lib/mo
+  if [[ ! -x ./.lib/mo ]]
   then
-    curl -sSL https://git.io/get-mo -o mo
+    curl --proto '=https' --tlsv1.2 -sSL https://git.io/get-mo -o mo
     chmod +x mo
     mv mo ./.lib/mo
   fi

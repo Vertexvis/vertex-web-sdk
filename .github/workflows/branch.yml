@@ -50,7 +50,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install"
+        run: "yarn install --ignore-scripts"
       - name: "Lint"
         run: "yarn lint"
   test:
@@ -73,7 +73,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install"
+        run: "yarn install --ignore-scripts"
       - name: "Test"
         run: "yarn test:ci"
   docs:
@@ -96,7 +96,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
       - name: "Install"
-        run: "yarn install"
+        run: "yarn install --ignore-scripts"
       - name: "Generate docs"
         run: "yarn generate:docs"
       - name: "Test docs"

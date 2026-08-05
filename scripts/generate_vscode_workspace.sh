@@ -39,7 +39,7 @@ update_workspace_projects() {
 }
 
 update_shadow_root() {
-  if ! test -d "$shadow_dir"
+  if [[ ! -d "$shadow_dir" ]]
   then
     mkdir "$shadow_dir"
   fi
@@ -48,7 +48,7 @@ update_shadow_root() {
 
   for file in $root_files
   do
-    if ! test -r "$shadow_dir/$file"
+    if [[ ! -r "$shadow_dir/$file" ]]
     then
       ln -s "../$file" "$shadow_dir/$file"
     fi
@@ -56,7 +56,7 @@ update_shadow_root() {
 }
 
 create_workspace_file() {
-  if ! test -r "$workspace_file"
+  if [[ ! -r "$workspace_file" ]]
   then
     touch "$workspace_file"
     jq -n '{"folders": [], "settings": {}}' > $workspace_file

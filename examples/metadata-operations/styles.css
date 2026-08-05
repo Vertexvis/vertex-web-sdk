@@ -1,5 +1,33 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
 .viewer {
-  display: block;
-  width: 500px;
-  height: 500px;
+  width: 100%;
+  height: 100%;
+  grid-column: 1 / 5;
+}
+
+.inputs {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.invisible {
+  position: absolute;
+  visibility: hidden;
 }

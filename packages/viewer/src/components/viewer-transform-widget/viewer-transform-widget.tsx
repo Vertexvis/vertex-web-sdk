@@ -1048,7 +1048,7 @@ export class ViewerTransformWidget {
       if (this.inputRef != null) {
         const definedValue =
           this.getDisplayedDistance() ?? this.getDisplayedAngle() ?? 0;
-        const displayValue = `${parseFloat(
+        const displayValue = `${Number.parseFloat(
           definedValue.toFixed(this.decimalPlaces),
         )}`;
 
