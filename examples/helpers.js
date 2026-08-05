@@ -3,13 +3,13 @@ const DEFAULT_STREAM_KEY = 'ydD87RtDdJCZQaa6twueZTEtsciQmAWl5qnP';
 
 export async function loadViewerWithQueryParams(
   viewer,
-  { env, streamKey } = {
-    streamKey: getStreamKey() || DEFAULT_STREAM_KEY,
-    env: getEnvironment() || DEFAULT_ENV,
-  }
+  options
 ) {
-  viewer.configEnv = env;
-  await viewer.load(`urn:vertex:stream-key:${streamKey}`);
+  const effectiveStreamKey = options?.streamKey ?? getStreamKey() ?? DEFAULT_STREAM_KEY;
+  const effectiveEnv = options?.env ?? getEnvironment() ?? DEFAULT_ENV;
+
+  viewer.configEnv = effectiveEnv;
+  await viewer.load(`urn:vertex:stream-key:${effectiveStreamKey}`);
 }
 
 export function getStreamKey() {

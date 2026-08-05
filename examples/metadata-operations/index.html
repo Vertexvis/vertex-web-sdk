@@ -16,13 +16,16 @@
     ></script>
   </head>
   <body>
-    <vertex-viewer id="viewer" class="viewer">
-      <vertex-viewer-toolbar data-viewer="viewer">
+    <div class="app">
+      <vertex-viewer id="viewer" class="viewer">
+      </vertex-viewer>
+      <div class="inputs">
+        <label class="invisible" for="metadata-key">Metadata Key</label>
         <input id="metadata-key" type="text" placeholder="Metadata Key" />
+        <label class="invisible" for="metadata-value">Metadata Value</label>
         <input id="metadata-value" type="text" placeholder="Metadata Value" />
         <button id="search-btn">Search</button>
         <button id="clear-btn">Clear</button>
-      </vertex-viewer-toolbar>
-    </vertex-viewer>
+    </div>
   </body>
 </html>
