@@ -5,12 +5,12 @@
   "devDependencies": {
     "eslint": "^8.57.1",
     "lerna": "^9.0.7",
-    "prettier": "^3.8.4",
-    "rollup": "^4.62.2",
-    "semver": "^7.8.4",
-    "typedoc": "^0.28.14",
-    "typescript": "^5.2.0",
-    "vite": "^8.1.0"
+    "prettier": "^3.9.6",
+    "rollup": "^4.62.4",
+    "semver": "^7.8.5",
+    "typedoc": "^0.28.20",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.1"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc",
@@ -50,5 +50,5 @@
   "engines": {
     "node": ">=22.0.0"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@4.17.1+sha512.ccbfabf7d7b6b32075088be9386fb9a2e00bb6887ef07fa56effabc890a56d53da1ccc4128d62db245fcbd3961b236d75335bdf7d5320ed6eafb7588b7ad4697"
 }
