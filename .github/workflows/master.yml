@@ -14,14 +14,14 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v7
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
         run: "yarn install --ignore-scripts --frozen-lockfile"
       - name: "Build"
@@ -65,6 +65,8 @@ jobs:
         with:
           name: build-artifact
           path: packages
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         env:
@@ -75,8 +77,6 @@ jobs:
           cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
         run: "yarn install --ignore-scripts"
       - name: "Publish Canary to NPM"
@@ -103,6 +103,8 @@ jobs:
         with:
           name: build-artifact
           path: packages
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         env:
@@ -113,8 +115,6 @@ jobs:
           cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
         run: "yarn install --ignore-scripts"
       - name: "Publish Release to NPM"
@@ -142,6 +142,8 @@ jobs:
         with:
           name: build-artifact
           path: packages
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
@@ -157,4 +159,3 @@ jobs:
       - name: "Deploy docs to GitHub Pages"
         id: deployment
         uses: actions/deploy-pages@v5
-
