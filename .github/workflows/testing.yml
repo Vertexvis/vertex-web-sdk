@@ -23,7 +23,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: "Install"
-        run: "yarn install --ignore-scripts --frozen-lockfile"
+        run: "yarn install --mode=skip-build --immutable"
       - name: "Build"
         run: "yarn build"
       - name: "Upload build artifacts"
@@ -61,7 +61,7 @@ jobs:
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Publish Testing build to NPM"
         env:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"

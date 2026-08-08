@@ -24,7 +24,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: "Install"
-        run: "yarn install --ignore-scripts --frozen-lockfile"
+        run: "yarn install --mode=skip-build --immutable"
       - name: "Build"
         run: "yarn build"
       - name: "Upload build artifacts"
@@ -50,7 +50,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Lint"
         run: "yarn lint"
   test:
@@ -73,7 +73,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Test"
         run: "yarn test:ci"
   docs:
@@ -96,7 +96,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Generate docs"
         run: "yarn generate:docs"
       - name: "Test docs"
