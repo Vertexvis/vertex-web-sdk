@@ -110,6 +110,57 @@ describe(InteractionApi, () => {
     });
   });
 
+  describe('InteractionApi.prototype.transformCamera', () => {
+    it('applies rapid transforms in invocation order when depth loading is asynchronous', async () => {
+      let resolveDepthBuffer: (value: undefined) => void;
+      const depthBuffer = new Promise<undefined>((resolve) => {
+        resolveDepthBuffer = resolve;
+      });
+      jest
+        .spyOn(frame, 'depthBuffer')
+        .mockReturnValueOnce(depthBuffer)
+        .mockResolvedValue(undefined);
+      const applied: string[] = [];
+
+      await api.beginInteraction();
+      const first = api.transformCamera(({ camera }) => {
+        applied.push('first');
+        return camera;
+      });
+      const second = api.transformCamera(({ camera }) => {
+        applied.push('second');
+        return camera;
+      });
+
+      await new Promise((resolve) => setTimeout(resolve));
+      expect(frame.depthBuffer).toHaveBeenCalledTimes(1);
+
+      resolveDepthBuffer!(undefined);
+      await Promise.all([first, second]);
+
+      expect(applied).toEqual(['first', 'second']);
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps the interaction active when a frame is temporarily unavailable', async () => {
+      let currentFrame: Frame | undefined = frame;
+      const configuredApi = createInteractionApi({
+        frameProvider: () => currentFrame,
+      });
+
+      await configuredApi.beginInteraction();
+      currentFrame = undefined;
+      await configuredApi.transformCamera(({ camera }) => camera);
+
+      expect(configuredApi.isInteracting()).toBe(true);
+
+      currentFrame = frame;
+      await configuredApi.transformCamera(({ camera }) => camera);
+
+      expect(streamApi.replaceCamera).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe(InteractionApi.prototype.panCameraByDelta, () => {
     it('replaces the camera if interacting', async () => {
       await api.beginInteraction();

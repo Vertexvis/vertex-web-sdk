@@ -63,6 +63,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
   protected currentCamera?: Camera;
   private activeRenderOptions?: CameraRenderOptions;
   private sceneLoadingPromise?: Promise<Scene>;
+  private interactionStartingPromise?: Promise<void>;
+  private transformQueue: Promise<void> = Promise.resolve();
+  private interactionEnding = false;
   private lastAngle: Angle.Angle | undefined;
   private worldRotationPoint?: Vector3.Vector3;
 
@@ -211,15 +214,25 @@ export abstract class InteractionApi<T extends Camera = Camera> {
   public async beginInteraction(
     renderOptions = this.activeRenderOptions ?? {},
   ): Promise<void> {
-    if (!this.isInteracting()) {
+    if (!this.isInteracting() && this.interactionStartingPromise == null) {
       renderOptions.correlationId ??= UUID.create();
       this.activeRenderOptions = renderOptions;
+      this.interactionEnding = false;
       this.interactionStartedEmitter.emit();
       this.sceneLoadingPromise = this.getScene();
-      this.currentCamera = (await this.sceneLoadingPromise).camera();
-      this.sceneLoadingPromise = undefined;
-      await this.stream.beginInteraction();
+      this.interactionStartingPromise = (async () => {
+        // console.log('beginInteraction');
+        try {
+          this.currentCamera = (await this.sceneLoadingPromise!).camera();
+          await this.stream.beginInteraction();
+        } finally {
+          this.sceneLoadingPromise = undefined;
+          this.interactionStartingPromise = undefined;
+        }
+      })();
     }
+
+    await this.interactionStartingPromise;
   }
 
   /**
@@ -233,26 +246,50 @@ export abstract class InteractionApi<T extends Camera = Camera> {
     t: CameraTransform<T>,
     renderOptions: CameraRenderOptions = this.activeRenderOptions ?? {},
   ): Promise<void> {
-    if (this.isInteracting()) {
-      const scene = await this.getScene();
-      const viewport = this.getViewport();
-      const frame = this.getFrame();
-      const depthBuffer = await frame?.depthBuffer();
+    const transform = async (): Promise<void> => {
+      // The camera becomes available when the scene load completes. Do not
+      // also wait for `stream.beginInteraction()`: keyboard handlers schedule
+      // their first transform immediately after beginning an interaction, and
+      // delaying it until the stream call completes can make that transform
+      // miss the interaction entirely.
+      await this.sceneLoadingPromise;
 
-      this.currentCamera =
-        this.currentCamera != null && viewport != null && frame != null
-          ? t({
-              camera: this.currentCamera as T,
-              viewport,
-              scale: scene.scale(),
-              boundingBox: scene.boundingBox(),
-              frame,
-              depthBuffer,
-            })
-          : undefined;
+      if (this.isInteracting() && !this.interactionEnding) {
+        const scene = await this.getScene();
+        const viewport = this.getViewport();
+        const frame = this.getFrame();
+        const depthBuffer = await frame?.depthBuffer();
 
-      await this.currentCamera?.render(renderOptions);
-    }
+        // A frame can be unavailable while the renderer is transitioning.
+        // Dropping that update must not clear the interaction camera, because
+        // its presence is also the interaction-state marker.
+        if (this.currentCamera == null || viewport == null || frame == null) {
+          return;
+        }
+
+        const camera = t({
+          camera: this.currentCamera as T,
+          viewport,
+          scale: scene.scale(),
+          boundingBox: scene.boundingBox(),
+          frame,
+          depthBuffer,
+        });
+
+        if (this.interactionEnding) {
+          return;
+        }
+
+        this.currentCamera = camera;
+        await camera.render(renderOptions);
+      }
+    };
+
+    const result = this.transformQueue.then(transform, transform);
+    // Keep the queue usable after an individual transform fails, while still
+    // returning that failure to the initiating interaction.
+    this.transformQueue = result.catch(() => undefined);
+    return result;
   }
 
   /**
@@ -461,8 +498,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    */
   public async zoomCamera(delta: number): Promise<void> {
     return this.transformCamera(({ camera, viewport, frame, boundingBox }) => {
+      // console.log('camera', camera.position);
       if (viewport != null && frame != null) {
-        const isPerspective = camera?.toFrameCamera().isPerspective();
+        const isPerspective = camera.toFrameCamera().isPerspective();
 
         if (isPerspective) {
           const vv = camera.viewVector;
@@ -609,9 +647,14 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * Marks the end of an interaction.
    */
   public async endInteraction(): Promise<void> {
+    // The stream's begin request can remain pending until the interaction is
+    // ended. Only wait for the scene here so that the camera has been
+    // initialized without creating a start/end deadlock.
     await this.sceneLoadingPromise;
 
     if (this.isInteracting()) {
+      this.interactionEnding = true;
+      await this.transformQueue;
       this.currentCamera = undefined;
       this.worldRotationPoint = undefined;
       this.panData = undefined;
@@ -620,7 +663,9 @@ export abstract class InteractionApi<T extends Camera = Camera> {
 
       this.interactionFinishedEmitter.emit();
       await this.stream.endInteraction();
+      // console.log('endInteraction');
     }
+    this.interactionEnding = false;
     this.activeRenderOptions = undefined;
   }
 
