@@ -12,7 +12,7 @@ export default {
   },
   roots: ['<rootDir>/src/'],
   moduleNameMapper: {
-    '^worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
+    '^native-worker:(.+)': '<rootDir>/src/__mocks__/web-workers.ts',
   },
   setupFilesAfterEnv: [
     '<rootDir>/../../jest.setup.console.js',

@@ -4,9 +4,8 @@ import terser from '@rollup/plugin-terser';
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
 import { vueOutputTarget } from '@stencil/vue-output-target';
-import workers from '@vertexvis/rollup-plugin-web-workers';
 import * as path from 'path';
-import type { Plugin } from 'rollup';
+import { type Plugin, rollup } from 'rollup';
 import * as ts from 'typescript';
 
 import jestConfig from './jest-shared.config';
@@ -17,9 +16,8 @@ export const config: Config = {
   nodeResolve: { browser: true },
   preamble: copyright(),
   plugins: [
-    workers({
+    nativeWorkers({
       plugins: [
-        resolveThreadsEsm(),
         commonjs(),
         nodeResolve({ browser: true }),
         workerTypescript(),
@@ -93,20 +91,54 @@ function workerTypescript(): Plugin {
   };
 }
 
-function resolveThreadsEsm(): Plugin {
+const nativeWorkerPrefix = 'native-worker:';
+
+function nativeWorkers({ plugins = [] }: { plugins?: Plugin[] }): Plugin {
   return {
-    name: 'resolve-threads-esm',
-    resolveId(source: string) {
-      if (source !== 'threads') {
+    name: 'native-workers',
+    async resolveId(source: string, importer) {
+      if (!source.startsWith(nativeWorkerPrefix)) {
         return null;
       }
 
-      // Preserve the legacy resolver behavior. The package exports default
-      // points at index.mjs, which omits `expose`; the module build includes it.
-      return path.resolve(
-        process.cwd(),
-        '../../node_modules/threads/dist-esm/index.js',
+      const resolved = await this.resolve(
+        source.slice(nativeWorkerPrefix.length),
+        importer ?? '',
       );
+      return resolved == null
+        ? null
+        : {
+            id: `${nativeWorkerPrefix}${resolved.id}`,
+            moduleSideEffects: false,
+          };
+    },
+    async load(id: string) {
+      if (!id.startsWith(nativeWorkerPrefix)) {
+        return null;
+      }
+
+      const filePath = id.slice(nativeWorkerPrefix.length);
+      const build = await rollup({ input: filePath, plugins });
+      const bundle = await build.generate({ format: 'iife' });
+      const chunks = bundle.output.filter((output) => output.type === 'chunk');
+      if (chunks.length !== 1 || chunks[0].type !== 'chunk') {
+        throw new Error('Native worker should generate exactly one chunk.');
+      }
+
+      const chunk = chunks[0];
+      if (chunk.imports.length > 0) {
+        throw new Error('Native worker should not contain imports.');
+      }
+
+      const workerName = `${path.basename(filePath, path.extname(filePath))}-worker`;
+      return `
+const workerText = ${JSON.stringify(chunk.code)};
+export function makeWorker() {
+  const url = URL.createObjectURL(new Blob([workerText], { type: 'text/javascript' }));
+  const worker = new Worker(url, { name: ${JSON.stringify(workerName)} });
+  URL.revokeObjectURL(url);
+  return worker;
+}`;
     },
   };
 }

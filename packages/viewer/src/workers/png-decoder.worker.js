@@ -1,8 +1,14 @@
-import { defineWorker } from '@vertexvis/web-workers';
 import { decode } from 'fast-png';
 
-async function decodePng(bytes) {
-  return decode(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
-}
-
-defineWorker(decodePng);
+self.addEventListener('message', async (event) => {
+  try {
+    const bytes = event.data;
+    const result = decode(
+      bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes),
+    );
+    self.postMessage({ result });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    self.postMessage({ error: message });
+  }
+});
