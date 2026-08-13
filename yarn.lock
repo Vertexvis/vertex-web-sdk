@@ -1935,21 +1935,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@protobufjs/codegen@npm:^2.0.5":
+"@protobufjs/codegen@npm:^2.0.4, @protobufjs/codegen@npm:^2.0.5":
   version: 2.0.5
   resolution: "@protobufjs/codegen@npm:2.0.5"
   checksum: 10c0/1b8a2ae56ee60a56e9d205cd4b6072a1503c5069b8ebb905710f974ff0098a0d0700641c137e0a8d98dedf14423156a106a9433695cbf52574810f55000fdcab
   languageName: node
   linkType: hard
 
-"@protobufjs/eventemitter@npm:^1.1.1":
+"@protobufjs/eventemitter@npm:^1.1.0, @protobufjs/eventemitter@npm:^1.1.1":
   version: 1.1.1
   resolution: "@protobufjs/eventemitter@npm:1.1.1"
   checksum: 10c0/8e06193d4629c5e7c09d4f8c2ddba8fc4dfa739f0149f33a1d901568d35bb7b8b5277a4e8452baf3bdd0b302fd599cf255d193267aa93a0a4747e23cd073c4ac
   languageName: node
   linkType: hard
 
-"@protobufjs/fetch@npm:^1.1.1":
+"@protobufjs/fetch@npm:^1.1.0, @protobufjs/fetch@npm:^1.1.1":
   version: 1.1.1
   resolution: "@protobufjs/fetch@npm:1.1.1"
   dependencies:
@@ -1965,6 +1965,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@protobufjs/inquire@npm:^1.1.0":
+  version: 1.1.2
+  resolution: "@protobufjs/inquire@npm:1.1.2"
+  checksum: 10c0/af69597818a14cac6a00a74cd5b3fb85aa96658b9dbbae73e6d907cb154ebf470953a8c537b3e6095a43de565ec4e6c5b40227c72f4a7d762d34fbec7ac179e7
+  languageName: node
+  linkType: hard
+
 "@protobufjs/path@npm:^1.1.2":
   version: 1.1.2
   resolution: "@protobufjs/path@npm:1.1.2"
@@ -1976,6 +1983,13 @@ __metadata:
   version: 1.1.0
   resolution: "@protobufjs/pool@npm:1.1.0"
   checksum: 10c0/eda2718b7f222ac6e6ad36f758a92ef90d26526026a19f4f17f668f45e0306a5bd734def3f48f51f8134ae0978b6262a5c517c08b115a551756d1a3aadfcf038
+  languageName: node
+  linkType: hard
+
+"@protobufjs/utf8@npm:^1.1.0":
+  version: 1.1.2
+  resolution: "@protobufjs/utf8@npm:1.1.2"
+  checksum: 10c0/975c6e2c0319bd50c17531d186b537a88cb4d3205e3ca9297cd842b631d341da0ee3ff16be8656cd2660756dc753b29c8a6a14c0ad8ed602c1f91ddf22e7b3f3
   languageName: node
   linkType: hard
 
@@ -2586,9 +2600,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stencil/react-output-target@npm:^1.6.1":
-  version: 1.6.1
-  resolution: "@stencil/react-output-target@npm:1.6.1"
+"@stencil/react-output-target@npm:^1.6.2":
+  version: 1.6.2
+  resolution: "@stencil/react-output-target@npm:1.6.2"
   dependencies:
     "@lit/react": "npm:^1.0.8"
     html-react-parser: "npm:^5.2.17"
@@ -2605,7 +2619,7 @@ __metadata:
       optional: false
     react-dom:
       optional: false
-  checksum: 10c0/dbcffa8b63f55d8a094c14c7e586ba42039d1d0d074e8fcf833784f04c2a24a3b2006f170ee2ea92017778efb47345ef070ce7d0efda30538422d5a41ff236e5
+  checksum: 10c0/4186189f309934997e36538a3601f1f7e4e83277e76904ac8c183e3d21bba84bcdb658daf31d9dbb920902005e42e5dd72a8eec9f38543d83e3af39dc3138037
   languageName: node
   linkType: hard
 
@@ -2810,6 +2824,13 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/4374b0f1b5641d1dd8847fa6f50bd34ec215f3244ea045556d2caa74ed559b2571502db73526bb8fbff038a60ff7e6bf56ffa79679c0b03539b55fda32617a23
+  languageName: node
+  linkType: hard
+
+"@types/long@npm:^4.0.1":
+  version: 4.0.2
+  resolution: "@types/long@npm:4.0.2"
+  checksum: 10c0/42ec66ade1f72ff9d143c5a519a65efc7c1c77be7b1ac5455c530ae9acd87baba065542f8847522af2e3ace2cc999f3ad464ef86e6b7352eece34daf88f8c924
   languageName: node
   linkType: hard
 
@@ -3080,7 +3101,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@vertexvis/doc-viewer-react@workspace:packages/doc-viewer-react"
   dependencies:
-    "@stencil/react-output-target": "npm:^1.6.1"
+    "@stencil/react-output-target": "npm:^1.6.2"
     "@types/react": "npm:^19.2.18"
     "@types/react-dom": "npm:^19.2.4"
     "@vertexvis/doc-viewer": "npm:1.1.0"
@@ -3120,7 +3141,7 @@ __metadata:
   resolution: "@vertexvis/doc-viewer@workspace:packages/doc-viewer"
   dependencies:
     "@stencil/core": "npm:^4.43.5"
-    "@stencil/react-output-target": "npm:^1.6.1"
+    "@stencil/react-output-target": "npm:^1.6.2"
     "@stencil/vue-output-target": "npm:^0.14.1"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^22.20.1"
@@ -3167,10 +3188,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vertexvis/frame-streaming-protos@npm:^0.18.7":
-  version: 0.18.7
-  resolution: "@vertexvis/frame-streaming-protos@npm:0.18.7"
-  checksum: 10c0/b06057af4a2c2b9f4db27b90a04beb93bd7da62cec27c3cf04d46700029323212ac85d9999271f53b311dbf658d980e9a1d05d5a3a668eee42abc9983bf09b87
+"@vertexvis/frame-streaming-protos@npm:^0.18.8":
+  version: 0.18.8
+  resolution: "@vertexvis/frame-streaming-protos@npm:0.18.8"
+  dependencies:
+    protobufjs: "npm:^6.11.2"
+  checksum: 10c0/6e72885460451acb3298b0833e3ca747cdc7a71b0f4963e12e8381ad22ca3580ac30095e4265724f7c7cad65071d1a1edfee0a20b76bfaa120e13efe2220a704
   languageName: node
   linkType: hard
 
@@ -3244,23 +3267,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vertexvis/scene-tree-protos@npm:^0.1.33":
-  version: 0.1.33
-  resolution: "@vertexvis/scene-tree-protos@npm:0.1.33"
+"@vertexvis/scene-tree-protos@npm:^0.1.34":
+  version: 0.1.34
+  resolution: "@vertexvis/scene-tree-protos@npm:0.1.34"
   peerDependencies:
     "@improbable-eng/grpc-web": ">=0.14.0"
     google-protobuf: ">=3.15.7"
-  checksum: 10c0/7bf6740ac47c4f34507488bf287d59f61dfa8ddfeb102c2e80303d8f1ca7cfd8eeab528acd5eb343279d58754c52ff6cdcba4f4058542292ce2e83f83408c8bb
+  checksum: 10c0/af2de6f80b05b79cd187ae58a5c8cd8633c878140b686e34ba27e5e77a2fe7f7f4f730152af6b9e82b263aec5b176a807cda108ef138339c593b6d29c116ab7b
   languageName: node
   linkType: hard
 
-"@vertexvis/scene-view-protos@npm:^0.8.4":
-  version: 0.8.4
-  resolution: "@vertexvis/scene-view-protos@npm:0.8.4"
+"@vertexvis/scene-view-protos@npm:^0.8.5":
+  version: 0.8.5
+  resolution: "@vertexvis/scene-view-protos@npm:0.8.5"
   peerDependencies:
     "@improbable-eng/grpc-web": ">=0.14.0"
     google-protobuf: ">=3.15.7"
-  checksum: 10c0/8a36b12239c470e7abc60f488b5c784ed8c0b1d659c5aa3ede9fea7f8270ad6733b4b5023ea8c09116180247966e067aab96f489e381be3debb5f6e06f547e1b
+  checksum: 10c0/418f0b9a65cc74df747008c4eb781bc29ef445a5d763a323d9e90b690d7d8b4d5d70d83986f8e9c92b6ffb55b0969126f7a9666a7eb28faf4e50200e01901a24
   languageName: node
   linkType: hard
 
@@ -3270,7 +3293,7 @@ __metadata:
   dependencies:
     "@types/jest": "npm:^29.5.14"
     "@vertexvis/eslint-config-vertexvis-typescript": "npm:^0.6.2"
-    "@vertexvis/frame-streaming-protos": "npm:^0.18.7"
+    "@vertexvis/frame-streaming-protos": "npm:^0.18.8"
     "@vertexvis/jest-config-vertexvis": "npm:^0.6.2"
     "@vertexvis/utils": "npm:1.1.0"
     "@vertexwebsdk/build": "npm:1.1.0"
@@ -3323,7 +3346,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@vertexvis/viewer-react@workspace:packages/viewer-react"
   dependencies:
-    "@stencil/react-output-target": "npm:^1.6.1"
+    "@stencil/react-output-target": "npm:^1.6.2"
     "@types/react": "npm:^19.2.18"
     "@types/react-dom": "npm:^19.2.4"
     "@vertexvis/eslint-config-vertexvis-typescript": "npm:^0.6.2"
@@ -3367,19 +3390,19 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@stencil/core": "npm:^4.43.5"
-    "@stencil/react-output-target": "npm:^1.6.1"
+    "@stencil/react-output-target": "npm:^1.6.2"
     "@stencil/vue-output-target": "npm:^0.14.1"
     "@types/chance": "npm:^1.1.8"
     "@types/google-protobuf": "npm:^3.15.12"
     "@types/jest": "npm:^29.5.14"
     "@types/jsonwebtoken": "npm:^8.5.9"
     "@vertexvis/eslint-config-vertexvis-typescript": "npm:^0.6.2"
-    "@vertexvis/frame-streaming-protos": "npm:^0.18.7"
+    "@vertexvis/frame-streaming-protos": "npm:^0.18.8"
     "@vertexvis/geometry": "npm:1.1.0"
     "@vertexvis/html-templates": "npm:1.1.0"
     "@vertexvis/rollup-plugin-web-workers": "npm:^0.2.1"
-    "@vertexvis/scene-tree-protos": "npm:^0.1.33"
-    "@vertexvis/scene-view-protos": "npm:^0.8.4"
+    "@vertexvis/scene-tree-protos": "npm:^0.1.34"
+    "@vertexvis/scene-view-protos": "npm:^0.8.5"
     "@vertexvis/stream-api": "npm:1.1.0"
     "@vertexvis/typescript-config-vertexvis": "npm:1.3.2"
     "@vertexvis/utils": "npm:1.1.0"
@@ -8334,6 +8357,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"long@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "long@npm:4.0.0"
+  checksum: 10c0/50a6417d15b06104dbe4e3d4a667c39b137f130a9108ea8752b352a4cfae047531a3ac351c181792f3f8768fe17cca6b0f406674a541a86fb638aaac560d83ed
+  languageName: node
+  linkType: hard
+
 "long@npm:^5.3.2":
   version: 5.3.2
   resolution: "long@npm:5.3.2"
@@ -10004,6 +10034,30 @@ __metadata:
     object-assign: "npm:^4.1.1"
     react-is: "npm:^16.13.1"
   checksum: 10c0/59ece7ca2fb9838031d73a48d4becb9a7cc1ed10e610517c7d8f19a1e02fa47f7c27d557d8a5702bec3cfeccddc853579832b43f449e54635803f277b1c78077
+  languageName: node
+  linkType: hard
+
+"protobufjs@npm:^6.11.2":
+  version: 6.11.6
+  resolution: "protobufjs@npm:6.11.6"
+  dependencies:
+    "@protobufjs/aspromise": "npm:^1.1.2"
+    "@protobufjs/base64": "npm:^1.1.2"
+    "@protobufjs/codegen": "npm:^2.0.4"
+    "@protobufjs/eventemitter": "npm:^1.1.0"
+    "@protobufjs/fetch": "npm:^1.1.0"
+    "@protobufjs/float": "npm:^1.0.2"
+    "@protobufjs/inquire": "npm:^1.1.0"
+    "@protobufjs/path": "npm:^1.1.2"
+    "@protobufjs/pool": "npm:^1.1.0"
+    "@protobufjs/utf8": "npm:^1.1.0"
+    "@types/long": "npm:^4.0.1"
+    "@types/node": "npm:>=13.7.0"
+    long: "npm:^4.0.0"
+  bin:
+    pbjs: bin/pbjs
+    pbts: bin/pbts
+  checksum: 10c0/a7ed63a75b86c7d22abdfef48e9775f373befbaad4beceadf5bd047066365d735386d57851b35f89ae2c1afdea2da1c93a17682aa9a4a8f3df7ca54ccdce309b
   languageName: node
   linkType: hard
 

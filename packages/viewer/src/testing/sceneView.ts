@@ -11,6 +11,7 @@ import {
 import { MeasureResponse } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb';
 import { toProtoTimestamp } from '@vertexvis/stream-api';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import Long from 'long';
 
 import { makeVector3f } from './geometry';
 import { random } from './random';
@@ -83,7 +84,7 @@ export function makeTimestamp(date: Date = new Date()): Timestamp {
   if (typeof timestamp.seconds === 'number') {
     res.setSeconds(timestamp.seconds);
   } else {
-    res.setSeconds(timestamp.seconds.toNumber());
+    res.setSeconds(Long.fromValue(timestamp.seconds).toNumber());
   }
 
   res.setNanos(timestamp.nanos);
