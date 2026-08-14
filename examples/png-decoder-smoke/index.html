@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PNG Decoder Worker Smoke Test</title>
+    <link rel="icon" href="./vertex-logo.png" type="image/png" />
+    <style>
+      body {
+        align-items: center;
+        background: #f6f8fb;
+        color: #162032;
+        display: grid;
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        place-content: center;
+      }
+
+      main {
+        background: white;
+        border: 1px solid #dfe5ee;
+        border-radius: 16px;
+        box-shadow: 0 16px 40px rgb(33 53 85 / 12%);
+        max-width: 28rem;
+        padding: 2.5rem;
+        text-align: center;
+      }
+
+      img {
+        height: 96px;
+        margin-bottom: 1rem;
+        width: 96px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin: 0 0 0.75rem;
+      }
+
+      #result {
+        margin: 0;
+      }
+
+      #result[data-status='passed'] {
+        color: #087f23;
+      }
+
+      #result[data-status='failed'] {
+        color: #b00020;
+      }
+    </style>
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <main>
+      <img src="./vertex-logo.png" alt="Vertex logo" />
+      <h1>PNG Decoder Worker Smoke Test</h1>
+      <p id="result" data-status="running">Starting worker…</p>
+    </main>
+  </body>
+</html>

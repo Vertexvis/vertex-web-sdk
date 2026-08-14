@@ -28,6 +28,9 @@ yarn examples:start
 http://localhost:8080/examples/pmi/
 ```
 
+The PNG decoder worker smoke test uses the locally built viewer assets, so run
+the build step before opening `/examples/png-decoder-smoke/`.
+
 Notes:
 
 - `yarn examples:start` serves the repository root through Vite, so `/packages/viewer/dist/...` is reachable during local development.

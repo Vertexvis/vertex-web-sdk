@@ -4,78 +4,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Examples</title>
-    <style>
-      :root {
-        color-scheme: light;
-        font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          sans-serif;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background: #f5f7fb;
-        color: #132238;
-      }
-
-      main {
-        max-width: 960px;
-        margin: 0 auto;
-        padding: 48px 24px 64px;
-      }
-
-      h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 4vw, 2.8rem);
-      }
-
-      p {
-        margin: 0 0 24px;
-        line-height: 1.6;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 12px;
-      }
-
-      a {
-        display: block;
-        padding: 16px 18px;
-        border: 1px solid #d8e1ec;
-        border-radius: 12px;
-        background: #ffffff;
-        color: inherit;
-        text-decoration: none;
-      }
-
-      a:hover {
-        border-color: #9ab3cf;
-        background: #f8fbff;
-      }
-
-      strong {
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      .back {
-        margin-bottom: 24px;
-        font-size: 0.95rem;
-      }
-    </style>
+    <link
+      rel="icon"
+      href="./png-decoder-smoke/vertex-logo.png"
+      type="image/png"
+    />
+    <link rel="stylesheet" href="./site.css" />
   </head>
   <body>
-    <main>
-      <div class="back"><a href="/">Back to root</a></div>
-      <h1>Examples</h1>
-      <p>Browse the available SDK examples</p>
-      <div class="grid">
+    <main class="site-main">
+      <div class="site-back"><a href="/">Back to root</a></div>
+      <div class="site-brand">
+        <img src="./png-decoder-smoke/vertex-logo.png" alt="Vertex logo" />
+        <div>
+          <h1>Examples</h1>
+          <p>Browse the available SDK examples</p>
+        </div>
+      </div>
+      <div class="site-links">
         <a href="/examples/align-two-surfaces/">
           <strong>Align Two Surfaces</strong>
           Surface alignment tools and interactions.
@@ -111,6 +57,10 @@
         <a href="/examples/pmi/">
           <strong>PMI</strong>
           Explore model views and PMI annotations.
+        </a>
+        <a href="/examples/png-decoder-smoke/">
+          <strong>PNG Decoder Worker</strong>
+          Smoke-test the locally built PNG decoder worker.
         </a>
         <a href="/examples/scene-tree-columns/">
           <strong>Scene Tree Columns</strong>
