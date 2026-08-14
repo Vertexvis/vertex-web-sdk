@@ -1,22 +1,15 @@
-import { loadWorker, Pool, WorkerModule } from 'worker:./png-decoder.js';
+import 'threadsx/register';
 
-import type { DecodePngFn } from './png-decoder';
+import { ExposedAs, Pool, spawn } from 'threadsx';
 
-type DecodePngModule = WorkerModule<DecodePngFn>;
-type DecodePngPool = Pool<DecodePngFn>;
+import type { DecodePngFn } from './png-decoder.worker';
+import { pngDecoderWorkerUrl } from './worker-url';
 
-let workerLoader: Promise<DecodePngModule> | undefined;
-let poolLoader: Promise<DecodePngPool> | undefined;
+type DecodePngPool = Pool<ExposedAs<DecodePngFn>>;
+
+let poolLoader: DecodePngPool | undefined;
 
 const DEFAULT_POOL_SIZE = 1;
-
-function loadWorkerModule(): Promise<DecodePngModule> {
-  if (workerLoader == null) {
-    console.debug(`Loading PNG worker module`);
-    workerLoader = loadWorker();
-  }
-  return workerLoader;
-}
 
 function getPoolSize(): number {
   if (typeof window !== 'undefined') {
@@ -27,23 +20,19 @@ function getPoolSize(): number {
   }
 }
 
-async function getPool(): Promise<DecodePngPool> {
+function getPool(): DecodePngPool {
   if (poolLoader == null) {
-    poolLoader = loadWorkerModule().then(async ({ spawnPool }) => {
-      const size = getPoolSize();
-      console.debug(`Spawning PNG worker pool [size=${size}]`);
-      return spawnPool({ size });
-    });
+    const size = getPoolSize();
+    console.debug(`Spawning PNG worker pool [size=${size}]`);
+    poolLoader = Pool(
+      () => spawn<DecodePngFn>(new Worker(pngDecoderWorkerUrl)),
+      { size },
+    );
   }
   return poolLoader;
 }
 
 export const decodePng: DecodePngFn = async (bytes) => {
-  const pool = await getPool();
+  const pool = getPool();
   return pool.queue((decode: DecodePngFn) => decode(bytes));
 };
-
-// Prefetch the worker and initialize the pool in browsers only.
-if (typeof window !== 'undefined') {
-  void getPool();
-}

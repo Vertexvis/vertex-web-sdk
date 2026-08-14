@@ -3303,16 +3303,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vertexvis/rollup-plugin-web-workers@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "@vertexvis/rollup-plugin-web-workers@npm:0.2.1"
-  peerDependencies:
-    rollup: ">=2"
-    threads: ^1
-  checksum: 10c0/d5128a973a646191fe755dcef7172d1f9b46db45af59e813b7c3226a96577d85da2a3a28334828291d72f8c99cab61267a968a3621bc93d714ab207205c571ea
-  languageName: node
-  linkType: hard
-
 "@vertexvis/scene-tree-protos@npm:^0.1.34":
   version: 0.1.34
   resolution: "@vertexvis/scene-tree-protos@npm:0.1.34"
@@ -3446,13 +3436,11 @@ __metadata:
     "@vertexvis/frame-streaming-protos": "npm:^0.18.8"
     "@vertexvis/geometry": "npm:1.1.0"
     "@vertexvis/html-templates": "npm:1.1.0"
-    "@vertexvis/rollup-plugin-web-workers": "npm:^0.2.1"
     "@vertexvis/scene-tree-protos": "npm:^0.1.34"
     "@vertexvis/scene-view-protos": "npm:^0.8.5"
     "@vertexvis/stream-api": "npm:1.1.0"
     "@vertexvis/typescript-config-vertexvis": "npm:1.3.2"
     "@vertexvis/utils": "npm:1.1.0"
-    "@vertexvis/web-workers": "npm:^0.2.1"
     "@vertexwebsdk/build": "npm:1.1.0"
     abortcontroller-polyfill: "npm:^1.7.8"
     camel-case: "npm:^4.1.2"
@@ -3475,7 +3463,7 @@ __metadata:
     regl-shape: "npm:^1.1.0"
     resize-observer: "npm:^1.0.4"
     rollup: "npm:^4.62.4"
-    threads: "npm:^1.7.0"
+    threadsx: "npm:^2.1.0"
     ts-jest: "npm:^29.4.12"
     ts-toolbelt: "npm:^9.6.0"
     tslib: "npm:^2.8.1"
@@ -3483,16 +3471,6 @@ __metadata:
     typescript: "npm:^5.9.3"
   languageName: unknown
   linkType: soft
-
-"@vertexvis/web-workers@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "@vertexvis/web-workers@npm:0.2.1"
-  peerDependencies:
-    threads: ^1
-    tslib: ^2
-  checksum: 10c0/6c6602a787836220fac7ad7e5d3f5977bdfb52cc7c0f933d45a818c712bdd9d8c4c93a69636f15e97a34a65cb06b8fa5d67d57e5d124b348fb96108cc0fe7294
-  languageName: node
-  linkType: hard
 
 "@vertexwebsdk/build@npm:1.1.0, @vertexwebsdk/build@workspace:internal/build":
   version: 0.0.0-use.local
@@ -4924,7 +4902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.2.0, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.4.3":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.4.3":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
   dependencies:
@@ -5625,13 +5603,6 @@ __metadata:
   bin:
     eslint: bin/eslint.js
   checksum: 10c0/46335bfcf180ffea9955b38122b578ac9e075b6220e5695be1c988354ea429b04f5db05edc132aa9019ce9847736e9ca0c9ea6d6cedda3c06209c9b52dbd0fd5
-  languageName: node
-  linkType: hard
-
-"esm@npm:^3.2.25":
-  version: 3.2.25
-  resolution: "esm@npm:3.2.25"
-  checksum: 10c0/8e60e8075506a7ce28681c30c8f54623fe18a251c364cd481d86719fc77f58aa055b293d80632d9686d5408aaf865ffa434897dc9fd9153c8b3f469fad23f094
   languageName: node
   linkType: hard
 
@@ -6957,13 +6928,6 @@ __metadata:
   version: 2.0.0
   resolution: "is-obj@npm:2.0.0"
   checksum: 10c0/85044ed7ba8bd169e2c2af3a178cacb92a97aa75de9569d02efef7f443a824b5e153eba72b9ae3aca6f8ce81955271aa2dc7da67a8b720575d3e38104208cb4e
-  languageName: node
-  linkType: hard
-
-"is-observable@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "is-observable@npm:2.1.0"
-  checksum: 10c0/f6ae9e136f66ad59c4faa4661112c389b398461cdeb0ef5bc3c505989469b77b2ba4602e2abc54a635d65f616eec9b5a40cd7d2c1f96b2cc4748b56635eba1c6
   languageName: node
   linkType: hard
 
@@ -11385,19 +11349,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"threads@npm:^1.7.0":
-  version: 1.7.0
-  resolution: "threads@npm:1.7.0"
+"threadsx@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "threadsx@npm:2.1.0"
   dependencies:
     callsites: "npm:^3.1.0"
-    debug: "npm:^4.2.0"
-    is-observable: "npm:^2.1.0"
+    debug: "npm:^4.4.3"
     observable-fns: "npm:^0.6.1"
-    tiny-worker: "npm:>= 2"
-  dependenciesMeta:
-    tiny-worker:
-      optional: true
-  checksum: 10c0/34114075c5eb253e937c01e0e51babb71eb1571c2fd4a8170645aa20c10186422324537d017d64bfd3de655cbb6647bf70d1d602260273b1e9750719d67f359a
+  checksum: 10c0/d4bdc353cf4e6e995d3148f7c9697e08c590607988fd92bc25e80e2a96d451b966801ee46a046e237d2e6e3087d52d9299560d5d2de190125a58026d28c935c3
   languageName: node
   linkType: hard
 
@@ -11415,15 +11374,6 @@ __metadata:
   version: 2.3.8
   resolution: "through@npm:2.3.8"
   checksum: 10c0/4b09f3774099de0d4df26d95c5821a62faee32c7e96fb1f4ebd54a2d7c11c57fe88b0a0d49cf375de5fee5ae6bf4eb56dbbf29d07366864e2ee805349970d3cc
-  languageName: node
-  linkType: hard
-
-"tiny-worker@npm:>= 2":
-  version: 2.3.0
-  resolution: "tiny-worker@npm:2.3.0"
-  dependencies:
-    esm: "npm:^3.2.25"
-  checksum: 10c0/3106cace86e673216426a517e96fb72ce642ba79002554e4c6bceb585ba77cf5e5e68b452c752cada6136ae94fdbf11c56943a70de6c6bc6a2a3a9ae439746c9
   languageName: node
   linkType: hard
 
