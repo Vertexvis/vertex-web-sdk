@@ -57,7 +57,7 @@
   "scripts": {
     "clean": "rm -fr ./dist && mkdir ./dist",
     "prebuild": "yarn clean",
-    "build": "stencil build --docs",
+    "build": "stencil build --docs && yarn postbuild",
     "postbuild": "./scripts/postbuild.sh",
     "start": "stencil build --dev --watch --serve",
     "dev": "yarn start",
