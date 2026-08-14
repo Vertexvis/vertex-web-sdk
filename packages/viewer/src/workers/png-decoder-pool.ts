@@ -92,11 +92,18 @@ class DecodePngPool {
 let poolLoader: Promise<DecodePngPool> | undefined;
 
 const DEFAULT_POOL_SIZE = 1;
+const MAX_POOL_SIZE = 4;
 
 function getPoolSize(): number {
   if (typeof window !== 'undefined') {
-    const concurrency = window.navigator.hardwareConcurrency ?? 8;
-    return Math.ceil(concurrency / 4);
+    const concurrency = window.navigator.hardwareConcurrency;
+    if (concurrency == null) {
+      return DEFAULT_POOL_SIZE;
+    }
+    return Math.min(
+      MAX_POOL_SIZE,
+      Math.max(DEFAULT_POOL_SIZE, Math.ceil(concurrency / 4)),
+    );
   } else {
     return DEFAULT_POOL_SIZE;
   }
@@ -104,10 +111,21 @@ function getPoolSize(): number {
 
 async function getPool(): Promise<DecodePngPool> {
   if (poolLoader == null) {
-    poolLoader = Promise.resolve().then(() => {
+    if (typeof Worker === 'undefined') {
+      throw new Error('Requires Web Worker for PNG decode.');
+    }
+
+    const loader = Promise.resolve().then(() => {
       const size = getPoolSize();
       console.debug(`Spawning PNG worker pool [size=${size}]`);
       return new DecodePngPool(size);
+    });
+    poolLoader = loader;
+    void loader.catch(() => {
+      // Allow a later decode attempt to recover from a transient startup error.
+      if (poolLoader === loader) {
+        poolLoader = undefined;
+      }
     });
   }
   return poolLoader;
@@ -120,5 +138,7 @@ export const decodePng: DecodePngFn = async (bytes) => {
 
 // Prefetch the worker and initialize the pool in browsers only.
 if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
-  void getPool();
+  void getPool().catch(() => {
+    // decodePng will retry initialization and surface the error to its caller.
+  });
 }

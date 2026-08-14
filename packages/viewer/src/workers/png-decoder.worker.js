@@ -6,7 +6,7 @@ self.addEventListener('message', async (event) => {
     const result = decode(
       bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes),
     );
-    self.postMessage({ result });
+    self.postMessage({ result }, [result.data.buffer]);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     self.postMessage({ error: message });
