@@ -119,19 +119,25 @@ function nativeWorkers({ plugins = [] }: { plugins?: Plugin[] }): Plugin {
 
       const filePath = id.slice(nativeWorkerPrefix.length);
       const build = await rollup({ input: filePath, plugins });
-      const bundle = await build.generate({ format: 'iife' });
-      const chunks = bundle.output.filter((output) => output.type === 'chunk');
-      if (chunks.length !== 1 || chunks[0].type !== 'chunk') {
-        throw new Error('Native worker should generate exactly one chunk.');
-      }
+      try {
+        const bundle = await build.generate({ format: 'iife' });
+        const chunks = bundle.output.filter(
+          (output) => output.type === 'chunk',
+        );
+        if (chunks.length !== 1 || chunks[0].type !== 'chunk') {
+          throw new Error('Native worker should generate exactly one chunk.');
+        }
 
-      const chunk = chunks[0];
-      if (chunk.imports.length > 0) {
-        throw new Error('Native worker should not contain imports.');
-      }
+        const chunk = chunks[0];
+        if (chunk.imports.length > 0) {
+          throw new Error('Native worker should not contain imports.');
+        }
 
-      const workerName = `${path.basename(filePath, path.extname(filePath))}-worker`;
-      return `
+        const workerBaseName = path
+          .basename(filePath, path.extname(filePath))
+          .replace(/\\.worker$/, '');
+        const workerName = `${workerBaseName}-worker`;
+        return `
 const workerText = ${JSON.stringify(chunk.code)};
 export function makeWorker() {
   const url = URL.createObjectURL(new Blob([workerText], { type: 'text/javascript' }));
@@ -139,6 +145,9 @@ export function makeWorker() {
   URL.revokeObjectURL(url);
   return worker;
 }`;
+      } finally {
+        await build.close();
+      }
     },
   };
 }
