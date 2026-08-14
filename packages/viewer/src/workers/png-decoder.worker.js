@@ -1,5 +1,6 @@
 import { decode } from 'fast-png';
 
+// NOSONAR: Dedicated worker messages can only be sent by its owner.
 self.addEventListener('message', async (event) => {
   try {
     const bytes = event.data;
