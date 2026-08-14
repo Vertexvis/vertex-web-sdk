@@ -11,6 +11,11 @@ export default {
     },
   },
   roots: ['<rootDir>/src/'],
+  transform: {
+    '^.+\\.(ts|tsx|js|jsx|css|mjs)$':
+      '@stencil/core/testing/jest-preprocessor.js',
+  },
+  transformIgnorePatterns: ['/node_modules/(?!(fast-png|fflate|iobuffer)/)'],
   moduleNameMapper: {
     '^\\./worker-url$': '<rootDir>/src/workers/__mocks__/worker-url.ts',
   },

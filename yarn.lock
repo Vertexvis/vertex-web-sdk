@@ -2919,13 +2919,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/pako@npm:^2.0.3":
-  version: 2.0.4
-  resolution: "@types/pako@npm:2.0.4"
-  checksum: 10c0/5765bf8bc7e77ee141c454118f03e544b8f6cb51eb257d82dc5830feeab8cd00818af3a1eabefdfbe8dd3ae9916ed5403937bf1031a0ee51deea27fdf4dccdfb
-  languageName: node
-  linkType: hard
-
 "@types/react-dom@npm:^19.2.4":
   version: 19.2.4
   resolution: "@types/react-dom@npm:19.2.4"
@@ -3450,7 +3443,7 @@ __metadata:
     eslint: "npm:^9.39.5"
     eslint-plugin-react: "npm:^7.37.5"
     fast-deep-equal: "npm:^3.1.3"
-    fast-png: "npm:^6.4.0"
+    fast-png: "npm:^8.0.0"
     google-protobuf: "npm:3.21.4"
     jest: "npm:^29.7.0"
     jest-cli: "npm:^29.7.0"
@@ -5755,14 +5748,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-png@npm:^6.4.0":
-  version: 6.4.0
-  resolution: "fast-png@npm:6.4.0"
+"fast-png@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "fast-png@npm:8.0.0"
   dependencies:
-    "@types/pako": "npm:^2.0.3"
-    iobuffer: "npm:^5.3.2"
-    pako: "npm:^2.1.0"
-  checksum: 10c0/bca27a09d56a5ead536b11c1ddccf4fe44c7c0af88a8faefab6a397527d9c71b00c09b2055d0108807c438c50719dd2acbd7217ef88785b500888db26fa0358a
+    fflate: "npm:^0.8.2"
+    iobuffer: "npm:^6.0.1"
+  checksum: 10c0/badc2f20acd5a45749260daf2519f9ae157a6a2f51cdd780da007d10be6a775f486406fd546dc18de766bc708ed809a4fba17e5ed9ef4aea3a73dcc281a747a9
   languageName: node
   linkType: hard
 
@@ -5784,6 +5776,13 @@ __metadata:
     picomatch:
       optional: true
   checksum: 10c0/e345083c4306b3aed6cb8ec551e26c36bab5c511e99ea4576a16750ddc8d3240e63826cc624f5ae17ad4dc82e68a253213b60d556c11bfad064b7607847ed07f
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.8.2":
+  version: 0.8.3
+  resolution: "fflate@npm:0.8.3"
+  checksum: 10c0/eab181ca37f5348ae76d4b6f840e0026e30220e33153289ac942222d8b9638237d486507dbcc09878d724095bd354993a2ee48bbee99c8f2c6440d4448719aa7
   languageName: node
   linkType: hard
 
@@ -6706,10 +6705,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iobuffer@npm:^5.3.2":
-  version: 5.4.0
-  resolution: "iobuffer@npm:5.4.0"
-  checksum: 10c0/1b3f9a5ea158bc63f038b374b42832acdb9db13ea9cfa4ed78723f30894986442f6c033dff4ae2fdf34724bf0fe432e3b86c11ca82049568c58b8d7fb47a6ac2
+"iobuffer@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "iobuffer@npm:6.0.1"
+  checksum: 10c0/d843535d643f2eee1a5f35faba15ea8e343f466b81bda6d3d9e1e9a7517d20a7f1cb2c4f3603cb9c3b61912c85e13d3894f84f8ea11fb6630a3c8190e0f19b4a
   languageName: node
   linkType: hard
 
@@ -9636,13 +9635,6 @@ __metadata:
   bin:
     pacote: bin/index.js
   checksum: 10c0/61649e22d3c03e5de416c2073032120820ef494f8dece2bcf205d1e17f0ea76d02872d5f2e0804832ba39c1ccc73b454152f7466bfa717053e7a552db690cd4a
-  languageName: node
-  linkType: hard
-
-"pako@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "pako@npm:2.1.0"
-  checksum: 10c0/8e8646581410654b50eb22a5dfd71159cae98145bd5086c9a7a816ec0370b5f72b4648d08674624b3870a521e6a3daffd6c2f7bc00fdefc7063c9d8232ff5116
   languageName: node
   linkType: hard
 
