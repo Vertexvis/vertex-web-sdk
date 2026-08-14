@@ -84,7 +84,13 @@ class DecodePngPool {
       }
 
       worker.task = task;
-      worker.worker.postMessage(task.bytes);
+      try {
+        worker.worker.postMessage(task.bytes);
+      } catch (error) {
+        worker.task = undefined;
+        this.idleWorkers.push(worker);
+        task.reject(error);
+      }
     }
   }
 }

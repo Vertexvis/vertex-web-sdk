@@ -65,6 +65,24 @@ describe('decodePng', () => {
     fakeWorkers[0].respond(secondResult);
     await expect(second).resolves.toBe(secondResult);
   });
+
+  it('continues processing after postMessage throws', async () => {
+    const worker = fakeWorkers[0];
+    const error = new DOMException('ArrayBuffer is detached.', 'DataCloneError');
+    worker.postMessage.mockImplementationOnce(() => {
+      throw error;
+    });
+
+    await expect(decodePng(new Uint8Array([1]))).rejects.toBe(error);
+
+    const next = decodePng(new Uint8Array([2]));
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(worker.postMessage).toHaveBeenLastCalledWith(new Uint8Array([2]));
+
+    const result = pngResult(2);
+    worker.respond(result);
+    await expect(next).resolves.toBe(result);
+  });
 });
 
 function pngResult(value: number): DecodedPng {
