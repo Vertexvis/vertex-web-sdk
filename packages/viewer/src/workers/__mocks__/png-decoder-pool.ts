@@ -1,4 +1,4 @@
-import type { DecodePngFn } from '../png-decoder';
+import type { DecodePngFn } from '../png-decoder.worker';
 
 export const decodePng: DecodePngFn = async () => {
   return {

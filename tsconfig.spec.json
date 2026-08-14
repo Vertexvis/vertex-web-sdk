@@ -3,8 +3,6 @@
   "extends": "./internal/build/tsconfig-web.json",
   "compilerOptions": {
     "noEmit": true,
-    // TODO: Remove once threads is replaced or publishes exports-compatible types.
-    "skipLibCheck": true,
     "experimentalDecorators": true,
     "jsx": "react",
     "jsxFactory": "h"
