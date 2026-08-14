@@ -47,32 +47,30 @@ p {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
 
-.site-links a {
-  background: #ffffff;
-  border: 1px solid #d8e1ec;
-  border-radius: 12px;
-  color: inherit;
-  display: block;
-  padding: 16px 18px;
-  text-decoration: none;
-}
-
-.site-links a:hover {
-  background: #f8fbff;
-  border-color: #9ab3cf;
-}
-
-.site-links strong {
-  display: block;
-  margin-bottom: 4px;
+  & a {
+    background: #ffffff;
+    border: 1px solid #d8e1ec;
+    border-radius: 12px;
+    color: inherit;
+    display: block;
+    padding: 16px 18px;
+    text-decoration: none;
+  }
+  & a:hover {
+    background: #f8fbff;
+    border-color: #9ab3cf;
+  }
+  & strong {
+    display: block;
+    margin-bottom: 4px;
+  }
 }
 
 .site-back {
   margin-bottom: 24px;
-}
 
-.site-back a {
-  color: inherit;
+  & a {
+    color: inherit;
+  }
 }
