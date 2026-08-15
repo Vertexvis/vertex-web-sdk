@@ -10,7 +10,15 @@ const workerEntry = new URL(
   '../src/workers/png-decoder.worker.ts',
   import.meta.url,
 );
-const outputDirectories = ['dist/cjs', 'dist/esm', 'dist/viewer'];
+// Each Stencil distribution contains modules that construct the worker URL
+// relative to themselves. Keep a copy beside every such module, including the
+// custom-elements entry consumed by viewer-react.
+const outputDirectories = [
+  'dist/cjs',
+  'dist/components',
+  'dist/esm',
+  'dist/viewer',
+];
 
 const bundle = await rollup({
   input: workerEntry.pathname,
