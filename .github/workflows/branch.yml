@@ -15,16 +15,16 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v7
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
-        run: "yarn install --ignore-scripts --frozen-lockfile"
+        run: "yarn install --mode=skip-build --immutable"
       - name: "Build"
         run: "yarn build"
       - name: "Upload build artifacts"
@@ -41,16 +41,16 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v7
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Lint"
         run: "yarn lint"
   test:
@@ -64,16 +64,16 @@ jobs:
         with:
           name: build-artifact
           path: packages
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Test"
         run: "yarn test:ci"
   docs:
@@ -87,16 +87,16 @@ jobs:
         with:
           name: build-artifact
           path: packages
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Generate docs"
         run: "yarn generate:docs"
       - name: "Test docs"

@@ -2,6 +2,7 @@ dist/
 www/
 loader/
 assets/pdf.worker.min.mjs
+!assets/.gitkeep
 
 *~
 *.sw[mnpcod]

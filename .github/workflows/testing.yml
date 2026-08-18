@@ -14,16 +14,16 @@ jobs:
     steps:
       - name: "Checkout changes"
         uses: actions/checkout@v7
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
-        run: "yarn install --ignore-scripts --frozen-lockfile"
+        run: "yarn install --mode=skip-build --immutable"
       - name: "Build"
         run: "yarn build"
       - name: "Upload build artifacts"
@@ -48,6 +48,8 @@ jobs:
         with:
           name: build-artifact
           path: packages
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         env:
@@ -58,10 +60,8 @@ jobs:
           cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
           scope: "@vertexvis"
-      - name: Enable Corepack
-        run: corepack enable
       - name: "Install"
-        run: "yarn install --ignore-scripts"
+        run: "yarn install --mode=skip-build"
       - name: "Publish Testing build to NPM"
         env:
           NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"

@@ -42,16 +42,16 @@
     "test:coverage": "echo 'No unit tests defined'"
   },
   "dependencies": {
-    "@stencil/vue-output-target": "^0.13.1",
+    "@stencil/vue-output-target": "^0.14.1",
     "@vertexvis/viewer": "1.1.0"
   },
   "devDependencies": {
-    "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.1",
+    "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
     "@vertexwebsdk/build": "1.1.0",
     "eslint": "^8.57.1",
-    "rollup": "^4.62.2",
-    "tslib": "^2.4.0",
-    "vue": "^3.3.4"
+    "rollup": "^4.62.4",
+    "tslib": "^2.8.1",
+    "vue": "^3.5.41"
   },
   "peerDependencies": {
     "tslib": ">=2.4.0"

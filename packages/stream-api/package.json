@@ -45,24 +45,24 @@
     "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.18.7",
-    "long": "^5.3.1"
+    "@vertexvis/frame-streaming-protos": "^0.18.8",
+    "long": "^5.3.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
-    "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.1",
-    "@vertexvis/jest-config-vertexvis": "^0.6.1",
+    "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
+    "@vertexvis/jest-config-vertexvis": "^0.6.2",
     "@vertexvis/utils": "1.1.0",
     "@vertexwebsdk/build": "1.1.0",
     "eslint": "^8.57.1",
-    "jest": "^29.5.14",
-    "jest-cli": "^29.5.14",
+    "jest": "^29.7.0",
+    "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "protobufjs": "^7.5.4",
-    "rollup": "^4.62.2",
-    "ts-jest": "^29.4.11",
-    "tslib": "^2.4.0",
-    "typescript": "^5.2.0"
+    "protobufjs": "^7.6.5",
+    "rollup": "^4.62.4",
+    "ts-jest": "^29.4.12",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "@vertexvis/utils": ">=0.23.0",
