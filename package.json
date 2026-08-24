@@ -3,7 +3,7 @@
   "private": true,
   "nextVersionBump": "patch",
   "devDependencies": {
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.5",
     "lerna": "^9.0.7",
     "prettier": "^3.9.6",
     "rollup": "^4.62.4",

@@ -60,7 +60,7 @@
     "@types/jest": "^29.5.14",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
     "@vertexvis/jest-config-vertexvis": "^0.6.2",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.5",
     "jest": "^29.7.0",
     "rollup": "^4.62.4",
     "ts-jest": "^29.4.12"
