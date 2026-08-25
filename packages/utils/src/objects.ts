@@ -86,7 +86,6 @@ export function isEqual(a: unknown, b: unknown): boolean {
   return fastDeepEqual(a, b);
 }
 
-/* eslint-disable padding-line-between-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /**
@@ -114,11 +113,9 @@ export function toPairs(obj: any): Array<[string, any]> {
     return [];
   }
 }
-/* eslint-enable padding-line-between-statements */
 /* eslint-enable @typescript-eslint/no-explicit-any */
 /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 
-/* eslint-disable padding-line-between-statements */
 export function fromPairs<T>(
   pairs: Array<[string, T]> | undefined | null,
 ): Record<string, T>;
@@ -138,4 +135,3 @@ export function fromPairs(pairs: unknown): Record<string, unknown> {
     return {};
   }
 }
-/* eslint-enable padding-line-between-statements */

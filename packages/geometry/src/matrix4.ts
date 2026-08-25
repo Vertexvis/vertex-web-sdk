@@ -11,12 +11,11 @@ import * as Vector3 from './vector3';
  * transformations such as translation, rotation and scale.
  */
 export type Matrix4 = [
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   number, number, number, number,
   number, number, number, number,
   number, number, number, number,
   number, number, number, number,
-  /* eslint-enable prettier/prettier */
 ];
 
 /**
@@ -57,49 +56,58 @@ export interface Matrix4AsObject {
  * Creates a 4x4 matrix from a set of row-major components.
  */
 export function fromValues(
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   m11: number, m12: number, m13: number, m14: number,
   m21: number, m22: number, m23: number, m24: number,
   m31: number, m32: number, m33: number, m34: number,
   m41: number, m42: number, m43: number, m44: number,
-  /* eslint-enable prettier/prettier */
 ): Matrix4 {
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     m11, m12, m13, m14,
     m21, m22, m23, m24,
     m31, m32, m33, m34,
     m41, m42, m43, m44,
   ]
-  /* eslint-enable prettier/prettier */
 }
 
 /**
  * Creates a `Matrix4` from an object representation.
  */
 export function fromObject(obj: Matrix4AsObject): Matrix4 {
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return fromValues(
-      obj.m11, obj.m12, obj.m13, obj.m14,
-      obj.m21, obj.m22, obj.m23, obj.m24,
-      obj.m31, obj.m32, obj.m33, obj.m34,
-      obj.m41, obj.m42, obj.m43, obj.m44
+    obj.m11, obj.m12, obj.m13, obj.m14,
+    obj.m21, obj.m22, obj.m23, obj.m24,
+    obj.m31, obj.m32, obj.m33, obj.m34,
+    obj.m41, obj.m42, obj.m43, obj.m44
   );
-  /* eslint-enable prettier/prettier */
 }
 
 /**
  * Returns a new [identity matrix](https://en.wikipedia.org/wiki/Identity_matrix).
  */
 export function makeIdentity(): Matrix4 {
-  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+  // prettier-ignore
+  return [
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+  ];
 }
 
 /**
  * Returns a matrix with all values as 0.
  */
 export function makeZero(): Matrix4 {
-  return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  // prettier-ignore
+  return [
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+  ];
 }
 
 /**
@@ -117,14 +125,13 @@ export function makeZero(): Matrix4 {
  */
 export function makeTranslation(translation: Vector3.Vector3): Matrix4 {
   const { x, y, z } = translation;
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
     x, y, z, 1,
   ];
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -157,14 +164,13 @@ export function makeRotation(rotation: Quaternion.Quaternion): Matrix4 {
     wy = w * y2,
     wz = w * z2;
 
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     1 - ( yy + zz ), xy - wz, xz + wy, 0,
     xy + wz, 1 - ( xx + zz ), yz - wx, 0,
     xz - wy, yz + wx, 1 - ( xx + yy ), 0,
     0, 0, 0, 1
   ];
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -182,14 +188,13 @@ export function makeRotation(rotation: Quaternion.Quaternion): Matrix4 {
  */
 export function makeScale(scale: Vector3.Vector3): Matrix4 {
   const { x, y, z } = scale;
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     x, 0, 0, 0,
     0, y, 0, 0,
     0, 0, z, 0,
     0, 0, 0, 1,
   ];
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -232,14 +237,13 @@ export function makeBasis(
   y: Vector3.Vector3,
   z: Vector3.Vector3,
 ): Matrix4 {
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     x.x, x.y, x.z, 0,
     y.x, y.y, y.z, 0,
     z.x, z.y, z.z, 0,
     0, 0, 0, 1
   ]
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -276,14 +280,13 @@ export function makeFrustum(
   const c = -(far + near) / (far - near);
   const d = (-2 * far * near) / (far - near);
 
-  /* eslint-disable prettier/prettier */
-    return [
-      x, 0, 0, 0,
-      0, y, 0, 0,
-      a, b, c, -1,
-      0, 0, d, 0
-    ];
-    /* eslint-enable prettier/prettier */
+  // prettier-ignore
+  return [
+    x, 0, 0, 0,
+    0, y, 0, 0,
+    a, b, c, -1,
+    0, 0, d, 0
+  ];
 }
 
 /**
@@ -354,14 +357,13 @@ export function makeOrthographic(
   const y = (top + bottom) * h;
   const z = (far + near) * d;
 
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     2 * w, 0,     0,      -x,
     0,     2 * h, 0,      -y,
     0,     0,     -2 * d, -z,
     0,     0,     0,      1
   ];
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -396,14 +398,13 @@ export function makeLookAtView(
   const dotY = -Vector3.dot(y, position);
   const dotZ = -Vector3.dot(z, position);
 
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     x.x, y.x, z.x, 0,
     x.y, y.y, z.y, 0,
     x.z, y.z, z.z, 0,
     dotX, dotY, dotZ, 1,
   ];
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -428,14 +429,13 @@ export function makeLookAt(
   const x = Vector3.normalize(Vector3.cross(up, z));
   const y = Vector3.cross(z, x);
 
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     x.x, x.y, x.z, 0,
     y.x, y.y, y.z, 0,
     z.x, z.y, z.z, 0,
     position.x, position.y, position.z, 1
   ];
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -543,11 +543,10 @@ export function lookAt(
   const y = Vector3.cross(z, x);
 
   const res: Matrix4 = [...m];
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   res[0] = x.x; res[1] = x.y; res[2] = x.z;
   res[4] = y.x; res[5] = y.y; res[6] = y.z;
   res[8] = z.x; res[9] = z.y; res[10] = z.z;
-  /* eslint-enable prettier/prettier */
   return res;
 }
 
@@ -582,14 +581,13 @@ export function multiply(a: Matrix4, b: Matrix4): Matrix4 {
  * matrix.
  */
 export function transpose(matrix: Matrix4): Matrix4 {
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return [
     matrix[0], matrix[4], matrix[8], matrix[12],
     matrix[1], matrix[5], matrix[9], matrix[13],
     matrix[2], matrix[6], matrix[10], matrix[14],
     matrix[3], matrix[7], matrix[11], matrix[15],
   ];
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -598,11 +596,10 @@ export function transpose(matrix: Matrix4): Matrix4 {
 export function scale(matrix: Matrix4, scale: Vector3.Vector3): Matrix4 {
   const { x, y, z } = scale;
   const m: Matrix4 = [...matrix];
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   m[0] *= x; m[1] *= x; m[2] *= x; m[3] *= x;
   m[4] *= y; m[5] *= y; m[6] *= y; m[7] *= y;
   m[8] *= z; m[9] *= z; m[10] *= z; m[11] *= z;
-  /* eslint-enable prettier/prettier */
   return m;
 }
 
@@ -646,14 +643,13 @@ export function toObject(m: Matrix4): Matrix4AsObject {
  * @param m A Matrix4 item written in column-major form.
  */
 export function toObjectColumnMajor(m: Matrix4): Matrix4AsObject {
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return {
     m11: m[0], m12: m[4], m13: m[8], m14: m[12],
     m21: m[1], m22: m[5], m23: m[9], m24: m[13],
     m31: m[2], m32: m[6], m33: m[10], m34: m[14],
     m41: m[3], m42: m[7], m43: m[11], m44: m[15],
   }
-  /* eslint-enable prettier/prettier */
 }
 
 /**
@@ -661,14 +657,13 @@ export function toObjectColumnMajor(m: Matrix4): Matrix4AsObject {
  * @param m A Matrix4 item written in row-major form.
  */
 export function toObjectRowMajor(m: Matrix4): Matrix4AsObject {
-  /* eslint-disable prettier/prettier */
+  // prettier-ignore
   return {
     m11: m[0], m12: m[1], m13: m[2], m14: m[3],
     m21: m[4], m22: m[5], m23: m[6], m24: m[7],
     m31: m[8], m32: m[9], m33: m[10], m34: m[11],
     m41: m[12], m42: m[13], m43: m[14], m44: m[15],
   }
-  /* eslint-enable prettier/prettier */
 }
 
 /**

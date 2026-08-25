@@ -58,7 +58,6 @@ export const epsilon = (boundingBox: BoundingBox): number => {
   );
 };
 
-/* eslint-disable padding-line-between-statements */
 /**
  * Combine two or more bounding boxes into a new minimal bounding box that
  * contains both.
@@ -82,7 +81,6 @@ export function union(box: BoundingBox, ...rest: BoundingBox[]): BoundingBox {
     return create(Vector3.min(a.min, b.min), Vector3.max(a.max, b.max));
   }, box);
 }
-/* eslint-enable padding-line-between-statements */
 
 /**
  * Returns the distance between the min and max for the provided

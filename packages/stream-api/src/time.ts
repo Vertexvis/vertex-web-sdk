@@ -62,7 +62,6 @@ export function toProtoDuration(...args: unknown[]): google.protobuf.Duration {
   }
 }
 
-/* eslint-disable padding-line-between-statements */
 /**
  * Converts a protobuf timestamp or duration to a JS date.
  *
@@ -81,7 +80,6 @@ export function protoToDate(
     return new Date(seconds * 1000 + time.nanos / 1000000);
   }
 }
-/* eslint-enable padding-line-between-statements */
 
 function parseEpochMillis(millis: number): DefinedTimestampOrDuration {
   const seconds = Math.floor(Math.abs(millis) / 1000);

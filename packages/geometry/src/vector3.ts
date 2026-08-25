@@ -20,7 +20,6 @@ export interface Vector3 {
 export type Vector3AsArray = [x: number, y: number, z: number];
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable padding-line-between-statements */
 /**
  * Returns a new `Vector3` either with the provided x, y, and z dimensions,
  * or from the provided `Partial<Vector3>` object populated with zeroes
@@ -54,7 +53,6 @@ export function create(...args: any[]): Vector3 {
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
-/* eslint-enable padding-line-between-statements */
 
 /**
  * Checks if each component of the given vector is populated with a numeric

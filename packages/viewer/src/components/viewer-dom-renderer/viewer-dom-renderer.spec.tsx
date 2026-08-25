@@ -331,14 +331,13 @@ describe('<vertex-viewer-dom-renderer>', () => {
   describe('initialization', () => {
     it('initializes the current camera when loaded with a populated viewer.frame', async () => {
       const addEventListener = jest.fn();
-      /* eslint-disable prettier/prettier */
+      // prettier-ignore
       const matrix = [
         0, 0.5, 0.5, 0,
         0, 1, 0, 0,
         0.5, 0.5, 0, 0,
         0, 0, 0, 1
       ];
-      /* eslint-enable prettier/prettier */
 
       const camera = {
         viewMatrix: matrix,
