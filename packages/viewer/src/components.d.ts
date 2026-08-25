@@ -2893,6 +2893,7 @@ declare namespace LocalJSX {
         "onTap"?: (event: VertexViewerCustomEvent<TapEventDetails>) => void;
         /**
           * Emits an event when a provided oauth2 token is about to expire, or is about to expire, causing issues with establishing a websocket connection, or performing API calls.
+          * @deprecated Token refresh is handled automatically internally; no replacement is needed
          */
         "onTokenExpired"?: (event: VertexViewerCustomEvent<void>) => void;
         /**
