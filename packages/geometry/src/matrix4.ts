@@ -12,10 +12,22 @@ import * as Vector3 from './vector3';
  */
 export type Matrix4 = [
   // prettier-ignore
-  number, number, number, number,
-  number, number, number, number,
-  number, number, number, number,
-  number, number, number, number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
 ];
 
 /**
@@ -57,10 +69,22 @@ export interface Matrix4AsObject {
  */
 export function fromValues(
   // prettier-ignore
-  m11: number, m12: number, m13: number, m14: number,
-  m21: number, m22: number, m23: number, m24: number,
-  m31: number, m32: number, m33: number, m34: number,
-  m41: number, m42: number, m43: number, m44: number,
+  m11: number,
+  m12: number,
+  m13: number,
+  m14: number,
+  m21: number,
+  m22: number,
+  m23: number,
+  m24: number,
+  m31: number,
+  m32: number,
+  m33: number,
+  m34: number,
+  m41: number,
+  m42: number,
+  m43: number,
+  m44: number,
 ): Matrix4 {
   // prettier-ignore
   return [
@@ -544,9 +568,15 @@ export function lookAt(
 
   const res: Matrix4 = [...m];
   // prettier-ignore
-  res[0] = x.x; res[1] = x.y; res[2] = x.z;
-  res[4] = y.x; res[5] = y.y; res[6] = y.z;
-  res[8] = z.x; res[9] = z.y; res[10] = z.z;
+  res[0] = x.x;
+  res[1] = x.y;
+  res[2] = x.z;
+  res[4] = y.x;
+  res[5] = y.y;
+  res[6] = y.z;
+  res[8] = z.x;
+  res[9] = z.y;
+  res[10] = z.z;
   return res;
 }
 
@@ -597,9 +627,18 @@ export function scale(matrix: Matrix4, scale: Vector3.Vector3): Matrix4 {
   const { x, y, z } = scale;
   const m: Matrix4 = [...matrix];
   // prettier-ignore
-  m[0] *= x; m[1] *= x; m[2] *= x; m[3] *= x;
-  m[4] *= y; m[5] *= y; m[6] *= y; m[7] *= y;
-  m[8] *= z; m[9] *= z; m[10] *= z; m[11] *= z;
+  m[0] *= x;
+  m[1] *= x;
+  m[2] *= x;
+  m[3] *= x;
+  m[4] *= y;
+  m[5] *= y;
+  m[6] *= y;
+  m[7] *= y;
+  m[8] *= z;
+  m[9] *= z;
+  m[10] *= z;
+  m[11] *= z;
   return m;
 }
 

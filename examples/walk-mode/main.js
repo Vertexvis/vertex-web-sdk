@@ -57,7 +57,7 @@ async function main() {
     } else {
       teleportAndAlignButton.style = undefined;
       teleportButton.style = undefined;
-      teleportTowardButton.style = "color: #0099cc";
+      teleportTowardButton.style = 'color: #0099cc';
       walkModeTool.teleportMode = 'teleport-toward';
     }
   });
@@ -74,7 +74,7 @@ async function main() {
     } else {
       teleportAndAlignButton.style = undefined;
       teleportTowardButton.style = undefined;
-      teleportButton.style = "color: #0099cc";
+      teleportButton.style = 'color: #0099cc';
       walkModeTool.teleportMode = 'teleport';
     }
   });
@@ -91,41 +91,41 @@ async function main() {
     } else {
       teleportButton.style = undefined;
       teleportTowardButton.style = undefined;
-      teleportAndAlignButton.style = "color: #0099cc";
+      teleportAndAlignButton.style = 'color: #0099cc';
       walkModeTool.teleportMode = 'teleport-and-align';
     }
   });
 
-  walkModeTool.addEventListener('controllerChanged', event => {
+  walkModeTool.addEventListener('controllerChanged', (event) => {
     const controller = event.detail;
 
-  /* Custom keys for interactions */
+    /* Custom keys for interactions */
 
-  /**
-   * Appending to existing keybindings:
-   * 
-   * // With the `ViewerWalkModeOperation` enum values
-   * controller.addKeyBinding(ViewerWalkModeOperation.WALK_FORWARD, 'ArrowUp');
-   * 
-   * // Without the `ViewerWalkModeOperation` enum values
-   * controller.addKeyBinding('WALK_FORWARD', 'ArrowUp');
-   */
+    /**
+     * Appending to existing keybindings:
+     *
+     * // With the `ViewerWalkModeOperation` enum values
+     * controller.addKeyBinding(ViewerWalkModeOperation.WALK_FORWARD, 'ArrowUp');
+     *
+     * // Without the `ViewerWalkModeOperation` enum values
+     * controller.addKeyBinding('WALK_FORWARD', 'ArrowUp');
+     */
 
-  /**
-   * Replacing existing keybindings:
-   * 
-   * // With the `ViewerWalkModeOperation` enum values
-   * controller.replaceKeyBinding(ViewerWalkModeOperation.WALK_FORWARD, 'ArrowUp');
-   * 
-   * // Without the `ViewerWalkModeOperation` enum values
-   * controller.replaceKeyBinding('WALK_FORWARD', 'ArrowUp');
-   * 
-   * **Note**
-   * Replacing a keybinding will not remove other bindings for that specific key,
-   * but they can be removed using the same method and providing an empty set of keys.
-   * 
-   * // Removing a keybinding (the `PIVOT_UP` action would normally be bound to `ArrowUp`)
-   * controller.replaceKeyBinding('PIVOT_UP');
-   */
+    /**
+     * Replacing existing keybindings:
+     *
+     * // With the `ViewerWalkModeOperation` enum values
+     * controller.replaceKeyBinding(ViewerWalkModeOperation.WALK_FORWARD, 'ArrowUp');
+     *
+     * // Without the `ViewerWalkModeOperation` enum values
+     * controller.replaceKeyBinding('WALK_FORWARD', 'ArrowUp');
+     *
+     * **Note**
+     * Replacing a keybinding will not remove other bindings for that specific key,
+     * but they can be removed using the same method and providing an empty set of keys.
+     *
+     * // Removing a keybinding (the `PIVOT_UP` action would normally be bound to `ArrowUp`)
+     * controller.replaceKeyBinding('PIVOT_UP');
+     */
   });
 }

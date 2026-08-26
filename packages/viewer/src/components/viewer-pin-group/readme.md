@@ -1,9 +1,6 @@
 # vertex-viewer-pin-group
 
-
-
 <!-- Auto Generated Below -->
-
 
 ## Properties
 
@@ -17,7 +14,6 @@
 | `projectionViewMatrix` | --         | Projection view matrix used for computing the position of the pin line           | `[number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number]` | `Matrix4.makeIdentity()` |
 | `selected`             | `selected` | Whether the pin is "selected"                                                    | `boolean`                                                                                                                          | `false`                  |
 
-
 ## CSS Custom Properties
 
 | Name                                       | Description                                                                                                   |
@@ -30,12 +26,11 @@
 | `--viewer-annotations-pin-selected-border` | A CSS color that specifies the border of a selected pin                                                       |
 | `--viewer-annotations-pin-selected-stroke` | A CSS color that specifies the stroke color of a selected pin                                                 |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-pin-tool](../viewer-pin-tool)
+- [vertex-viewer-pin-tool](../viewer-pin-tool)
 
 ### Depends on
 
@@ -45,6 +40,7 @@
 - [vertex-viewer-icon](../viewer-icon)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-pin-group --> vertex-viewer-dom-element
@@ -55,6 +51,6 @@ graph TD;
   style vertex-viewer-pin-group fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

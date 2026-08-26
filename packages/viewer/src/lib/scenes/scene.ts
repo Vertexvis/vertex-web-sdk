@@ -880,8 +880,7 @@ export class Scene {
    */
   public async applySceneViewState(
     sceneViewStateId:
-      | UUID.UUID
-      | SceneViewStateIdentifier.SceneViewStateIdentifier,
+      UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
     opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {
     return await this.sceneViewStateLoader.applySceneViewState(
@@ -895,8 +894,7 @@ export class Scene {
    */
   public async applyPartialSceneViewState(
     sceneViewStateId:
-      | UUID.UUID
-      | SceneViewStateIdentifier.SceneViewStateIdentifier,
+      UUID.UUID | SceneViewStateIdentifier.SceneViewStateIdentifier,
     featuresToApply: SceneViewStateFeature[],
     opts: ApplySceneViewStateOptions = {},
   ): Promise<vertexvis.protobuf.stream.ILoadSceneViewStateResult | undefined> {

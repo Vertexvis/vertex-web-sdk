@@ -12,7 +12,6 @@ information.
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
 | Property         | Attribute    | Description                                                                                                                                                               | Type                                                                                                                               | Default                   |
@@ -27,27 +26,26 @@ information.
 | `scale`          | --           | The local scale of this element.                                                                                                                                          | `Vector3`                                                                                                                          | `Vector3.create(1, 1, 1)` |
 | `scaleJson`      | `scale`      | The local scale of this element, as a JSON string. JSON string representation can either be in the format of `[x, y, z]` or `{"x": 0, "y": 0, "z": 0}`.                   | `string`                                                                                                                           | `''`                      |
 
-
 ## Events
 
 | Event            | Description                                                         | Type                |
 | ---------------- | ------------------------------------------------------------------- | ------------------- |
 | `propertyChange` | An event that is emitted when any property on the dom group changes | `CustomEvent<void>` |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-view-cube](../viewer-view-cube)
+- [vertex-viewer-view-cube](../viewer-view-cube)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-view-cube --> vertex-viewer-dom-group
   style vertex-viewer-dom-group fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

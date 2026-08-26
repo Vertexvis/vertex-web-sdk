@@ -12,21 +12,19 @@ export interface ViewerWalkModeConfiguration {
 }
 
 export type ViewerTeleportMode =
-  | 'teleport'
-  | 'teleport-and-align'
-  | 'teleport-toward';
+  'teleport' | 'teleport-and-align' | 'teleport-toward';
 
 export enum ViewerWalkModeOperation {
-  'MOVE_DOWN' = 'MOVE_DOWN',
-  'MOVE_UP' = 'MOVE_UP',
-  'PIVOT_DOWN' = 'PIVOT_DOWN',
-  'PIVOT_LEFT' = 'PIVOT_LEFT',
-  'PIVOT_RIGHT' = 'PIVOT_RIGHT',
-  'PIVOT_UP' = 'PIVOT_UP',
-  'WALK_BACKWARD' = 'WALK_BACKWARD',
-  'WALK_FORWARD' = 'WALK_FORWARD',
-  'WALK_LEFT' = 'WALK_LEFT',
-  'WALK_RIGHT' = 'WALK_RIGHT',
+  MOVE_DOWN = 'MOVE_DOWN',
+  MOVE_UP = 'MOVE_UP',
+  PIVOT_DOWN = 'PIVOT_DOWN',
+  PIVOT_LEFT = 'PIVOT_LEFT',
+  PIVOT_RIGHT = 'PIVOT_RIGHT',
+  PIVOT_UP = 'PIVOT_UP',
+  WALK_BACKWARD = 'WALK_BACKWARD',
+  WALK_FORWARD = 'WALK_FORWARD',
+  WALK_LEFT = 'WALK_LEFT',
+  WALK_RIGHT = 'WALK_RIGHT',
 }
 
 export type ViewerWalkModeKeyBindings = Record<

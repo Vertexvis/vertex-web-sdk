@@ -69,9 +69,7 @@ const step2 = {
       ],
       query: {
         type: 'itemId',
-        values: [
-          '73b19c01-ebab-4e4c-afad-80d5fce7c1f1',
-        ],
+        values: ['73b19c01-ebab-4e4c-afad-80d5fce7c1f1'],
       },
     },
   ],
@@ -176,9 +174,7 @@ const step4 = {
       ],
       query: {
         type: 'itemId',
-        values: [
-          '5fef7133-f8e7-490d-821e-604288f75377',
-        ],
+        values: ['5fef7133-f8e7-490d-821e-604288f75377'],
       },
     },
   ],
@@ -229,9 +225,7 @@ const step5 = {
       ],
       query: {
         type: 'itemId',
-        values: [
-          'c5bc911d-24e6-4fe4-bade-084d4c822d64',
-        ],
+        values: ['c5bc911d-24e6-4fe4-bade-084d4c822d64'],
       },
     },
   ],

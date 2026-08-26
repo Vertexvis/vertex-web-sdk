@@ -5,10 +5,10 @@ measurement for models that have been imported with BREP data. Precise
 measurement currently supports measurement of surfaces and will return available
 measurement data between multiple surfaces, including:
 
-* Minimum distance
-* Planar angle
-* Planar distance
-* Surface area
+- Minimum distance
+- Planar angle
+- Planar distance
+- Surface area
 
 **Example:** Performing a measurement and displaying results.
 
@@ -21,36 +21,39 @@ precise measurement to work.
 
 ```html
 <html>
-<body>
-  <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key" feature-maps="final">
-    <vertex-viewer-measurement-precise
-      id="measurement"
-    ></vertex-viewer-measurement-precise>
+  <body>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+      feature-maps="final"
+    >
+      <vertex-viewer-measurement-precise
+        id="measurement"
+      ></vertex-viewer-measurement-precise>
 
-    <vertex-viewer-toolbar placement="bottom-right">
-      <vertex-viewer-measurement-details
-        id="details"
-      ></vertex-viewer-measurement-details>
-    </vertex-viewer-toolbar>
-  </vertex-viewer>
+      <vertex-viewer-toolbar placement="bottom-right">
+        <vertex-viewer-measurement-details
+          id="details"
+        ></vertex-viewer-measurement-details>
+      </vertex-viewer-toolbar>
+    </vertex-viewer>
 
-  <script type="module">
-    window.addEventListener('load', () => main());
+    <script type="module">
+      window.addEventListener('load', () => main());
 
-    async function main() {
-      const measurement = document.getElementById('measurement');
-      const details = document.getElementById('details');
+      async function main() {
+        const measurement = document.getElementById('measurement');
+        const details = document.getElementById('details');
 
-      // Set the detail's measurement model to display measurement results.
-      details.measurementModel = measurement.measurementModel;
-    }
-  </script>
-</body>
+        // Set the detail's measurement model to display measurement results.
+        details.measurementModel = measurement.measurementModel;
+      }
+    </script>
+  </body>
 </html>
 ```
 
 <!-- Auto Generated Below -->
-
 
 ## Properties
 
@@ -63,7 +66,6 @@ precise measurement to work.
 | `measurementOverlays`   | --           | The manager that is responsible for measurement overlays to present by this component.                                           | `MeasurementOverlayManager`                | `new MeasurementOverlayManager()` |
 | `viewer`                | --           | The viewer that this component is bound to. This is automatically assigned if added to the light-dom of a parent viewer element. | `HTMLVertexViewerElement \| undefined`     | `undefined`                       |
 
-
 ## Dependencies
 
 ### Depends on
@@ -71,6 +73,7 @@ precise measurement to work.
 - [vertex-viewer-measurement-overlays](../viewer-measurement-overlays)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-measurement-precise --> vertex-viewer-measurement-overlays
@@ -78,6 +81,6 @@ graph TD;
   style vertex-viewer-measurement-precise fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

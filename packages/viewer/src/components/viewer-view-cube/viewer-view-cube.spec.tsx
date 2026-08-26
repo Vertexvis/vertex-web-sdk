@@ -193,9 +193,7 @@ describe('vertex-viewer-view-cube interactions', () => {
   it('performs standard view when side clicked', async () => {
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => (
-        <vertex-viewer-view-cube viewer={viewerElement} />
-      ),
+      template: () => <vertex-viewer-view-cube viewer={viewerElement} />,
     });
 
     const frontEl = page.root?.shadowRoot?.querySelector(
@@ -259,9 +257,7 @@ describe('vertex-viewer-view-cube interactions', () => {
 
     const page = await newSpecPage({
       components: [ViewerViewCube],
-      template: () => (
-        <vertex-viewer-view-cube viewer={viewerElement} />
-      ),
+      template: () => <vertex-viewer-view-cube viewer={viewerElement} />,
     });
 
     const frontEl = page.root?.shadowRoot?.querySelector(

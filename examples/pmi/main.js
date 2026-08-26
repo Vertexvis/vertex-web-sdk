@@ -15,7 +15,8 @@ async function main() {
 
   viewer.addEventListener('sceneReady', async () => {
     // Load all model views for the scene item, and display them in the model view list.
-    const modelViewsResponse = await viewer.modelViews.listByItem(SCENE_ITEM_ID);
+    const modelViewsResponse =
+      await viewer.modelViews.listByItem(SCENE_ITEM_ID);
 
     modelViewsResponse.modelViews.forEach((modelView) => {
       createModelViewListItem(modelView, SCENE_ITEM_ID);

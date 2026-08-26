@@ -32,7 +32,6 @@ the group with a fractional gap size of this component.
 
 <!-- Auto Generated Below -->
 
-
 ## Slots
 
 | Slot                                                                                                                 | Description                                        |
@@ -41,27 +40,26 @@ the group with a fractional gap size of this component.
 | `"after"`                                                                                                            | Content that is placed after the primary content.  |
 | `"before"`                                                                                                           | Content that is placed before the primary content. |
 
-
 ## CSS Custom Properties
 
 | Name                               | Description                                                   |
 | ---------------------------------- | ------------------------------------------------------------- |
 | `--scene-tree-toolbar-content-gap` | A CSS length that specifies the horizontal gap between slots. |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-scene-tree](../scene-tree)
+- [vertex-scene-tree](../scene-tree)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-scene-tree --> vertex-scene-tree-toolbar
   style vertex-scene-tree-toolbar fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

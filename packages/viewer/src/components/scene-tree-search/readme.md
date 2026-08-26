@@ -15,17 +15,15 @@ functionality will need to be wired programmatically to
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
-| Property      | Attribute     | Description                                                                                                                                                                                                                                                                                                    | Type                               | Default     |
-| ------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ----------- |
-| `controller`  | --            | The scene tree controller                                                                                                                                                                                                                                                                                      | `SceneTreeController \| undefined` | `undefined` |
-| `debounce`    | `debounce`    | Specifies the delay, in milliseconds, to emit `search` events after user input.  If this value is specified, searches will automatically occur after a keystroke has occurred and the debounce threshold has elapsed.  Defaults to `undefined`, and searches only occur on an `Enter` press or a `blur` event. | `number \| undefined`              | `undefined` |
-| `disabled`    | `disabled`    | If `true`, disables user interaction of the component.                                                                                                                                                                                                                                                         | `boolean`                          | `false`     |
-| `placeholder` | `placeholder` | Placeholder text if `value` is empty.                                                                                                                                                                                                                                                                          | `string \| undefined`              | `undefined` |
-| `value`       | `value`       | The current text value of the component. Value is updated on user interaction.                                                                                                                                                                                                                                 | `string`                           | `''`        |
-
+| Property      | Attribute     | Description                                                                                                                                                                                                                                                                                                  | Type                               | Default     |
+| ------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------- | ----------- |
+| `controller`  | --            | The scene tree controller                                                                                                                                                                                                                                                                                    | `SceneTreeController \| undefined` | `undefined` |
+| `debounce`    | `debounce`    | Specifies the delay, in milliseconds, to emit `search` events after user input. If this value is specified, searches will automatically occur after a keystroke has occurred and the debounce threshold has elapsed. Defaults to `undefined`, and searches only occur on an `Enter` press or a `blur` event. | `number \| undefined`              | `undefined` |
+| `disabled`    | `disabled`    | If `true`, disables user interaction of the component.                                                                                                                                                                                                                                                       | `boolean`                          | `false`     |
+| `placeholder` | `placeholder` | Placeholder text if `value` is empty.                                                                                                                                                                                                                                                                        | `string \| undefined`              | `undefined` |
+| `value`       | `value`       | The current text value of the component. Value is updated on user interaction.                                                                                                                                                                                                                               | `string`                           | `''`        |
 
 ## Events
 
@@ -33,7 +31,6 @@ functionality will need to be wired programmatically to
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
 | `search`          | An event that is emitted when a user has changed or cleared the search term. The event may be delayed according to the current `debounce` value. | `CustomEvent<string>` |
 | `searchCompleted` | An event that is emitted when a search has completed.                                                                                            | `CustomEvent<string>` |
-
 
 ## Methods
 
@@ -45,8 +42,6 @@ Clears the current search term and clears any debounced filters.
 
 Type: `Promise<void>`
 
-
-
 ### `setFocus() => Promise<void>`
 
 Gives focus to the component's internal text input.
@@ -55,16 +50,12 @@ Gives focus to the component's internal text input.
 
 Type: `Promise<void>`
 
-
-
-
 ## Slots
 
 | Slot            | Description                                               |
 | --------------- | --------------------------------------------------------- |
 | `"clear-icon"`  | A slot that replaces the component's default clear icon.  |
 | `"search-icon"` | A slot that replaces the component's default search icon. |
-
 
 ## CSS Custom Properties
 
@@ -79,12 +70,11 @@ Type: `Promise<void>`
 | `--scene-tree-search-input-padding`            | A CSS padding value that specifies horizontal and vertical lengths of the internal text input. |
 | `--scene-tree-search-search-icon-offset`       | A CSS length that specifies the horizontal offset of the search icon                           |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-scene-tree](../scene-tree)
+- [vertex-scene-tree](../scene-tree)
 
 ### Depends on
 
@@ -92,6 +82,7 @@ Type: `Promise<void>`
 - [vertex-viewer-icon](../viewer-icon)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-scene-tree-search --> vertex-viewer-spinner
@@ -100,6 +91,6 @@ graph TD;
   style vertex-scene-tree-search fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

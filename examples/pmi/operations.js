@@ -1,4 +1,7 @@
-import { addAnnotationSelectedClass, clearAnnotationSelectionClasses } from './dom.js';
+import {
+  addAnnotationSelectedClass,
+  clearAnnotationSelectionClasses,
+} from './dom.js';
 
 // Helpers for performing operations on PMI annotations and scene items.
 
@@ -21,22 +24,18 @@ export async function selectAnnotation(annotationId) {
  * provided `visible` flag.
  */
 export async function updateAnnotationVisibility(annotationId, visible) {
-  const scene = await viewer.scene(); 
+  const scene = await viewer.scene();
 
   if (visible) {
     await scene
       .elements((op) => [
-        op.annotations
-          .where((q) => q.withAnnotationId(annotationId))
-          .hide(),
+        op.annotations.where((q) => q.withAnnotationId(annotationId)).hide(),
       ])
       .execute();
   } else {
     await scene
       .elements((op) => [
-        op.annotations
-          .where((q) => q.withAnnotationId(annotationId))
-          .show(),
+        op.annotations.where((q) => q.withAnnotationId(annotationId)).show(),
       ])
       .execute();
   }
@@ -45,7 +44,7 @@ export async function updateAnnotationVisibility(annotationId, visible) {
 /**
  * Performs a raycast at the provided position, and performs a few different actions
  * based on the result of the raycast.
- * 
+ *
  * If the raycast hits a PMI annotation, the annotation is selected, and all other annotations are deselected.
  * If the raycast hits a scene-item, the item is selected, and all other items are deselected.
  * If the raycast hits nothing, all annotations and items are deselected.

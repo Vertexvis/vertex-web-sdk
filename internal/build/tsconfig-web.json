@@ -5,7 +5,7 @@
     "importHelpers": true,
     "target": "ES2019",
     "jsx": "react-jsx",
-    "lib": ["DOM", "es2020"],
+    "lib": ["DOM", "es2020"]
   },
   "exclude": ["dist", "node_modules"]
 }

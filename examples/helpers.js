@@ -1,11 +1,9 @@
 const DEFAULT_ENV = 'platprod';
 const DEFAULT_STREAM_KEY = 'ydD87RtDdJCZQaa6twueZTEtsciQmAWl5qnP';
 
-export async function loadViewerWithQueryParams(
-  viewer,
-  options
-) {
-  const effectiveStreamKey = options?.streamKey ?? getStreamKey() ?? DEFAULT_STREAM_KEY;
+export async function loadViewerWithQueryParams(viewer, options) {
+  const effectiveStreamKey =
+    options?.streamKey ?? getStreamKey() ?? DEFAULT_STREAM_KEY;
   const effectiveEnv = options?.env ?? getEnvironment() ?? DEFAULT_ENV;
 
   viewer.configEnv = effectiveEnv;

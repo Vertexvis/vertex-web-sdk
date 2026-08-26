@@ -1,16 +1,17 @@
-
 :host {
   /**
    * @prop  --viewer-annotations-pin-label-line-color: A CSS color that
    * specifies the color of the label line
    */
-   --viewer-annotations-pin-label-line-color: var(--viewer-annotations-pin-primary-color);
+  --viewer-annotations-pin-label-line-color: var(
+    --viewer-annotations-pin-primary-color
+  );
 
   /**
    * @prop --viewer-annotations-pin-label-line-width: A CSS color that
    * specifies the width of the label line
    */
-   --viewer-annotations-pin-label-line-width: 1;
+  --viewer-annotations-pin-label-line-width: 1;
 
   overflow: hidden;
   pointer-events: none;
@@ -19,7 +20,7 @@
 .label-line {
   pointer-events: auto;
   stroke: var(--viewer-annotations-pin-label-line-color);
-  stroke-width: var( --viewer-annotations-pin-label-line-width);
+  stroke-width: var(--viewer-annotations-pin-label-line-width);
   cursor: default;
 }
 

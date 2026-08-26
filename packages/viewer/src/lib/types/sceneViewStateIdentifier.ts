@@ -14,8 +14,7 @@ export interface SceneViewStateSuppliedId {
  * a supplied id provided during creation.
  */
 export type SceneViewStateIdentifier =
-  | SceneViewStateId
-  | SceneViewStateSuppliedId;
+  SceneViewStateId | SceneViewStateSuppliedId;
 
 export function isSceneViewStateId(
   identifier: SceneViewStateIdentifier,

@@ -20,8 +20,7 @@ viewer.
 
 ```html
 <html>
-  <head>
-  </head>
+  <head> </head>
   <body>
     <script type="module">
       import { Vector3 } from 'https://cdn.jsdelivr.net/npm/@vertexvis/geometry@{{version}}/dist/cdn/bundle.esm.js';
@@ -31,12 +30,13 @@ viewer.
         const scene = await viewer.scene();
         const camera = scene.camera();
 
-        await camera.update({
-          position: Vector3.create(0, 0, 100),
-          lookAt: Vector3.origin(),
-          up: Vector3.up(),
-        })
-        .render();
+        await camera
+          .update({
+            position: Vector3.create(0, 0, 100),
+            lookAt: Vector3.origin(),
+            up: Vector3.up(),
+          })
+          .render();
       }
     </script>
   </body>

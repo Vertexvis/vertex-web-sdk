@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout changes"
+      - name: 'Checkout changes'
         uses: actions/checkout@v7
       - name: Enable Corepack
         run: corepack enable
@@ -22,13 +22,13 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: "Install"
-        run: "yarn install --mode=skip-build --immutable"
-      - name: "Build"
-        run: "yarn build"
-      - name: "Test"
-        run: "yarn test:ci"
-      - name: "Upload build artifacts"
+      - name: 'Install'
+        run: 'yarn install --mode=skip-build --immutable'
+      - name: 'Build'
+        run: 'yarn build'
+      - name: 'Test'
+        run: 'yarn test:ci'
+      - name: 'Upload build artifacts'
         uses: actions/upload-artifact@v7
         with:
           name: build-artifact
@@ -43,10 +43,10 @@ jobs:
     outputs:
       publish: ${{ steps.detect-publish.outputs.publish }}
     steps:
-      - name: "Checkout changes"
+      - name: 'Checkout changes'
         uses: actions/checkout@v7
-      - name: "Detect publish"
-        id: "detect-publish"
+      - name: 'Detect publish'
+        id: 'detect-publish'
         run: |
           result=`./scripts/detect_release.sh`
           echo $result
@@ -58,9 +58,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: "Checkout changes"
+      - name: 'Checkout changes'
         uses: actions/checkout@v7
-      - name: "Download build artifacts"
+      - name: 'Download build artifacts'
         uses: actions/download-artifact@v7
         with:
           name: build-artifact
@@ -70,18 +70,18 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          NODE_AUTH_TOKEN: '${{ secrets.NPMJS_ACCESS_TOKEN }}'
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
-          scope: "@vertexvis"
-      - name: "Install"
-        run: "yarn install --mode=skip-build"
-      - name: "Publish Canary to NPM"
+          scope: '@vertexvis'
+      - name: 'Install'
+        run: 'yarn install --mode=skip-build'
+      - name: 'Publish Canary to NPM'
         env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          NODE_AUTH_TOKEN: '${{ secrets.NPMJS_ACCESS_TOKEN }}'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
         run: |
@@ -96,9 +96,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: "Checkout changes"
+      - name: 'Checkout changes'
         uses: actions/checkout@v7
-      - name: "Download build artifacts"
+      - name: 'Download build artifacts'
         uses: actions/download-artifact@v7
         with:
           name: build-artifact
@@ -108,21 +108,21 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          NODE_AUTH_TOKEN: '${{ secrets.NPMJS_ACCESS_TOKEN }}'
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
-          scope: "@vertexvis"
-      - name: "Install"
-        run: "yarn install --mode=skip-build"
-      - name: "Publish Release to NPM"
+          scope: '@vertexvis'
+      - name: 'Install'
+        run: 'yarn install --mode=skip-build'
+      - name: 'Publish Release to NPM'
         env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          NODE_AUTH_TOKEN: '${{ secrets.NPMJS_ACCESS_TOKEN }}'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
-        run: "./scripts/publish_release.sh"
+        run: './scripts/publish_release.sh'
 
   docs:
     runs-on: ubuntu-latest
@@ -135,9 +135,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: "Checkout changes"
+      - name: 'Checkout changes'
         uses: actions/checkout@v7
-      - name: "Download build artifacts"
+      - name: 'Download build artifacts'
         uses: actions/download-artifact@v8
         with:
           name: build-artifact
@@ -147,15 +147,15 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-      - name: "Install"
-        run: "yarn install --mode=skip-build"
-      - name: "Generate docs"
-        run: "yarn generate:docs"
-      - name: "Upload docs as pages artifact"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - name: 'Install'
+        run: 'yarn install --mode=skip-build'
+      - name: 'Generate docs'
+        run: 'yarn generate:docs'
+      - name: 'Upload docs as pages artifact'
         uses: actions/upload-pages-artifact@v5
         with:
           path: docs
-      - name: "Deploy docs to GitHub Pages"
+      - name: 'Deploy docs to GitHub Pages'
         id: deployment
         uses: actions/deploy-pages@v5

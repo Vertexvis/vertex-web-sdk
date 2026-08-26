@@ -6,13 +6,13 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "target": "ES2019",
+    "target": "ES2019"
   },
   "include": [
     "src",
     "types/*.d.ts",
     "src/components.d.ts",
-    "src/regl-shape.d.ts",
+    "src/regl-shape.d.ts"
   ],
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["dist", "node_modules"]
 }

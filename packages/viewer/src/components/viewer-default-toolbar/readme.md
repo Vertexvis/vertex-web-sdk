@@ -27,7 +27,10 @@ elements flow horizontally. These can be changed using the `placement` and
 
 ```html
 <vertex-viewer>
-  <vertex-viewer-default-toolbar placement="middle-left" direction="vertical"></vertex-viewer-default-toolbar>
+  <vertex-viewer-default-toolbar
+    placement="middle-left"
+    direction="vertical"
+  ></vertex-viewer-default-toolbar>
 </vertex-viewer>
 ```
 
@@ -55,7 +58,6 @@ then the viewer will need to be manually connected.
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
 | Property             | Attribute             | Description                                                                                                                                                 | Type                                                                                                                                 | Default           |
@@ -65,7 +67,6 @@ then the viewer will need to be manually connected.
 | `direction`          | `direction`           | Specifies the direction that UI elements are placed.                                                                                                        | `"horizontal" \| "vertical"`                                                                                                         | `'horizontal'`    |
 | `placement`          | `placement`           | Specifies where the toolbar is positioned.                                                                                                                  | `"bottom-center" \| "bottom-left" \| "bottom-right" \| "middle-left" \| "middle-right" \| "top-center" \| "top-left" \| "top-right"` | `'bottom-center'` |
 | `viewer`             | --                    | An instance of the viewer that operations will be performed on. If contained within a `<vertex-viewer>` element, this property will automatically be wired. | `HTMLVertexViewerElement \| undefined`                                                                                               | `undefined`       |
-
 
 ## CSS Custom Properties
 
@@ -78,7 +79,6 @@ then the viewer will need to be manually connected.
 | `--viewer-toolbar-group-item-gap`      | The spacing between each item within a toolbar group. Defaults to `0.25rem`.                                                   |
 | `--viewer-toolbar-group-padding`       | The padding to apply to each group in the toolbar. Defaults to `0.25rem`.                                                      |
 
-
 ## Dependencies
 
 ### Depends on
@@ -89,6 +89,7 @@ then the viewer will need to be manually connected.
 - [vertex-viewer-icon](../viewer-icon)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-default-toolbar --> vertex-viewer-toolbar
@@ -99,6 +100,6 @@ graph TD;
   style vertex-viewer-default-toolbar fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

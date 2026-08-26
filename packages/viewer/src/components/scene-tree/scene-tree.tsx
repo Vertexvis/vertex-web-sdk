@@ -885,8 +885,7 @@ export class SceneTree {
 
     if (this.viewer == null && this.viewerSelector != null) {
       this.viewer = document.querySelector(this.viewerSelector) as
-        | HTMLVertexViewerElement
-        | undefined;
+        HTMLVertexViewerElement | undefined;
     }
 
     if (this.viewer != null) {

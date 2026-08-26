@@ -59,28 +59,56 @@ describe('vertex-viewer-measurement-line', () => {
       ?.querySelector('.line-fill')
       ?.querySelector('.end-cap') as SVGLineElement;
 
-    expect(Number.parseFloat(fillStartCap.getAttribute('x1') ?? '')).toBeCloseTo(0);
-    expect(Number.parseFloat(fillStartCap.getAttribute('y1') ?? '')).toBeCloseTo(5);
-    expect(Number.parseFloat(fillStartCap.getAttribute('x2') ?? '')).toBeCloseTo(0);
-    expect(Number.parseFloat(fillStartCap.getAttribute('y2') ?? '')).toBeCloseTo(-5);
+    expect(
+      Number.parseFloat(fillStartCap.getAttribute('x1') ?? ''),
+    ).toBeCloseTo(0);
+    expect(
+      Number.parseFloat(fillStartCap.getAttribute('y1') ?? ''),
+    ).toBeCloseTo(5);
+    expect(
+      Number.parseFloat(fillStartCap.getAttribute('x2') ?? ''),
+    ).toBeCloseTo(0);
+    expect(
+      Number.parseFloat(fillStartCap.getAttribute('y2') ?? ''),
+    ).toBeCloseTo(-5);
 
-    expect(Number.parseFloat(fillEndCap.getAttribute('x1') ?? '')).toBeCloseTo(100);
-    expect(Number.parseFloat(fillEndCap.getAttribute('y1') ?? '')).toBeCloseTo(5);
-    expect(Number.parseFloat(fillEndCap.getAttribute('x2') ?? '')).toBeCloseTo(100);
-    expect(Number.parseFloat(fillEndCap.getAttribute('y2') ?? '')).toBeCloseTo(-5);
-
-    expect(Number.parseFloat(strokeStartCap.getAttribute('x1') ?? '')).toBeCloseTo(0);
-    expect(Number.parseFloat(strokeStartCap.getAttribute('y1') ?? '')).toBeCloseTo(
-      5.5,
+    expect(Number.parseFloat(fillEndCap.getAttribute('x1') ?? '')).toBeCloseTo(
+      100,
     );
-    expect(Number.parseFloat(strokeStartCap.getAttribute('x2') ?? '')).toBeCloseTo(0);
-    expect(Number.parseFloat(strokeStartCap.getAttribute('y2') ?? '')).toBeCloseTo(
-      -5.5,
+    expect(Number.parseFloat(fillEndCap.getAttribute('y1') ?? '')).toBeCloseTo(
+      5,
+    );
+    expect(Number.parseFloat(fillEndCap.getAttribute('x2') ?? '')).toBeCloseTo(
+      100,
+    );
+    expect(Number.parseFloat(fillEndCap.getAttribute('y2') ?? '')).toBeCloseTo(
+      -5,
     );
 
-    expect(Number.parseFloat(strokeEndCap.getAttribute('x1') ?? '')).toBeCloseTo(100);
-    expect(Number.parseFloat(strokeEndCap.getAttribute('y1') ?? '')).toBeCloseTo(5.5);
-    expect(Number.parseFloat(strokeEndCap.getAttribute('x2') ?? '')).toBeCloseTo(100);
-    expect(Number.parseFloat(strokeEndCap.getAttribute('y2') ?? '')).toBeCloseTo(-5.5);
+    expect(
+      Number.parseFloat(strokeStartCap.getAttribute('x1') ?? ''),
+    ).toBeCloseTo(0);
+    expect(
+      Number.parseFloat(strokeStartCap.getAttribute('y1') ?? ''),
+    ).toBeCloseTo(5.5);
+    expect(
+      Number.parseFloat(strokeStartCap.getAttribute('x2') ?? ''),
+    ).toBeCloseTo(0);
+    expect(
+      Number.parseFloat(strokeStartCap.getAttribute('y2') ?? ''),
+    ).toBeCloseTo(-5.5);
+
+    expect(
+      Number.parseFloat(strokeEndCap.getAttribute('x1') ?? ''),
+    ).toBeCloseTo(100);
+    expect(
+      Number.parseFloat(strokeEndCap.getAttribute('y1') ?? ''),
+    ).toBeCloseTo(5.5);
+    expect(
+      Number.parseFloat(strokeEndCap.getAttribute('x2') ?? ''),
+    ).toBeCloseTo(100);
+    expect(
+      Number.parseFloat(strokeEndCap.getAttribute('y2') ?? ''),
+    ).toBeCloseTo(-5.5);
   });
 });

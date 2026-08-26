@@ -659,8 +659,7 @@ export class ViewerMarkup {
 
   private getMarkupTool(): HTMLVertexViewerMarkupToolElement | undefined {
     return this.hostEl.querySelector('vertex-viewer-markup-tool') as
-      | HTMLVertexViewerMarkupToolElement
-      | undefined;
+      HTMLVertexViewerMarkupToolElement | undefined;
   }
 
   private async getSelectedArrowMarkup(): Promise<

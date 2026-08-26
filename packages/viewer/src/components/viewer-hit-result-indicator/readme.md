@@ -22,26 +22,28 @@ displayed. This can be set directly on the element to display a static indicator
         padding: 0;
         margin: 0;
       }
-      
+
       #viewer {
         width: 100%;
         height: 100%;
       }
     </style>
-    
+
     <script type="module">
       function main() {
-        const indicator = document.querySelector('vertex-viewer-hit-result-indicator');
-        
-        indicator.position = { 
+        const indicator = document.querySelector(
+          'vertex-viewer-hit-result-indicator',
+        );
+
+        indicator.position = {
           x: 1,
           y: 2,
-          z: 3
+          z: 3,
         };
         indicator.normal = {
           x: 0,
           y: 1,
-          z: 0
+          z: 0,
         };
       }
 
@@ -49,7 +51,10 @@ displayed. This can be set directly on the element to display a static indicator
     </script>
   </head>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j">
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    >
       <vertex-viewer-hit-result-indicator></vertex-viewer-hit-result-indicator>
     </vertex-viewer>
   </body>
@@ -75,7 +80,7 @@ the result of the `Raycaster.hitItems()` method.
         padding: 0;
         margin: 0;
       }
-      
+
       #viewer {
         width: 100%;
         height: 100%;
@@ -85,8 +90,10 @@ the result of the `Raycaster.hitItems()` method.
     <script type="module">
       function main() {
         const viewer = document.querySelector('vertex-viewer');
-        const indicator = document.querySelector('vertex-viewer-hit-result-indicator');
-        
+        const indicator = document.querySelector(
+          'vertex-viewer-hit-result-indicator',
+        );
+
         viewer.addEventListener('tap', async (e) => {
           const detail = e.detail;
           const scene = await viewer.scene();
@@ -105,18 +112,17 @@ the result of the `Raycaster.hitItems()` method.
     </script>
   </head>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j">
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:xwa3EgD3xfeETw164U9XmxopKZ0c8n1gt93j"
+    >
       <vertex-viewer-hit-result-indicator></vertex-viewer-hit-result-indicator>
     </vertex-viewer>
   </body>
 </html>
 ```
 
-
-
-
 <!-- Auto Generated Below -->
-
 
 ## Properties
 
@@ -125,7 +131,6 @@ the result of the `Raycaster.hitItems()` method.
 | `normal`   | --        | The normal of this indicator. This value will be represented as an arrow, and will be used alongside the provided `position` to display a plane.                                              | `Vector3 \| undefined`                 | `undefined` |
 | `position` | --        | The position of this indicator. A point will be displayed at this position, and it will be used alongside the provided `normal` to display a plane and normal arrow centered at the position. | `Vector3 \| undefined`                 | `undefined` |
 | `viewer`   | --        | The viewer to connect to this indicator. If nested within a <vertex-viewer>, this property will be populated automatically.                                                                   | `HTMLVertexViewerElement \| undefined` | `undefined` |
-
 
 ## CSS Custom Properties
 
@@ -136,7 +141,6 @@ the result of the `Raycaster.hitItems()` method.
 | `--viewer-hit-result-indicator-plane-color`   | A CSS color for the plane for this hit indicator. Defaults to `#0099cc`.                         |
 | `--viewer-hit-result-indicator-plane-opacity` | A CSS number for the opacity of the plane for this hit indicator. Defaults to `0.75`.            |
 
+---
 
-----------------------------------------------
-
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

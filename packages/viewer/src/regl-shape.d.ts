@@ -16,11 +16,7 @@ declare module 'array-normalize' {
 
 declare module 'color-normalize' {
   export type InputColor =
-    | string
-    | Float32Array
-    | Uint8Array
-    | number[]
-    | number;
+    string | Float32Array | Uint8Array | number[] | number;
   const rgba: (color: InputColor, type: 'uint8') => Uint8Array;
   export default rgba;
 }

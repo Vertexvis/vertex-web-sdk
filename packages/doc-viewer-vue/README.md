@@ -26,16 +26,16 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => tag.includes('vertex-')
-        }
-      }
+          isCustomElement: (tag) => tag.includes('vertex-'),
+        },
+      },
     }),
-    vueJsx()
-  ]
+    vueJsx(),
+  ],
 });
 ```
 
-Next, `@vertexvis/doc-viewer-vue` includes a Vue [Plugin][vue plugins], 
+Next, `@vertexvis/doc-viewer-vue` includes a Vue [Plugin][vue plugins],
 `VertexDocumentViewerPlugin`, that needs to be added to the Vue App. It also
 includes a global stylesheet with default styling. Consult your bundler's
 documentation on how to bundle CSS with your project's bundler.
@@ -56,7 +56,7 @@ Lastly, use the component wrappers in one of your Vue components.
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
   import workerSrc from '@vertexvis/doc-viewer/assets/pdf.worker.min.mjs?url';
-  
+
   const viewer = ref<HTMLVertexDocumentViewerElement | null>(null);
 
   onMounted(async () => {

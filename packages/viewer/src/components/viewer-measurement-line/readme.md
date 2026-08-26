@@ -4,7 +4,6 @@ Intended for internal use.
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
 | Property        | Attribute        | Description                                                                                                                                  | Type     | Default          |
@@ -13,7 +12,6 @@ Intended for internal use.
 | `end`           | --               | A point that specifies the ending point of the line.                                                                                         | `Point`  | `Point.create()` |
 | `pointerEvents` | `pointer-events` | The type of [SVG pointer events](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events) that the line should respond to. | `string` | `'none'`         |
 | `start`         | --               | A point that specifies the starting point of the line.                                                                                       | `Point`  | `Point.create()` |
-
 
 ## CSS Custom Properties
 
@@ -27,15 +25,15 @@ Intended for internal use.
 | `--viewer-measurement-line-stroke-opacity`       | An SVG stroke that specifies the stroke opacity of the line.  |
 | `--viewer-measurement-line-stroke-width`         | A CSS length that specifies the width of the stroke.          |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-measurement-distance](../viewer-measurement-distance)
- - [vertex-viewer-measurement-overlays](../viewer-measurement-overlays)
+- [vertex-viewer-measurement-distance](../viewer-measurement-distance)
+- [vertex-viewer-measurement-overlays](../viewer-measurement-overlays)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-measurement-distance --> vertex-viewer-measurement-line
@@ -43,6 +41,6 @@ graph TD;
   style vertex-viewer-measurement-line fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

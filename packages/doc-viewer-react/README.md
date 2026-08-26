@@ -43,7 +43,10 @@ import workerSrc from '@vertexvis/doc-viewer/assets/pdf.worker.min.mjs';
 export function App() {
   return (
     <div>
-      <VertexDocumentViewer config={{ pdfJs: { workerSrc } }} src="https://{{ DOCUMENT_URL }}" />
+      <VertexDocumentViewer
+        config={{ pdfJs: { workerSrc } }}
+        src="https://{{ DOCUMENT_URL }}"
+      />
     </div>
   );
 }

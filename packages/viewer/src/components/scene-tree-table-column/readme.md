@@ -1,9 +1,6 @@
 # vertex-scene-tree-table-column
 
-
-
 <!-- Auto Generated Below -->
-
 
 ## Properties
 
@@ -13,7 +10,6 @@
 | `maxWidth`     | `max-width`     | The maximum width of this column. | `number \| undefined` | `undefined` |
 | `minWidth`     | `min-width`     | The minimum width of this column. | `number \| undefined` | `undefined` |
 
+---
 
-----------------------------------------------
-
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

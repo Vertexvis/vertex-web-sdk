@@ -314,7 +314,10 @@ export class VertexPinLabel {
           1,
           Math.ceil(
             (Number.parseFloat(computedStyles.getPropertyValue('height')) -
-              Number.parseFloat(computedStyles.getPropertyValue('borderWidth')) * 2) /
+              Number.parseFloat(
+                computedStyles.getPropertyValue('borderWidth'),
+              ) *
+                2) /
               Number.parseFloat(computedStyles.getPropertyValue('lineHeight')),
           ),
         );

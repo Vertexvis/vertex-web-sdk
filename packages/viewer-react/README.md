@@ -27,7 +27,7 @@ import '@vertexvis/viewer/dist/viewer/viewer.css';
 
 async function main() {
   await defineCustomElement(window);
-  ReactDom.render(<App />, document.querySelector("#app"));
+  ReactDom.render(<App />, document.querySelector('#app'));
 }
 
 main();
@@ -40,9 +40,11 @@ import React from 'react';
 import { VertexViewer } from '@vertexvis/viewer-react';
 
 export function App() {
-  return (<div>
-    <VertexViewer src="urn:vertex:stream-key:123" />
-  </div>);
+  return (
+    <div>
+      <VertexViewer src="urn:vertex:stream-key:123" />
+    </div>
+  );
 }
 ```
 

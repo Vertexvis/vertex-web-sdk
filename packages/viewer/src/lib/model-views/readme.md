@@ -2,7 +2,7 @@
 
 The `ModelViewController` is a controller for retrieving and interacting with
 the model views associated to a scene item. This controller is available as a
-read-only property on the `<vertex-viewer>` element after the viewer has connected 
+read-only property on the `<vertex-viewer>` element after the viewer has connected
 to a scene.
 
 ## Listing Model Views for an Item
@@ -16,7 +16,10 @@ page of results.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
@@ -28,7 +31,9 @@ page of results.
 
           // `listByItem` returns an object containing an array of `ModelView`s (`response.modelViews`),
           // along with paging data (`paging`). Each `ModelView` object will contain an `id` and `displayName`.
-          console.log(response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+          console.log(
+            response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`),
+          );
         });
       }
 
@@ -49,7 +54,10 @@ by this method can also be configured using the `size` option (default page size
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
@@ -57,16 +65,32 @@ by this method can also be configured using the `size` option (default page size
 
         viewer.addEventListener('sceneReady', async () => {
           const sceneItemId = 'scene-item-id';
-          const firstPageResponse = await viewer.modelViews.listByItem(sceneItemId, {
-            size: 25,
-          });
-          const secondPageResponse = await viewer.modelViews.listByItem(sceneItemId, {
-            cursor: firstPageResponse.paging.next,
-            size: 25,
-          });
-  
-          console.log('First Page:', firstPageResponse.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
-          console.log('Second Page:', secondPageResponse.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+          const firstPageResponse = await viewer.modelViews.listByItem(
+            sceneItemId,
+            {
+              size: 25,
+            },
+          );
+          const secondPageResponse = await viewer.modelViews.listByItem(
+            sceneItemId,
+            {
+              cursor: firstPageResponse.paging.next,
+              size: 25,
+            },
+          );
+
+          console.log(
+            'First Page:',
+            firstPageResponse.modelViews.map(
+              (mv) => `${mv.displayName}: ${mv.id}`,
+            ),
+          );
+          console.log(
+            'Second Page:',
+            secondPageResponse.modelViews.map(
+              (mv) => `${mv.displayName}: ${mv.id}`,
+            ),
+          );
         });
       }
 
@@ -87,7 +111,10 @@ and can be filtered out using the `hasAnnotations` flag.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
@@ -99,7 +126,9 @@ and can be filtered out using the `hasAnnotations` flag.
             hasAnnotations: true,
           });
 
-          console.log(response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`));
+          console.log(
+            response.modelViews.map((mv) => `${mv.displayName}: ${mv.id}`),
+          );
         });
       }
 
@@ -111,7 +140,7 @@ and can be filtered out using the `hasAnnotations` flag.
 
 ## Loading a Model View
 
-The `load` method applies a model view to the current scene view. This will update the viewer 
+The `load` method applies a model view to the current scene view. This will update the viewer
 to reflect the state captured by the model view, including camera orientation and annotations.
 
 **Example:** Loading a model view.
@@ -119,7 +148,10 @@ to reflect the state captured by the model view, including camera orientation an
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
@@ -152,7 +184,10 @@ The `unload` method removes any previously loaded model view and clears any load
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
     <button id="unload">Unload Model View</button>
 
     <script type="module">

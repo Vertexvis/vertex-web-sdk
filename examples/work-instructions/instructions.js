@@ -21,9 +21,9 @@ export async function applyWorkInstruction(scene, stepNumber) {
         steps[stepNumber].operationSets.map((set) =>
           applyOps(
             op.items.where((q) => applyQuery(q, set.query)),
-            set.operations
-          )
-        )
+            set.operations,
+          ),
+        ),
       )
       .execute();
   }
@@ -46,12 +46,12 @@ function applyQuery(builder, query) {
     case 'itemId':
       return query.values.reduce(
         (result, v) => result.withItemId(v).or(),
-        builder
+        builder,
       );
     case 'suppliedId':
       return query.values.reduce(
         (result, v) => result.withSuppliedId(v).or(),
-        builder
+        builder,
       );
     default:
       return builder;

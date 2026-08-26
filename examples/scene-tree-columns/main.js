@@ -41,9 +41,11 @@ async function main() {
     const selectedMetadataKeys = Array.from(selectedColumns);
 
     if (!searchInput) {
-      console.warn('No search input currently, resetting phantom state')
+      console.warn('No search input currently, resetting phantom state');
       // If no search value, reset phantom state
-      await scene.elements((op) => [op.items.where((q) => q.all()).clearPhantom()]).execute();
+      await scene
+        .elements((op) => [op.items.where((q) => q.all()).clearPhantom()])
+        .execute();
     } else if (selectedMetadataKeys.length === 0) {
       console.warn('No metadata columns selected for search');
     } else {
@@ -53,7 +55,11 @@ async function main() {
       await scene
         .elements((op) => [
           op.items.where((q) => q.all()).setPhantom(true),
-          op.items.where((q) => q.withMetadata(searchInput, selectedMetadataKeys, false)).setPhantom(false)
+          op.items
+            .where((q) =>
+              q.withMetadata(searchInput, selectedMetadataKeys, false),
+            )
+            .setPhantom(false),
         ])
         .execute();
     }
@@ -66,16 +72,21 @@ async function main() {
         const selectionContent = document.getElementById('selection-content');
 
         // note: this is paginated, but we'll just get the first page.
-        const itemMetadata = await viewer.sceneItems.listSceneItemMetadata(row.node.id.hex, {});
+        const itemMetadata = await viewer.sceneItems.listSceneItemMetadata(
+          row.node.id.hex,
+          {},
+        );
 
         if (row) {
           const metadataHtml = itemMetadata.entries
-            .map(entry => `
+            .map(
+              (entry) => `
               <tr class="metadata-item">
                 <td class="metadata-key">${entry.key.name}</td>
                 <td class="metadata-value">${entry.value.value}</td>
               </tr>
-            `)
+            `,
+            )
             .join('');
 
           selectionContent.innerHTML = `
@@ -96,9 +107,9 @@ async function main() {
         } else {
           selectionContent.innerHTML = '<p>No item selected</p>';
         }
-      }
-    }
-  }
+      },
+    };
+  };
 
   await loadViewerWithQueryParams(viewer);
 }
@@ -116,9 +127,10 @@ function updateAvailableColumnsUI(keys, sceneTree) {
   columnsBody.innerHTML = '';
 
   // Add metadata keys
-  keys.forEach(key => {
+  keys.forEach((key) => {
     const columnDiv = document.createElement('div');
-    columnDiv.className = 'available-column' + (selectedColumns.has(key) ? ' selected' : '');
+    columnDiv.className =
+      'available-column' + (selectedColumns.has(key) ? ' selected' : '');
     columnDiv.innerHTML = `
       <h3>${key}</h3>
     `;
@@ -150,7 +162,7 @@ function updateTableLayout(sceneTree, selectedColumns) {
   }
 
   // Add selected metadata columns
-  selectedColumns.forEach(key => {
+  selectedColumns.forEach((key) => {
     const column = document.createElement('vertex-scene-tree-table-column');
     const template = document.createElement('template');
     template.innerHTML = `
