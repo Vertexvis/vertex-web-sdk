@@ -5,7 +5,6 @@ import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
 
 import { ResizeObserver } from 'resize-observer';
 
-/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 (global as any).ResizeObserver = ResizeObserver;
 

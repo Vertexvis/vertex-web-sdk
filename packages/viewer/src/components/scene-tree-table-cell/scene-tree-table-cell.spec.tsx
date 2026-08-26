@@ -443,7 +443,6 @@ describe('<vertex-scene-tree-table-cell>', () => {
   it('supports custom selection handling', async () => {
     const node = createNode({ selected: false });
     const tree = { selectItem: jest.fn() };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
     const { cell } = await newComponentSpec({
       template: () => (

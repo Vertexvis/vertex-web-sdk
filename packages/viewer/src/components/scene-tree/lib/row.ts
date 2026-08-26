@@ -13,7 +13,6 @@ export interface LoadedRow {
 
 export type Row = LoadedRow | undefined;
 
-/* eslint-disable padding-line-between-statements */
 export function fromNodeProto(
   index: number,
   node: Node,
@@ -41,7 +40,6 @@ export function fromNodeProto(
     };
   }
 }
-/* eslint-enable padding-line-between-statements */
 
 function makeMetadataMap(keys: MetadataKey[], values: string[]): MetadataMap {
   return keys.reduce((map, key, i) => {

@@ -275,7 +275,6 @@ function ifValidThen<T, R>(
   }
 }
 
-/* eslint-disable padding-line-between-statements */
 /**
  * Accumulates the results of mappers into an array.
  *
@@ -387,7 +386,6 @@ export function read(
     }, []);
   };
 }
-/* eslint-enable padding-line-between-statements */
 
 /**
  * Defines a mapper that reads the values from an input and invokes a builder to
@@ -461,7 +459,6 @@ export function defineMapper<T, V, R>(
   };
 }
 
-/* eslint-disable padding-line-between-statements */
 /**
  * Returns a mapper that passes the output of each mapper to the next mapper.
  */
@@ -547,9 +544,7 @@ export function compose(
     }, input);
   };
 }
-/* eslint-enable padding-line-between-statements */
 
-/* eslint-disable padding-line-between-statements */
 /**
  * Returns a mapper that returns the first defined result of a mapper. If all
  * mappers return `undefined`, then `undefined` is returned.
@@ -639,4 +634,3 @@ export function pickFirst(
     }, undefined as unknown);
   };
 }
-/* eslint-enable padding-line-between-statements */

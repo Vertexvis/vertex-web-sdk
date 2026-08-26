@@ -54,7 +54,7 @@
     "@vertexvis/jest-config-vertexvis": "^0.6.2",
     "@vertexvis/utils": "1.1.0",
     "@vertexwebsdk/build": "1.1.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.5",
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",

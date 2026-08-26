@@ -156,7 +156,7 @@ export type ConnectionStatus =
  * @slot retry - A slot that replaces the default Retry button displayed when
  * the viewer fails to connect. If slotted, the element is expected to handle
  * the logic to reload the viewer.
- * 
+ *
  * @slot - Children to be rendered as a sibling of the rendered canvas for the viewer.
  */
 @Component({
@@ -464,6 +464,8 @@ export class Viewer implements BasicViewer {
   /**
    * Emits an event when a provided oauth2 token is about to expire, or is about to expire,
    * causing issues with establishing a websocket connection, or performing API calls.
+   *
+   * @deprecated Token refresh is handled automatically internally; no replacement is needed
    */
   @Event() public tokenExpired!: EventEmitter<void>;
 

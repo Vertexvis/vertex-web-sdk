@@ -10,57 +10,53 @@ const camera = {
   up: Vector3.create(0, 1, 0),
 };
 
-describe(Matrix4.fromObject, () => {
+describe('Matrix4.fromObject', () => {
   it('returns Matrix4 from object representation', () => {
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     const obj = Matrix4.toObjectColumnMajor(Matrix4.fromValues(
-        1, 1, 1, 1,
-        2, 2, 2, 2,
-        3, 3, 3, 3,
-        4, 4, 4, 4,
+      1, 1, 1, 1,
+      2, 2, 2, 2,
+      3, 3, 3, 3,
+      4, 4, 4, 4,
     ));
-    /* eslint-enable prettier/prettier */
     const m = Matrix4.fromObject(obj);
 
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     expect(m).toEqual([
       1, 2, 3, 4,
       1, 2, 3, 4,
       1, 2, 3, 4,
       1, 2, 3, 4,
     ])
-    /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.makeZero, () => {
+describe('Matrix4.makeZero', () => {
   it('returns zero matrix', () => {
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     expect(Matrix4.makeZero()).toEqual([
       0, 0, 0, 0,
       0, 0, 0, 0,
       0, 0, 0, 0,
       0, 0, 0, 0
     ])
-    /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.makeTranslation, () => {
+describe('Matrix4.makeTranslation', () => {
   it('creates matrix with translation components', () => {
     const m = Matrix4.makeTranslation(Vector3.create(1, 2, 3));
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     expect(m).toEqual([
       1, 0, 0, 0,
       0, 1, 0, 0,
       0, 0, 1, 0,
       1, 2, 3, 1,
     ])
-    /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.makeRotation, () => {
+describe('Matrix4.makeRotation', () => {
   it('creates matrix with rotation components', () => {
     const q = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
     const m = Matrix4.makeRotation(q);
@@ -69,38 +65,36 @@ describe(Matrix4.makeRotation, () => {
   });
 });
 
-describe(Matrix4.makeBasis, () => {
+describe('Matrix4.makeBasis', () => {
   it('creates a basis matrix', () => {
     const x = { x: 1, y: 2, z: 3 };
     const y = { x: 11, y: 22, z: 33 };
     const z = { x: 111, y: 222, z: 333 };
     const matrix = Matrix4.makeBasis(x, y, z);
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     expect(matrix).toEqual([
       1,   2,   3,   0,
       11,  22,  33,  0,
       111, 222, 333, 0,
       0,   0,   0,   1
     ])
-    /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.makeScale, () => {
+describe('Matrix4.makeScale', () => {
   it('creates matrix with scale components', () => {
     const m = Matrix4.makeScale(Vector3.create(1, 2, 3));
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     expect(m).toEqual([
       1, 0, 0, 0,
       0, 2, 0, 0,
       0, 0, 3, 0,
       0, 0, 0, 1,
     ])
-    /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.makeTRS, () => {
+describe('Matrix4.makeTRS', () => {
   it('returns matrix with translation, rotation and scale multiplied', () => {
     const t = Vector3.create(10, 20, 30);
     const r = Quaternion.fromAxisAngle(Vector3.up(), Angle.toRadians(90));
@@ -117,7 +111,7 @@ describe(Matrix4.makeTRS, () => {
   });
 });
 
-describe(Matrix4.makePerspective, () => {
+describe('Matrix4.makePerspective', () => {
   it('returns projection matrix', () => {
     const m = Matrix4.toObjectColumnMajor(Matrix4.makePerspective(1, 2, 90, 1));
 
@@ -129,7 +123,7 @@ describe(Matrix4.makePerspective, () => {
   });
 });
 
-describe(Matrix4.makeOrthographic, () => {
+describe('Matrix4.makeOrthographic', () => {
   it('returns projection matrix for uniform horizontal and vertical clipping planes', () => {
     const m = Matrix4.toObjectColumnMajor(
       Matrix4.makeOrthographic(-2, 2, -2, 2, 0, 10),
@@ -159,7 +153,7 @@ describe(Matrix4.makeOrthographic, () => {
   });
 });
 
-describe(Matrix4.makeLookAtView, () => {
+describe('Matrix4.makeLookAtView', () => {
   it('returns view matrix that looks at target', () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
@@ -177,7 +171,7 @@ describe(Matrix4.makeLookAtView, () => {
   });
 });
 
-describe(Matrix4.makeLookAt, () => {
+describe('Matrix4.makeLookAt', () => {
   it('returns matrix that looks at target', () => {
     const cosRotation = Math.cos(Angle.toRadians(45));
     const sinRotation = Math.sin(Angle.toRadians(45));
@@ -195,53 +189,52 @@ describe(Matrix4.makeLookAt, () => {
   });
 });
 
-describe(Matrix4.invert, () => {
+describe('Matrix4.invert', () => {
   it('returns the inverse of a provided matrix', () => {
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     const m = Matrix4.fromValues(
       1, 1, 1, -1,
       1, 1, -1, 1,
       1, -1, 1, 1,
       -1, 1, 1, 1,
     );
-
+    // prettier-ignore
     expect(Matrix4.invert(m)).toEqual([
       1 / 4, 1 / 4, 1 / 4, -1 / 4,
       1 / 4, 1 / 4, -1 / 4, 1 / 4,
       1 / 4, -1 / 4, 1 / 4, 1 / 4,
       -1 / 4, 1 / 4, 1 / 4, 1 / 4,
     ]);
-    /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.multiply, () => {
+describe('Matrix4.multiply', () => {
   it('returns the result of multiplying two matrices', () => {
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     const matrix1 = Matrix4.fromValues(
       1, 1, 1, 1,
       2, 2, 2, 2,
       3, 3, 3, 3,
       4, 4, 4, 4,
     );
+    // prettier-ignore
     const matrix2 = Matrix4.fromValues(
       5, 4, 4, 4,
       3, 3, 3, 3,
       2, 5, 2, 2,
       1, 1, 5, 1,
     );
-
+    // prettier-ignore
     expect(Matrix4.multiply(matrix1, matrix2)).toEqual([
       11, 13, 14, 10,
       22, 26, 28, 20,
       33, 39, 42, 30,
       44, 52, 56, 40
     ]);
-    /* eslint-enable prettier/prettier */
   });
 });
 
-describe(Matrix4.lookAt, () => {
+describe('Matrix4.lookAt', () => {
   it('rotate towards target', () => {
     const i = Matrix4.makeIdentity();
     const m = Matrix4.lookAt(
@@ -256,7 +249,7 @@ describe(Matrix4.lookAt, () => {
   });
 });
 
-describe(Matrix4.scale, () => {
+describe('Matrix4.scale', () => {
   it('scales components', () => {
     const t = Matrix4.makeScale(Vector3.create(10, 10, 10));
     const s = Matrix4.scale(t, Vector3.create(2, 2, 2));
@@ -266,66 +259,66 @@ describe(Matrix4.scale, () => {
   });
 });
 
-describe(Matrix4.transpose, () => {
+describe('Matrix4.transpose', () => {
   it('swaps matrix values', () => {
-    /* eslint-disable prettier/prettier */
-      const matrix = Matrix4.fromValues(
-        1, 2, 3, 4,
-        5, 6, 7, 8,
-        9, 10, 11, 12,
-        13, 14, 15, 16
-      );
+    // prettier-ignore
+    const matrix = Matrix4.fromValues(
+      1, 2, 3, 4,
+      5, 6, 7, 8,
+      9, 10, 11, 12,
+      13, 14, 15, 16
+    );
 
-      const transposed = Matrix4.transpose(matrix);
-
-      expect(transposed).toEqual([
-        1, 5, 9, 13,
-        2, 6, 10, 14,
-        3, 7, 11, 15,
-        4, 8, 12, 16
-      ]);
-      /* eslint-enable prettier/prettier */
+    const transposed = Matrix4.transpose(matrix);
+    // prettier-ignore
+    expect(transposed).toEqual([
+      1, 5, 9, 13,
+      2, 6, 10, 14,
+      3, 7, 11, 15,
+      4, 8, 12, 16
+    ]);
   });
 });
 
-describe(Matrix4.toObjectColumnMajor, () => {
+describe('Matrix4.toObjectColumnMajor', () => {
   it('converts matrix to column major', () => {
-    /* eslint-disable prettier/prettier */
-      const matrix = Matrix4.fromValues(
-        1, 2, 3, 4,
-        5, 6, 7, 8,
-        9, 10, 11, 12,
-        13, 14, 15, 16
-      );
+    // prettier-ignore
+    const matrix = Matrix4.fromValues(
+      1, 2, 3, 4,
+      5, 6, 7, 8,
+      9, 10, 11, 12,
+      13, 14, 15, 16
+    );
 
-      const values = Matrix4.toObjectColumnMajor(matrix);
-      expect(values).toMatchObject({
-        m11: 1, m12: 5, m13: 9, m14: 13,
-        m21: 2, m22: 6, m23: 10, m24: 14,
-        m31: 3, m32: 7, m33: 11, m34: 15,
-        m41: 4, m42: 8, m43: 12, m44: 16
-      })
-      /* eslint-enable prettier/prettier */
+    const values = Matrix4.toObjectColumnMajor(matrix);
+    // prettier-ignore
+    expect(values).toMatchObject({
+      m11: 1, m12: 5, m13: 9, m14: 13,
+      m21: 2, m22: 6, m23: 10, m24: 14,
+      m31: 3, m32: 7, m33: 11, m34: 15,
+      m41: 4, m42: 8, m43: 12, m44: 16
+    })
   });
 });
 
-describe(Matrix4.toObjectRowMajor, () => {
+describe('Matrix4.toObjectRowMajor', () => {
   it('converts matrix to row major', () => {
-    /* eslint-disable prettier/prettier */
-      const matrix = Matrix4.fromValues(
-        1, 2, 3, 4,
-        5, 6, 7, 8,
-        9, 10, 11, 12,
-        13, 14, 15, 16
-      );
+    // prettier-ignore
+    const matrix = Matrix4.fromValues(
+      1, 2, 3, 4,
+      5, 6, 7, 8,
+      9, 10, 11, 12,
+      13, 14, 15, 16
+    );
 
-      const values = Matrix4.toObjectRowMajor(matrix);
-      expect(values).toMatchObject({
-        m11: 1, m12: 2, m13: 3, m14: 4,
-        m21: 5, m22: 6, m23: 7, m24: 8,
-        m31: 9, m32: 10, m33: 11, m34: 12,
-        m41: 13, m42: 14, m43: 15, m44: 16
-      })
-      /* eslint-enable prettier/prettier */
+    const values = Matrix4.toObjectRowMajor(matrix);
+
+    // prettier-ignore
+    expect(values).toMatchObject({
+      m11: 1, m12: 2, m13: 3, m14: 4,
+      m21: 5, m22: 6, m23: 7, m24: 8,
+      m31: 9, m32: 10, m33: 11, m34: 12,
+      m41: 13, m42: 14, m43: 15, m44: 16
+    })
   });
 });

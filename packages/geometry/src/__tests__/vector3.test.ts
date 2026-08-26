@@ -3,7 +3,7 @@ import * as Angle from '../angle';
 import * as Matrix4 from '../matrix4';
 import * as Vector3 from '../vector3';
 
-describe(Vector3.create, () => {
+describe('Vector3.create', () => {
   it('creates a vector with x, y, z', () => {
     expect(Vector3.create(1, 2, 3)).toMatchObject({ x: 1, y: 2, z: 3 });
   });
@@ -21,7 +21,7 @@ describe(Vector3.create, () => {
   });
 });
 
-describe(Vector3.fromJson, () => {
+describe('Vector3.fromJson', () => {
   it('parses json obj', () => {
     const v = Vector3.fromJson(JSON.stringify({ x: 1, y: 2, z: 3 }));
     expect(v).toEqual(Vector3.create(1, 2, 3));
@@ -33,32 +33,32 @@ describe(Vector3.fromJson, () => {
   });
 });
 
-describe(Vector3.fromArray, () => {
+describe('Vector3.fromArray', () => {
   it('creates a vector from an array', () => {
     expect(Vector3.fromArray([1, 2, 3])).toEqual(Vector3.create(1, 2, 3));
   });
 });
 
-describe(Vector3.toArray, () => {
+describe('Vector3.toArray', () => {
   it('returns a vector as an array', () => {
     expect(Vector3.toArray(Vector3.create(1, 2, 3))).toEqual([1, 2, 3]);
   });
 });
 
-describe(Vector3.normalize, () => {
+describe('Vector3.normalize', () => {
   it('returns a normalized vector', () => {
     const result = Vector3.normalize(Vector3.create(1, 0, 0));
     expect(result).toEqual(Vector3.create(1, 0, 0));
   });
 });
 
-describe(Vector3.magnitude, () => {
+describe('Vector3.magnitude', () => {
   it('returns the length of the vector', () => {
     expect(Vector3.magnitude(Vector3.create(3, 3, 3))).toEqual(Math.sqrt(27));
   });
 });
 
-describe(Vector3.add, () => {
+describe('Vector3.add', () => {
   it('returns the sum of two vectors', () => {
     const result = Vector3.add(
       Vector3.create(1, 2, 3),
@@ -68,7 +68,7 @@ describe(Vector3.add, () => {
   });
 });
 
-describe(Vector3.subtract, () => {
+describe('Vector3.subtract', () => {
   it('returns a vector of b subtracted from a', () => {
     const result = Vector3.subtract(
       Vector3.create(3, 4, 5),
@@ -78,7 +78,7 @@ describe(Vector3.subtract, () => {
   });
 });
 
-describe(Vector3.dot, () => {
+describe('Vector3.dot', () => {
   it('returns the dot product of two vectors', () => {
     const result = Vector3.dot(
       Vector3.create(1, 2, 3),
@@ -88,7 +88,7 @@ describe(Vector3.dot, () => {
   });
 });
 
-describe(Vector3.angleTo, () => {
+describe('Vector3.angleTo', () => {
   it('calculates the angle between two vectors', () => {
     const angle = Vector3.angleTo(
       Vector3.create(1, 1, 1),
@@ -98,7 +98,7 @@ describe(Vector3.angleTo, () => {
   });
 });
 
-describe(Vector3.eulerTo, () => {
+describe('Vector3.eulerTo', () => {
   it('calculates the euler angle between two vectors', () => {
     const angle1 = Vector3.eulerTo(Vector3.create(1, 1, 0), Vector3.up());
     const angle2 = Vector3.eulerTo(
@@ -137,7 +137,7 @@ describe(Vector3.eulerTo, () => {
   });
 });
 
-describe(Vector3.distance, () => {
+describe('Vector3.distance', () => {
   it('calculates euclidean distance between two vectors', () => {
     expect(
       Vector3.distance(Vector3.create(0, 0, 0), Vector3.create(0, 4, 0)),
@@ -152,7 +152,7 @@ describe(Vector3.distance, () => {
   });
 });
 
-describe(Vector3.isEqual, () => {
+describe('Vector3.isEqual', () => {
   it('returns true if all components are equal values', () => {
     const a = Vector3.create(1, 2, 3);
     const b = Vector3.create(1, 2, 3);
@@ -166,7 +166,7 @@ describe(Vector3.isEqual, () => {
   });
 });
 
-describe(Vector3.isValid, () => {
+describe('Vector3.isValid', () => {
   it('returns true if all components are numeric', () => {
     const a = Vector3.create(1, 2, 3);
     expect(Vector3.isValid(a)).toEqual(true);
@@ -195,7 +195,7 @@ describe('Vector3.isZeroVector', () => {
   });
 });
 
-describe(Vector3.multiply, () => {
+describe('Vector3.multiply', () => {
   it('returns a vector with each component multiplied by the given vector', () => {
     const a = Vector3.create(2, 3, 4);
     const b = Vector3.create(2, 3, 4);
@@ -203,7 +203,7 @@ describe(Vector3.multiply, () => {
   });
 });
 
-describe(Vector3.rotateAboutAxis, () => {
+describe('Vector3.rotateAboutAxis', () => {
   it('returns a vector that is rotated around an origin point', () => {
     const radians = Angle.toRadians(90);
     const vector = Vector3.up();
@@ -225,7 +225,7 @@ describe(Vector3.rotateAboutAxis, () => {
   });
 });
 
-describe(Vector3.cross, () => {
+describe('Vector3.cross', () => {
   it('returns the cross product of two vectors', () => {
     const a = Vector3.right();
     const b = Vector3.forward();
@@ -236,16 +236,15 @@ describe(Vector3.cross, () => {
   });
 });
 
-describe(Vector3.multiplyByTransformMatrixColumnMajor, () => {
+describe('Vector3.multiplyByTransformMatrixColumnMajor', () => {
   it('returns correct value given a column-major Matrix4 and Vector3', () => {
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     const values = Matrix4.fromValues(
         5, 3, 2, 1,
         5, 3, 2, 1,
         5, 3, 2, 1,
         5, 3, 2, 1,
     );
-    /* eslint-enable prettier/prettier */
     const transformed = Vector3.multiplyByTransformMatrixColumnMajor(
       Vector3.create(2, 2, 2),
       values,
@@ -254,16 +253,15 @@ describe(Vector3.multiplyByTransformMatrixColumnMajor, () => {
   });
 });
 
-describe(Vector3.multiplyByTransformMatrixRowMajor, () => {
+describe('Vector3.multiplyByTransformMatrixRowMajor', () => {
   it('returns correct value given a row-major Matrix4 and Vector3', () => {
-    /* eslint-disable prettier/prettier */
+    // prettier-ignore
     const values = Matrix4.fromValues(
         5, 5, 5, 5,
         3, 3, 3, 3,
         2, 2, 2, 2,
         1, 1, 1, 1,
     );
-    /* eslint-enable prettier/prettier */
     const transformed = Vector3.multiplyByTransformMatrixRowMajor(
       Vector3.create(2, 2, 2),
       values,
@@ -272,14 +270,14 @@ describe(Vector3.multiplyByTransformMatrixRowMajor, () => {
   });
 });
 
-describe(Vector3.negate, () => {
+describe('Vector3.negate', () => {
   it('returns vector with each component negated', () => {
     const negated = Vector3.negate({ x: 1, y: 1, z: 1 });
     expect(negated).toEqual({ x: -1, y: -1, z: -1 });
   });
 });
 
-describe(Vector3.lerp, () => {
+describe('Vector3.lerp', () => {
   it('returns a point between A and B', () => {
     const pt = Vector3.lerp(
       Vector3.create(1, 1, 1),

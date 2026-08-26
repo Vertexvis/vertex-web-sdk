@@ -43,4 +43,5 @@ export default [
       ],
     },
   },
+  { linterOptions: { reportUnusedDisableDirectives: 'off' } },
 ];

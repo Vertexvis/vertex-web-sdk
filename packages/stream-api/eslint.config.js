@@ -4,4 +4,5 @@ export default [
   { ignores: ['dist/**', 'coverage/**', '.rpt2_cache/**'] },
   ...vertexvisTypescript,
   { rules: { '@typescript-eslint/no-explicit-any': 'off' } },
+  { linterOptions: { reportUnusedDisableDirectives: 'off' } },
 ];
