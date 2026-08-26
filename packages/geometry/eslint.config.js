@@ -18,4 +18,5 @@ export default [
     plugins: { prettier: prettierCompatibilityPlugin },
     rules: { '@typescript-eslint/no-explicit-any': 'off' },
   },
+  { linterOptions: { reportUnusedDisableDirectives: 'off' } },
 ];
