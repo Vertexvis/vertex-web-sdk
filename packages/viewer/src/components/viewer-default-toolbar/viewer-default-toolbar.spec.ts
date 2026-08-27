@@ -30,6 +30,7 @@ describe('<vertex-viewer-default-toolbar>', () => {
         '[data-testid="fit-all-btn"]',
       );
       expect(btn).toBeDefined();
+      expect(btn).toEqualAttribute('aria-label', 'Fit all');
     });
 
     it('performs fit all with animation when fit all button is clicked', async () => {
