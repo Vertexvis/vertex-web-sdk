@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout changes"
+      - name: 'Checkout changes'
         uses: actions/checkout@v7
       - name: Enable Corepack
         run: corepack enable
@@ -22,11 +22,11 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
-      - name: "Install"
-        run: "yarn install --mode=skip-build --immutable"
-      - name: "Build"
-        run: "yarn build"
-      - name: "Upload build artifacts"
+      - name: 'Install'
+        run: 'yarn install --mode=skip-build --immutable'
+      - name: 'Build'
+        run: 'yarn build'
+      - name: 'Upload build artifacts'
         uses: actions/upload-artifact@v7
         with:
           name: build-artifact
@@ -41,9 +41,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: "Checkout changes"
+      - name: 'Checkout changes'
         uses: actions/checkout@v7
-      - name: "Download build artifacts"
+      - name: 'Download build artifacts'
         uses: actions/download-artifact@v7
         with:
           name: build-artifact
@@ -53,18 +53,18 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          NODE_AUTH_TOKEN: '${{ secrets.NPMJS_ACCESS_TOKEN }}'
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
           registry-url: https://registry.npmjs.org
-          scope: "@vertexvis"
-      - name: "Install"
-        run: "yarn install --mode=skip-build"
-      - name: "Publish Testing build to NPM"
+          scope: '@vertexvis'
+      - name: 'Install'
+        run: 'yarn install --mode=skip-build'
+      - name: 'Publish Testing build to NPM'
         env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+          NODE_AUTH_TOKEN: '${{ secrets.NPMJS_ACCESS_TOKEN }}'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
         run: |

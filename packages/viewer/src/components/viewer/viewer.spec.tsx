@@ -432,7 +432,9 @@ describe('vertex-viewer', () => {
       const { page, viewer } = await newViewerSpecWithPage({
         template: () => (
           <vertex-viewer stream={stream}>
-            <button slot="retry" onClick={customRetryHandler}>Try again</button>
+            <button slot="retry" onClick={customRetryHandler}>
+              Try again
+            </button>
           </vertex-viewer>
         ),
       });
@@ -444,9 +446,7 @@ describe('vertex-viewer', () => {
       });
       await page.waitForChanges();
 
-      retry.dispatchEvent(
-        new MouseEvent('click'),
-      );
+      retry.dispatchEvent(new MouseEvent('click'));
       expect(customRetryHandler).toHaveBeenCalled();
       expect(reload).not.toHaveBeenCalled();
     });

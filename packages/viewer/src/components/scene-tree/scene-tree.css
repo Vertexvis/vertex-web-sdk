@@ -43,14 +43,14 @@
    * displaying hovered rows. This value takes precedence only if the row is not selected.
    * Defaults to `unset`.
    */
-   --scene-tree-hovered-row-background-color: unset;
+  --scene-tree-hovered-row-background-color: unset;
 
   /**
    * @prop --scene-tree-row-background-color: The default background color to use for displaying
    * rows within a <vertex-scene-tree>. Defaults to `unset`, and will be overridden
    * by any depth specific background configuration.
    */
-   --scene-tree-row-background-color: unset;
+  --scene-tree-row-background-color: unset;
 
   /**
    * @prop --scene-tree-row-background-color-depth-n: The background color to use for n-depth
@@ -64,7 +64,6 @@
    * --scene-tree-row-background-color-depth-1: #ff0000
    */
   --scene-tree-row-background-color-depth-n: unset;
-
 
   /**
   * @prop --scene-tree-overlay-z-index: A CSS z-index value that will

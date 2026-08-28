@@ -1,5 +1,4 @@
 :host {
-
   /**
    * @prop  --viewer-annotations-pin-primary-color: A CSS color that
    * specifies the primary color for the pins. This value gets used for the dot color 
@@ -18,43 +17,45 @@
    * @prop  viewer-annotations-pin-dot-color: A CSS color that
    * specifies the color of the anchor dot
    */
-   --viewer-annotations-pin-dot-color: var(--viewer-annotations-pin-primary-color);
+  --viewer-annotations-pin-dot-color: var(
+    --viewer-annotations-pin-primary-color
+  );
 
   /**
    * @prop  --viewer-annotations-pin-color: A CSS color that
    * specifies the color of the pin
    */
-   --viewer-annotations-pin-color: var(--viewer-annotations-pin-primary-color);
+  --viewer-annotations-pin-color: var(--viewer-annotations-pin-primary-color);
 
   /**
    * @prop  --viewer-annotations-pin-font-size: A CSS property to specify
    the font size of the pin
    */
-   --viewer-annotations-pin-font-size: 0.75rem;
+  --viewer-annotations-pin-font-size: 0.75rem;
 
   /**
    * @prop  --viewer-annotations-pin-selected-stroke: A CSS color that
    * specifies the stroke color of a selected pin
    */
-   --viewer-annotations-pin-selected-stroke: var(--white);
+  --viewer-annotations-pin-selected-stroke: var(--white);
 
   /**
    * @prop   --viewer-annotations-pin-selected-border: A CSS color that
    * specifies the border of a selected pin
    */
-   --viewer-annotations-pin-selected-border:  2px solid var(--white);
+  --viewer-annotations-pin-selected-border: 2px solid var(--white);
 
   /**
    * @prop --viewer-annotations-pin-label-border: A CSS color that
    * specifies the border of a text pin anchor
    */
-   --viewer-annotations-pin-label-border:  2px solid var(--black);
+  --viewer-annotations-pin-label-border: 2px solid var(--black);
 
   /**
    * @prop   --viewer-annotations-pin-selected-border: A CSS color that
    * specifies the stroke of a selected default pin
    */
-   --viewer-annotations-pin-selected-stroke: var(--white);
+  --viewer-annotations-pin-selected-stroke: var(--white);
 
   font-size: var(--viewer-annotations-pin-font-size);
   position: absolute;
@@ -83,7 +84,7 @@
 .selected {
   width: 13px;
   height: 13px;
-  border: var(--viewer-annotations-pin-selected-border)
+  border: var(--viewer-annotations-pin-selected-border);
 }
 
 .pin {
@@ -103,7 +104,7 @@
 }
 
 .pin-occluded {
-  opacity: .3;
+  opacity: 0.3;
   transition: opacity 0.3s ease-in;
 }
 

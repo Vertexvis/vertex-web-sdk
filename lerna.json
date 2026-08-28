@@ -3,11 +3,7 @@
   "npmClient": "yarn",
   "command": {
     "version": {
-      "allowBranch": [
-        "master",
-        "release-temp/*",
-        "publish-testing"
-      ]
+      "allowBranch": ["master", "release-temp/*", "publish-testing"]
     }
   }
 }

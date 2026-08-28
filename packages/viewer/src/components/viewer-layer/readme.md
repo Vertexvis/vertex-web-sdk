@@ -30,22 +30,21 @@ viewport of a `<vertex-viewer>`.
 
 <!-- Auto Generated Below -->
 
-
 ## Properties
 
 | Property     | Attribute     | Description                                                                                          | Type      | Default |
 | ------------ | ------------- | ---------------------------------------------------------------------------------------------------- | --------- | ------- |
 | `stretchOff` | `stretch-off` | Indicates if the layer should stretch to fill the size of its container's nearest positioned parent. | `boolean` | `false` |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-box-query-tool](../viewer-box-query-tool)
- - [vertex-viewer-toolbar](../viewer-toolbar)
+- [vertex-viewer-box-query-tool](../viewer-box-query-tool)
+- [vertex-viewer-toolbar](../viewer-toolbar)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-box-query-tool --> vertex-viewer-layer
@@ -53,6 +52,6 @@ graph TD;
   style vertex-viewer-layer fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

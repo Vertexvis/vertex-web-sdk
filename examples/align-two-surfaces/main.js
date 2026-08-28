@@ -37,7 +37,7 @@ async function main() {
           hit1.hitNormal,
           hit1.hitPoint,
           hit2.hitNormal,
-          hit2.hitPoint
+          hit2.hitPoint,
         );
         transformWidget.controller?.beginTransform();
         transformWidget.controller?.updateTransform(translationDelta);
@@ -50,7 +50,7 @@ async function main() {
         hit2.hitNormal,
         hit2.hitPoint,
         hit2.hitNormal,
-        hit2.hitPoint
+        hit2.hitPoint,
       );
 
       transformWidget.controller?.beginTransform();
@@ -72,7 +72,9 @@ async function main() {
     const result = await raycaster.hitItems(position);
 
     if (result.hits && result.hits.length == 0) {
-      await scene.elements((op) => op.items.where((q) => q.all()).deselect()).execute();
+      await scene
+        .elements((op) => op.items.where((q) => q.all()).deselect())
+        .execute();
 
       resetIndicators();
     } else if (hit1 != null) {

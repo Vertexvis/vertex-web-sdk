@@ -52,12 +52,14 @@
   border-radius: var(--viewer-box-query-outline-border-radius);
 }
 
-:host([exclusive="true"]) .outline {
-  border: 3px var(--viewer-box-query-outline-exclusive-border-style) var(--viewer-box-query-outline-exclusive-color);
+:host([exclusive='true']) .outline {
+  border: 3px var(--viewer-box-query-outline-exclusive-border-style)
+    var(--viewer-box-query-outline-exclusive-color);
 }
 
-:host([inclusive="true"]) .outline {
-  border: 3px var(--viewer-box-query-outline-inclusive-border-style) var(--viewer-box-query-outline-inclusive-color);
+:host([inclusive='true']) .outline {
+  border: 3px var(--viewer-box-query-outline-inclusive-border-style)
+    var(--viewer-box-query-outline-inclusive-color);
 }
 
 .fill {
@@ -70,10 +72,10 @@
   border-radius: var(--viewer-box-query-outline-border-radius);
 }
 
-:host([exclusive="true"]) .fill {
+:host([exclusive='true']) .fill {
   background-color: var(--viewer-box-query-outline-exclusive-color);
 }
 
-:host([inclusive="true"]) .fill {
+:host([inclusive='true']) .fill {
   background-color: var(--viewer-box-query-outline-inclusive-color);
 }

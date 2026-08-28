@@ -21,8 +21,8 @@
    * @prop --viewer-toolbar-group-box-shadow: The shadow to apply to each group
    * in the toolbar. Defaults to `-1px 0 2px rgba(0, 0, 0, 0.12), 1px 0 2px rgba(0, 0, 0, 0.13)`.
    */
-  --viewer-toolbar-group-box-shadow: -1px 0 2px rgba(0, 0, 0, 0.12),
-    1px 0 2px rgba(0, 0, 0, 0.13);
+  --viewer-toolbar-group-box-shadow:
+    -1px 0 2px rgba(0, 0, 0, 0.12), 1px 0 2px rgba(0, 0, 0, 0.13);
 
   /**
    * @prop --viewer-toolbar-group-padding: The padding to apply to each group in

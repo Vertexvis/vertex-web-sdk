@@ -7,9 +7,7 @@ export type GrpcCaller<R, E> = (
 type GrpcHandler<R, E> = (err: E | null, res: R | null) => void | Promise<void>;
 
 export type JwtProvider = () =>
-  | Promise<string | undefined>
-  | string
-  | undefined;
+  Promise<string | undefined> | string | undefined;
 
 export function requestUnary<R, E = unknown>(
   caller: GrpcCaller<R, E>,

@@ -3,10 +3,7 @@ import { Disposable, EventDispatcher, UUID } from '@vertexvis/utils';
 import { ConnectionDescriptor } from './connection';
 
 export type WebSocketSendData =
-  | string
-  | ArrayBufferLike
-  | Blob
-  | ArrayBufferView;
+  string | ArrayBufferLike | Blob | ArrayBufferView;
 
 export type MessageHandler = (event: MessageEvent) => void;
 

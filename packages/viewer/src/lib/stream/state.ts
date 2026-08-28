@@ -42,8 +42,4 @@ export interface Reconnecting {
 }
 
 export type ViewerStreamState =
-  | Disconnected
-  | Connecting
-  | ConnectionFailed
-  | Connected
-  | Reconnecting;
+  Disconnected | Connecting | ConnectionFailed | Connected | Reconnecting;

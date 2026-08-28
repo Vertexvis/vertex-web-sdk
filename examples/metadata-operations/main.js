@@ -32,7 +32,9 @@ async function search(viewer, metadataKey, metadataValue) {
   await scene
     .elements((op) => [
       op.items.where((q) => q.all()).setPhantom(true),
-      op.items.where((q) => q.withMetadata(value, [key], false)).setPhantom(false),
+      op.items
+        .where((q) => q.withMetadata(value, [key], false))
+        .setPhantom(false),
     ])
     .execute();
 }

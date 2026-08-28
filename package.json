@@ -26,7 +26,7 @@
     "typecheck:spec": "tsc -p tsconfig.spec.json",
     "lint": "lerna run lint",
     "format:prettier": "prettier --write --list-different .",
-    "format": "lerna run format && lerna run format:prettier",
+    "format": "lerna run format && yarn format:prettier",
     "clean": "lerna clean",
     "validate": "yarn build && yarn test && yarn lint",
     "version:bump": "./scripts/version_bump.sh",

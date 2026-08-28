@@ -17,7 +17,7 @@ async function main() {
   const viewer = document.querySelector('vertex-viewer');
   const viewAllBtn = document.querySelector('#view-all-btn');
   const fitToBoundingBoxBtn = document.querySelector(
-    '#fit-to-bounding-box-btn'
+    '#fit-to-bounding-box-btn',
   );
   const viewTopBtn = document.querySelector('#view-top-btn');
   const viewBottomBtn = document.querySelector('#view-bottom-btn');
@@ -26,10 +26,10 @@ async function main() {
   const viewFrontBtn = document.querySelector('#view-front-btn');
   const viewBackBtn = document.querySelector('#view-back-btn');
   const viewFrontTopLeftBtn = document.querySelector(
-    '#view-front-top-left-btn'
+    '#view-front-top-left-btn',
   );
   const viewFrontBottomLeftBtn = document.querySelector(
-    '#view-front-bottom-left-btn'
+    '#view-front-bottom-left-btn',
   );
 
   await loadViewerWithQueryParams(viewer);

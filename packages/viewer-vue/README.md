@@ -26,16 +26,16 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => tag.includes('vertex-')
-        }
-      }
+          isCustomElement: (tag) => tag.includes('vertex-'),
+        },
+      },
     }),
-    vueJsx()
-  ]
+    vueJsx(),
+  ],
 });
 ```
 
-Next, `@vertexvis/viewer-vue` includes a Vue [Plugin][vue plugins], 
+Next, `@vertexvis/viewer-vue` includes a Vue [Plugin][vue plugins],
 `VertexViewerPlugin`, that needs to be added to the Vue App. It also
 includes a global stylesheet with default styling. Consult your bundler's
 documentation on how to bundle CSS with your project's bundler.
@@ -54,11 +54,7 @@ Lastly, use the component wrappers in one of your Vue components.
 
 ```jsx
 <template>
-  <vertex-viewer
-    id="viewer"
-    src="urn:vertex:stream-key:123"
-  >
-  </vertex-viewer>
+  <vertex-viewer id="viewer" src="urn:vertex:stream-key:123"></vertex-viewer>
 </template>
 ```
 

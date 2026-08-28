@@ -29,7 +29,6 @@
   */
   --viewer-transform-widget-two-axes-square-color: var(--two-axes-color);
 
-
   /**
   * @prop --viewer-transform-widget-hovered-arrow-color: A CSS color for the arrow
   * when it is hovered. Defaults to `#ffff00`.

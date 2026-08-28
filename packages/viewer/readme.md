@@ -34,7 +34,11 @@ file that references our published JS bundles from a CDN.
   </head>
 
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:123" client-id="123"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:123"
+      client-id="123"
+    ></vertex-viewer>
   </body>
 </html>
 ```
@@ -47,8 +51,7 @@ These utilities can be imported from a CDN as shown below:
 ```html
 <!-- CDN -->
 <html>
-  <head>
-  </head>
+  <head> </head>
   <body>
     <script type="module">
       import { ColorMaterial } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@1.1.0/dist/esm/index.mjs';
@@ -75,7 +78,7 @@ async function main() {
 
   // Wait for the component to be registered.
   await customElements.whenDefined('vertex-viewer');
-  viewer.load("urn:vertex:stream-key:123")
+  viewer.load('urn:vertex:stream-key:123');
 }
 ```
 
@@ -108,9 +111,9 @@ import { defineCustomElements } from '@vertexvis/viewer/loader';
 async function main() {
   await defineCustomElements();
 
-  const viewer = document.querySelector("viewer");
-  await viewer.load("urn:vertex:stream-key:123");
-  console.log("Loaded!");
+  const viewer = document.querySelector('viewer');
+  await viewer.load('urn:vertex:stream-key:123');
+  console.log('Loaded!');
 }
 
 main();
@@ -129,7 +132,10 @@ with the browser.
 import { VertexViewer, VertexViewerDefaultToolbar } from '@vertexvis/viewer';
 
 customElements.define('vertex-viewer', VertexViewer);
-customElements.define('vertex-viewer-default-toolbar', VertexViewerDefaultToolbar);
+customElements.define(
+  'vertex-viewer-default-toolbar',
+  VertexViewerDefaultToolbar,
+);
 ```
 
 If a component depends on other components, you'll need to register each one

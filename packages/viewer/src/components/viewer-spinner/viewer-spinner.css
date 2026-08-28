@@ -62,7 +62,7 @@
 }
 
 .spinner.md div {
-  border-width:  3px;
+  border-width: 3px;
   height: 32px;
   width: 32px;
   margin: 2px;
@@ -75,7 +75,7 @@
 }
 
 .spinner.lg div {
-  border-width:  6px;
+  border-width: 6px;
   height: 52px;
   width: 52px;
   margin: 6px;

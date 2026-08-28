@@ -86,7 +86,9 @@ export async function timeout(...args: unknown[]): Promise<unknown> {
       return timeout;
     }
   } else {
-    return Promise.reject(new Error('First argument to `timeout` must be a number'));
+    return Promise.reject(
+      new Error('First argument to `timeout` must be a number'),
+    );
   }
 }
 

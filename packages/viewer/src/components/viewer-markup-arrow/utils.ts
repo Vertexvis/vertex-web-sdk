@@ -3,11 +3,7 @@ import { Angle } from '@vertexvis/geometry';
 import * as Point from '../../../../geometry/src/point';
 
 export type LineAnchorStyle =
-  | 'arrow-triangle'
-  | 'arrow-line'
-  | 'dot'
-  | 'hash'
-  | 'none';
+  'arrow-triangle' | 'arrow-line' | 'dot' | 'hash' | 'none';
 
 export interface LineAnchorStylePoints {
   tip: Point.Point;

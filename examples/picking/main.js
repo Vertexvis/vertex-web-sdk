@@ -36,35 +36,44 @@ async function main() {
       if (event.detail.shiftKey) {
         // If the shift key is pressed, add to the current selection without removing existing selection
         await scene
-            .elements((op) => op.items.where((q) => q.withItemId(hit.itemId.hex)).select())
-            .execute();
+          .elements((op) =>
+            op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
+          )
+          .execute();
       } else {
         const ancestors = hit.ancestors.reverse();
-        const indexOfLastSelectedPartInAncestors = ancestors.findIndex((a) => a.itemId.hex === lastSelectedId);
+        const indexOfLastSelectedPartInAncestors = ancestors.findIndex(
+          (a) => a.itemId.hex === lastSelectedId,
+        );
         const indexOfAncestorToSelect = indexOfLastSelectedPartInAncestors + 1;
 
-        if (hit.itemId.hex === lastSelectedId || (indexOfAncestorToSelect > 0 && indexOfAncestorToSelect < ancestors.length)) {
-            // If the part is already selected, then select the item's parent
-            const toSelectId = ancestors[indexOfLastSelectedPartInAncestors + 1].itemId.hex;
+        if (
+          hit.itemId.hex === lastSelectedId ||
+          (indexOfAncestorToSelect > 0 &&
+            indexOfAncestorToSelect < ancestors.length)
+        ) {
+          // If the part is already selected, then select the item's parent
+          const toSelectId =
+            ancestors[indexOfLastSelectedPartInAncestors + 1].itemId.hex;
 
-            await scene
-                .elements((op) => [
-                  op.items.where((q) => q.all()).deselect(),
-                  op.items.where((q) => q.withItemId(toSelectId)).select(),
-                ])
-                .execute();
+          await scene
+            .elements((op) => [
+              op.items.where((q) => q.all()).deselect(),
+              op.items.where((q) => q.withItemId(toSelectId)).select(),
+            ])
+            .execute();
 
-            lastSelectedId = toSelectId;
+          lastSelectedId = toSelectId;
         } else {
-            // Select the part and deselect all other parts
-            await scene
-                .elements((op) => [
-                  op.items.where((q) => q.all()).deselect(),
-                  op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
-                ])
-                .execute();
+          // Select the part and deselect all other parts
+          await scene
+            .elements((op) => [
+              op.items.where((q) => q.all()).deselect(),
+              op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
+            ])
+            .execute();
 
-            lastSelectedId = hit.itemId.hex;
+          lastSelectedId = hit.itemId.hex;
         }
       }
     } else {
@@ -73,7 +82,7 @@ async function main() {
         .elements((op) => [op.items.where((q) => q.all()).deselect()])
         .execute();
 
-      lastSelectedId = "";
+      lastSelectedId = '';
     }
   });
 }

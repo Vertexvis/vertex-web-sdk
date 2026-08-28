@@ -41,8 +41,7 @@ export function fromUrn(urn: string): Resource {
       const subResource =
         fromSubResourcePath(subResourcePath.join('/')) ??
         (queries.find((q) => q.type === 'scene-view-state') as
-          | SceneViewStateResource
-          | undefined);
+          SceneViewStateResource | undefined);
 
       return {
         resource: { type: 'stream-key', id: resourceId },

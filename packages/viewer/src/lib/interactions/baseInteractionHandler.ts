@@ -17,12 +17,7 @@ import {
 } from './mouseInteractions';
 
 export type InteractionType =
-  | 'rotate'
-  | 'zoom'
-  | 'pan'
-  | 'twist'
-  | 'rotate-point'
-  | 'pivot';
+  'rotate' | 'zoom' | 'pan' | 'twist' | 'rotate-point' | 'pivot';
 
 const DEFAULT_FONT_SIZE = 16;
 const DEFAULT_FONT_TO_LINE_HEIGHT_MULTIPLIER = 1.2;
@@ -353,8 +348,11 @@ export abstract class BaseInteractionHandler implements InteractionHandler {
     if (this.bodyStyleCache == null) {
       const bodyStyle = window.getComputedStyle(document.body);
       const fontSize =
-        Number.parseFloat(bodyStyle.getPropertyValue('fontSize')) || DEFAULT_FONT_SIZE;
-      const lineHeight = Number.parseFloat(bodyStyle.getPropertyValue('lineHeight'));
+        Number.parseFloat(bodyStyle.getPropertyValue('fontSize')) ||
+        DEFAULT_FONT_SIZE;
+      const lineHeight = Number.parseFloat(
+        bodyStyle.getPropertyValue('lineHeight'),
+      );
       this.bodyStyleCache = {
         lineHeightPixels: Number.isFinite(lineHeight)
           ? lineHeight

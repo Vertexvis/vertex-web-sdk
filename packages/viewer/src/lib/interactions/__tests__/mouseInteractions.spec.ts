@@ -159,8 +159,9 @@ describe(PanInteraction, () => {
 });
 
 describe(ZoomInteraction, () => {
-  const api =
-    new (InteractionApiPerspective as jest.Mock<InteractionApiPerspective>)();
+  const api = new (
+    InteractionApiPerspective as jest.Mock<InteractionApiPerspective>
+  )();
 
   const defaultConfigProvider = (): InteractionConfig => ({
     ...defaultInteractionConfig,

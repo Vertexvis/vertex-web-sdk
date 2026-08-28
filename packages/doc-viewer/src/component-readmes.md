@@ -2,7 +2,7 @@
 title: Component-level READMEs
 group: Component-level READMEs
 children:
-  "<vertex-document-viewer>": ./components/document-viewer/readme.md
+  '<vertex-document-viewer>': ./components/document-viewer/readme.md
 ---
 
 # Component READMEs

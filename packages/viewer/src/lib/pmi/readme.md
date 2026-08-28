@@ -1,8 +1,8 @@
 # PmiController
 
-The `PmiController` is a controller for accessing Product Manufacturing Information (PMI) 
+The `PmiController` is a controller for accessing Product Manufacturing Information (PMI)
 annotations associated with a model view. PMI annotations represent dimensions, tolerances,
-surface finishes, welding symbols, and other manufacturing instructions. This controller is 
+surface finishes, welding symbols, and other manufacturing instructions. This controller is
 available as a read-only property on the `<vertex-viewer>` element after the viewer has connected to a scene.
 
 ## Listing PMI Annotations
@@ -16,7 +16,10 @@ Annotations can optionally be scoped to a specific model view.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
@@ -28,7 +31,9 @@ Annotations can optionally be scoped to a specific model view.
 
           // `listAnnotations` returns an object containing an array of `PmiAnnotation`s (`response.annotations`),
           // along with paging data (`paging`). Each `PmiAnnotation` object will contain an `id` and `displayName`.
-          console.log(response.annotations.map((a) => `${a.displayName}: ${a.id}`));
+          console.log(
+            response.annotations.map((a) => `${a.displayName}: ${a.id}`),
+          );
         });
       }
 
@@ -49,12 +54,15 @@ by this method can also be configured using the `size` option (default page size
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
         const viewer = document.querySelector('#viewer');
-        
+
         viewer.addEventListener('sceneReady', async () => {
           const modelViewId = 'model-view-id';
 
@@ -68,8 +76,18 @@ by this method can also be configured using the `size` option (default page size
             size: 25,
           });
 
-          console.log('First Page:', firstPageResponse.annotations.map((a) => `${a.displayName}: ${a.id}`));
-          console.log('Second Page:', secondPageResponse.annotations.map((a) => `${a.displayName}: ${a.id}`));
+          console.log(
+            'First Page:',
+            firstPageResponse.annotations.map(
+              (a) => `${a.displayName}: ${a.id}`,
+            ),
+          );
+          console.log(
+            'Second Page:',
+            secondPageResponse.annotations.map(
+              (a) => `${a.displayName}: ${a.id}`,
+            ),
+          );
         });
       }
 
@@ -83,7 +101,7 @@ by this method can also be configured using the `size` option (default page size
 
 Typically, the `listAnnotations` method is combined with the `listByItem` method of the [model view
 controller][model-view-controller]. In this workflow, model views are listed for an individual scene
-item, and the annotations for an individual model view are retrieved so they can be interacted on. 
+item, and the annotations for an individual model view are retrieved so they can be interacted on.
 PMI annotations currently support being selected, shown, or hidden.
 
 **Example:** Listing model views and interacting with the annotations for a single model view.
@@ -91,18 +109,24 @@ PMI annotations currently support being selected, shown, or hidden.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
         const viewer = document.querySelector('#viewer');
-        
+
         const sceneItemId = 'scene-item-id';
 
         viewer.addEventListener('sceneReady', async () => {
-          const modelViewsResponse = await viewer.modelViews.listByItem(sceneItemId, {
-            hasAnnotations: true,
-          });
+          const modelViewsResponse = await viewer.modelViews.listByItem(
+            sceneItemId,
+            {
+              hasAnnotations: true,
+            },
+          );
 
           // Load a model view and select the first annotation present
           if (modelViewsResponse.modelViews.length > 0) {
@@ -122,7 +146,7 @@ PMI annotations currently support being selected, shown, or hidden.
                 .elements((op) =>
                   op.annotations
                     .where((q) => q.withAnnotationId(annotation.id))
-                    .select()
+                    .select(),
                 )
                 .execute();
             }
@@ -149,12 +173,15 @@ the annotation.
 ```html
 <html>
   <body>
-    <vertex-viewer id="viewer" src="urn:vertex:stream-key:my-key"></vertex-viewer>
+    <vertex-viewer
+      id="viewer"
+      src="urn:vertex:stream-key:my-key"
+    ></vertex-viewer>
 
     <script type="module">
       async function main() {
         const viewer = document.querySelector('#viewer');
-        
+
         const sceneItemId = 'scene-item-id';
 
         viewer.addEventListener('tap', async (event) => {
@@ -164,7 +191,11 @@ the annotation.
 
           const result = await raycaster.hitItems(position);
 
-          if (result.hits && result.hits.length > 0 && result.hits[0].annotationId != null) {
+          if (
+            result.hits &&
+            result.hits.length > 0 &&
+            result.hits[0].annotationId != null
+          ) {
             const hit = result.hits[0];
 
             const scene = await viewer.scene();
@@ -172,16 +203,19 @@ the annotation.
               .elements((op) =>
                 op.annotations
                   .where((q) => q.withAnnotationId(hit.annotationId.hex))
-                  .select()
+                  .select(),
               )
               .execute();
           }
         });
 
         viewer.addEventListener('sceneReady', async () => {
-          const modelViewsResponse = await viewer.modelViews.listByItem(sceneItemId, {
-            hasAnnotations: true,
-          });
+          const modelViewsResponse = await viewer.modelViews.listByItem(
+            sceneItemId,
+            {
+              hasAnnotations: true,
+            },
+          );
 
           if (modelViewsResponse.modelViews.length > 0) {
             const modelView = modelViewsResponse.modelViews[0];

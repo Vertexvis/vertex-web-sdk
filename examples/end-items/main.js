@@ -13,7 +13,9 @@ async function main() {
     if (event.key === 'e') {
       console.log('setting end item state');
       await scene
-        .elements((op) => op.items.where((q) => q.withSelected()).setEndItem(true))
+        .elements((op) =>
+          op.items.where((q) => q.withSelected()).setEndItem(true),
+        )
         .execute();
     }
 
@@ -21,7 +23,9 @@ async function main() {
     if (event.key === 'r') {
       console.log('removing end item state');
       await scene
-        .elements((op) => op.items.where((q) => q.withSelected()).setEndItem(false))
+        .elements((op) =>
+          op.items.where((q) => q.withSelected()).setEndItem(false),
+        )
         .execute();
     }
   });
@@ -42,24 +46,25 @@ async function main() {
       if (event.detail.shiftKey && hit.ancestors.length > 0) {
         const ancestors = hit.ancestors.reverse();
         const toSelectId =
-          ancestors[ancestors.findIndex((a) => a.itemId.hex === lastSelectedId) + 1]
-            .itemId.hex;
+          ancestors[
+            ancestors.findIndex((a) => a.itemId.hex === lastSelectedId) + 1
+          ].itemId.hex;
 
         await scene
-            .elements((op) => [
-              op.items.where((q) => q.all()).deselect(),
-              op.items.where((q) => q.withItemId(toSelectId)).select(),
-            ])
-            .execute();
+          .elements((op) => [
+            op.items.where((q) => q.all()).deselect(),
+            op.items.where((q) => q.withItemId(toSelectId)).select(),
+          ])
+          .execute();
 
         lastSelectedId = toSelectId;
       } else {
         await scene
-            .elements((op) => [
-              op.items.where((q) => q.all()).deselect(),
-              op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
-            ])
-            .execute();
+          .elements((op) => [
+            op.items.where((q) => q.all()).deselect(),
+            op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
+          ])
+          .execute();
         lastSelectedId = hit.itemId.hex;
       }
     } else {

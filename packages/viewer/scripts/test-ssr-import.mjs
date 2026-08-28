@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 
 const modulePath = new URL(
   '../dist/components/vertex-viewer.js',
-  import.meta.url
+  import.meta.url,
 );
 const require = createRequire(import.meta.url);
 

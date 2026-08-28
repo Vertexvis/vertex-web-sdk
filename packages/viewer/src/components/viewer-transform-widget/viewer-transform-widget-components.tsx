@@ -5,10 +5,7 @@ import { Dimensions, Point } from '@vertexvis/geometry';
 import { AngleUnits, DistanceUnits, Viewport } from '../../lib/types';
 
 export type TransformWidgetInputPlacement =
-  | 'top-left'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-right';
+  'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 export interface TransformWidgetInputWrapperProps {
   ref: (el?: HTMLDivElement) => void;
@@ -73,7 +70,9 @@ export const TransformWidgetInput: FunctionalComponent<
 }) => {
   const handleChange = (event: Event): void => {
     if (event.target != null) {
-      const parsed = Number.parseFloat((event.target as HTMLInputElement).value);
+      const parsed = Number.parseFloat(
+        (event.target as HTMLInputElement).value,
+      );
 
       if (!Number.isNaN(parsed)) {
         onChange?.(Number.parseFloat((event.target as HTMLInputElement).value));

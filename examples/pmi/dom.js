@@ -17,7 +17,7 @@ export function createModelViewListItem(modelView, sceneItemId) {
 
   modelViewListItem.addEventListener('click', async () => {
     const annotationList = document.getElementById('annotation-list');
-    
+
     addModelViewSelectedClass(modelView.id);
     showLoadingLayer();
     // Loads the specified model view into the viewer.
@@ -35,7 +35,7 @@ export function createModelViewListItem(modelView, sceneItemId) {
     });
     hideLoadingLayer();
   });
-  
+
   modelViewList.appendChild(modelViewListItem);
 }
 
@@ -54,7 +54,9 @@ export function createAnnotationListItem(annotation) {
 
   annotationListItem.id = annotation.id;
   annotationListItem.classList.add('annotation-list-item');
-  annotationListItemSelectButton.classList.add('annotation-list-item-select-button');
+  annotationListItemSelectButton.classList.add(
+    'annotation-list-item-select-button',
+  );
   annotationListItemSelectButton.textContent = annotation.displayName;
   annotationListItemVisibilityIcon.setAttribute('name', 'eye-open');
   annotationListItemVisibilityIcon.setAttribute('size', 'sm');
@@ -68,7 +70,7 @@ export function createAnnotationListItem(annotation) {
   });
 
   annotationListItemVisibilityButton.appendChild(
-    annotationListItemVisibilityIcon
+    annotationListItemVisibilityIcon,
   );
   annotationListItem.appendChild(annotationListItemSelectButton);
   annotationListItem.appendChild(annotationListItemVisibilityButton);
@@ -122,7 +124,7 @@ export function addModelViewSelectedClass(modelViewId) {
  */
 export function showLoadingLayer() {
   const loadingLayer = document.getElementById('loading-layer');
-  
+
   loadingLayer.classList.add('visible');
 }
 
@@ -152,6 +154,6 @@ const handleToggleAnnotationVisibility = async (annotationId) => {
 
   annotationListItemVisibilityIcon.setAttribute(
     'name',
-    visible ? 'eye-half' : 'eye-open'
+    visible ? 'eye-half' : 'eye-open',
   );
 };

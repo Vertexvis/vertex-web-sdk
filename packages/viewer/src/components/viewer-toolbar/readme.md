@@ -25,13 +25,14 @@ right of the viewer.
 ```html
 <vertex-viewer>
   <vertex-viewer-toolbar placement="middle-left" direction="vertical">
-    <vertex-viewer-toolbar-group direction="vertical"></vertex-viewer-toolbar-group>
+    <vertex-viewer-toolbar-group
+      direction="vertical"
+    ></vertex-viewer-toolbar-group>
   </vertex-viewer-toolbar>
 </vertex-viewer>
 ```
 
 <!-- Auto Generated Below -->
-
 
 ## Properties
 
@@ -40,18 +41,18 @@ right of the viewer.
 | `direction` | `direction` |                                            | `"horizontal" \| "vertical"`                                                                                                         | `'horizontal'`    |
 | `placement` | `placement` | Specifies where the toolbar is positioned. | `"bottom-center" \| "bottom-left" \| "bottom-right" \| "middle-left" \| "middle-right" \| "top-center" \| "top-left" \| "top-right"` | `'bottom-center'` |
 
-
 ## Dependencies
 
 ### Used by
 
- - [vertex-viewer-default-toolbar](../viewer-default-toolbar)
+- [vertex-viewer-default-toolbar](../viewer-default-toolbar)
 
 ### Depends on
 
 - [vertex-viewer-layer](../viewer-layer)
 
 ### Graph
+
 ```mermaid
 graph TD;
   vertex-viewer-toolbar --> vertex-viewer-layer
@@ -59,6 +60,6 @@ graph TD;
   style vertex-viewer-toolbar fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
-----------------------------------------------
+---
 
-*Built with [StencilJS](https://stenciljs.com/)*
+_Built with [StencilJS](https://stenciljs.com/)_

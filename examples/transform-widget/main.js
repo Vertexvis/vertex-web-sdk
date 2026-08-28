@@ -18,7 +18,7 @@ async function main() {
     // Setting the widget position to `undefined` will hide it, but it can
     // also be conditionally rendered to remove it from the DOM entirely
     widget.position = undefined;
-  }
+  };
 
   window.addEventListener('keydown', async (event) => {
     const scene = await viewer.scene();
@@ -29,7 +29,7 @@ async function main() {
       await scene.reset({
         includeCamera: true,
       });
-      
+
       hideTransformWidget();
     }
   });
@@ -52,7 +52,9 @@ async function main() {
       if (event.detail.shiftKey) {
         // If the shift key is pressed, add to the current selection without removing existing selection
         await scene
-          .elements((op) => op.items.where((q) => q.withItemId(hit.itemId.hex)).select())
+          .elements((op) =>
+            op.items.where((q) => q.withItemId(hit.itemId.hex)).select(),
+          )
           .execute({
             suppliedCorrelationId: SELECTION_CORRELATION_ID,
           });
