@@ -10,24 +10,12 @@ import * as Vector3 from './vector3';
  * This allows a point in 3D space to be projected onto a 2D screen using
  * transformations such as translation, rotation and scale.
  */
+// prettier-ignore
 export type Matrix4 = [
-  // prettier-ignore
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
+  number, number, number, number,
+  number, number, number, number,
+  number, number, number, number,
+  number, number, number, number,
 ];
 
 /**
@@ -67,24 +55,12 @@ export interface Matrix4AsObject {
 /**
  * Creates a 4x4 matrix from a set of row-major components.
  */
+// prettier-ignore
 export function fromValues(
-  // prettier-ignore
-  m11: number,
-  m12: number,
-  m13: number,
-  m14: number,
-  m21: number,
-  m22: number,
-  m23: number,
-  m24: number,
-  m31: number,
-  m32: number,
-  m33: number,
-  m34: number,
-  m41: number,
-  m42: number,
-  m43: number,
-  m44: number,
+  m11: number, m12: number, m13: number, m14: number,
+  m21: number, m22: number, m23: number, m24: number,
+  m31: number, m32: number, m33: number, m34: number,
+  m41: number, m42: number, m43: number, m44: number,
 ): Matrix4 {
   // prettier-ignore
   return [
