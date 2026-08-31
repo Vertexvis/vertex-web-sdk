@@ -24,7 +24,25 @@ customize the styling to your application.
 <vertex-viewer-button class="btn">Click Me</vertex-viewer-button>
 ```
 
+## Accessibility
+
+For icon-only buttons, provide an `aria-label`. The component applies this
+value to its internal native `<button>`, making the accessible name available
+to assistive technology.
+
+```html
+<vertex-viewer-button aria-label="Fit all">
+  <vertex-viewer-icon name="fit-all" size="md"></vertex-viewer-icon>
+</vertex-viewer-button>
+```
+
 <!-- Auto Generated Below -->
+
+## Properties
+
+| Property    | Attribute    | Description                                                                                                                                | Type             | Default |
+| ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- | ------- |
+| `ariaLabel` | `aria-label` | Accessible name applied to the internal native button. Use this for icon-only buttons or when the slotted content does not provide a name. | `null \| string` | `null`  |
 
 ## Dependencies
 

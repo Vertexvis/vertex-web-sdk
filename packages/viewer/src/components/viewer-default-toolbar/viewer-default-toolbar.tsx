@@ -54,6 +54,7 @@ export class ViewerDefaultToolbar {
           data-direction={this.direction}
         >
           <vertex-viewer-button
+            aria-label="Fit all"
             class="group-item btn"
             data-testid="fit-all-btn"
             onClick={() => this.viewAll()}

@@ -894,7 +894,13 @@ export namespace Components {
      */
     viewer?: HTMLVertexViewerElement;
   }
-  interface VertexViewerButton {}
+  interface VertexViewerButton {
+    /**
+     * Accessible name applied to the internal native button. Use this for icon-only buttons or when the slotted content does not provide a name.
+     * @default null
+     */
+    ariaLabel: string | null;
+  }
   interface VertexViewerDefaultToolbar {
     /**
      * The duration of animations, in milliseconds. Defaults to `1000`.
@@ -4081,7 +4087,13 @@ declare namespace LocalJSX {
      */
     viewer?: HTMLVertexViewerElement;
   }
-  interface VertexViewerButton {}
+  interface VertexViewerButton {
+    /**
+     * Accessible name applied to the internal native button. Use this for icon-only buttons or when the slotted content does not provide a name.
+     * @default null
+     */
+    ariaLabel?: string | null;
+  }
   interface VertexViewerDefaultToolbar {
     /**
      * The duration of animations, in milliseconds. Defaults to `1000`.
@@ -5357,6 +5369,9 @@ declare namespace LocalJSX {
     operationType: VolumeIntersectionQueryType;
     mode: VolumeIntersectionQueryMode;
   }
+  interface VertexViewerButtonAttributes {
+    ariaLabel: string | null;
+  }
   interface VertexViewerDefaultToolbarAttributes {
     placement: ViewerToolbarPlacement;
     direction: ViewerToolbarGroupDirection;
@@ -5700,7 +5715,24 @@ declare namespace LocalJSX {
           keyof VertexViewerBoxQueryToolAttributes as `prop:${K}`
       ]?: VertexViewerBoxQueryTool[K];
     };
-    'vertex-viewer-button': VertexViewerButton;
+    'vertex-viewer-button': Omit<
+      VertexViewerButton,
+      keyof VertexViewerButtonAttributes
+    > & {
+      [
+        K in keyof VertexViewerButton & keyof VertexViewerButtonAttributes
+      ]?: VertexViewerButton[K];
+    } & {
+      [
+        K in keyof VertexViewerButton &
+          keyof VertexViewerButtonAttributes as `attr:${K}`
+      ]?: VertexViewerButtonAttributes[K];
+    } & {
+      [
+        K in keyof VertexViewerButton &
+          keyof VertexViewerButtonAttributes as `prop:${K}`
+      ]?: VertexViewerButton[K];
+    };
     'vertex-viewer-default-toolbar': Omit<
       VertexViewerDefaultToolbar,
       keyof VertexViewerDefaultToolbarAttributes
