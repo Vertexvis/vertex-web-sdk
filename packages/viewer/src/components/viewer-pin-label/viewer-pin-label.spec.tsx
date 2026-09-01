@@ -151,7 +151,7 @@ describe('vertex-viewer-pin-label', () => {
     ) as HTMLTextAreaElement;
 
     expect(input).toEqualHtml(`
-      <textarea class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
+      <textarea aria-label="Pin label input" class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
     `);
 
     const originalPin = pinModel.getPinById(pin.id) as TextPin;
@@ -161,7 +161,7 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     expect(input).toEqualHtml(`
-      <textarea class="pin-label-input pin-label-text" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
+      <textarea aria-label="Pin label input" class="pin-label-input pin-label-text" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
     `);
 
     input.value = 'Updated Text';
@@ -218,7 +218,7 @@ describe('vertex-viewer-pin-label', () => {
     ) as HTMLTextAreaElement;
 
     expect(input).toEqualHtml(`
-      <textarea class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
+      <textarea aria-label="Pin label input" class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
     `);
 
     const originalPin = pinModel.getPinById(pin.id) as TextPin;
@@ -229,7 +229,7 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     expect(input).toEqualHtml(`
-      <textarea class="pin-label-input pin-label-text" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
+      <textarea aria-label="Pin label input" class="pin-label-input pin-label-text" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
     `);
 
     input.value = 'Updated Text With Enter';
