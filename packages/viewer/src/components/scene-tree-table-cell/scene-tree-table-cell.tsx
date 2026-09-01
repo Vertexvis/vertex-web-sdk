@@ -246,6 +246,7 @@ export class SceneTreeTableCell {
               onPointerUp={this.createActionPointerUpHandler(
                 this.toggleExpansion,
               )}
+              aria-label="Expand"
             >
               {expansionIcon && (
                 <vertex-viewer-icon
@@ -261,6 +262,7 @@ export class SceneTreeTableCell {
             <button
               class="end-item-btn no-shrink"
               data-testid={'end-item-' + this.node?.name}
+              aria-label="End item"
             >
               {endItemIcon && (
                 <vertex-viewer-icon
@@ -284,6 +286,7 @@ export class SceneTreeTableCell {
               class="isolate-btn no-shrink"
               data-testid={'isolate-btn-' + this.node?.name}
               onPointerUp={this.createActionPointerUpHandler(this.isolate)}
+              aria-label="Isolate"
             >
               {isolateIcon && (
                 <vertex-viewer-icon class="icon" name="locate" size="sm" />
@@ -297,6 +300,7 @@ export class SceneTreeTableCell {
               onPointerUp={this.createActionPointerUpHandler(
                 this.toggleVisibility,
               )}
+              aria-label="Toggle visibility"
             >
               {visibilityIcon && (
                 <vertex-viewer-icon
