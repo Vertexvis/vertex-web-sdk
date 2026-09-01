@@ -246,7 +246,7 @@ export class SceneTreeTableCell {
               onPointerUp={this.createActionPointerUpHandler(
                 this.toggleExpansion,
               )}
-              aria-label="Expand"
+              aria-label="Cell expansion toggle"
             >
               {expansionIcon && (
                 <vertex-viewer-icon
