@@ -224,6 +224,7 @@ export class VertexPinLabel {
             onKeyDown={this.handleInputKeyDown}
             onInput={this.handleTextInput}
             onBlur={this.handleTextBlur}
+            aria-label="Pin label input"
           />
           {/* This corrects for a behavior in Firefox where setting the `disabled` attribute to true */}
           {/* prevents any events from propagating. */}

@@ -174,6 +174,7 @@ export class SceneTreeSearch {
               tabIndex={-1}
               onMouseDown={this.handleClear}
               disabled={this.disabled}
+              aria-label="Clear search"
             >
               <slot name="clear-icon">
                 <vertex-viewer-icon name="close-circle" size="sm" />

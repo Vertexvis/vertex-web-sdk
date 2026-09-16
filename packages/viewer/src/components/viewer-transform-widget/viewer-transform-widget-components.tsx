@@ -103,7 +103,8 @@ export const TransformWidgetInput: FunctionalComponent<
       onChange={handleChange}
       onKeyDown={handleKeyDown}
       onBlur={onBlur}
-    ></input>
+      aria-label="Transform widget input"
+    />
   );
 };
 
