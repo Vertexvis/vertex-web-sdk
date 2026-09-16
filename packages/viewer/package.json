@@ -95,7 +95,7 @@
     "regl": "^2.1.1",
     "regl-shape": "^1.1.0",
     "resize-observer": "^1.0.4",
-    "threadsx": "^2.1.0",
+    "threadsx": "2.2.0",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
@@ -118,7 +118,7 @@
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
     "jsonwebtoken": "^9.0.3",
-    "rollup": "^4.62.4",
+    "rollup": "^4.63.3",
     "ts-jest": "^29.4.12",
     "ts-toolbelt": "^9.6.0",
     "typedoc": "^0.28.20",
