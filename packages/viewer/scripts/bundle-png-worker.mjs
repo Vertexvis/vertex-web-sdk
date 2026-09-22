@@ -60,24 +60,28 @@ try {
   await bundle.close();
 }
 
-await Promise.all(
-  outputDirectories.map(async (directory) => {
-    const outputDirectory = new URL(`${directory}/`, packageDirectory);
-    const files = await readdir(outputDirectory);
-    const bundleFiles = await Promise.all(
-      files
-        .filter(
-          (file) => file.endsWith('.js') && file !== 'png-decoder.worker.js',
-        )
-        .map((file) => readFile(new URL(file, outputDirectory), 'utf8')),
-    );
+// Development output targets run concurrently, so Stencil's bundles may not
+// exist yet. Validate their worker URLs only after the production build.
+if (!process.argv.includes('--dev')) {
+  await Promise.all(
+    outputDirectories.map(async (directory) => {
+      const outputDirectory = new URL(`${directory}/`, packageDirectory);
+      const files = await readdir(outputDirectory);
+      const bundleFiles = await Promise.all(
+        files
+          .filter(
+            (file) => file.endsWith('.js') && file !== 'png-decoder.worker.js',
+          )
+          .map((file) => readFile(new URL(file, outputDirectory), 'utf8')),
+      );
 
-    if (!bundleFiles.some((file) => file.includes('png-decoder.worker.js'))) {
-      throw new Error(`PNG worker URL was not emitted in ${directory}`);
-    }
+      if (!bundleFiles.some((file) => file.includes('png-decoder.worker.js'))) {
+        throw new Error(`PNG worker URL was not emitted in ${directory}`);
+      }
 
-    if (bundleFiles.some((file) => file.includes('png-decoder.worker.ts'))) {
-      throw new Error(`PNG worker TypeScript URL remains in ${directory}`);
-    }
-  }),
-);
+      if (bundleFiles.some((file) => file.includes('png-decoder.worker.ts'))) {
+        throw new Error(`PNG worker TypeScript URL remains in ${directory}`);
+      }
+    }),
+  );
+}

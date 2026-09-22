@@ -1,3 +1,7 @@
+import { execFile } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
+import { promisify } from 'node:util';
+
 import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
 import { vueOutputTarget } from '@stencil/vue-output-target';
@@ -12,6 +16,28 @@ export const config: Config = {
   globalScript: 'src/polyfill/resize-observer.ts',
   globalStyle: 'src/css/global.css',
   outputTargets: [
+    {
+      type: 'custom',
+      name: 'png-decoder-worker',
+      async generator(config, compilerCtx) {
+        if (config.devMode) {
+          await promisify(execFile)(process.execPath, [
+            `${config.rootDir}/scripts/bundle-png-worker.mjs`,
+            '--dev',
+          ]);
+          // Register the files with Stencil so its output cleanup preserves them.
+          await Promise.all(
+            ['cjs', 'components', 'esm', 'viewer'].map(async (directory) => {
+              const file = `${config.rootDir}/dist/${directory}/png-decoder.worker.js`;
+              await compilerCtx.fs.writeFile(
+                file,
+                await readFile(file, 'utf8'),
+              );
+            }),
+          );
+        }
+      },
+    },
     reactOutputTarget({
       outDir: '../viewer-react/src/generated/',
       stencilPackageName: '@vertexvis/viewer',
