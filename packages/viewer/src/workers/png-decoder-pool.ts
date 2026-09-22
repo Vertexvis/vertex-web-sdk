@@ -1,6 +1,4 @@
-import 'threadsx/register';
-
-import { ExposedAs, Pool, spawn } from 'threadsx';
+import { ExposedAs, Pool, spawn, Worker } from 'threadsx';
 
 import type { DecodePngFn } from './png-decoder.worker';
 import { pngDecoderWorkerUrl } from './worker-url';
@@ -25,7 +23,8 @@ function getPool(): DecodePngPool {
     const size = getPoolSize();
     console.debug(`Spawning PNG worker pool [size=${size}]`);
     poolLoader = Pool(
-      () => spawn<DecodePngFn>(new Worker(pngDecoderWorkerUrl)),
+      // threadsx applies its cross-origin workaround only to string URLs.
+      () => spawn<DecodePngFn>(new Worker(pngDecoderWorkerUrl.href)),
       { size },
     );
   }

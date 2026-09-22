@@ -1,6 +1,4 @@
-import 'threadsx/register';
-
-import { spawn, Thread } from 'threadsx';
+import { spawn, Thread, Worker } from 'threadsx';
 
 const logoUrl = new URL('./vertex-logo.png', import.meta.url);
 const workerUrl = new URL(
@@ -16,7 +14,7 @@ try {
   }
 
   const pngBytes = new Uint8Array(await response.arrayBuffer());
-  const decodePng = await spawn(new Worker(workerUrl));
+  const decodePng = await spawn(new Worker(workerUrl.href));
   const decoded = await decodePng(pngBytes);
   await Thread.terminate(decodePng);
 
