@@ -1,5 +1,4 @@
 import { execFile } from 'node:child_process';
-import { readFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
 
 import { Config } from '@stencil/core';
@@ -21,18 +20,17 @@ export const config: Config = {
       name: 'png-decoder-worker',
       async generator(config, compilerCtx) {
         if (config.devMode) {
-          await promisify(execFile)(process.execPath, [
-            `${config.rootDir}/scripts/bundle-png-worker.mjs`,
-            '--dev',
-          ]);
-          // Register the files with Stencil so its output cleanup preserves them.
+          const { stdout } = await promisify(execFile)(
+            process.execPath,
+            [`${config.rootDir}/scripts/bundle-png-worker.mjs`, '--dev'],
+            { maxBuffer: 10 * 1024 * 1024 },
+          );
+          // Queue the bundle in Stencil's filesystem so it owns output writes
+          // and cleanup, without reading intermediate files from dist.
           await Promise.all(
             ['cjs', 'components', 'esm', 'viewer'].map(async (directory) => {
               const file = `${config.rootDir}/dist/${directory}/png-decoder.worker.js`;
-              await compilerCtx.fs.writeFile(
-                file,
-                await readFile(file, 'utf8'),
-              );
+              await compilerCtx.fs.writeFile(file, stdout);
             }),
           );
         }

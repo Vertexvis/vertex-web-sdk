@@ -19,6 +19,7 @@ const outputDirectories = [
   'dist/esm',
   'dist/viewer',
 ];
+const dev = process.argv.includes('--dev');
 
 const bundle = await rollup({
   input: workerEntry.pathname,
@@ -47,22 +48,29 @@ const bundle = await rollup({
 });
 
 try {
-  await Promise.all(
-    outputDirectories.map((directory) =>
-      bundle.write({
-        file: new URL(`${directory}/png-decoder.worker.js`, packageDirectory)
-          .pathname,
-        format: 'iife',
-      }),
-    ),
-  );
+  if (dev) {
+    // Let Stencil own development output writes and cleanup. Do not write to
+    // dist here: the custom output target consumes this bundle from stdout.
+    const { output } = await bundle.generate({ format: 'iife' });
+    process.stdout.write(output[0].code);
+  } else {
+    await Promise.all(
+      outputDirectories.map((directory) =>
+        bundle.write({
+          file: new URL(`${directory}/png-decoder.worker.js`, packageDirectory)
+            .pathname,
+          format: 'iife',
+        }),
+      ),
+    );
+  }
 } finally {
   await bundle.close();
 }
 
 // Development output targets run concurrently, so Stencil's bundles may not
 // exist yet. Validate their worker URLs only after the production build.
-if (!process.argv.includes('--dev')) {
+if (!dev) {
   await Promise.all(
     outputDirectories.map(async (directory) => {
       const outputDirectory = new URL(`${directory}/`, packageDirectory);
