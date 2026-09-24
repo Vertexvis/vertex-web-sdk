@@ -22,7 +22,7 @@ yarn examples:start
 6. Open the example from that server:
 
 ```text
-http://localhost:8080/examples/pmi/
+http://localhost:8088/examples/pmi/
 ```
 
 Notes:

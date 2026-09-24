@@ -1,11 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "./packages/viewer/tsconfig.json",
-  "compilerOptions": {
-    // TODO: Remove once @vertexvis/frame-streaming-protos imports Long in its
-    // declarations and @vertexvis/web-workers/threads publish exports-compatible types.
-    "skipLibCheck": true
-  },
   "include": ["./packages/*/src", "./packages/*/types/*.d.ts"],
   "exclude": [
     "dist",

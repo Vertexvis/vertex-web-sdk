@@ -16,6 +16,7 @@ cp "${PACKAGE_DIR}/dist/index.cjs.js" "${PACKAGE_DIR}/dist/index.cjs"
 cp "${PACKAGE_DIR}/loader/index.cjs.js" "${PACKAGE_DIR}/loader/index.cjs"
 mkdir -p "${PACKAGE_DIR}/dist/cjs"
 printf '{\n  "type": "commonjs"\n}\n' > "${PACKAGE_DIR}/dist/cjs/package.json"
+node "${SCRIPT_DIR}/bundle-png-worker.mjs"
 
 node "${SCRIPT_DIR}/format-examples.js" < "${PACKAGE_DIR}/src/components.d.ts" > "${PACKAGE_DIR}/src/components.d.ts.tmp"
 node "${PRETTIER_CLI}" --write --parser typescript --config "${ROOT_DIR}/.prettierrc.json" "${PACKAGE_DIR}/src/components.d.ts.tmp"

@@ -10,10 +10,16 @@ Examples default to loading resources from CDNs. To test or experiment with loca
 <script type="module" src="/packages/viewer/dist/viewer/viewer.esm.js"></script>
 ```
 
-3. Build a local package:
+3. Build the local package:
 
 ```sh
 yarn workspace @vertexvis/viewer build
+```
+
+or all for all packages in the repository
+
+```sh
+yarn build
 ```
 
 4. Start the examples dev server:
@@ -25,7 +31,7 @@ yarn examples:start
 5. Open the example from that server:
 
 ```text
-http://localhost:8080/examples/pmi/
+http://localhost:8088/examples/pmi/
 ```
 
 Notes:
