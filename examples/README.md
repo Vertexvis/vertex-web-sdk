@@ -25,7 +25,7 @@ yarn examples:start
 5. Open the example from that server:
 
 ```text
-http://localhost:8080/examples/pmi/
+http://localhost:8088/examples/pmi/
 ```
 
 The PNG decoder worker smoke test uses the locally built viewer assets, so run
