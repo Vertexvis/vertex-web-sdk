@@ -10,10 +10,16 @@ Examples default to loading resources from CDNs. To test or experiment with loca
 <script type="module" src="/packages/viewer/dist/viewer/viewer.esm.js"></script>
 ```
 
-3. Build a local package:
+3. Build the local package:
 
 ```sh
 yarn workspace @vertexvis/viewer build
+```
+
+or all for all packages in the repository
+
+```sh
+yarn build
 ```
 
 4. Start the examples dev server:
@@ -27,9 +33,6 @@ yarn examples:start
 ```text
 http://localhost:8088/examples/pmi/
 ```
-
-The PNG decoder worker smoke test uses the locally built viewer assets, so run
-the build step before opening `/examples/png-decoder-smoke/`.
 
 Notes:
 
