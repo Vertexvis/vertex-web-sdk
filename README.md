@@ -117,7 +117,9 @@ specific to the `publish-testing` branch.
 
 Once a branch has been updated with the latest changes in the `master` branch,
 it can be pushed to the `publish-testing` branch which will automatically start
-a publish workflow. This package can then be found on NPM under the `testing` tag.
+a publish workflow. The published version uses an `-alpha` prerelease suffix and
+can be found on NPM under the `alpha` tag. Use an exact version when depending
+on a prerelease; a caret range can resolve to a different prerelease series.
 
 Run `git push origin local_branch:publish-testing` to update the branch
 with your changes and start the workflow.
