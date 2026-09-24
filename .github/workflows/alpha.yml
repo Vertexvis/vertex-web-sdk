@@ -3,7 +3,7 @@ name: Publish Alpha
 on:
   push:
     branches:
-      - publish-testing
+      - publish-alpha
 
 permissions:
   contents: read
