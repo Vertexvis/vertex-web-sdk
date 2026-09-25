@@ -113,13 +113,15 @@ has been created.
 
 The project supports publishing an NPM package that can be used for testing purposes
 in other applications. This package is published using a Github Actions workflow
-specific to the `publish-testing` branch.
+specific to the `publish-alpha` branch.
 
 Once a branch has been updated with the latest changes in the `master` branch,
-it can be pushed to the `publish-testing` branch which will automatically start
-a publish workflow. This package can then be found on NPM under the `testing` tag.
+it can be pushed to the `publish-alpha` branch which will automatically start
+a publish workflow. The published version uses an `-alpha` prerelease suffix and
+can be found on NPM under the `alpha` tag. Use an exact version when depending
+on a prerelease; a caret range can resolve to a different prerelease series.
 
-Run `git push origin local_branch:publish-testing` to update the branch
+Run `git push origin local_branch:publish-alpha` to update the branch
 with your changes and start the workflow.
 
 ## Semver

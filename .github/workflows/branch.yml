@@ -4,7 +4,7 @@ on:
   push:
     branches-ignore:
       - master
-      - publish-testing
+      - publish-alpha
 
 permissions:
   contents: read
