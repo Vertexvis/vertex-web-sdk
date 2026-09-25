@@ -59,8 +59,8 @@
     "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "protobufjs": "^7.6.6",
-    "rollup": "^4.63.3",
-    "ts-jest": "^29.4.12",
+    "rollup": "^4.63.5",
+    "ts-jest": "^29.4.13",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3"
   },
