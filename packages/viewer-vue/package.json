@@ -49,7 +49,7 @@
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
     "@vertexwebsdk/build": "1.1.0",
     "eslint": "^9.39.5",
-    "rollup": "^4.63.3",
+    "rollup": "^4.63.5",
     "tslib": "^2.8.1",
     "vue": "^3.5.41"
   },
