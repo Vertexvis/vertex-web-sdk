@@ -2,11 +2,11 @@ import { Point } from '@vertexvis/geometry';
 
 import { DocumentApi, DocumentApiState } from '../lib/document/api';
 
-export const mockPanByDelta = jest.fn();
-export const mockZoomTo = jest.fn();
-export const mockDispose = jest.fn();
-export const mockLoad = jest.fn();
-export const mockLoadPage = jest.fn();
+export const mockPanByDelta = vi.fn();
+export const mockZoomTo = vi.fn();
+export const mockDispose = vi.fn();
+export const mockLoad = vi.fn();
+export const mockLoadPage = vi.fn();
 
 export class MockDocumentApi extends DocumentApi {
   public panByDelta = mockPanByDelta.mockImplementation((delta: Point.Point) => super.panByDelta(delta));

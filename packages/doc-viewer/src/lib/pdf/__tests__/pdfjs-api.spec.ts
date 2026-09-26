@@ -1,5 +1,6 @@
-jest.mock('../../types/loadableResource', () => ({
-  fromUri: jest.fn(() => ({ resource: { type: 'url', url: 'https' } })),
+import type { Mock } from '#test/mock-types';
+vi.mock('../../types/loadableResource', () => ({
+  fromUri: vi.fn(() => ({ resource: { type: 'url', url: 'https' } })),
 }));
 
 import { mockDestroy, mockGetDocument, mockGetPage, MockOptionalContentConfig } from '../../../__mocks__/pdfjs-mock';
@@ -8,16 +9,16 @@ import { PdfJsApi } from '../pdfjs-api';
 
 describe('PdfJsApi', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('load', () => {
     it('loads a PDF by URI if it is a URL', async () => {
-      const mockStateChanged = jest.fn();
+      const mockStateChanged = vi.fn();
       const mockPdfDocument = {
         numPages: 1,
         getPage: mockGetPage,
-        getOptionalContentConfig: jest.fn(() => Promise.resolve(new Map())),
+        getOptionalContentConfig: vi.fn(() => Promise.resolve(new Map())),
       };
 
       mockGetDocument.mockReturnValueOnce({ promise: Promise.resolve(mockPdfDocument) });
@@ -30,7 +31,7 @@ describe('PdfJsApi', () => {
     });
 
     it('throws an error if the URI is not a URL', async () => {
-      (fromUri as jest.Mock).mockReturnValueOnce({ resource: { type: 'invalid' } });
+      (fromUri as Mock).mockReturnValueOnce({ resource: { type: 'invalid' } });
 
       const api = new PdfJsApi();
 
@@ -40,10 +41,10 @@ describe('PdfJsApi', () => {
 
   describe('loadPage', () => {
     it('loads a page by number', async () => {
-      const mockStateChanged = jest.fn();
+      const mockStateChanged = vi.fn();
       const mockContentDimensions = { width: 100, height: 100 };
 
-      (mockGetPage as jest.Mock).mockReturnValueOnce({ getViewport: jest.fn(() => mockContentDimensions) });
+      (mockGetPage as Mock).mockReturnValueOnce({ getViewport: vi.fn(() => mockContentDimensions) });
 
       const api = new PdfJsApi();
       api.onStateChanged(mockStateChanged);
@@ -83,7 +84,7 @@ describe('PdfJsApi', () => {
       const mockPdfDocument = {
         numPages: 1,
         getPage: mockGetPage,
-        getOptionalContentConfig: jest.fn(() => Promise.resolve(mockOptionalContentConfig)),
+        getOptionalContentConfig: vi.fn(() => Promise.resolve(mockOptionalContentConfig)),
       };
 
       mockLayerIds.forEach(layerId => {
@@ -104,7 +105,7 @@ describe('PdfJsApi', () => {
       const mockPdfDocument = {
         numPages: 1,
         getPage: mockGetPage,
-        getOptionalContentConfig: jest.fn(() => Promise.resolve(mockOptionalContentConfig)),
+        getOptionalContentConfig: vi.fn(() => Promise.resolve(mockOptionalContentConfig)),
       };
 
       mockOptionalContentConfig.set('layer-1', { name: 'layer-1', visible: true });

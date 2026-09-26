@@ -9,12 +9,12 @@ describe('PanInteractionHandler', () => {
 
   function mockWindowEventListeners(): void {
     Object.defineProperty(window, 'addEventListener', {
-      value: jest.fn(),
+      value: vi.fn(),
       writable: true,
       configurable: true,
     });
     Object.defineProperty(window, 'removeEventListener', {
-      value: jest.fn(),
+      value: vi.fn(),
       writable: true,
       configurable: true,
     });
@@ -39,7 +39,7 @@ describe('PanInteractionHandler', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     unmockWindowEventListeners();
   });
@@ -51,7 +51,7 @@ describe('PanInteractionHandler', () => {
   it('should create an instance and bind listeners to the element and window', () => {
     mockWindowEventListeners();
 
-    const mockAddEventListener = jest.fn();
+    const mockAddEventListener = vi.fn();
     const element = document.createElement('div');
     const hostElement = document.createElement('div');
 
@@ -83,7 +83,7 @@ describe('PanInteractionHandler', () => {
   it('should remove listeners when disposed', () => {
     mockWindowEventListeners();
 
-    const mockRemoveEventListener = jest.fn();
+    const mockRemoveEventListener = vi.fn();
     const element = document.createElement('div');
     const hostElement = document.createElement('div');
 

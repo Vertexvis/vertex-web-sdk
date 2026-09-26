@@ -1,16 +1,21 @@
-const mockOnStateChangeDispose = jest.fn();
-const mockOnStateChange = jest.fn((_handler: (state: PdfJsApiState) => Promise<void>) => ({
-  dispose: mockOnStateChangeDispose,
-}));
-const mockCreateElement = jest.fn();
-jest.mock('../../dom', () => ({
+import type { Mock } from '#test/mock-types';
+
+const { mockOnStateChangeDispose, mockOnStateChange, mockCreateElement } = vi.hoisted(() => {
+  const mockOnStateChangeDispose = vi.fn();
+  return {
+    mockOnStateChangeDispose,
+    mockOnStateChange: vi.fn<(_handler: (state: PdfJsApiState) => Promise<void>) => { dispose: () => void }>(() => ({ dispose: mockOnStateChangeDispose })),
+    mockCreateElement: vi.fn(),
+  };
+});
+vi.mock('../../dom', () => ({
   createElement: mockCreateElement,
 }));
-jest.mock('../pdfjs-api', () => ({
-  PdfJsApi: jest.fn().mockImplementation(() => ({
-    onStateChanged: mockOnStateChange,
-    dispose: jest.fn(),
-  })),
+vi.mock('../pdfjs-api', () => ({
+  PdfJsApi: class {
+    public onStateChanged = mockOnStateChange;
+    public dispose = vi.fn();
+  },
 }));
 
 import { Dimensions, Point } from '@vertexvis/geometry';
@@ -22,7 +27,7 @@ import { PdfJsRenderer } from '../pdfjs-renderer';
 
 describe('PdfJsRenderer', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('dispose', () => {
@@ -36,9 +41,9 @@ describe('PdfJsRenderer', () => {
 
   describe('renderPage', () => {
     it('renders the page', async () => {
-      const mockContext = { fillStyle: '#000000', fillRect: jest.fn() };
+      const mockContext = { fillStyle: '#000000', fillRect: vi.fn() };
 
-      mockCreateElement.mockImplementation(() => ({ getContext: jest.fn().mockReturnValue(mockContext) }));
+      mockCreateElement.mockImplementation(() => ({ getContext: vi.fn().mockReturnValue(mockContext) }));
 
       new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
       const handler = mockOnStateChange.mock.calls[0][0];
@@ -57,7 +62,7 @@ describe('PdfJsRenderer', () => {
       new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
       const handler = mockOnStateChange.mock.calls[0][0];
 
-      (mockGetViewport as jest.Mock).mockImplementation(({ scale }) => ({ width: 100 * scale, height: 100 * scale }));
+      (mockGetViewport as Mock).mockImplementation(({ scale }) => ({ width: 100 * scale, height: 100 * scale }));
 
       await handler({ document: mockPdfDocument, loadedPageNumber: 1, viewport: Dimensions.create(10, 10), zoomPercentage: 100, panOffset: Point.create(0, 0) });
 
@@ -72,12 +77,12 @@ describe('PdfJsRenderer', () => {
     });
 
     it('does not render if already rendering', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
       const handler = mockOnStateChange.mock.calls[0][0];
 
-      (mockPageRender as jest.Mock).mockImplementationOnce(() => ({ promise: Async.delay(10000) }));
+      (mockPageRender as Mock).mockImplementationOnce(() => ({ promise: Async.delay(10000) }));
 
       handler({ document: mockPdfDocument, loadedPageNumber: 1, zoomPercentage: 100, panOffset: Point.create(0, 0) });
 

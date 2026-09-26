@@ -1,14 +1,16 @@
-jest.mock('../../lib/dom', () => {
-  const original = jest.requireActual('../../lib/dom');
+import type { Mock } from '#test/mock-types';
+vi.mock('../../lib/dom', async () => {
+  const original = await vi.importActual('../../lib/dom');
 
   return {
     ...original,
-    getAllVertexElementChildren: jest.fn(() => []),
+    getAllVertexElementChildren: vi.fn(() => []),
   };
 });
 
-import { newSpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { mockGetDocument, mockGetPage, mockGetViewport, mockPageRender } from '../../__mocks__/pdfjs-mock';
 import { triggerResizeObserver } from '../../__setup__/resize-observer';
@@ -17,13 +19,13 @@ import { VertexDocumentViewer } from './document-viewer';
 
 describe('vertex-document-viewer', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('retrieves the document specified by the src property and loads the first page', async () => {
     const mockSrc = 'https://vertex3d.com';
 
-    await newSpecPage({
+    await renderSpecPage({
       components: [VertexDocumentViewer],
       html: `<vertex-document-viewer src="${mockSrc}"></vertex-document-viewer>`,
     });
@@ -36,7 +38,7 @@ describe('vertex-document-viewer', () => {
   it('updates dimensions when the the element is resized', async () => {
     const mockSrc = 'https';
 
-    const { root } = await newSpecPage({
+    const { root } = await renderSpecPage({
       components: [VertexDocumentViewer],
       html: `<vertex-document-viewer src="${mockSrc}" resize-debounce="0"></vertex-document-viewer>`,
     });
@@ -85,7 +87,7 @@ describe('vertex-document-viewer', () => {
     it('loads a page by number', async () => {
       const mockSrc = 'https';
 
-      const { root } = await newSpecPage({
+      const { root } = await renderSpecPage({
         components: [VertexDocumentViewer],
         html: `<vertex-document-viewer src="${mockSrc}"></vertex-document-viewer>`,
       });
@@ -98,7 +100,7 @@ describe('vertex-document-viewer', () => {
     });
 
     it('throws an error if no document has been loaded and the API is not defined', async () => {
-      const { root } = await newSpecPage({
+      const { root } = await renderSpecPage({
         components: [VertexDocumentViewer],
         html: '<vertex-document-viewer></vertex-document-viewer>',
       });
@@ -111,9 +113,9 @@ describe('vertex-document-viewer', () => {
   describe('injectViewerApi', () => {
     it('injects the viewer API into vertex custom element children', async () => {
       const testElement = { nodeName: 'VERTEX-VIEWER-MARKUP', viewer: undefined };
-      (getAllVertexElementChildren as jest.Mock).mockReturnValue([testElement]);
+      (getAllVertexElementChildren as Mock).mockReturnValue([testElement]);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [VertexDocumentViewer],
         html: `<vertex-document-viewer></vertex-document-viewer>`,
       });
