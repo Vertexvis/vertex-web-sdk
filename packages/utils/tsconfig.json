@@ -3,7 +3,8 @@
   "extends": "@vertexwebsdk/build/tsconfig",
   "compilerOptions": {
     "downlevelIteration": true,
-    "lib": ["ES2019", "WebWorker"]
+    "lib": ["ES2019", "DOM", "WebWorker"],
+    "types": ["vitest/globals"],
   },
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules"],
 }

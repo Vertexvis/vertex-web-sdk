@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { WebSocketClientMock } from '../webSocketClientMock';
 
 describe(WebSocketClientMock, () => {
@@ -43,7 +45,7 @@ describe(WebSocketClientMock, () => {
   });
 
   describe(WebSocketClientMock.prototype.onMessage, () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     beforeEach(() => handler.mockClear());
 

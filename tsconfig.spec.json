@@ -3,16 +3,23 @@
   "extends": "./internal/build/tsconfig-web.json",
   "compilerOptions": {
     "noEmit": true,
+    "skipLibCheck": true,
     "experimentalDecorators": true,
     "jsx": "react",
-    "jsxFactory": "h"
+    "jsxFactory": "h",
+    "types": ["vitest/globals", "@stencil/vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "#test/mock-types": ["./vitest.mock-types.ts"],
+      "#test/render-spec-page": ["./vitest.render-spec-page.ts"]
+    }
   },
   "include": [
     "packages/**/*.spec.ts",
     "packages/**/*.spec.tsx",
     "packages/**/src/components.d.ts",
     "packages/**/types/**/*.d.ts",
-    "packages/**/src/regl-shape.d.ts"
+    "packages/**/src/regl-shape.d.ts",
   ],
-  "exclude": ["**/dist", "**/node_modules"]
+  "exclude": ["**/dist", "**/node_modules"],
 }
