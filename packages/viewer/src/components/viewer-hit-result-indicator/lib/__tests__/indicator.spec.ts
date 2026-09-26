@@ -150,7 +150,7 @@ describe(HitIndicator, () => {
   canvas.height = 900;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('begins drawing when a transform and normal are provided after a frame', async () => {

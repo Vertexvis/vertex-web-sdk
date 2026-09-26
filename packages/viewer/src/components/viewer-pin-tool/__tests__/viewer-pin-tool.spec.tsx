@@ -18,10 +18,10 @@ describe('vertex-viewer-pin-tool', () => {
       text: 'My New Pin',
     },
   };
-  const addEventListener = jest.fn();
+  const addEventListener = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render a label for a pin and support dragging the label', async () => {
@@ -132,7 +132,7 @@ describe('vertex-viewer-pin-tool', () => {
     const toolEl = page.root as HTMLVertexViewerPinToolElement;
     toolEl.viewer = {
       ...viewer,
-      addEventListener: jest.fn(),
+      addEventListener: vi.fn(),
       frame: {
         scene: {
           camera: {
@@ -175,7 +175,7 @@ describe('vertex-viewer-pin-tool', () => {
     const toolEl = page.root as HTMLVertexViewerPinToolElement;
     toolEl.viewer = {
       ...viewer,
-      addEventListener: jest.fn(),
+      addEventListener: vi.fn(),
       frame: {
         scene: {
           camera: {
@@ -225,7 +225,7 @@ describe('vertex-viewer-pin-tool', () => {
     const toolEl = page.root as HTMLVertexViewerPinToolElement;
     toolEl.viewer = {
       ...viewer,
-      addEventListener: jest.fn(),
+      addEventListener: vi.fn(),
       frame: {
         scene: {
           camera: {

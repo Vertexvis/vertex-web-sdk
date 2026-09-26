@@ -1,14 +1,14 @@
 import { TimingMeter } from '../meters';
 
 describe(TimingMeter, () => {
-  const mark = jest.spyOn(window.performance, 'mark');
-  const measure = jest.spyOn(window.performance, 'measure');
-  const clearMeasures = jest.spyOn(window.performance, 'clearMeasures');
+  const mark = vi.spyOn(window.performance, 'mark');
+  const measure = vi.spyOn(window.performance, 'measure');
+  const clearMeasures = vi.spyOn(window.performance, 'clearMeasures');
 
   const timer = new TimingMeter('timer');
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe(TimingMeter.prototype.clearMeasurements, () => {
@@ -49,9 +49,9 @@ describe(TimingMeter, () => {
       const entry1 = createEntry();
       const entry2 = createEntry();
       const entries = [entry1, entry2];
-      jest
-        .spyOn(window.performance, 'getEntriesByName')
-        .mockReturnValueOnce(entries);
+      vi.spyOn(window.performance, 'getEntriesByName').mockReturnValueOnce(
+        entries,
+      );
 
       expect(timer.takeMeasurements()).toBe(entries);
     });
@@ -66,9 +66,10 @@ describe(TimingMeter, () => {
     it('returns the last recorded measurement', () => {
       const entry1 = createEntry();
       const entry2 = createEntry();
-      jest
-        .spyOn(window.performance, 'getEntriesByName')
-        .mockReturnValueOnce([entry1, entry2]);
+      vi.spyOn(window.performance, 'getEntriesByName').mockReturnValueOnce([
+        entry1,
+        entry2,
+      ]);
 
       expect(timer.takeLastMeasurement()).toBe(entry2);
     });
@@ -86,6 +87,6 @@ function createEntry(): PerformanceEntry {
     duration: 0,
     entryType: 'mark',
     name: 'name',
-    toJSON: jest.fn(),
+    toJSON: vi.fn(),
   };
 }

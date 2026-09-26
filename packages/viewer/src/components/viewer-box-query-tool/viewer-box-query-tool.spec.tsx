@@ -1,5 +1,5 @@
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('../../workers/png-decoder-pool');
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -17,7 +17,7 @@ import { ViewerBoxQueryTool } from './viewer-box-query-tool';
 
 describe('vertex-viewer-box-query-tool', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders a vertex-viewer-layer', async () => {
@@ -111,7 +111,7 @@ describe('vertex-viewer-box-query-tool', () => {
 
     const viewer = page.root as HTMLVertexViewerElement;
 
-    const streamSpy = jest.spyOn(stream, 'createSceneAlteration');
+    const streamSpy = vi.spyOn(stream, 'createSceneAlteration');
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await drawExclusiveBox(page, viewer);
@@ -163,7 +163,7 @@ describe('vertex-viewer-box-query-tool', () => {
 
     const viewer = page.root as HTMLVertexViewerElement;
 
-    const streamSpy = jest.spyOn(stream, 'createSceneAlteration');
+    const streamSpy = vi.spyOn(stream, 'createSceneAlteration');
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await drawInclusiveBox(page, viewer);
@@ -215,7 +215,7 @@ describe('vertex-viewer-box-query-tool', () => {
 
     const viewer = page.root as HTMLVertexViewerElement;
 
-    const streamSpy = jest.spyOn(stream, 'createSceneAlteration');
+    const streamSpy = vi.spyOn(stream, 'createSceneAlteration');
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await drawInclusiveBox(page, viewer);
@@ -267,7 +267,7 @@ describe('vertex-viewer-box-query-tool', () => {
 
     const viewer = page.root as HTMLVertexViewerElement;
 
-    const streamSpy = jest.spyOn(stream, 'createSceneAlteration');
+    const streamSpy = vi.spyOn(stream, 'createSceneAlteration');
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await drawInclusiveBox(page, viewer);
@@ -337,7 +337,7 @@ describe('vertex-viewer-box-query-tool', () => {
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
-    const streamSpy = jest
+    const streamSpy = vi
       .spyOn(stream, 'createSceneAlteration')
       .mockImplementation(async () => {
         await new Promise((resolve) => setTimeout(resolve, 10));

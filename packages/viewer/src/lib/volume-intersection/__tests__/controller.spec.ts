@@ -6,14 +6,14 @@ import { VolumeIntersectionQueryModel } from '../model';
 
 describe('volume intersection controller', () => {
   const mockQuery = {
-    withVolumeIntersection: jest.fn(),
-    all: jest.fn(),
-    withItemId: jest.fn(),
+    withVolumeIntersection: vi.fn(),
+    all: vi.fn(),
+    withItemId: vi.fn(),
   };
   const mockOperations = {
-    select: jest.fn(),
-    deselect: jest.fn(),
-    materialOverride: jest.fn(),
+    select: vi.fn(),
+    deselect: vi.fn(),
+    materialOverride: vi.fn(),
   };
   const mockItemBuilder = {
     where: (fn: (query: typeof mockQuery) => void) => {
@@ -24,7 +24,7 @@ describe('volume intersection controller', () => {
   const mockBuilder = {
     items: mockItemBuilder,
   };
-  const mockExecute = jest.fn();
+  const mockExecute = vi.fn();
   const model = new VolumeIntersectionQueryModel();
   const mockViewer = {
     scene: () => ({
@@ -47,11 +47,11 @@ describe('volume intersection controller', () => {
 
   beforeEach(() => {
     mockExecute.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('limits the number of in flight operations', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     mockExecute.mockImplementation(async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -66,7 +66,7 @@ describe('volume intersection controller', () => {
 
     await expect(drag(controller)).rejects.toThrow();
 
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
 
     await firstDrag;
 
@@ -127,8 +127,8 @@ describe('volume intersection controller', () => {
       mockViewer as unknown as HTMLVertexViewerElement,
     );
 
-    const handleExecuteAborted = jest.fn();
-    const handleExecuteComplete = jest.fn();
+    const handleExecuteAborted = vi.fn();
+    const handleExecuteComplete = vi.fn();
     controller.onExecuteAborted(handleExecuteAborted);
     controller.onExecuteComplete(handleExecuteComplete);
 

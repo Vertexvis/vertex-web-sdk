@@ -13,15 +13,11 @@ export default defineVitestConfig({
       { find: 'pdfjs-dist/legacy/build/pdf.mjs', replacement: './src/__mocks__/pdfjs-mock.ts' },
       {
         find: '#test/mock-types',
-        replacement: fileURLToPath(
-          new URL('../../vitest.mock-types.ts', import.meta.url),
-        ),
+        replacement: fileURLToPath(new URL('../../vitest.mock-types.ts', import.meta.url)),
       },
       {
         find: '#test/render-spec-page',
-        replacement: fileURLToPath(
-          new URL('../../vitest.render-spec-page.ts', import.meta.url),
-        ),
+        replacement: fileURLToPath(new URL('../../vitest.render-spec-page.ts', import.meta.url)),
       },
     ],
   },

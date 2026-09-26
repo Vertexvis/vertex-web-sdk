@@ -1,9 +1,10 @@
-jest.mock('../viewer/utils');
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('./lib/indicator');
-jest.mock('../../lib/stencil', () => ({
-  readDOM: jest.fn((callback) => callback()),
-  writeDOM: jest.fn((callback) => callback()),
+import type { Mock } from '#test/mock-types';
+vi.mock('../viewer/utils');
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('./lib/indicator');
+vi.mock('../../lib/stencil', () => ({
+  readDOM: vi.fn((callback) => callback()),
+  writeDOM: vi.fn((callback) => callback()),
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -27,12 +28,12 @@ import { ViewerHitResultIndicator } from './viewer-hit-result-indicator';
 describe('<vertex-viewer-hit-result-indicator>', () => {
   const mockIndicator = new HitIndicator(document.createElement('canvas'));
 
-  (loadImageBytes as jest.Mock).mockResolvedValue({
+  (loadImageBytes as Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
   });
-  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getElementBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 150,
@@ -42,7 +43,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('displays an indicator at the provided position and normal', async () => {

@@ -10,12 +10,12 @@ jest.mock('./util', () => {
 
   return {
     ...actual,
-    convertPointToCanvas: jest.fn(),
-    convertCanvasPointToWorld: jest.fn(),
-    computeHandleDeltaTransform: jest.fn(),
+    convertPointToCanvas: vi.fn(),
+    convertCanvasPointToWorld: vi.fn(),
+    computeHandleDeltaTransform: vi.fn(),
   };
 });
-jest.mock('./dom');
+vi.mock('./dom');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -83,7 +83,7 @@ describe('vertex-viewer-transform-widget', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders a canvas', async () => {
@@ -202,8 +202,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
@@ -215,7 +215,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -231,11 +231,11 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    const beginSpy = jest
+    const beginSpy = vi
       .spyOn(stream, 'beginInteraction')
       .mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    const endSpy = jest
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    const endSpy = vi
       .spyOn(stream, 'endInteraction')
       .mockReturnValue(Promise.resolve({}));
 
@@ -321,8 +321,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     await viewer.dispatchFrameDrawn(frame);
@@ -334,7 +334,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -423,8 +423,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     await viewer.dispatchFrameDrawn(frame);
@@ -436,7 +436,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -541,8 +541,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
@@ -554,7 +554,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-rotate',
       new TriangleMeshPoints(
         true,
@@ -639,8 +639,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     await viewer.dispatchFrameDrawn(frame);
@@ -652,7 +652,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-rotate',
       new TriangleMeshPoints(
         true,
@@ -753,8 +753,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
@@ -766,7 +766,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -782,11 +782,11 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    const beginSpy = jest
+    const beginSpy = vi
       .spyOn(stream, 'beginInteraction')
       .mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    const endSpy = jest
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    const endSpy = vi
       .spyOn(stream, 'endInteraction')
       .mockReturnValue(Promise.resolve({}));
 
@@ -986,8 +986,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
@@ -998,7 +998,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -1014,11 +1014,11 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    const beginSpy = jest
+    const beginSpy = vi
       .spyOn(stream, 'beginInteraction')
       .mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    const endSpy = jest
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    const endSpy = vi
       .spyOn(stream, 'endInteraction')
       .mockReturnValue(Promise.resolve({}));
 
@@ -1117,7 +1117,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -1242,7 +1242,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -1259,8 +1259,8 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
     );
 
-    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
-    const endSpy = jest.spyOn(stream, 'endInteraction');
+    vi.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const endSpy = vi.spyOn(stream, 'endInteraction');
 
     (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
@@ -1358,7 +1358,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
-    const onPositionChanged = jest.fn();
+    const onPositionChanged = vi.fn();
     widget.addEventListener('positionChanged', onPositionChanged);
 
     const position1 = Vector3.create(1, 1, 1);

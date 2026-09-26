@@ -1,14 +1,21 @@
 // This file contains imports for any browser polyfills that are needed by
 // tests.
 
-import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
-
 import { ResizeObserver } from 'resize-observer';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-(global as any).ResizeObserver = ResizeObserver;
+(globalThis as any).ResizeObserver = ResizeObserver;
 
-(global as any).MessageEvent = class extends Event {
+// The Stencil mock-doc environment replaces the global `Event` constructor.
+// Node's built-in MessageEvent/CloseEvent are defined lazily on first access,
+// and bind to whatever `Event` is global at that time. If that first access
+// happens after mock-doc's Event has been installed, Node's own
+// MessageEvent/CloseEvent end up extending mock-doc's MockEvent, whose
+// constructor does `Object.assign(this, eventInitDict)` -- which throws,
+// because `code`/`reason`/`data` are getter-only accessors on the native
+// prototypes. Defining our own minimal versions here avoids ever touching
+// Node's native constructors in this environment.
+(globalThis as any).MessageEvent = class extends Event {
   public readonly data?: any;
 
   public constructor(type: string, initDict?: MessageEventInit) {
@@ -17,7 +24,7 @@ import { ResizeObserver } from 'resize-observer';
   }
 };
 
-(global as any).CloseEvent = class extends Event {
+(globalThis as any).CloseEvent = class extends Event {
   public readonly code?: number;
   public readonly reason?: string;
 
@@ -28,7 +35,7 @@ import { ResizeObserver } from 'resize-observer';
   }
 };
 
-(global as any).MutationObserver = class {
+(globalThis as any).MutationObserver = class {
   public constructor() {}
   public disconnect(): void {}
   public observe(): void {}

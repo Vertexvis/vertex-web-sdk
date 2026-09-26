@@ -37,7 +37,7 @@ describe(PointToPointHitTester, () => {
     it('transforms points to world coordinates for orthographic cameras with hit test', () => {
       const failingHitTestBuffer = makeDepthBuffer(100, 100, undefined, camera);
 
-      jest.spyOn(failingHitTestBuffer, 'hitTest').mockReturnValue(false);
+      vi.spyOn(failingHitTestBuffer, 'hitTest').mockReturnValue(false);
 
       const hitTester = new PointToPointHitTester(
         undefined,

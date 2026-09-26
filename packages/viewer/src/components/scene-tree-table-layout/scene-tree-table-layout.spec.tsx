@@ -1,13 +1,14 @@
-jest.mock('@vertexvis/stream-api');
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock('@vertexvis/stream-api');
+vi.mock(
   '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service',
 );
-jest.mock('./lib/dom');
-jest.mock('./lib/window');
-jest.mock('../../lib/stencil', () => ({
-  readDOM: jest.fn((fn) => fn()),
+vi.mock('./lib/dom');
+vi.mock('./lib/window');
+vi.mock('../../lib/stencil', () => ({
+  readDOM: vi.fn((fn) => fn()),
 }));
-jest.mock('../scene-tree/lib/dom');
+vi.mock('../scene-tree/lib/dom');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -40,17 +41,17 @@ import { SceneTreeTableLayout } from './scene-tree-table-layout';
 
 describe('<vertex-scene-tree-table-layout>', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
-    (getSceneTreeTableOffsetTop as jest.Mock).mockReturnValue(0);
-    (getSceneTreeTableViewportWidth as jest.Mock).mockReturnValue(200);
+    vi.clearAllMocks();
+    (getSceneTreeViewportHeight as Mock).mockReturnValue(1000);
+    (getSceneTreeTableOffsetTop as Mock).mockReturnValue(0);
+    (getSceneTreeTableViewportWidth as Mock).mockReturnValue(200);
   });
 
   it('updates the layout position on resize', async () => {
     const { page, table } = await newSceneTreeTableSpec();
 
     expect(table.layoutOffset).toBe(0);
-    (getSceneTreeTableOffsetTop as jest.Mock).mockReturnValue(1000);
+    (getSceneTreeTableOffsetTop as Mock).mockReturnValue(1000);
 
     triggerResizeObserver();
     await page.waitForChanges();
@@ -125,7 +126,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     await page.waitForChanges();
 
-    const hovered = jest.fn();
+    const hovered = vi.fn();
     const hoverController = new SceneTreeCellHoverController();
     const disposable = hoverController.stateChanged(hovered);
     const cell = table.querySelector(
@@ -425,7 +426,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     let resizeDetail: number[] = [];
-    const resizeListener = jest.fn((event) => {
+    const resizeListener = vi.fn((event) => {
       resizeDetail = event.detail;
     });
 
@@ -545,7 +546,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     });
 
     let restartTimeoutFn: VoidFunction | undefined;
-    (restartTimeout as jest.Mock).mockImplementation((fn: VoidFunction) => {
+    (restartTimeout as Mock).mockImplementation((fn: VoidFunction) => {
       restartTimeoutFn = fn;
 
       return 1;
@@ -607,7 +608,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
     const client = mockSceneTreeClient();
     mockGetTree({ client });
 
-    (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(0);
+    (getSceneTreeViewportHeight as Mock).mockReturnValue(0);
 
     const controller = new SceneTreeController(client, 100);
     const { page, table } = await newSceneTreeTableSpec({
@@ -637,7 +638,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
         type: 'connected',
         jwtProvider: () => 'jwt',
         sceneViewId: 'scene-view-id',
-        subscription: { dispose: jest.fn() },
+        subscription: { dispose: vi.fn() },
       },
     });
     table.rows = [mockRow];
@@ -715,7 +716,7 @@ interface MockGetTreeOptions {
 
 function mockSceneTreeClient(): SceneTreeAPIClient {
   const client = new SceneTreeAPIClient('https://example.com');
-  (client.subscribe as jest.Mock).mockReturnValue(new ResponseStreamMock());
+  (client.subscribe as Mock).mockReturnValue(new ResponseStreamMock());
   return client;
 }
 
@@ -726,7 +727,7 @@ function mockGetTree({
   transform,
 }: MockGetTreeOptions): GetTreeResponse {
   const res = createGetTreeResponse(itemCount, totalCount, transform);
-  (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
+  (client.getTree as Mock).mockImplementation(mockGrpcUnaryResult(res));
   return res;
 }
 

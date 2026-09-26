@@ -209,7 +209,7 @@ describe('vertex-view-pin-group', () => {
     const viewMatrix = Matrix4.makeIdentity();
     const pinModel = new PinModel();
 
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     pinModel.onSelectionChange(mockFn);
 
     const relativePointCenterScreen = Point.create(0, 0);
@@ -256,7 +256,7 @@ describe('vertex-view-pin-group', () => {
     const viewMatrix = Matrix4.makeIdentity();
     const pinModel = new PinModel();
 
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     pinModel.onSelectionChange(mockFn);
 
     const relativePointCenterScreen = Point.create(0, 0);

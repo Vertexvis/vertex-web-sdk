@@ -1,5 +1,6 @@
-jest.mock('../viewer/utils');
-jest.mock('../viewer-markup/dom');
+import type { Mock } from '#test/mock-types';
+vi.mock('../viewer/utils');
+vi.mock('../viewer-markup/dom');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -15,7 +16,7 @@ describe('vertex-viewer-markup-arrow', () => {
   const start = Point.create(0, -0.5);
   const end = Point.create(0, 0);
 
-  (getMarkupBoundingClientRect as jest.Mock).mockReturnValue({
+  (getMarkupBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 0,
@@ -25,7 +26,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('positions the anchors correctly', async () => {
@@ -176,7 +177,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('does not render svg content when the element width or height is 0', async () => {
-    (getMarkupBoundingClientRect as jest.Mock).mockReturnValueOnce({
+    (getMarkupBoundingClientRect as Mock).mockReturnValueOnce({
       left: 0,
       top: 0,
       bottom: 0,
@@ -221,7 +222,7 @@ describe('vertex-viewer-markup-arrow', () => {
     const canvas = root.shadowRoot?.querySelector(
       'canvas',
     ) as HTMLCanvasElement;
-    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+    const removeEventListener = vi.spyOn(canvas, 'removeEventListener');
 
     const markup = root.querySelector(
       'vertex-viewer-markup-arrow',
@@ -252,7 +253,7 @@ describe('vertex-viewer-markup-arrow', () => {
     const canvas = root.shadowRoot?.querySelector(
       'canvas',
     ) as HTMLCanvasElement;
-    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+    const removeEventListener = vi.spyOn(canvas, 'removeEventListener');
 
     const el = root.querySelector(
       'vertex-viewer-markup-arrow',

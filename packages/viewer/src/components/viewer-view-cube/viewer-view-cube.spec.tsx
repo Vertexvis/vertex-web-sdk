@@ -1,5 +1,6 @@
-jest.mock('../viewer/utils');
-jest.mock('../../lib/rendering/imageLoaders');
+import type { Mock } from '#test/mock-types';
+vi.mock('../viewer/utils');
+vi.mock('../../lib/rendering/imageLoaders');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -21,12 +22,12 @@ import { ViewerDomRenderer } from '../viewer-dom-renderer/viewer-dom-renderer';
 import { ViewerViewCube } from './viewer-view-cube';
 
 describe('vertex-viewer-view-cube', () => {
-  (loadImageBytes as jest.Mock).mockResolvedValue({
+  (loadImageBytes as Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
   });
-  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getElementBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 150,
@@ -36,8 +37,8 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('renders a triad', async () => {
@@ -181,11 +182,11 @@ describe('vertex-viewer-view-cube interactions', () => {
   const viewerElement = viewer as unknown as HTMLVertexViewerElement;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
     Object.assign(viewer, {
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     });
     resetAwaiter(sceneMock);
   });
@@ -251,7 +252,7 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('performs standard view when side clicked with no visible geometry', async () => {
-    (sceneMock.boundingBox as jest.Mock).mockReturnValue(
+    (sceneMock.boundingBox as Mock).mockReturnValue(
       BoundingBox.create(Vector3.origin(), Vector3.origin()),
     );
 

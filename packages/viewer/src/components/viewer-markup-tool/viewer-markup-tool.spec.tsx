@@ -299,8 +299,8 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('emits markup event during editing', async () => {
-    const onMarkupBegin = jest.fn();
-    const onMarkupEnd = jest.fn();
+    const onMarkupBegin = vi.fn();
+    const onMarkupEnd = vi.fn();
 
     const page = await newSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupArrow],

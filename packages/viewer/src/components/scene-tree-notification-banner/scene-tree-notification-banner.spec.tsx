@@ -14,7 +14,7 @@ describe('<vertex-scene-tree-notification-banner>', () => {
   });
 
   it('emits an action event when the action button is clicked', async () => {
-    const onActionMock = jest.fn();
+    const onActionMock = vi.fn();
     const { banner } = await newComponentSpec({
       html: `<vertex-scene-tree-notification-banner action-label="My Action"></vertex-scene-tree-notification-banner>`,
     });

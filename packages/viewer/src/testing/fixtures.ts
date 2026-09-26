@@ -271,7 +271,7 @@ export function makeHitTester({
 }
 
 export function makeRaycaster(): RaycasterLike {
-  return { hitItems: jest.fn().mockResolvedValue({ hits: [] }) };
+  return { hitItems: vi.fn().mockResolvedValue({ hits: [] }) };
 }
 
 export function makeHitProvider({

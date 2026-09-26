@@ -1,12 +1,12 @@
 jest.mock(
   '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service',
 );
-jest.mock('./lib/dom');
-jest.mock('../scene-tree-table-layout/lib/dom');
-jest.mock('./lib/viewer-ops');
-jest.mock('../viewer/utils');
-jest.mock('../../lib/stencil');
-jest.mock('../../lib/rendering/imageLoaders');
+vi.mock('./lib/dom');
+vi.mock('../scene-tree-table-layout/lib/dom');
+vi.mock('./lib/viewer-ops');
+vi.mock('../viewer/utils');
+vi.mock('../../lib/stencil');
+vi.mock('../../lib/rendering/imageLoaders');
 
 import { grpc } from '@improbable-eng/grpc-web';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -83,7 +83,7 @@ describe('<vertex-scene-tree>', () => {
   const clientId = random.guid();
 
   // Viewer mocks
-  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getElementBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 150,
@@ -93,16 +93,16 @@ describe('<vertex-scene-tree>', () => {
   });
 
   // Scene tree mocks
-  (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(1000);
-  (getSceneTreeOffsetTop as jest.Mock).mockReturnValue(0);
-  (loadImageBytes as jest.Mock).mockResolvedValue({
+  (getSceneTreeViewportHeight as Mock).mockReturnValue(1000);
+  (getSceneTreeOffsetTop as Mock).mockReturnValue(0);
+  (loadImageBytes as Mock).mockResolvedValue({
     width: 100,
     height: 100,
     dispose: () => undefined,
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initialization', () => {
@@ -151,7 +151,7 @@ describe('<vertex-scene-tree>', () => {
       const client = mockSceneTreeClient();
       mockGetTree({ client });
 
-      const rowData = jest.fn();
+      const rowData = vi.fn();
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
@@ -478,7 +478,7 @@ describe('<vertex-scene-tree>', () => {
 
       await page.waitForChanges();
 
-      const cancelSpy = jest.spyOn(controller, 'cancel');
+      const cancelSpy = vi.spyOn(controller, 'cancel');
 
       tree.remove();
 
@@ -501,13 +501,13 @@ describe('<vertex-scene-tree>', () => {
 
       await page.waitForChanges();
 
-      const cancelSpy = jest.spyOn(controller, 'cancel');
+      const cancelSpy = vi.spyOn(controller, 'cancel');
       const treeParent = tree.parentElement;
       tree.remove();
 
       expect(cancelSpy).toHaveBeenCalled();
 
-      const connectToViewerSpy = jest.spyOn(controller, 'connectToViewer');
+      const connectToViewerSpy = vi.spyOn(controller, 'connectToViewer');
       treeParent?.appendChild(tree);
 
       expect(connectToViewerSpy).toHaveBeenCalled();
@@ -563,7 +563,7 @@ describe('<vertex-scene-tree>', () => {
       const client = mockSceneTreeClient();
       mockGetTree({ client });
 
-      const onStateChange = jest.fn();
+      const onStateChange = vi.fn();
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
       const { tree, viewer, page, waitForSceneTreeConnected } =
@@ -687,12 +687,12 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.invalidateRows, () => {
+  describe('SceneTree.prototype.invalidateRows', () => {
     it('rerenders each row', async () => {
       const client = mockSceneTreeClient();
       mockGetTree({ client });
 
-      const rowData = jest.fn();
+      const rowData = vi.fn();
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
@@ -723,7 +723,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.getRowAtIndex, () => {
+  describe('SceneTree.prototype.getRowAtIndex', () => {
     it('returns row at index', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -736,7 +736,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.getRowForItemId, () => {
+  describe('SceneTree.prototype.getRowForItemId', () => {
     it('returns row matching id', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 20);
@@ -747,7 +747,7 @@ describe('<vertex-scene-tree>', () => {
       const res = new LocateItemResponse();
       res.setLocatedIndex(index);
 
-      (client.locateItem as jest.Mock).mockImplementationOnce(
+      (client.locateItem as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(res),
       );
 
@@ -757,13 +757,13 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.getRowForEvent, () => {
+  describe('SceneTree.prototype.getRowForEvent', () => {
     it('returns row for event', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
 
       const res = mockGetTree({ client });
-      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+      (getSceneTreeContainsElement as Mock).mockReturnValue(true);
 
       const { tree, page } = await newConnectedSceneTreeSpec({
         controller,
@@ -794,7 +794,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client });
       const controller = new SceneTreeController(client, 100);
 
-      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+      (getSceneTreeContainsElement as Mock).mockReturnValue(true);
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowForEvent(
@@ -804,13 +804,13 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.getRowAtClientY, () => {
+  describe('SceneTree.prototype.getRowAtClientY', () => {
     it('returns row at vertical position', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
 
       const res = mockGetTree({ client });
-      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+      (getSceneTreeContainsElement as Mock).mockReturnValue(true);
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtClientY(30);
@@ -818,14 +818,14 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.selectFilteredItems, () => {
+  describe('SceneTree.prototype.selectFilteredItems', () => {
     it('defaults to the name for selection if no metadatakeys are defined', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
       mockGetTree({ client });
-      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+      (getSceneTreeContainsElement as Mock).mockReturnValue(true);
 
-      (selectFilterResults as jest.Mock).mockClear();
+      (selectFilterResults as Mock).mockClear();
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       await tree.selectFilteredItems('query');
@@ -845,10 +845,10 @@ describe('<vertex-scene-tree>', () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
       mockGetTree({ client });
-      (getSceneTreeContainsElement as jest.Mock).mockReturnValue(true);
+      (getSceneTreeContainsElement as Mock).mockReturnValue(true);
 
       const expectedKeys = ['key1', 'key2'];
-      (selectFilterResults as jest.Mock).mockClear();
+      (selectFilterResults as Mock).mockClear();
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       tree.metadataSearchKeys = expectedKeys;
@@ -866,13 +866,13 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.expandItem, () => {
+  describe('SceneTree.prototype.expandItem', () => {
     it('expands item if index collapsed', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
       mockGetTree({ client, transform: (node) => node.setExpanded(false) });
 
-      (client.expandNode as jest.Mock).mockImplementationOnce(
+      (client.expandNode as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(new ExpandNodeResponse()),
       );
 
@@ -892,13 +892,13 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.collapseItem, () => {
+  describe('SceneTree.prototype.collapseItem', () => {
     it('collapses item if index changed', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
 
       mockGetTree({ client, transform: (node) => node.setExpanded(true) });
-      (client.collapseNode as jest.Mock).mockImplementationOnce(
+      (client.collapseNode as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(new CollapseNodeResponse()),
       );
 
@@ -918,13 +918,13 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.toggleExpandItem, () => {
+  describe('SceneTree.prototype.toggleExpandItem', () => {
     it('collapses item if index expanded', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
 
       mockGetTree({ client, transform: (node) => node.setExpanded(true) });
-      (client.collapseNode as jest.Mock).mockImplementationOnce(
+      (client.collapseNode as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(new CollapseNodeResponse()),
       );
 
@@ -938,7 +938,7 @@ describe('<vertex-scene-tree>', () => {
       const controller = new SceneTreeController(client, 100);
 
       mockGetTree({ client, transform: (node) => node.setExpanded(false) });
-      (client.expandNode as jest.Mock).mockImplementationOnce(
+      (client.expandNode as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(new ExpandNodeResponse()),
       );
 
@@ -948,7 +948,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.toggleItemVisibility, () => {
+  describe('SceneTree.prototype.toggleItemVisibility', () => {
     it('shows item if index hidden', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -998,7 +998,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.showItem, () => {
+  describe('SceneTree.prototype.showItem', () => {
     it('shows item if row hidden', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -1034,7 +1034,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.hideItem, () => {
+  describe('SceneTree.prototype.hideItem', () => {
     it('hides item if row visible', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -1070,7 +1070,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.selectItem, () => {
+  describe('SceneTree.prototype.selectItem', () => {
     it('selects item if row deselected', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -1078,7 +1078,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client, transform: (node) => node.setSelected(false) });
 
       const res = new GetNodeAncestorsResponse();
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1095,7 +1095,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client, transform: (node) => node.setSelected(true) });
 
       const res = new GetNodeAncestorsResponse();
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1112,7 +1112,7 @@ describe('<vertex-scene-tree>', () => {
       mockGetTree({ client, transform: (node) => node.setSelected(false) });
 
       const res = new GetNodeAncestorsResponse();
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1144,7 +1144,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1152,7 +1152,7 @@ describe('<vertex-scene-tree>', () => {
       const row = await tree.getRowAtIndex(2);
       await tree.selectItem(row, { recurseParent: true });
 
-      (selectItem as jest.Mock).mockClear();
+      (selectItem as Mock).mockClear();
       await tree.selectItem(row, { recurseParent: true });
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
@@ -1178,7 +1178,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1195,7 +1195,7 @@ describe('<vertex-scene-tree>', () => {
             }
           : row;
 
-      (selectItem as jest.Mock).mockClear();
+      (selectItem as Mock).mockClear();
       await tree.selectItem(selectedRow, { recurseParent: true });
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
@@ -1222,14 +1222,14 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
       const row = await tree.getRowAtIndex(2);
 
-      (selectItem as jest.Mock).mockClear();
+      (selectItem as Mock).mockClear();
       await tree.selectItem(row, { recurseParent: true });
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
@@ -1257,7 +1257,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1265,7 +1265,7 @@ describe('<vertex-scene-tree>', () => {
       const row = await tree.getRowAtIndex(2);
       await tree.selectItem(row, { recurseParent: true });
 
-      (selectItem as jest.Mock).mockClear();
+      (selectItem as Mock).mockClear();
       await tree.selectItem(row, { recurseParent: true });
       expect(selectItem).toHaveBeenCalledWith(
         expect.anything(),
@@ -1281,7 +1281,7 @@ describe('<vertex-scene-tree>', () => {
       const locateItemResponse = new LocateItemResponse();
       locateItemResponse.setLocatedIndex(index);
 
-      (client.locateItem as jest.Mock).mockImplementation(
+      (client.locateItem as Mock).mockImplementation(
         mockGrpcUnaryResult(locateItemResponse),
       );
       const controller = new SceneTreeController(client, 100);
@@ -1300,7 +1300,7 @@ describe('<vertex-scene-tree>', () => {
 
       const res = new GetNodeAncestorsResponse();
       res.setItemsList(ancestry);
-      (client.getNodeAncestors as jest.Mock).mockImplementation(
+      (client.getNodeAncestors as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1308,7 +1308,7 @@ describe('<vertex-scene-tree>', () => {
       const row = await tree.getRowAtIndex(0);
       await tree.selectItem(row, { range: true });
 
-      (selectRangeInSceneTree as jest.Mock).mockClear();
+      (selectRangeInSceneTree as Mock).mockClear();
       const row2 = await tree.getRowAtIndex(2);
       await tree.selectItem(row2, { range: true });
 
@@ -1321,7 +1321,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.deselectItem, () => {
+  describe('SceneTree.prototype.deselectItem', () => {
     it('deselects item if row selected', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -1346,7 +1346,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.isolateItem, () => {
+  describe('SceneTree.prototype.isolateItem', () => {
     it('isolates a row', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -1360,9 +1360,9 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.scrollToIndex, () => {
+  describe('SceneTree.prototype.scrollToIndex', () => {
     beforeEach(() => {
-      (getSceneTreeViewportHeight as jest.Mock).mockReturnValue(240);
+      (getSceneTreeViewportHeight as Mock).mockReturnValue(240);
     });
 
     it('positions item at viewport start', async () => {
@@ -1411,7 +1411,7 @@ describe('<vertex-scene-tree>', () => {
     });
   });
 
-  describe(SceneTree.prototype.scrollToItem, () => {
+  describe('SceneTree.prototype.scrollToItem', () => {
     it('scrolls to the index of the item', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
@@ -1423,14 +1423,14 @@ describe('<vertex-scene-tree>', () => {
       const res = new LocateItemResponse();
       res.setLocatedIndex(index);
 
-      (client.locateItem as jest.Mock).mockImplementationOnce(
+      (client.locateItem as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(res),
       );
 
       const { page } = await newConnectedSceneTreeSpec({ controller, token });
       const tree = page.rootInstance as SceneTree;
 
-      const scrollToIndex = jest.spyOn(tree, 'scrollToIndex');
+      const scrollToIndex = vi.spyOn(tree, 'scrollToIndex');
 
       await tree.scrollToItem('item-id');
       expect(scrollToIndex).toHaveBeenCalledWith(10, expect.anything());
@@ -1448,7 +1448,7 @@ describe('<vertex-scene-tree>', () => {
       const controller = new SceneTreeController(client, 100);
 
       mockGetTree({ client });
-      (client.getAvailableColumns as jest.Mock).mockImplementation(
+      (client.getAvailableColumns as Mock).mockImplementation(
         mockGrpcUnaryResult(res),
       );
 
@@ -1462,7 +1462,7 @@ describe('<vertex-scene-tree>', () => {
     it('fetches metadata when tree is initialized', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
-      const rowData = jest.fn();
+      const rowData = vi.fn();
 
       mockGetTree({
         client,
@@ -1491,7 +1491,7 @@ describe('<vertex-scene-tree>', () => {
     it('fetches metadata when metadata keys are set', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
-      const rowData = jest.fn();
+      const rowData = vi.fn();
 
       mockGetTree({ client });
 
@@ -1537,7 +1537,7 @@ describe('<vertex-scene-tree>', () => {
     it('performs a search element when search event is emitted', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
-      const filter = jest.spyOn(controller, 'filter');
+      const filter = vi.spyOn(controller, 'filter');
 
       mockGetTree({ client });
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -1549,7 +1549,7 @@ describe('<vertex-scene-tree>', () => {
     it('performs a name-only search if no metadata search keys are specified', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
-      const filter = jest.spyOn(controller, 'filter');
+      const filter = vi.spyOn(controller, 'filter');
 
       mockGetTree({ client });
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -1566,7 +1566,7 @@ describe('<vertex-scene-tree>', () => {
     it('performs a metadata-based name search if the exact match flag is set, but no metadata search keys are specified', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
-      const filter = jest.spyOn(controller, 'filter');
+      const filter = vi.spyOn(controller, 'filter');
 
       mockGetTree({ client });
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -1584,7 +1584,7 @@ describe('<vertex-scene-tree>', () => {
     it('performs a metadata-based search using the provided search keys', async () => {
       const client = mockSceneTreeClient();
       const controller = new SceneTreeController(client, 100);
-      const filter = jest.spyOn(controller, 'filter');
+      const filter = vi.spyOn(controller, 'filter');
 
       mockGetTree({ client });
       const { tree } = await newConnectedSceneTreeSpec({ controller, token });
@@ -1606,7 +1606,7 @@ describe('<vertex-scene-tree>', () => {
     it('fires an event once when the first row has rendered', async () => {
       const client = mockSceneTreeClient();
       mockGetTree({ client });
-      const firstRowRendered = jest.fn();
+      const firstRowRendered = vi.fn();
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
@@ -1719,7 +1719,7 @@ function mockSceneTreeClient(
   subscriptionMock = new ResponseStreamMock(),
 ): SceneTreeAPIClient {
   const client = new SceneTreeAPIClient('https://example.com');
-  (client.subscribe as jest.Mock).mockReturnValue(subscriptionMock);
+  (client.subscribe as Mock).mockReturnValue(subscriptionMock);
   return client;
 }
 
@@ -1730,7 +1730,7 @@ function mockGetTree({
   transform,
 }: MockGetTreeOptions): GetTreeResponse {
   const res = createGetTreeResponse(itemCount, totalCount, transform);
-  (client.getTree as jest.Mock).mockImplementation(mockGrpcUnaryResult(res));
+  (client.getTree as Mock).mockImplementation(mockGrpcUnaryResult(res));
   return res;
 }
 
@@ -1740,9 +1740,7 @@ function mockGetTreeError(client: SceneTreeAPIClient, code: grpc.Code): void {
     message: 'Scene tree test error',
     metadata: new grpc.Metadata({}),
   };
-  (client.getTree as jest.Mock).mockImplementationOnce(
-    mockGrpcUnaryError(error),
-  );
+  (client.getTree as Mock).mockImplementationOnce(mockGrpcUnaryError(error));
 }
 
 function mockFilterTree(
@@ -1751,7 +1749,7 @@ function mockFilterTree(
   partialResults = false,
 ): void {
   const res = createFilterTreeResponse(resultCount, partialResults);
-  (client.filter as jest.Mock).mockImplementationOnce(mockGrpcUnaryResult(res));
+  (client.filter as Mock).mockImplementationOnce(mockGrpcUnaryResult(res));
 }
 
 function signJwt(viewId: string): string {

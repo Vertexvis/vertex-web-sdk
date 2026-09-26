@@ -1,6 +1,6 @@
 import Long from 'long';
 
-jest.mock('@vertexvis/stream-api');
+vi.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions, Point } from '@vertexvis/geometry';
@@ -75,7 +75,7 @@ describe(Scene, () => {
   );
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     streamApi.reset();
   });

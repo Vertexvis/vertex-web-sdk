@@ -132,7 +132,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('debounces search events', async () => {
-    const onSearch = jest.fn();
+    const onSearch = vi.fn();
 
     const page = await newSpecPage({
       components: [SceneTreeSearch],
@@ -159,7 +159,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('does not emit search events without Enter press by default', async () => {
-    const onSearch = jest.fn();
+    const onSearch = vi.fn();
 
     const page = await newSpecPage({
       components: [SceneTreeSearch],
@@ -180,7 +180,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('emits search events when Enter is pressed', async () => {
-    const onSearch = jest.fn();
+    const onSearch = vi.fn();
 
     const page = await newSpecPage({
       components: [SceneTreeSearch],
@@ -207,7 +207,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('emits search events when a blur occurs, and content has not been emitted', async () => {
-    const onSearch = jest.fn();
+    const onSearch = vi.fn();
 
     const page = await newSpecPage({
       components: [SceneTreeSearch],
@@ -234,7 +234,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('does not emit search events when a blur occurs, and content has been emitted', async () => {
-    const onSearch = jest.fn();
+    const onSearch = vi.fn();
 
     const page = await newSpecPage({
       components: [SceneTreeSearch],
@@ -265,7 +265,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('emits search event when cleared', async () => {
-    const onSearch = jest.fn();
+    const onSearch = vi.fn();
 
     const page = await newSpecPage({
       components: [SceneTreeSearch],

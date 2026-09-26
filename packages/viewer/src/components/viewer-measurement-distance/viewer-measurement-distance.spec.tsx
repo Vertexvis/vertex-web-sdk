@@ -1,7 +1,8 @@
-jest.mock('../viewer/utils');
-jest.mock('./dom');
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('../../workers/png-decoder-pool');
+import type { Mock } from '#test/mock-types';
+vi.mock('../viewer/utils');
+vi.mock('./dom');
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -66,7 +67,7 @@ describe('vertex-viewer-measurement-distance', () => {
     raycaster,
   });
 
-  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getElementBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 150,
@@ -75,12 +76,12 @@ describe('vertex-viewer-measurement-distance', () => {
     height: 150,
   });
 
-  (getMeasurementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getMeasurementBoundingClientRect as Mock).mockReturnValue({
     width: 100,
     height: 100,
   });
 
-  (loadImageBytes as jest.Mock).mockResolvedValue({
+  (loadImageBytes as Mock).mockResolvedValue({
     width: 100,
     height: 100,
     dispose: () => undefined,
@@ -411,7 +412,7 @@ describe('vertex-viewer-measurement-distance', () => {
     const viewer = page.body.querySelector(
       'vertex-viewer',
     ) as HTMLVertexViewerElement;
-    const update = jest.spyOn(stream, 'update');
+    const update = vi.spyOn(stream, 'update');
 
     await loadViewerStreamKey(key1, { stream, ws, viewer });
     await page.waitForChanges();
@@ -519,7 +520,7 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('emits editBegin event when anchor editing started', async () => {
-      const onEditBegin = jest.fn();
+      const onEditBegin = vi.fn();
 
       const page = await newSpecPage({
         components: [ViewerMeasurementDistance],

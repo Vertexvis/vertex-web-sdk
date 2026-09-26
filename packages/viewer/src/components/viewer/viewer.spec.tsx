@@ -1,7 +1,8 @@
-jest.mock('./utils');
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('../../workers/png-decoder-pool');
-jest.mock('../../lib/annotations/controller');
+import type { Mock } from '#test/mock-types';
+vi.mock('./utils');
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('../../workers/png-decoder-pool');
+vi.mock('../../lib/annotations/controller');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -32,12 +33,12 @@ import { getElementBoundingClientRect, getElementPropertyValue } from './utils';
 import { Viewer } from './viewer';
 
 describe('vertex-viewer', () => {
-  (loadImageBytes as jest.Mock).mockResolvedValue({
+  (loadImageBytes as Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
   });
-  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getElementBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 150,
@@ -53,8 +54,8 @@ describe('vertex-viewer', () => {
   const screenPos50 = { screenX: 50, screenY: 50 };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('config', () => {
@@ -111,10 +112,10 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe(Viewer.prototype.registerInteractionHandler, () => {
+  describe('Viewer.prototype.registerInteractionHandler', () => {
     const handler = {
-      dispose: jest.fn(),
-      initialize: jest.fn(),
+      dispose: vi.fn(),
+      initialize: vi.fn(),
     };
 
     it('initializes interaction handler', async () => {
@@ -143,17 +144,17 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe(Viewer.prototype.load, () => {
+  describe('Viewer.prototype.load', () => {
     it('emits connection, frame and scene events', async () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const onConnectionChange = jest.fn();
-      const onSceneReady = jest.fn();
-      const onFrameReceived = jest.fn();
-      const onFrameDrawn = jest.fn();
+      const onConnectionChange = vi.fn();
+      const onSceneReady = vi.fn();
+      const onFrameReceived = vi.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('connectionChange', onConnectionChange);
       viewer.addEventListener('sceneReady', onSceneReady);
@@ -187,7 +188,7 @@ describe('vertex-viewer', () => {
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const onSceneReady = jest.fn();
+      const onSceneReady = vi.fn();
       viewer.addEventListener('sceneReady', onSceneReady);
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
@@ -206,7 +207,7 @@ describe('vertex-viewer', () => {
     });
 
     it('loads stream with correct stream attributes', async () => {
-      (getElementPropertyValue as jest.Mock).mockReturnValue('#0000ff');
+      (getElementPropertyValue as Mock).mockReturnValue('#0000ff');
 
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
@@ -227,7 +228,7 @@ describe('vertex-viewer', () => {
         ),
       });
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       expect(update).toHaveBeenCalledWith(
@@ -250,14 +251,14 @@ describe('vertex-viewer', () => {
     });
 
     it('updates the stream with correct stream attributes', async () => {
-      (getElementPropertyValue as jest.Mock).mockReturnValue('#00ffff');
+      (getElementPropertyValue as Mock).mockReturnValue('#00ffff');
 
       /* eslint-disable @typescript-eslint/no-explicit-any */
       const mutationObserver = (global as any).MutationObserver;
       let observerFns: VoidFunction[] = [];
       (global as any).MutationObserver = class {
-        public disconnect = jest.fn();
-        public observe = jest.fn();
+        public disconnect = vi.fn();
+        public observe = vi.fn();
 
         public constructor(fn: VoidFunction) {
           observerFns = [...observerFns, fn];
@@ -284,7 +285,7 @@ describe('vertex-viewer', () => {
         ),
       });
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -314,12 +315,12 @@ describe('vertex-viewer', () => {
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const onConnectionChange = jest.fn();
-      const onSceneReady = jest.fn();
+      const onConnectionChange = vi.fn();
+      const onSceneReady = vi.fn();
       viewer.addEventListener('connectionChange', onConnectionChange);
       viewer.addEventListener('sceneReady', onSceneReady);
 
-      let loadPromiseResolve: VoidFunction = jest.fn();
+      let loadPromiseResolve: VoidFunction = vi.fn();
       const loadPromise = new Promise<void>((resolve) => {
         loadPromiseResolve = resolve;
       });
@@ -362,14 +363,14 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe(Viewer.prototype.unload, () => {
+  describe('Viewer.prototype.unload', () => {
     it('disconnects the WS', async () => {
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const close = jest.spyOn(ws, 'close');
+      const close = vi.spyOn(ws, 'close');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
       await viewer.unload();
 
@@ -459,8 +460,8 @@ describe('vertex-viewer', () => {
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const close = jest.spyOn(ws, 'close');
-      const pause = jest.spyOn(stream, 'pause');
+      const close = vi.spyOn(ws, 'close');
+      const pause = vi.spyOn(stream, 'pause');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
       viewer.remove();
 
@@ -476,8 +477,8 @@ describe('vertex-viewer', () => {
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const pause = jest.spyOn(stream, 'pause');
-      const resume = jest.spyOn(stream, 'resume');
+      const pause = vi.spyOn(stream, 'pause');
+      const resume = vi.spyOn(stream, 'resume');
       const viewerParent = viewer.parentElement;
       await loadViewerStreamKey(key1, { stream, ws, viewer });
       viewer.remove();
@@ -496,13 +497,13 @@ describe('vertex-viewer', () => {
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.depthBuffers = 'all';
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -511,10 +512,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.phantom = { opacity: 1 };
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -523,10 +524,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.featureLines = { width: 1 };
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -535,10 +536,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.featureHighlighting = { highlightColor: 0xff0000 };
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -547,10 +548,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.featureMaps = 'final';
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -559,12 +560,12 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.crossSectioning = {};
       viewer.crossSectioning.endCapEnabled = true;
       viewer.crossSectioning.endCapColor = '#112233';
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -592,7 +593,7 @@ describe('vertex-viewer', () => {
         ),
       });
 
-      const load = jest.spyOn(stream, 'load');
+      const load = vi.spyOn(stream, 'load');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
       expect(deviceId).toBe(viewer.deviceId);
@@ -606,16 +607,16 @@ describe('vertex-viewer', () => {
     });
 
     it('uses stored device id if available', async () => {
-      jest
-        .spyOn(Storage, 'getStorageEntry')
-        .mockImplementation(() => 'some-device-id');
+      vi.spyOn(Storage, 'getStorageEntry').mockImplementation(
+        () => 'some-device-id',
+      );
 
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
         template: () => <vertex-viewer clientId={clientId} stream={stream} />,
       });
 
-      const load = jest.spyOn(stream, 'load');
+      const load = vi.spyOn(stream, 'load');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
       expect(viewer.deviceId).toBe('some-device-id');
@@ -642,7 +643,7 @@ describe('vertex-viewer', () => {
         ),
       });
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       expect(update).toHaveBeenCalledWith(
@@ -666,7 +667,7 @@ describe('vertex-viewer', () => {
         ),
       });
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       expect(update).toHaveBeenCalledWith(
@@ -681,7 +682,7 @@ describe('vertex-viewer', () => {
 
   describe('interaction events', () => {
     it('emits an interaction started event on first interaction', async () => {
-      const onInteractionStarted = jest.fn();
+      const onInteractionStarted = vi.fn();
 
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
@@ -714,7 +715,7 @@ describe('vertex-viewer', () => {
       const interactionEndedPromise = new Promise<void>((resolve) => {
         interactionEndedPromiseResolve = resolve;
       });
-      const onInteractionEnded = jest.fn();
+      const onInteractionEnded = vi.fn();
 
       const { stream, ws } = makeViewerStream();
       const viewer = await newViewerSpec({
@@ -819,7 +820,7 @@ describe('vertex-viewer', () => {
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
@@ -868,7 +869,7 @@ describe('vertex-viewer', () => {
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
@@ -925,7 +926,7 @@ describe('vertex-viewer', () => {
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
-      (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+      (getElementBoundingClientRect as Mock).mockReturnValue({
         left: 0,
         top: 0,
         bottom: 150,
@@ -934,16 +935,16 @@ describe('vertex-viewer', () => {
         height: 500,
       });
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       triggerResizeObserver([
         {
           contentRect: { width: 500, height: 500 },
         },
       ]);
-      jest.advanceTimersByTime(1000);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(1000);
+      vi.useRealTimers();
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
@@ -980,7 +981,7 @@ describe('vertex-viewer', () => {
         ),
       });
 
-      const updateDimensionsSpy = jest.spyOn(stream, 'update');
+      const updateDimensionsSpy = vi.spyOn(stream, 'update');
 
       await loadViewerStreamKey(
         key1,
@@ -988,7 +989,7 @@ describe('vertex-viewer', () => {
         {
           token,
           beforeConnected: () => {
-            (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+            (getElementBoundingClientRect as Mock).mockReturnValue({
               left: 0,
               top: 0,
               bottom: 150,
@@ -997,14 +998,14 @@ describe('vertex-viewer', () => {
               height: 500,
             });
 
-            jest.useFakeTimers();
+            vi.useFakeTimers();
             triggerResizeObserver([
               {
                 contentRect: { width: 500, height: 500 },
               },
             ]);
-            jest.advanceTimersByTime(1000);
-            jest.useRealTimers();
+            vi.advanceTimersByTime(1000);
+            vi.useRealTimers();
           },
         },
       );
@@ -1034,11 +1035,11 @@ describe('vertex-viewer', () => {
 
       await Async.delay(1);
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
-      (loadImageBytes as jest.Mock).mockImplementation(async () => {
+      (loadImageBytes as Mock).mockImplementation(async () => {
         await Async.delay(5);
 
         return {
@@ -1060,7 +1061,7 @@ describe('vertex-viewer', () => {
 
       await Async.delay(1);
 
-      (loadImageBytes as jest.Mock).mockImplementation(async () => ({
+      (loadImageBytes as Mock).mockImplementation(async () => ({
         width: 200,
         height: 150,
         dispose: () => undefined,
@@ -1136,7 +1137,7 @@ describe('vertex-viewer', () => {
       });
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const connectSpy = jest.spyOn(viewer.annotations!, 'connect');
+      const connectSpy = vi.spyOn(viewer.annotations!, 'connect');
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await Async.delay(1);
@@ -1151,7 +1152,7 @@ describe('vertex-viewer', () => {
       });
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const connectSpy = jest.spyOn(viewer.annotations!, 'connect');
+      const connectSpy = vi.spyOn(viewer.annotations!, 'connect');
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await Async.delay(1);
@@ -1171,7 +1172,7 @@ describe('vertex-viewer', () => {
         ),
       });
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 

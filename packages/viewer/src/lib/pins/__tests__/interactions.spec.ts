@@ -16,15 +16,15 @@ describe('PinsInteractionHandler', () => {
   const api = new InteractionApiPerspective(
     new StreamApi(),
     new CursorManager(),
-    jest.fn(),
-    jest.fn(),
-    jest.fn(),
-    jest.fn(),
-    { emit: jest.fn() },
-    { emit: jest.fn() },
-    { emit: jest.fn() },
-    { emit: jest.fn() },
-    { emit: jest.fn() },
+    vi.fn(),
+    vi.fn(),
+    vi.fn(),
+    vi.fn(),
+    { emit: vi.fn() },
+    { emit: vi.fn() },
+    { emit: vi.fn() },
+    { emit: vi.fn() },
+    { emit: vi.fn() },
   );
 
   const pin: TextPin = {
@@ -47,7 +47,7 @@ describe('PinsInteractionHandler', () => {
     controller.setDraggable(undefined);
 
     controller.addPin(pin);
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('supports dragging pins', async () => {
@@ -70,7 +70,7 @@ describe('PinsInteractionHandler', () => {
   });
 
   it('supports switching the cursor when over geometry', async () => {
-    const addCursor = jest.spyOn(api, 'addCursor');
+    const addCursor = vi.spyOn(api, 'addCursor');
     controller.setToolMode('edit');
 
     function reset(): void {
@@ -96,14 +96,14 @@ describe('PinsInteractionHandler', () => {
   });
 
   function mockDroppableSurface(type = EntityType.GENERIC_GEOMETRY): void {
-    const getEntityTypeAtPoint = jest.spyOn(api, 'getEntityTypeAtPoint');
+    const getEntityTypeAtPoint = vi.spyOn(api, 'getEntityTypeAtPoint');
     getEntityTypeAtPoint.mockResolvedValue(type);
   }
 
   function mockGetWorldPointFromViewport(
     mockedPoint = Vector3.create(1, 2, 3),
   ): void {
-    const getWorldPointFromViewport = jest.spyOn(
+    const getWorldPointFromViewport = vi.spyOn(
       api,
       'getWorldPointFromViewport',
     );

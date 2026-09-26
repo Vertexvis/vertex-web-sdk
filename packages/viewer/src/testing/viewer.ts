@@ -42,7 +42,7 @@ export async function loadViewerStreamKey(
     beforeConnected,
   }: LoadViewerStreamKeyOptions = {},
 ): Promise<void> {
-  jest.spyOn(stream, 'startStream').mockResolvedValue(
+  vi.spyOn(stream, 'startStream').mockResolvedValue(
     StreamFixtures.Responses.startStream({
       result: {
         token: {
@@ -52,9 +52,9 @@ export async function loadViewerStreamKey(
       },
     }).response,
   );
-  jest
-    .spyOn(stream, 'syncTime')
-    .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
+  vi.spyOn(stream, 'syncTime').mockResolvedValue(
+    StreamFixtures.Responses.syncTime().response,
+  );
 
   const connecting = stream.stateChanged.onceWhen(
     (s) => s.type === 'connecting',
@@ -83,12 +83,12 @@ export async function gracefulReconnect<T = void>(
   { stream, ws }: ViewerStreamOperationCtx,
   { beforeReconnect }: GracefulReconnectOptions<T> = {},
 ): Promise<T | undefined> {
-  jest
-    .spyOn(stream, 'reconnect')
-    .mockResolvedValue(StreamFixtures.Responses.reconnect().response);
-  jest
-    .spyOn(stream, 'syncTime')
-    .mockResolvedValue(StreamFixtures.Responses.syncTime().response);
+  vi.spyOn(stream, 'reconnect').mockResolvedValue(
+    StreamFixtures.Responses.reconnect().response,
+  );
+  vi.spyOn(stream, 'syncTime').mockResolvedValue(
+    StreamFixtures.Responses.syncTime().response,
+  );
 
   const connecting = stream.stateChanged.onceWhen(
     (s) => s.type === 'reconnecting',

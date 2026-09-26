@@ -1,5 +1,5 @@
-jest.mock('./dom', () => ({
-  getMarkupBoundingClientRect: jest.fn(() => ({
+vi.mock('./dom', () => ({
+  getMarkupBoundingClientRect: vi.fn(() => ({
     width: 100,
     height: 100,
   })),
@@ -535,7 +535,7 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('selects markup when pressed and not disabled', async () => {
-      const selectionChangedListener = jest.fn();
+      const selectionChangedListener = vi.fn();
 
       const page = await newSpecPage({
         components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],

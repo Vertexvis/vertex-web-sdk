@@ -1,7 +1,7 @@
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('../../workers/png-decoder-pool');
-jest.mock('../../lib/walk-mode/dom', () => ({
-  targetIsElement: jest.fn(() => true),
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('../../workers/png-decoder-pool');
+vi.mock('../../lib/walk-mode/dom', () => ({
+  targetIsElement: vi.fn(() => true),
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,7 +23,7 @@ import { ViewerWalkModeTool } from './viewer-walk-mode-tool';
 
 describe('vertex-viewer-walk-mode-tool', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const mockHit = {
@@ -32,15 +32,15 @@ describe('vertex-viewer-walk-mode-tool', () => {
   };
 
   function mockHitInteraction(stream: ViewerStream): void {
-    jest.spyOn(stream, 'beginInteraction').mockResolvedValueOnce({
+    vi.spyOn(stream, 'beginInteraction').mockResolvedValueOnce({
       beginInteraction: {},
     });
-    jest.spyOn(stream, 'hitItems').mockResolvedValueOnce({
+    vi.spyOn(stream, 'hitItems').mockResolvedValueOnce({
       hitItems: {
         hits: [mockHit],
       },
     });
-    jest.spyOn(stream, 'endInteraction').mockResolvedValueOnce({
+    vi.spyOn(stream, 'endInteraction').mockResolvedValueOnce({
       endInteraction: {},
     });
   }
@@ -129,7 +129,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -211,7 +211,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -259,7 +259,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -340,7 +340,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'flyTo');
+    const streamSpy = vi.spyOn(stream, 'flyTo');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -390,7 +390,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -480,7 +480,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -559,7 +559,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -599,7 +599,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -644,7 +644,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });

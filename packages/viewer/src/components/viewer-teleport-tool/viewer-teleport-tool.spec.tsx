@@ -1,5 +1,5 @@
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('../../workers/png-decoder-pool');
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -24,7 +24,7 @@ import { ViewerTeleportTool } from './viewer-teleport-tool';
 
 describe('vertex-viewer-teleport-tool', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const mockHit = {
@@ -32,15 +32,15 @@ describe('vertex-viewer-teleport-tool', () => {
     hitNormal: Vector3.up(),
   };
   function mockHitInteraction(stream: ViewerStream, hit = mockHit): void {
-    jest.spyOn(stream, 'beginInteraction').mockResolvedValueOnce({
+    vi.spyOn(stream, 'beginInteraction').mockResolvedValueOnce({
       beginInteraction: {},
     });
-    jest.spyOn(stream, 'hitItems').mockResolvedValueOnce({
+    vi.spyOn(stream, 'hitItems').mockResolvedValueOnce({
       hitItems: {
         hits: [hit],
       },
     });
-    jest.spyOn(stream, 'endInteraction').mockResolvedValueOnce({
+    vi.spyOn(stream, 'endInteraction').mockResolvedValueOnce({
       endInteraction: {},
     });
   }
@@ -53,9 +53,9 @@ describe('vertex-viewer-teleport-tool', () => {
         ?.height as number,
     );
 
-    jest
-      .spyOn(viewport, 'transformPointToWorldSpace')
-      .mockReturnValue(hit.hitPoint);
+    vi.spyOn(viewport, 'transformPointToWorldSpace').mockReturnValue(
+      hit.hitPoint,
+    );
 
     viewer.viewport = viewport;
   }
@@ -75,7 +75,7 @@ describe('vertex-viewer-teleport-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -142,7 +142,7 @@ describe('vertex-viewer-teleport-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream, { ...mockHit, hitNormal: Vector3.right() });
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -207,7 +207,7 @@ describe('vertex-viewer-teleport-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream, { ...mockHit, hitNormal: Vector3.right() });
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -277,7 +277,7 @@ describe('vertex-viewer-teleport-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream, { ...mockHit, hitNormal: Vector3.right() });
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -350,7 +350,7 @@ describe('vertex-viewer-teleport-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream, { ...mockHit, hitNormal: Vector3.right() });
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -421,7 +421,7 @@ describe('vertex-viewer-teleport-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'flyTo');
+    const streamSpy = vi.spyOn(stream, 'flyTo');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -486,7 +486,7 @@ describe('vertex-viewer-teleport-tool', () => {
     });
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'flyTo');
+    const streamSpy = vi.spyOn(stream, 'flyTo');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });

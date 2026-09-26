@@ -1,4 +1,4 @@
-jest.mock('./utils');
+vi.mock('./utils');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -19,7 +19,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders empty element if node is undefined', async () => {
@@ -275,7 +275,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { toggleExpandItem: jest.fn() };
+    const tree = { toggleExpandItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -301,7 +301,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { toggleExpandItem: jest.fn() };
+    const tree = { toggleExpandItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -320,7 +320,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { toggleItemVisibility: jest.fn() };
+    const tree = { toggleItemVisibility: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -345,7 +345,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { toggleItemVisibility: jest.fn() };
+    const tree = { toggleItemVisibility: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -364,7 +364,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { isolateItem: jest.fn() };
+    const tree = { isolateItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -389,7 +389,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { isolateItem: jest.fn() };
+    const tree = { isolateItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -408,7 +408,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -428,7 +428,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -442,7 +442,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
   it('supports custom selection handling', async () => {
     const node = createNode({ selected: false });
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
 
     const { cell } = await newComponentSpec({
       template: () => (
@@ -479,7 +479,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -506,7 +506,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -530,7 +530,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -552,7 +552,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { deselectItem: jest.fn() };
+    const tree = { deselectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -574,7 +574,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { deselectItem: jest.fn() };
+    const tree = { deselectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -597,7 +597,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -618,7 +618,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     });
 
     const hoverController = new SceneTreeCellHoverController();
-    const hovered = jest.fn();
+    const hovered = vi.fn();
     const disposable = hoverController.stateChanged(hovered);
     cell.hoverController = hoverController;
 
@@ -639,7 +639,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     });
 
     const hoverController = new SceneTreeCellHoverController();
-    const hovered = jest.fn();
+    const hovered = vi.fn();
     const disposable = hoverController.stateChanged(hovered);
     cell.hoverController = hoverController;
 

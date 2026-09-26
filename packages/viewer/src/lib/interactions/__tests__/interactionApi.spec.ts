@@ -1,5 +1,6 @@
-jest.mock('@vertexvis/stream-api');
-jest.mock('../../../workers/png-decoder-pool');
+import type { Mock } from '#test/mock-types';
+vi.mock('@vertexvis/stream-api');
+vi.mock('../../../workers/png-decoder-pool');
 
 import { EventEmitter } from '@stencil/core';
 import { Angle, Dimensions, Point, Vector3 } from '@vertexvis/geometry';
@@ -26,11 +27,11 @@ import { InteractionApiPerspective } from '../interactionApiPerspective';
 import { TapEventDetails } from '../tapEventDetails';
 
 describe(InteractionApi, () => {
-  const emitTap = jest.fn();
-  const emitDoubleTap = jest.fn();
-  const emitLongPress = jest.fn();
-  const emitInteractionStarted = jest.fn();
-  const emitInteractionFinished = jest.fn();
+  const emitTap = vi.fn();
+  const emitDoubleTap = vi.fn();
+  const emitLongPress = vi.fn();
+  const emitInteractionStarted = vi.fn();
+  const emitInteractionFinished = vi.fn();
   const streamApi = new StreamApi();
   const sceneId = random.guid();
   const sceneViewId = random.guid();
@@ -74,8 +75,8 @@ describe(InteractionApi, () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
 
     api = createInteractionApi();
   });
@@ -126,7 +127,7 @@ describe(InteractionApi, () => {
 
   describe(InteractionApi.prototype.viewAll, () => {
     it('replaces the camera', async () => {
-      (streamApi.flyTo as jest.Mock).mockResolvedValueOnce({
+      (streamApi.flyTo as Mock).mockResolvedValueOnce({
         flyTo: {},
       });
       await api.viewAll();
@@ -198,9 +199,8 @@ describe(InteractionApi, () => {
       }
       await configuredApi.endInteraction();
 
-      const lastCall: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+      const lastCall: PerspectiveFrameCamera = (streamApi.replaceCamera as Mock)
+        .mock.lastCall![0].camera.perspective;
 
       expect(lastCall.position.z).toBeCloseTo(0);
     });
@@ -212,9 +212,8 @@ describe(InteractionApi, () => {
       }
       await api.endInteraction();
 
-      const lastCall: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+      const lastCall: PerspectiveFrameCamera = (streamApi.replaceCamera as Mock)
+        .mock.lastCall![0].camera.perspective;
 
       expect(lastCall.position.z).not.toBeCloseTo(0);
     });

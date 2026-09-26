@@ -1,5 +1,5 @@
-jest.mock('../../lib/stencil', () => ({
-  readDOM: jest.fn((fn) => fn()),
+vi.mock('../../lib/stencil', () => ({
+  readDOM: vi.fn((fn) => fn()),
 }));
 
 const mockGetComputedStyle = jest.fn(() => ({
@@ -427,7 +427,7 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     mockGetComputedStyle.mockReturnValue({
-      getPropertyValue: jest.fn((property: string): string => {
+      getPropertyValue: vi.fn((property: string): string => {
         const values: Record<string, string> = {
           height: '48px',
           borderWidth: '2px',

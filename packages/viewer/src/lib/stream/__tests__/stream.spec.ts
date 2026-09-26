@@ -34,12 +34,12 @@ describe(ViewerStream, () => {
     it('starts stream if in disconnected state', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
       const connecting = stream.stateChanged.onceWhen(
         (s) => s.type === 'connecting' && s.resource.resource.id === '123',
@@ -58,12 +58,12 @@ describe(ViewerStream, () => {
     it('starts stream if in connected state and stream key different', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
@@ -72,7 +72,7 @@ describe(ViewerStream, () => {
       await simulateFrame(ws);
       await expect(connected123).resolves.toBeDefined();
 
-      const closeWs = jest.spyOn(ws, 'close');
+      const closeWs = vi.spyOn(ws, 'close');
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234',
       );
@@ -86,15 +86,15 @@ describe(ViewerStream, () => {
     it('uses existing websocket if changing scene view state', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      jest
-        .spyOn(stream, 'loadSceneViewState')
-        .mockResolvedValue(Fixtures.Responses.loadSceneViewState().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      vi.spyOn(stream, 'loadSceneViewState').mockResolvedValue(
+        Fixtures.Responses.loadSceneViewState().response,
+      );
 
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
@@ -103,7 +103,7 @@ describe(ViewerStream, () => {
       await simulateFrame(ws);
       await expect(connected123).resolves.toBeDefined();
 
-      const closeWs = jest.spyOn(ws, 'close');
+      const closeWs = vi.spyOn(ws, 'close');
       const connectedSvs = stream.stateChanged.onceWhen(
         (s) =>
           s.type === 'connected' &&
@@ -119,14 +119,14 @@ describe(ViewerStream, () => {
     it('opens new websocket if connecting and urn changes', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const closeWs = jest.spyOn(ws, 'close');
+      const closeWs = vi.spyOn(ws, 'close');
       const connected234 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '234',
       );
@@ -142,14 +142,14 @@ describe(ViewerStream, () => {
     it('opens new websocket if reconnecting and urn changes', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const closeWs = jest.spyOn(ws, 'close');
+      const closeWs = vi.spyOn(ws, 'close');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -172,14 +172,14 @@ describe(ViewerStream, () => {
     it('connects with device id', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const connect = jest.spyOn(stream, 'connect');
+      const connect = vi.spyOn(stream, 'connect');
       const connecting = stream.stateChanged.onceWhen(
         (s) => s.type === 'connecting' && s.resource.resource.id === '123',
       );
@@ -200,12 +200,12 @@ describe(ViewerStream, () => {
     it('sets connection-failed state if connection fails', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const connect = jest.spyOn(ws, 'connect');
-      const startStream = jest.spyOn(stream, 'startStream');
+      const connect = vi.spyOn(ws, 'connect');
+      const startStream = vi.spyOn(stream, 'startStream');
 
       let failure = stream.stateChanged.onceWhen(
         (s) => s.type === 'connection-failed',
@@ -235,12 +235,12 @@ describe(ViewerStream, () => {
     it('always requests at least a 1x1 image', async () => {
       const { stream, ws } = makeStreamBase();
 
-      const startSpy = jest
+      const startSpy = vi
         .spyOn(stream, 'startStream')
         .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
       const connecting = stream.stateChanged.onceWhen(
         (s) => s.type === 'connecting' && s.resource.resource.id === '123',
@@ -270,17 +270,17 @@ describe(ViewerStream, () => {
     it('reconnects websocket if requested', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      jest
-        .spyOn(stream, 'reconnect')
-        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      vi.spyOn(stream, 'reconnect').mockResolvedValue(
+        Fixtures.Responses.reconnect().response,
+      );
 
-      const closeWs = jest.spyOn(ws, 'close');
+      const closeWs = vi.spyOn(ws, 'close');
 
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
@@ -301,15 +301,15 @@ describe(ViewerStream, () => {
     it('reconnects websocket if websocket disconnected', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      jest
-        .spyOn(stream, 'reconnect')
-        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      vi.spyOn(stream, 'reconnect').mockResolvedValue(
+        Fixtures.Responses.reconnect().response,
+      );
 
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
@@ -333,15 +333,15 @@ describe(ViewerStream, () => {
     it('attempts reconnect after host goes offline', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      jest
-        .spyOn(stream, 'reconnect')
-        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      vi.spyOn(stream, 'reconnect').mockResolvedValue(
+        Fixtures.Responses.reconnect().response,
+      );
 
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
@@ -362,15 +362,15 @@ describe(ViewerStream, () => {
     it('does not attempt reconnect if host toggles between offline/online within threshold', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      jest
-        .spyOn(stream, 'reconnect')
-        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      vi.spyOn(stream, 'reconnect').mockResolvedValue(
+        Fixtures.Responses.reconnect().response,
+      );
 
       const connected = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
@@ -398,17 +398,17 @@ describe(ViewerStream, () => {
     it('always requests at least a 1x1 image', async () => {
       const { stream, ws } = makeStreamBase();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      const reconnectSpy = jest
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      const reconnectSpy = vi
         .spyOn(stream, 'reconnect')
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 
-      const closeWs = jest.spyOn(ws, 'close');
+      const closeWs = vi.spyOn(ws, 'close');
 
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
@@ -440,21 +440,21 @@ describe(ViewerStream, () => {
     it('refreshes token when about to expire', async () => {
       const { stream, ws } = makeStream();
 
-      jest.spyOn(stream, 'startStream').mockResolvedValue(
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
         Fixtures.Responses.startStream({
           result: {
             token: { token: random.string(), expiresIn: expiryInMs / 1000 },
           },
         }).response,
       );
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      jest
-        .spyOn(stream, 'reconnect')
-        .mockResolvedValue(Fixtures.Responses.reconnect().response);
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      vi.spyOn(stream, 'reconnect').mockResolvedValue(
+        Fixtures.Responses.reconnect().response,
+      );
 
-      const refreshToken = jest.spyOn(stream, 'refreshToken');
+      const refreshToken = vi.spyOn(stream, 'refreshToken');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -471,14 +471,14 @@ describe(ViewerStream, () => {
     it('updates stream attributes if defined', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const updateStream = jest.spyOn(stream, 'updateStream');
+      const updateStream = vi.spyOn(stream, 'updateStream');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -496,14 +496,14 @@ describe(ViewerStream, () => {
     it('does not update stream attributes if equal', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const updateStream = jest.spyOn(stream, 'updateStream');
+      const updateStream = vi.spyOn(stream, 'updateStream');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -522,14 +522,14 @@ describe(ViewerStream, () => {
     it('updates dimensions if defined', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const updateDimensions = vi.spyOn(stream, 'updateDimensions');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -552,18 +552,18 @@ describe(ViewerStream, () => {
     it('updates dimensions and resolution if defined', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
       Object.defineProperty(window, 'devicePixelRatio', {
         value: 3,
       });
 
-      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const updateDimensions = vi.spyOn(stream, 'updateDimensions');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -586,14 +586,14 @@ describe(ViewerStream, () => {
     it('does not update dimensions if equal', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const updateDimensions = vi.spyOn(stream, 'updateDimensions');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -612,14 +612,14 @@ describe(ViewerStream, () => {
     it('always request at least a 1x1 image', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const updateDimensions = jest.spyOn(stream, 'updateDimensions');
+      const updateDimensions = vi.spyOn(stream, 'updateDimensions');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -647,14 +647,14 @@ describe(ViewerStream, () => {
     it('closes an open connection and captures state', async () => {
       const { stream, ws } = makeStream();
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
 
-      const close = jest.spyOn(ws, 'close');
+      const close = vi.spyOn(ws, 'close');
       const connected123 = stream.stateChanged.onceWhen(
         (s) => s.type === 'connected' && s.resource.resource.id === '123',
       );
@@ -675,13 +675,13 @@ describe(ViewerStream, () => {
         streamAttributes: { featureLines: { width: 1, color: '#ff0000' } },
       };
 
-      jest
-        .spyOn(stream, 'startStream')
-        .mockResolvedValue(Fixtures.Responses.startStream().response);
-      jest
-        .spyOn(stream, 'syncTime')
-        .mockResolvedValue(Fixtures.Responses.syncTime().response);
-      const reconnectSpy = jest
+      vi.spyOn(stream, 'startStream').mockResolvedValue(
+        Fixtures.Responses.startStream().response,
+      );
+      vi.spyOn(stream, 'syncTime').mockResolvedValue(
+        Fixtures.Responses.syncTime().response,
+      );
+      const reconnectSpy = vi
         .spyOn(stream, 'reconnect')
         .mockResolvedValue(Fixtures.Responses.reconnect().response);
 

@@ -1,10 +1,12 @@
+import type { Mock } from '#test/mock-types';
+
 import { boxQueryCursor } from '../../cursors';
 import { InteractionApi } from '../../interactions';
 import { VolumeIntersectionQueryController } from '../controller';
 import { VolumeIntersectionQueryInteractionHandler } from '../interactions';
 import { VolumeIntersectionQueryModel } from '../model';
 
-const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
+const InteractionApiMock = InteractionApi as Mock<InteractionApi>;
 
 describe('VolumeIntersectionInteractionHandler', () => {
   it('disposes of resources properly', async () => {
@@ -15,10 +17,10 @@ describe('VolumeIntersectionInteractionHandler', () => {
 
     const mockApi = new InteractionApiMock();
 
-    const addEventListenerSpy = jest.spyOn(viewer, 'addEventListener');
-    const removeEventListenerSpy = jest.spyOn(viewer, 'removeEventListener');
-    const dispose = jest.fn();
-    mockApi.addCursor = jest.fn(() => ({ dispose }));
+    const addEventListenerSpy = vi.spyOn(viewer, 'addEventListener');
+    const removeEventListenerSpy = vi.spyOn(viewer, 'removeEventListener');
+    const dispose = vi.fn();
+    mockApi.addCursor = vi.fn(() => ({ dispose }));
 
     handler.initialize(viewer, mockApi);
 

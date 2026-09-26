@@ -171,7 +171,7 @@ describe(TransformWidget, () => {
   smallCanvas.height = 700;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('begins drawing when a position and frame are provided', async () => {
@@ -414,7 +414,7 @@ describe(TransformWidget, () => {
     const frame = makePerspectiveFrame();
     const positionTransform = Matrix4.makeTranslation(Vector3.create(1, 1, 1));
     const meshes = createMeshes(positionTransform, frame, canvas);
-    const hoveredListener = jest.fn();
+    const hoveredListener = vi.fn();
 
     (testDrawable as jest.Mock).mockImplementation(
       (m) => m.identifier === 'x-translate',
