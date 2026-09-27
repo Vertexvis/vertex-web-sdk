@@ -28,6 +28,7 @@ import { ViewerHitResultIndicator } from './viewer-hit-result-indicator';
 
 describe('<vertex-viewer-hit-result-indicator>', () => {
   const mockIndicator = new HitIndicator(document.createElement('canvas'));
+  HitIndicator.prototype.dispose = vi.fn();
 
   (loadImageBytes as Mock).mockResolvedValue({
     width: 200,

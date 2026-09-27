@@ -573,7 +573,7 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
       expect(el.selectedMarkupId).toBeUndefined();
       expect(selectionChangedListener).toHaveBeenCalledWith(
-        expect.objectContaining({ detail: undefined }),
+        expect.objectContaining({ detail: null }),
       );
 
       // Should select, markup has ID

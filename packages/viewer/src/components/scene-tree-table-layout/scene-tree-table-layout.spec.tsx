@@ -265,7 +265,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
 
     table
       .querySelector('div.templated-divider-div')
@@ -279,7 +279,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  110px 1fr');
+    ).toContain('grid-template-columns: 110px 1fr');
   });
 
   it('constrains column resizing minimums', async () => {
@@ -311,7 +311,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
 
     table
       .querySelector('div.templated-divider-div')
@@ -325,7 +325,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
 
     table
       .querySelector('div.templated-divider-div')
@@ -339,7 +339,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
   });
 
   it('constrains column resizing minimums', async () => {
@@ -371,7 +371,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
 
     table
       .querySelector('div.templated-divider-div')
@@ -385,7 +385,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
 
     table
       .querySelector('div.templated-divider-div')
@@ -399,7 +399,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
   });
 
   it('emits events on column resize', async () => {
@@ -436,7 +436,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  100px 1fr');
+    ).toContain('grid-template-columns: 100px 1fr');
 
     table.addEventListener('columnsResized', resizeListener);
 
@@ -452,7 +452,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  110px 1fr');
+    ).toContain('grid-template-columns: 110px 1fr');
     expect(resizeDetail).toHaveLength(2);
     expect(resizeDetail[0]).toBeCloseTo(110);
     expect(resizeDetail[1]).toBeCloseTo(90);
@@ -487,7 +487,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  150px 1fr');
+    ).toContain('grid-template-columns: 150px 1fr');
   });
 
   it('initializes with widths adjusted up', async () => {
@@ -519,7 +519,7 @@ describe('<vertex-scene-tree-table-layout>', () => {
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
-    ).toContain('grid-template-columns:  150px 1fr');
+    ).toContain('grid-template-columns: 150px 1fr');
   });
 
   it('debounces isScrolling updates for the cells', async () => {
