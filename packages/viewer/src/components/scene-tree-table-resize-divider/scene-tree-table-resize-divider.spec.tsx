@@ -1,29 +1,13 @@
-import {
-  type RenderSpecPage as SpecPage,
-  renderSpecPage,
-} from '#test/render-spec-page';
-
-import { SceneTreeTableResizeDivider } from './scene-tree-table-resize-divider';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h, render } from '@stencil/vitest';
 
 describe('<vertex-scene-tree-table-resize-divider>', () => {
-  it('renders', async () => {
-    const { divider } = await newComponentSpec({
-      html: `
-        <vertex-scene-tree-table-resize-divider>
-        </vertex-scene-tree-table-resize-divider>
-      `,
-    });
-
+  it('renders and applies dragging styles', async () => {
+    const { root, waitForChanges } = await render(
+      <vertex-scene-tree-table-resize-divider></vertex-scene-tree-table-resize-divider>,
+    );
+    const divider = root as HTMLVertexSceneTreeTableResizeDividerElement;
     expect(divider.shadowRoot?.querySelector('div.divider')).not.toBeNull();
-  });
-
-  it('applies dragging styles', async () => {
-    const { page, divider } = await newComponentSpec({
-      html: `
-        <vertex-scene-tree-table-resize-divider>
-        </vertex-scene-tree-table-resize-divider>
-      `,
-    });
 
     expect(divider.getAttribute('style')).toContain(
       'height: var(--header-height)',
@@ -34,16 +18,16 @@ describe('<vertex-scene-tree-table-resize-divider>', () => {
 
     divider.dispatchEvent(new MouseEvent('pointerdown'));
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(divider.getAttribute('style')).toContain('height: 100%');
     expect(divider.getAttribute('style')).toContain(
-      'padding: 0 calc(var(--scene-tree-table-column-gap) / 2)',
+      'padding: 0px calc(var(--scene-tree-table-column-gap) / 2)',
     );
 
     window.dispatchEvent(new MouseEvent('pointerup'));
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(divider.getAttribute('style')).toContain(
       'height: var(--header-height)',
@@ -53,16 +37,3 @@ describe('<vertex-scene-tree-table-resize-divider>', () => {
     );
   });
 });
-
-async function newComponentSpec(data: { html: string }): Promise<{
-  page: SpecPage;
-  divider: HTMLVertexSceneTreeTableResizeDividerElement;
-}> {
-  const page = await renderSpecPage({
-    components: [SceneTreeTableResizeDivider],
-    html: data.html,
-  });
-  const divider = page.root as HTMLVertexSceneTreeTableResizeDividerElement;
-
-  return { page, divider };
-}

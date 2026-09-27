@@ -2,8 +2,6 @@
 import { describe, expect, h, it, render } from '@stencil/vitest';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
 
-import { renderSpecPage } from '#test/render-spec-page';
-
 import { PinController } from '../../lib/pins/controller';
 import { PinModel, TextPin } from '../../lib/pins/model';
 import { triggerResizeObserver } from '../../testing/resizeObserver';
@@ -253,15 +251,13 @@ describe('vertex-viewer-pin-label', () => {
     };
     pinController.addPin(pin);
 
-    const page = await renderSpecPage({
-      template: () => (
-        <vertex-viewer-pin-label
-          elementBounds={dimensions as DOMRect}
-          pin={pin}
-          pinController={pinController}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-label
+        elementBounds={dimensions as DOMRect}
+        pin={pin}
+        pinController={pinController}
+      />,
+    );
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
     const label = el.querySelector(
@@ -318,15 +314,13 @@ describe('vertex-viewer-pin-label', () => {
     };
     pinController.addPin(pin);
 
-    const page = await renderSpecPage({
-      template: () => (
-        <vertex-viewer-pin-label
-          elementBounds={dimensions as DOMRect}
-          pin={pin}
-          pinController={pinController}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-label
+        elementBounds={dimensions as DOMRect}
+        pin={pin}
+        pinController={pinController}
+      />,
+    );
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
     const label = el.querySelector(
@@ -376,15 +370,13 @@ describe('vertex-viewer-pin-label', () => {
     };
     pinController.addPin(pin);
 
-    const page = await renderSpecPage({
-      template: () => (
-        <vertex-viewer-pin-label
-          elementBounds={dimensions as DOMRect}
-          pin={pin}
-          pinController={pinController}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-label
+        elementBounds={dimensions as DOMRect}
+        pin={pin}
+        pinController={pinController}
+      />,
+    );
 
     const el = page.root as HTMLVertexViewerPinLabelElement;
     const label = el.querySelector(

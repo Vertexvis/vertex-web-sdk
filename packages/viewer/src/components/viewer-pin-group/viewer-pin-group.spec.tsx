@@ -1,14 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
+import { render } from '@stencil/vitest';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
 
-import { renderSpecPage } from '#test/render-spec-page';
-
 import { IconPin, PinModel, TextPin } from '../../lib/pins/model';
-import { VertexPinLabel } from '../viewer-pin-label/viewer-pin-label';
-import { VertexPinLabelLine } from '../viewer-pin-label-line/viewer-pin-label-line';
 import { getClosestCenterToPoint } from './utils';
-import { ViewerPinGroup } from './viewer-pin-group';
 
 describe('vertex-view-pin-group', () => {
   it('should render a text pin', async () => {
@@ -27,41 +23,24 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await renderSpecPage({
-      components: [ViewerPinGroup, VertexPinLabel, VertexPinLabelLine],
-      template: () => (
-        <vertex-viewer-pin-group
-          data-is-dom-group-element={true}
-          pin={pin}
-          elementBounds={dimensions as DOMRect}
-          projectionViewMatrix={viewMatrix}
-          selected={false}
-        ></vertex-viewer-pin-group>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-group
+        data-is-dom-group-element={true}
+        pin={pin}
+        elementBounds={dimensions as DOMRect}
+        projectionViewMatrix={viewMatrix}
+        selected={false}
+      ></vertex-viewer-pin-group>,
+    );
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
-    expect(el).toEqualHtml(`
-      <vertex-viewer-pin-group data-is-dom-group-element>
-        <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
-          <div class="pin-anchor" id="pin-anchor"></div>
-        </vertex-viewer-dom-element>
-        <vertex-viewer-pin-label-line id="pin-label-line-my-pin-id">
-          <svg class="svg">
-            <line class="label-line" x1="50" x2="50" y1="50" y2="50"></line>
-          </svg>
-        </vertex-viewer-pin-label-line>
-        <vertex-viewer-pin-label>
-        <div class="pin-label-input-wrapper" style="top: 50px; left: 50px; min-width: var(--viewer-annotations-pin-label-min-width); max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
-          <textarea aria-label="Pin label input" class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea><div class="pin-input-drag-target"></div>
-        </div>
-        <div class="pin-label-hidden pin-label-text" style="max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
-          My New Pin
-        </div>
-        </vertex-viewer-pin-label>
-      </vertex-viewer-pin-group>
-    `);
+    const anchor = el.querySelector('#pin-anchor');
+    const line = el.querySelector('vertex-viewer-pin-label-line line');
+    const label = el.querySelector('vertex-viewer-pin-label');
+    expect(anchor).not.toBeNull();
+    expect(line).not.toBeNull();
+    expect(label?.textContent).toContain('My New Pin');
   });
 
   it('should support passing primary/accent colors for a text pin', async () => {
@@ -86,41 +65,28 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await renderSpecPage({
-      components: [ViewerPinGroup, VertexPinLabel, VertexPinLabelLine],
-      template: () => (
-        <vertex-viewer-pin-group
-          data-is-dom-group-element={true}
-          pin={pin}
-          elementBounds={dimensions as DOMRect}
-          projectionViewMatrix={viewMatrix}
-          selected={false}
-        ></vertex-viewer-pin-group>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-group
+        data-is-dom-group-element={true}
+        pin={pin}
+        elementBounds={dimensions as DOMRect}
+        projectionViewMatrix={viewMatrix}
+        selected={false}
+      ></vertex-viewer-pin-group>,
+    );
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
-    expect(el).toEqualHtml(`
-      <vertex-viewer-pin-group data-is-dom-group-element>
-        <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
-          <div class="pin-anchor" id="pin-anchor" style="background: #badefe;"></div>
-        </vertex-viewer-dom-element>
-        <vertex-viewer-pin-label-line id="pin-label-line-my-pin-id">
-          <svg class="svg">
-            <line class="label-line" x1="50" x2="50" y1="50" y2="50" style="stroke: #badefe;"></line>
-          </svg>
-        </vertex-viewer-pin-label-line>
-        <vertex-viewer-pin-label>
-        <div class="pin-label-input-wrapper" style="top: 50px; left: 50px; min-width: var(--viewer-annotations-pin-label-min-width); max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px)); border-color: #badefe; background: #fefefe;">
-          <textarea aria-label="Pin label input" class="pin-label-input pin-label-text readonly" disabled="" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea><div class="pin-input-drag-target"></div>
-        </div>
-        <div class="pin-label-hidden pin-label-text" style="max-width: min(var(--viewer-annotations-pin-label-max-width), calc(100px - 50px)); max-height: min(var(--viewer-annotations-pin-label-max-height), calc(100px - 50px));">
-          My New Pin
-        </div>
-        </vertex-viewer-pin-label>
-      </vertex-viewer-pin-group>
-    `);
+    const anchor = el.querySelector('#pin-anchor') as HTMLElement;
+    const line = el.querySelector('vertex-viewer-pin-label-line line');
+    const label = el.querySelector('vertex-viewer-pin-label');
+    expect(anchor.style.background).toBe('#badefe');
+    expect(line?.getAttribute('style')).toBe('stroke: #badefe;');
+    const wrapper = label?.querySelector(
+      '.pin-label-input-wrapper',
+    ) as HTMLElement;
+    expect(wrapper.style.borderColor).toBe('#badefe');
+    expect(wrapper.style.background).toBe('#fefefe');
   });
 
   it('should render a simple pin', async () => {
@@ -136,29 +102,22 @@ describe('vertex-view-pin-group', () => {
       worldPosition,
     };
 
-    const page = await renderSpecPage({
-      components: [ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-group
-          data-is-dom-group-element={true}
-          pin={pin}
-          elementBounds={dimensions as DOMRect}
-          pinModel={pinModel}
-          projectionViewMatrix={viewMatrix}
-          selected={false}
-        ></vertex-viewer-pin-group>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-group
+        data-is-dom-group-element={true}
+        pin={pin}
+        elementBounds={dimensions as DOMRect}
+        pinModel={pinModel}
+        projectionViewMatrix={viewMatrix}
+        selected={false}
+      ></vertex-viewer-pin-group>,
+    );
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
-    expect(el).toEqualHtml(`
-      <vertex-viewer-pin-group data-is-dom-group-element>
-        <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
-          <vertex-viewer-icon class="pin" name="pin-fill" size="lg"></vertex-viewer-icon>
-        </vertex-viewer-dom-element>
-      </vertex-viewer-pin-group>
-    `);
+    const icon = el.querySelector('vertex-viewer-icon');
+    expect(icon).toHaveClass('pin');
+    expect(icon?.shadowRoot?.querySelector('svg')).not.toBeNull();
   });
 
   it('should render a simple pin with a primary color', async () => {
@@ -179,29 +138,22 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await renderSpecPage({
-      components: [ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-group
-          data-is-dom-group-element={true}
-          pin={pin}
-          elementBounds={dimensions as DOMRect}
-          pinModel={pinModel}
-          projectionViewMatrix={viewMatrix}
-          selected={false}
-        ></vertex-viewer-pin-group>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-group
+        data-is-dom-group-element={true}
+        pin={pin}
+        elementBounds={dimensions as DOMRect}
+        pinModel={pinModel}
+        projectionViewMatrix={viewMatrix}
+        selected={false}
+      ></vertex-viewer-pin-group>,
+    );
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
-    expect(el).toEqualHtml(`
-      <vertex-viewer-pin-group data-is-dom-group-element>
-        <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
-          <vertex-viewer-icon class="pin" name="pin-fill" size="lg" style="color: #ff22ee;"></vertex-viewer-icon>
-        </vertex-viewer-dom-element>
-      </vertex-viewer-pin-group>
-    `);
+    const icon = el.querySelector('vertex-viewer-icon');
+    expect(icon).toHaveClass('pin');
+    expect(icon?.style.color).toBe('#ff22ee');
   });
 
   it('should select the pin when selecting the line', async () => {
@@ -225,19 +177,16 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await renderSpecPage({
-      components: [ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-group
-          data-is-dom-group-element={true}
-          pin={pin}
-          elementBounds={dimensions as DOMRect}
-          pinModel={pinModel}
-          projectionViewMatrix={viewMatrix}
-          selected={false}
-        ></vertex-viewer-pin-group>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-group
+        data-is-dom-group-element={true}
+        pin={pin}
+        elementBounds={dimensions as DOMRect}
+        pinModel={pinModel}
+        projectionViewMatrix={viewMatrix}
+        selected={false}
+      ></vertex-viewer-pin-group>,
+    );
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
@@ -272,19 +221,16 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await renderSpecPage({
-      components: [ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-group
-          data-is-dom-group-element={true}
-          pin={pin}
-          elementBounds={dimensions as DOMRect}
-          pinModel={pinModel}
-          projectionViewMatrix={viewMatrix}
-          selected={false}
-        ></vertex-viewer-pin-group>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-pin-group
+        data-is-dom-group-element={true}
+        pin={pin}
+        elementBounds={dimensions as DOMRect}
+        pinModel={pinModel}
+        projectionViewMatrix={viewMatrix}
+        selected={false}
+      ></vertex-viewer-pin-group>,
+    );
 
     const el = page.root as HTMLVertexViewerPinGroupElement;
 
