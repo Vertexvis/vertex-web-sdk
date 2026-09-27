@@ -222,6 +222,6 @@ describe(generateBindings, () => {
     expect(data.click).toHaveBeenCalled();
     expect(data.clickMe).toHaveBeenCalled();
     expect(input1.value).toBe('foo');
-    expect(input2.formAction).toBe('foo');
+    expect(input2.getAttribute('formaction')).toBe('foo');
   });
 });

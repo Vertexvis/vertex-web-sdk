@@ -12,7 +12,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: 'happy-dom',
     include: ['src/**/*.{spec,test}.{ts,tsx}'],
     setupFiles: ['../../vitest.setup.console.ts'],
     maxWorkers: 2,

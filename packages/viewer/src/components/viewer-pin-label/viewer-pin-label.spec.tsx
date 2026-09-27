@@ -1,24 +1,3 @@
-vi.mock('../../lib/stencil', () => ({
-  readDOM: vi.fn((fn) => fn()),
-}));
-
-const mockGetComputedStyle = vi.hoisted(() =>
-  vi.fn(() => ({
-    getPropertyValue: vi.fn((property: string): string => {
-      const values: Record<string, string> = {
-        height: '10px',
-        borderWidth: '1px',
-        lineHeight: '1px',
-      };
-
-      return values[property];
-    }),
-  })),
-);
-vi.mock('./utils', () => ({
-  getComputedStyle: mockGetComputedStyle,
-}));
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { describe, expect, h, it, render } from '@stencil/vitest';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
@@ -28,7 +7,6 @@ import { renderSpecPage } from '#test/render-spec-page';
 import { PinController } from '../../lib/pins/controller';
 import { PinModel, TextPin } from '../../lib/pins/model';
 import { triggerResizeObserver } from '../../testing/resizeObserver';
-import { VertexPinLabel } from './viewer-pin-label';
 
 describe('vertex-viewer-pin-label', () => {
   function clickLabel(label: HTMLDivElement): void {
@@ -79,9 +57,7 @@ describe('vertex-viewer-pin-label', () => {
         pin={pin}
         pinController={pinController}
       />,
-      { waitForReady: false },
     );
-    await waitForChanges();
 
     const label = root.querySelector(
       '.pin-label-input-wrapper',
@@ -134,9 +110,7 @@ describe('vertex-viewer-pin-label', () => {
         pin={pin}
         pinController={pinController}
       />,
-      { waitForReady: false },
     );
-    await waitForChanges();
 
     const label = root.querySelector(
       '.pin-label-input-wrapper',
@@ -146,17 +120,14 @@ describe('vertex-viewer-pin-label', () => {
     ) as HTMLTextAreaElement;
 
     expect(input).toHaveClass('pin-label-input');
-    // expect(input).toEqualHtml(`
-    //   <textarea aria-label="Pin label input" class="pin-label-input pin-label-text readonly" disabled id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
-    // `);
     expect(input).toEqualAttributes({
       'aria-label': 'Pin label input',
       class: 'pin-label-input pin-label-text readonly',
       disabled: '',
       id: `pin-label-input-${pin.id}`,
       rows: '1',
-      value: 'My New Pin',
     });
+    expect(input.value).toBe('My New Pin');
 
     const originalPin = pinModel.getPinById(pin.id) as TextPin;
     expect(originalPin.label.point).toEqual({ x: 0, y: 0 });
@@ -164,16 +135,13 @@ describe('vertex-viewer-pin-label', () => {
 
     await waitForChanges();
 
-    // expect(input).toEqualHtml(`
-    //   <textarea aria-label="Pin label input" class="pin-label-input pin-label-text" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
-    // `);
     expect(input).toEqualAttributes({
       'aria-label': 'Pin label input',
       class: 'pin-label-input pin-label-text',
       id: `pin-label-input-${pin.id}`,
       rows: '1',
-      value: 'My New Pin',
     });
+    expect(input.value).toBe('My New Pin');
 
     input.value = 'Updated Text';
     input.dispatchEvent(new Event('input'));
@@ -214,11 +182,7 @@ describe('vertex-viewer-pin-label', () => {
         pin={pin}
         pinController={pinController}
       />,
-      { waitForReady: false },
     );
-    await waitForChanges();
-
-    // const el = page.root as HTMLVertexViewerPinLabelLineElement;
 
     const label = root.querySelector(
       '.pin-label-input-wrapper',
@@ -227,17 +191,14 @@ describe('vertex-viewer-pin-label', () => {
       `#pin-label-input-${pin.id}`,
     ) as HTMLTextAreaElement;
 
-    // expect(input).toEqualHtml(`
-    //   <textarea aria-label="Pin label input" class="pin-label-input pin-label-text readonly" disabled id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
-    // `);
     expect(input).toEqualAttributes({
       'aria-label': 'Pin label input',
       class: 'pin-label-input pin-label-text readonly',
       disabled: '',
       id: `pin-label-input-${pin.id}`,
       rows: '1',
-      // value: 'My New Pin',
     });
+    expect(input.value).toBe('My New Pin');
 
     const originalPin = pinModel.getPinById(pin.id) as TextPin;
     expect(originalPin.label.point).toEqual({ x: 0, y: 0 });
@@ -246,15 +207,13 @@ describe('vertex-viewer-pin-label', () => {
 
     await waitForChanges();
 
-    // expect(input).toEqualHtml(`
-    //   <textarea aria-label="Pin label input" class="pin-label-input pin-label-text" id="pin-label-input-my-pin-id" rows="1" value="My New Pin"></textarea>
-    // `);
     expect(input).toEqualAttributes({
       'aria-label': 'Pin label input',
       class: 'pin-label-input pin-label-text',
       id: `pin-label-input-${pin.id}`,
       rows: '1',
     });
+    expect(input.value).toBe('My New Pin');
 
     input.value = 'Updated Text With Enter';
     input.dispatchEvent(new Event('input'));
@@ -295,7 +254,6 @@ describe('vertex-viewer-pin-label', () => {
     pinController.addPin(pin);
 
     const page = await renderSpecPage({
-      components: [VertexPinLabel],
       template: () => (
         <vertex-viewer-pin-label
           elementBounds={dimensions as DOMRect}
@@ -361,7 +319,6 @@ describe('vertex-viewer-pin-label', () => {
     pinController.addPin(pin);
 
     const page = await renderSpecPage({
-      components: [VertexPinLabel],
       template: () => (
         <vertex-viewer-pin-label
           elementBounds={dimensions as DOMRect}
@@ -420,7 +377,6 @@ describe('vertex-viewer-pin-label', () => {
     pinController.addPin(pin);
 
     const page = await renderSpecPage({
-      components: [VertexPinLabel],
       template: () => (
         <vertex-viewer-pin-label
           elementBounds={dimensions as DOMRect}
@@ -450,7 +406,7 @@ describe('vertex-viewer-pin-label', () => {
 
     await page.waitForChanges();
 
-    mockGetComputedStyle.mockReturnValue({
+    const computedStyle = vi.spyOn(window, 'getComputedStyle').mockReturnValue({
       getPropertyValue: vi.fn((property: string): string => {
         const values: Record<string, string> = {
           height: '48px',
@@ -460,7 +416,7 @@ describe('vertex-viewer-pin-label', () => {
 
         return values[property];
       }),
-    });
+    } as unknown as CSSStyleDeclaration);
 
     triggerResizeObserver([
       {
@@ -471,5 +427,6 @@ describe('vertex-viewer-pin-label', () => {
     await page.waitForChanges();
 
     expect(input.getAttribute('rows')).toBe('3');
+    computedStyle.mockRestore();
   });
 });

@@ -1,13 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from '@stencil/core';
+import { describe, expect, h, it, render } from '@stencil/vitest';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
-
-import { renderSpecPage } from '#test/render-spec-page';
 
 import { TextPin } from '../../../lib/pins/model';
 import { viewer } from '../../viewer/__mocks__/mocks';
-import { ViewerPinGroup } from '../../viewer-pin-group/viewer-pin-group';
-import { ViewerPinTool } from '../viewer-pin-tool';
 
 describe('vertex-viewer-pin-tool', () => {
   const pin: TextPin = {
@@ -25,18 +21,15 @@ describe('vertex-viewer-pin-tool', () => {
     vi.clearAllMocks();
   });
 
-  it('should render a label for a pin and support dragging the label', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerPinTool, ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-tool
-          id="vertex-viewer-pin-tool"
-          mode="edit"
-          tool="pin-text"
-        ></vertex-viewer-pin-tool>
-      ),
-    });
-    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+  it('renders a label for a pin', async () => {
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-pin-tool
+        id="vertex-viewer-pin-tool"
+        mode="edit"
+        tool="pin-text"
+      ></vertex-viewer-pin-tool>,
+    );
+    const toolEl = root as HTMLVertexViewerPinToolElement;
     toolEl.viewer = {
       ...viewer,
       addEventListener,
@@ -50,24 +43,30 @@ describe('vertex-viewer-pin-tool', () => {
     } as unknown as HTMLVertexViewerElement;
     toolEl.pinController?.addPin(pin);
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(addEventListener).toHaveBeenCalledWith(
       'frameDrawn',
       expect.any(Function),
     );
 
-    expect(toolEl.shadowRoot).toEqualHtml(`
-      <vertex-viewer-dom-renderer drawmode="2d">
-        <vertex-viewer-pin-group data-is-dom-group-element id="pin-group-my-pin-id">
-          <vertex-viewer-dom-element data-testid="drawn-pin-my-pin-id">
-            <div class="pin-anchor" id="pin-anchor"></div>
-          </vertex-viewer-dom-element>
-          <vertex-viewer-pin-label-line id="pin-label-line-my-pin-id"></vertex-viewer-pin-label-line>
-          <vertex-viewer-pin-label></vertex-viewer-pin-label>
-        </vertex-viewer-pin-group>
-      </vertex-viewer-dom-renderer>
-    `);
+    const renderer = toolEl.shadowRoot?.querySelector(
+      'vertex-viewer-dom-renderer',
+    );
+    expect(renderer?.drawMode).toBe('2d');
+
+    const group = renderer?.querySelector('#pin-group-my-pin-id');
+    if (!group) {
+      throw new Error('Expected pin group to render');
+    }
+    expect(group.hasAttribute('data-is-dom-group-element')).toBe(true);
+    expect(
+      group.querySelector('[data-testid="drawn-pin-my-pin-id"] #pin-anchor'),
+    ).not.toBeNull();
+    expect(group.querySelector('#pin-label-line-my-pin-id')).not.toBeNull();
+    expect(
+      group.querySelector('vertex-viewer-pin-label')?.textContent,
+    ).toContain('My New Pin');
   });
 
   it('should setup the projectionViewMatrix when loading with an initialized viewer', async () => {
@@ -79,34 +78,33 @@ describe('vertex-viewer-pin-tool', () => {
       0, 0, 0, 1,
     ];
 
-    const page = await renderSpecPage({
-      components: [ViewerPinTool, ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-tool
-          id="vertex-viewer-pin-tool"
-          mode="edit"
-          tool="pin-text"
-          viewer={
-            {
-              ...viewer,
-              addEventListener,
-              frame: {
-                scene: {
-                  camera: {
-                    projectionViewMatrix: matrix,
-                  },
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-pin-tool
+        id="vertex-viewer-pin-tool"
+        mode="edit"
+        tool="pin-text"
+        viewer={
+          {
+            ...viewer,
+            addEventListener,
+            getInteractionHandlers: vi.fn().mockResolvedValue([]),
+            frame: {
+              depthBuffer: vi.fn().mockResolvedValue(undefined),
+              scene: {
+                camera: {
+                  projectionViewMatrix: matrix,
                 },
               },
-            } as unknown as HTMLVertexViewerElement
-          }
-        ></vertex-viewer-pin-tool>
-      ),
-    });
-    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+            },
+          } as unknown as HTMLVertexViewerElement
+        }
+      ></vertex-viewer-pin-tool>,
+    );
+    const toolEl = root as HTMLVertexViewerPinToolElement;
 
     toolEl.pinController?.addPin(pin);
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(addEventListener).toHaveBeenCalledWith(
       'frameDrawn',
@@ -120,17 +118,14 @@ describe('vertex-viewer-pin-tool', () => {
   });
 
   it('sets the depth buffers value depending if there are pins rendered', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerPinTool, ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-tool
-          id="vertex-viewer-pin-tool"
-          mode="edit"
-          tool="pin-text"
-        ></vertex-viewer-pin-tool>
-      ),
-    });
-    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-pin-tool
+        id="vertex-viewer-pin-tool"
+        mode="edit"
+        tool="pin-text"
+      ></vertex-viewer-pin-tool>,
+    );
+    const toolEl = root as HTMLVertexViewerPinToolElement;
     toolEl.viewer = {
       ...viewer,
       addEventListener: vi.fn(),
@@ -149,7 +144,7 @@ describe('vertex-viewer-pin-tool', () => {
     // Set depthBuffers to 'final' when there are pins
     toolEl.pinController?.addPin(pin);
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(toolEl.viewer.rotateAroundTapPoint).toEqual(false);
     expect(toolEl.viewer.depthBuffers).toMatch('final');
@@ -157,23 +152,20 @@ describe('vertex-viewer-pin-tool', () => {
     // Remove depthBuffers override when there are no pins
     toolEl.pinController?.clearPins();
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(toolEl.viewer.depthBuffers).toEqual(undefined);
   });
 
   it('sets feature maps, camera controls, and keyboard controls when changing modes', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerPinTool, ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-tool
-          id="vertex-viewer-pin-tool"
-          mode="view"
-          tool="pin-text"
-        ></vertex-viewer-pin-tool>
-      ),
-    });
-    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-pin-tool
+        id="vertex-viewer-pin-tool"
+        mode="view"
+        tool="pin-text"
+      ></vertex-viewer-pin-tool>,
+    );
+    const toolEl = root as HTMLVertexViewerPinToolElement;
     toolEl.viewer = {
       ...viewer,
       addEventListener: vi.fn(),
@@ -196,7 +188,7 @@ describe('vertex-viewer-pin-tool', () => {
     // Enter edit mode
     toolEl.mode = 'edit';
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(toolEl.viewer.featureMaps).toEqual('final');
     expect(toolEl.viewer.cameraControls).toEqual(false);
@@ -205,7 +197,7 @@ describe('vertex-viewer-pin-tool', () => {
     // Exit edit mode
     toolEl.mode = 'view';
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(toolEl.viewer.featureMaps).toEqual(undefined);
     expect(toolEl.viewer.cameraControls).toEqual(true);
@@ -213,17 +205,14 @@ describe('vertex-viewer-pin-tool', () => {
   });
 
   it('does not set feature maps, camera controls, and keyboard controls when exiting edit mode if not overridden', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerPinTool, ViewerPinGroup],
-      template: () => (
-        <vertex-viewer-pin-tool
-          id="vertex-viewer-pin-tool"
-          mode="view"
-          tool="pin-text"
-        ></vertex-viewer-pin-tool>
-      ),
-    });
-    const toolEl = page.root as HTMLVertexViewerPinToolElement;
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-pin-tool
+        id="vertex-viewer-pin-tool"
+        mode="view"
+        tool="pin-text"
+      ></vertex-viewer-pin-tool>,
+    );
+    const toolEl = root as HTMLVertexViewerPinToolElement;
     toolEl.viewer = {
       ...viewer,
       addEventListener: vi.fn(),
@@ -247,7 +236,7 @@ describe('vertex-viewer-pin-tool', () => {
     // Enter edit mode
     toolEl.mode = 'edit';
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     expect(toolEl.viewer.featureMaps).toEqual('final');
     expect(toolEl.viewer.cameraControls).toEqual(false);
@@ -256,7 +245,7 @@ describe('vertex-viewer-pin-tool', () => {
     // Exit edit mode
     toolEl.mode = 'view';
 
-    await page.waitForChanges();
+    await waitForChanges();
 
     // Should not change since they were not overridden when entering edit mode
     expect(toolEl.viewer.featureMaps).toEqual('final');

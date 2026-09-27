@@ -32,7 +32,7 @@ describe('PdfJsRenderer', () => {
 
   describe('dispose', () => {
     it('disposes the renderer', () => {
-      const renderer = new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
+      const renderer = new PdfJsRenderer(new PdfJsApi(), document.createElement('canvas'));
       renderer.dispose();
 
       expect(mockOnStateChangeDispose).toHaveBeenCalledTimes(1);
@@ -45,7 +45,7 @@ describe('PdfJsRenderer', () => {
 
       mockCreateElement.mockImplementation(() => ({ getContext: vi.fn().mockReturnValue(mockContext) }));
 
-      new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
+      new PdfJsRenderer(new PdfJsApi(), document.createElement('canvas'));
       const handler = mockOnStateChange.mock.calls[0][0];
 
       await handler({ document: mockPdfDocument, loadedPageNumber: 1, zoomPercentage: 100, panOffset: Point.create(0, 0) });
@@ -59,7 +59,7 @@ describe('PdfJsRenderer', () => {
     });
 
     it('scales the page to fit within the viewport', async () => {
-      new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
+      new PdfJsRenderer(new PdfJsApi(), document.createElement('canvas'));
       const handler = mockOnStateChange.mock.calls[0][0];
 
       (mockGetViewport as Mock).mockImplementation(({ scale }) => ({ width: 100 * scale, height: 100 * scale }));
@@ -79,7 +79,7 @@ describe('PdfJsRenderer', () => {
     it('does not render if already rendering', async () => {
       vi.useFakeTimers();
 
-      new PdfJsRenderer(new PdfJsApi(), new HTMLCanvasElement());
+      new PdfJsRenderer(new PdfJsApi(), document.createElement('canvas'));
       const handler = mockOnStateChange.mock.calls[0][0];
 
       (mockPageRender as Mock).mockImplementationOnce(() => ({ promise: Async.delay(10000) }));

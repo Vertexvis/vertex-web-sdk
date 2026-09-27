@@ -6,7 +6,8 @@ import { ResizeObserver } from 'resize-observer';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 (globalThis as any).ResizeObserver = ResizeObserver;
 
-// The Stencil mock-doc environment replaces the global `Event` constructor.
+// Stencil replaces the global `Event` constructor with mock-doc's version,
+// even when happy-dom is selected.
 // Node's built-in MessageEvent/CloseEvent are defined lazily on first access,
 // and bind to whatever `Event` is global at that time. If that first access
 // happens after mock-doc's Event has been installed, Node's own

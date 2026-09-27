@@ -24,7 +24,7 @@ export default defineVitestConfig({
   test: {
     globals: true,
     environment: 'stencil',
-    // Keep Stencil's mock-doc semantics used by the existing component specs.
+    environmentOptions: { stencil: { domEnvironment: 'happy-dom' } },
     include: ['src/**/*.spec.{ts,tsx}'],
     setupFiles: ['./vitest-setup.ts'],
     maxWorkers: 1,

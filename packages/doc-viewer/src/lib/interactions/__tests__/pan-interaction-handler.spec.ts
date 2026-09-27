@@ -158,7 +158,7 @@ describe('PanInteractionHandler', () => {
       new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
     );
 
-    hostElement.dispatchEvent(new Event('wheel', { deltaX: 100, deltaY: 100 } as unknown as EventInit));
+    hostElement.dispatchEvent(new WheelEvent('wheel', { deltaX: 100, deltaY: 100 }));
 
     expect(mockPanByDelta).toHaveBeenCalledWith(Point.create(-50, -50));
 
@@ -177,7 +177,7 @@ describe('PanInteractionHandler', () => {
 
     element.dispatchEvent(new MouseEvent('pointerdown', { button: 2, clientX: 10, clientY: 10 }));
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
-    hostElement.dispatchEvent(new Event('wheel', { deltaX: 100, deltaY: 100 } as unknown as EventInit));
+    hostElement.dispatchEvent(new WheelEvent('wheel', { deltaX: 100, deltaY: 100 }));
 
     expect(mockPanByDelta).toHaveBeenCalledWith(Point.create(-50, -50));
 

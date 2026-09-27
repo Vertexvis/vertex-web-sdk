@@ -1,9 +1,9 @@
-// This file contains globals that the Stencil mock-doc test environment
-// doesn't provide, needed by tests.
+// This file contains globals needed by the Stencil test environment.
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// The Stencil mock-doc environment replaces the global `Event` constructor.
+// Stencil replaces the global `Event` constructor with mock-doc's version,
+// even when happy-dom is selected.
 // Node's built-in MessageEvent/CloseEvent are defined lazily on first access,
 // and bind to whatever `Event` is global at that time. If that first access
 // happens after mock-doc's Event has been installed, Node's own
