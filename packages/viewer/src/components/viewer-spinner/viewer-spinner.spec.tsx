@@ -1,10 +1,10 @@
-import { newSpecPage } from '@stencil/core/testing';
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerSpinner } from './viewer-spinner';
 
 describe('viewer spinner', () => {
   it('renders a xs spinner', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerSpinner],
       html: `<vertex-viewer-spinner size="xs"></vertex-viewer-spinner>`,
     });
@@ -14,7 +14,7 @@ describe('viewer spinner', () => {
   });
 
   it('renders a sm spinner', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerSpinner],
       html: `<vertex-viewer-spinner size="sm"></vertex-viewer-spinner>`,
     });
@@ -24,7 +24,7 @@ describe('viewer spinner', () => {
   });
 
   it('renders a md spinner', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerSpinner],
       html: `<vertex-viewer-spinner size="md"></vertex-viewer-spinner>`,
     });
@@ -34,7 +34,7 @@ describe('viewer spinner', () => {
   });
 
   it('renders a lg spinner', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerSpinner],
       html: `<vertex-viewer-spinner size="lg"></vertex-viewer-spinner>`,
     });

@@ -204,6 +204,9 @@ export class ViewerPinTool {
    * @ignore
    */
   protected disconnectedCallback(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+
     this.clearInteractionHandler();
     this.clearModelListeners();
     this.resetDepthBuffers();

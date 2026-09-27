@@ -3,8 +3,9 @@ vi.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { BoundingBox, Point, Ray, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerStream } from '../../lib/stream/stream';
 import {
@@ -62,7 +63,7 @@ describe('vertex-viewer-teleport-tool', () => {
 
   it('supports the teleport interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -129,7 +130,7 @@ describe('vertex-viewer-teleport-tool', () => {
 
   it('supports the teleport and align interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -194,7 +195,7 @@ describe('vertex-viewer-teleport-tool', () => {
 
   it('supports the teleport toward interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -264,7 +265,7 @@ describe('vertex-viewer-teleport-tool', () => {
 
   it('teleports toward the mouse position', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -337,7 +338,7 @@ describe('vertex-viewer-teleport-tool', () => {
   it('handles collision', async () => {
     const collisionDistance = 10;
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -411,7 +412,7 @@ describe('vertex-viewer-teleport-tool', () => {
 
   it('supports animations', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -476,7 +477,7 @@ describe('vertex-viewer-teleport-tool', () => {
 
   it('supports changing animation properties', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>

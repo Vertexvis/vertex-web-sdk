@@ -4,8 +4,9 @@ vi.mock('../viewer-markup/dom');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions, Point } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
@@ -30,7 +31,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('positions the anchors correctly', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupArrow],
       template: () => (
         <vertex-viewer-markup-arrow start={start} end={end} mode="edit" />
@@ -55,7 +56,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('handles resizes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer>
@@ -116,7 +117,7 @@ describe('vertex-viewer-markup-arrow', () => {
     const bottomCenter = Point.create(0, -0.5);
     const topCenter = Point.create(0, 0.5);
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer>
@@ -145,7 +146,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('defines and updates the scale property as scale changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer>
@@ -186,7 +187,7 @@ describe('vertex-viewer-markup-arrow', () => {
       height: 0,
     });
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer>
@@ -205,7 +206,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('removes event listeners when the viewer changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer>
@@ -237,7 +238,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('removes event listeners when disposed', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer>

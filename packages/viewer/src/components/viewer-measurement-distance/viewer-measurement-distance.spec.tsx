@@ -6,8 +6,9 @@ vi.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Point, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import {
@@ -88,7 +89,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions the start and end anchors as Vector3 objects', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -114,7 +115,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions the start and end anchors as JSON strings', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -140,7 +141,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions the label between the start and end anchors', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -162,7 +163,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions anchors and labels to element center', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -185,7 +186,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('update positions of anchors when start or end changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -228,7 +229,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('supports slots for anchor labels', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       html: `
         <vertex-viewer-measurement-distance>
@@ -246,7 +247,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions anchor labels with distance property', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -274,7 +275,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('is empty if start and end points cant be calculated', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       html: `<vertex-viewer-measurement-distance></vertex-viewer-measurement-distance>`,
     });
@@ -283,7 +284,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('formats distance with specified units and fractional digits', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -301,7 +302,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('displays dashes if measurement invalid', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -320,8 +321,8 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('formats distance with provided label formatter', async () => {
-    const labelFormatter = jest.fn().mockReturnValue('test');
-    const page = await newSpecPage({
+    const labelFormatter = vi.fn().mockReturnValue('test');
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -340,7 +341,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('updates label when units change', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance
@@ -363,7 +364,7 @@ describe('vertex-viewer-measurement-distance', () => {
 
   it('rerenders when viewer renders', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerLayer, ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -398,7 +399,7 @@ describe('vertex-viewer-measurement-distance', () => {
 
   it('sets the depth buffers when the component loads', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerLayer, ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -428,7 +429,7 @@ describe('vertex-viewer-measurement-distance', () => {
 
   describe(ViewerMeasurementDistance.prototype.computeElementMetrics, () => {
     it('returns metrics for rendered elements', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurement-distance
@@ -451,7 +452,7 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('returns undefined if anchors are not visible', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => <vertex-viewer-measurement-distance />,
       });
@@ -471,7 +472,7 @@ describe('vertex-viewer-measurement-distance', () => {
     );
 
     it('does not update anchor if measurement is not editable', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurement-distance
@@ -495,7 +496,7 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('does not update anchor if not primary button', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurement-distance
@@ -522,7 +523,7 @@ describe('vertex-viewer-measurement-distance', () => {
     it('emits editBegin event when anchor editing started', async () => {
       const onEditBegin = vi.fn();
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurement-distance
@@ -547,7 +548,7 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('updates start point when anchor is moved', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurement-distance
@@ -587,7 +588,7 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('updates end point when anchor is moved', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurement-distance
@@ -619,8 +620,8 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('emits edit end event on anchor mouse up', async () => {
-      const onEditEnd = jest.fn();
-      const page = await newSpecPage({
+      const onEditEnd = vi.fn();
+      const page = await renderSpecPage({
         components: [ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer-measurement-distance
@@ -659,7 +660,7 @@ describe('vertex-viewer-measurement-distance', () => {
     );
 
     it('updates indicator on pointer move', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
@@ -697,9 +698,9 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('does nothing if not primary button', async () => {
-      const onEditBegin = jest.fn();
-      const onEditEnd = jest.fn();
-      const page = await newSpecPage({
+      const onEditBegin = vi.fn();
+      const onEditEnd = vi.fn();
+      const page = await renderSpecPage({
         components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
@@ -756,9 +757,9 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('updates end pt on interaction', async () => {
-      const onEditBegin = jest.fn();
-      const onEditEnd = jest.fn();
-      const page = await newSpecPage({
+      const onEditBegin = vi.fn();
+      const onEditEnd = vi.fn();
+      const page = await renderSpecPage({
         components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
@@ -821,9 +822,9 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('cancels begin interaction if mouse moved during first mouse down', async () => {
-      const onEditBegin = jest.fn();
-      const onEditEnd = jest.fn();
-      const page = await newSpecPage({
+      const onEditBegin = vi.fn();
+      const onEditEnd = vi.fn();
+      const page = await renderSpecPage({
         components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
@@ -876,9 +877,9 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('skips end interaction if mouse moved during last pointer end', async () => {
-      const onEditBegin = jest.fn();
-      const onEditEnd = jest.fn();
-      const page = await newSpecPage({
+      const onEditBegin = vi.fn();
+      const onEditEnd = vi.fn();
+      const page = await renderSpecPage({
         components: [Viewer, ViewerMeasurementDistance],
         template: () => (
           <vertex-viewer>
@@ -950,7 +951,7 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('renders axis reference lines if enabled', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDistance],
       template: () => (
         <vertex-viewer-measurement-distance

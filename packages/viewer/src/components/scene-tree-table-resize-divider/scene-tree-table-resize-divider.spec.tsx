@@ -1,4 +1,7 @@
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import { SceneTreeTableResizeDivider } from './scene-tree-table-resize-divider';
 
@@ -55,7 +58,7 @@ async function newComponentSpec(data: { html: string }): Promise<{
   page: SpecPage;
   divider: HTMLVertexSceneTreeTableResizeDividerElement;
 }> {
-  const page = await newSpecPage({
+  const page = await renderSpecPage({
     components: [SceneTreeTableResizeDivider],
     html: data.html,
   });

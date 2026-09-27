@@ -6,11 +6,15 @@ vi.mock('../../lib/annotations/controller');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
-import { newSpecPage } from '@stencil/core/testing';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 import { Async, UUID } from '@vertexvis/utils';
+
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+  type RenderSpecPageOptions as NewSpecPageOptions,
+} from '#test/render-spec-page';
 
 import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
@@ -395,7 +399,9 @@ describe('vertex-viewer', () => {
 
   describe('connection failure behavior', () => {
     it('displays a connection error with a retry button that reloads the viewer', async () => {
-      const reload = jest.spyOn(Viewer.prototype, 'reload').mockResolvedValue();
+      const reload = vi
+        .spyOn(customElements.get('vertex-viewer')!.prototype, 'reload')
+        .mockResolvedValue(undefined);
       const { stream } = makeViewerStream();
       const { page, viewer } = await newViewerSpecWithPage({
         template: () => <vertex-viewer stream={stream} />,
@@ -427,8 +433,10 @@ describe('vertex-viewer', () => {
     });
 
     it('allows overriding the default retry button behavior', async () => {
-      const reload = jest.spyOn(Viewer.prototype, 'reload').mockResolvedValue();
-      const customRetryHandler = jest.fn();
+      const reload = vi
+        .spyOn(customElements.get('vertex-viewer')!.prototype, 'reload')
+        .mockResolvedValue(undefined);
+      const customRetryHandler = vi.fn();
       const { stream } = makeViewerStream();
       const { page, viewer } = await newViewerSpecWithPage({
         template: () => (
@@ -1213,14 +1221,14 @@ describe('vertex-viewer', () => {
   async function newViewerSpec(
     opts: Pick<NewSpecPageOptions, 'template' | 'html'>,
   ): Promise<HTMLVertexViewerElement> {
-    const page = await newSpecPage({ components: [Viewer], ...opts });
+    const page = await renderSpecPage({ components: [Viewer], ...opts });
     return page.root as HTMLVertexViewerElement;
   }
 
   async function newViewerSpecWithPage(
     opts: Pick<NewSpecPageOptions, 'template' | 'html'>,
   ): Promise<{ page: SpecPage; viewer: HTMLVertexViewerElement }> {
-    const page = await newSpecPage({ components: [Viewer], ...opts });
+    const page = await renderSpecPage({ components: [Viewer], ...opts });
     return { page, viewer: page.root as HTMLVertexViewerElement };
   }
 });

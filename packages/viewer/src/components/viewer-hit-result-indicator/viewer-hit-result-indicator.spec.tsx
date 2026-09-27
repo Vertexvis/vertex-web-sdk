@@ -9,8 +9,9 @@ vi.mock('../../lib/stencil', () => ({
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { Viewport } from '../../lib/types';
@@ -47,7 +48,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
   });
 
   it('displays an indicator at the provided position and normal', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerHitResultIndicator],
       html: `<vertex-viewer-hit-result-indicator></vertex-viewer-hit-result-indicator>`,
     });
@@ -57,7 +58,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
 
   it('renders an indicator at the provided position and normal', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerHitResultIndicator],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -93,7 +94,7 @@ describe('<vertex-viewer-hit-result-indicator>', () => {
 
   it('updates and redraws the indicator when the viewer dimensions change', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerHitResultIndicator],
       template: () => (
         <vertex-viewer stream={stream}>

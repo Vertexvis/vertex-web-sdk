@@ -4,8 +4,9 @@ vi.mock('../../lib/rendering/imageLoaders');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { BoundingBox, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { FramePerspectiveCamera, Orientation } from '../../lib/types';
@@ -42,7 +43,7 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   it('renders a triad', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       html: `<vertex-viewer-view-cube></vertex-viewer-view-cube>`,
     });
@@ -51,7 +52,7 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   it('does not render triad if disabled', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       html: `<vertex-viewer-view-cube triad-off></vertex-viewer-view-cube>`,
     });
@@ -60,7 +61,7 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   it('shows custom labels for cube', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       html: `
         <vertex-viewer-view-cube
@@ -96,7 +97,7 @@ describe('vertex-viewer-view-cube', () => {
 
   it('uses world orientation for cube', async () => {
     const worldOrientation = new Orientation(Vector3.left(), Vector3.down());
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [
         ViewerDomRenderer,
         ViewerDomElement,
@@ -126,7 +127,7 @@ describe('vertex-viewer-view-cube', () => {
       2,
       45,
     );
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerDomRenderer, ViewerViewCube],
       template: () => <vertex-viewer-view-cube camera={camera} />,
     });
@@ -145,7 +146,7 @@ describe('vertex-viewer-view-cube', () => {
 
   it('applies camera from viewer', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerViewCube],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -192,7 +193,7 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('performs standard view when side clicked', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       template: () => <vertex-viewer-view-cube viewer={viewerElement} />,
     });
@@ -221,7 +222,7 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('performs a standard view without a fit all when side clicked with viewAll set to false', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       template: () => (
         <vertex-viewer-view-cube viewer={viewerElement} viewAll={false} />
@@ -256,7 +257,7 @@ describe('vertex-viewer-view-cube interactions', () => {
       BoundingBox.create(Vector3.origin(), Vector3.origin()),
     );
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       template: () => <vertex-viewer-view-cube viewer={viewerElement} />,
     });
@@ -285,7 +286,7 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('does not animation if animation duration is 0', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       template: () => (
         <vertex-viewer-view-cube viewer={viewerElement} animationDuration={0} />
@@ -303,7 +304,7 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('does not perform standard view if disabled', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerViewCube],
       template: () => (
         <vertex-viewer-view-cube viewer={viewerElement} standardViewsOff />

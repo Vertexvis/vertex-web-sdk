@@ -286,8 +286,8 @@ describe(InteractionApi, () => {
       await apiCloseX.endInteraction();
 
       const lastCallX: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+        streamApi.replaceCamera as Mock
+      ).mock.lastCall![0].camera.perspective;
 
       const apiCloseY = createInteractionApi({
         sceneProvider: async () =>
@@ -309,8 +309,8 @@ describe(InteractionApi, () => {
       await apiCloseY.endInteraction();
 
       const lastCallY: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+        streamApi.replaceCamera as Mock
+      ).mock.lastCall![0].camera.perspective;
 
       const apiCloseZ = createInteractionApi({
         sceneProvider: async () =>
@@ -332,8 +332,8 @@ describe(InteractionApi, () => {
       await apiCloseZ.endInteraction();
 
       const lastCallZ: PerspectiveFrameCamera = (
-        streamApi.replaceCamera as jest.Mock
-      ).mock.lastCall[0].camera.perspective;
+        streamApi.replaceCamera as Mock
+      ).mock.lastCall![0].camera.perspective;
 
       expect(lastCallX.lookAt.x).toBeCloseTo(-7.426);
       expect(lastCallY.lookAt.y).toBeCloseTo(-15.1);

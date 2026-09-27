@@ -1,11 +1,14 @@
-const dispose = jest.fn();
-const mockRegisterAdditionalElement = jest.fn();
-jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
-  const { MultiElementInteractionHandler } = jest.requireActual(
-    '../../lib/interactions/multiElementInteractionHandler',
-  );
+const { dispose, mockRegisterAdditionalElement } = vi.hoisted(() => ({
+  dispose: vi.fn(),
+  mockRegisterAdditionalElement: vi.fn(),
+}));
+vi.mock('../../lib/interactions/pointerInteractionHandler', async () => {
+  const { MultiElementInteractionHandler } = await vi.importActual<
+    typeof import('../../lib/interactions/multiElementInteractionHandler')
+  >('../../lib/interactions/multiElementInteractionHandler');
   return {
     PointerInteractionHandler: class extends MultiElementInteractionHandler {
+      public addEventListenersToElement = vi.fn(() => ({ dispose: vi.fn() }));
       public registerAdditionalElement =
         mockRegisterAdditionalElement.mockReturnValue({
           dispose,
@@ -16,7 +19,6 @@ jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import {
   BoundingBox,
   Dimensions,
@@ -59,7 +61,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
   describe('2d draw mode', () => {
     it('positions children using matrix3d', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomGroup, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer drawMode="2d" camera={camera}>
@@ -80,7 +82,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(false);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -103,7 +105,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -126,7 +128,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -148,7 +150,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
   describe('3d draw mode', () => {
     it('positions children using matrix3d', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomGroup, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
@@ -167,7 +169,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('rotates element when bill boarding is off', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
@@ -189,7 +191,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(false);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -212,7 +214,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -235,7 +237,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -260,7 +262,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isDetached = vi.spyOn(depthBuffer, 'isDetached');
       isDetached.mockReturnValue(false);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -285,7 +287,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isDetached = vi.spyOn(depthBuffer, 'isDetached');
       isDetached.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -310,7 +312,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
       const isDetached = vi.spyOn(depthBuffer, 'isDetached');
       isDetached.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -350,8 +352,8 @@ describe('<vertex-viewer-dom-renderer>', () => {
         isOrthographic: vi.fn().mockReturnValue(false),
       };
 
-      const getInteractionHandlers = jest.fn();
-      const page = await newSpecPage({
+      const getInteractionHandlers = vi.fn();
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -390,7 +392,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
           new PointerInteractionHandler(() => parseConfig('platdev')),
         ]);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -431,7 +433,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
         },
         getInteractionHandlers,
       } as unknown as HTMLVertexViewerElement;
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer

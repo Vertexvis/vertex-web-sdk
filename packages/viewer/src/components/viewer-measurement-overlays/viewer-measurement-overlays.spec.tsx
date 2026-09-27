@@ -1,7 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
+
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import {
   MeasurementOverlayManager,
@@ -59,7 +63,7 @@ describe('vertex-viewer-measurement-overlays', () => {
     page: SpecPage;
     overlays: MeasurementOverlayManager;
   }> {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementOverlays],
       template: () => (
         <vertex-viewer-measurement-overlays measurementOverlays={overlays} />

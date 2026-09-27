@@ -1,10 +1,10 @@
-import { newSpecPage } from '@stencil/core/testing';
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { SceneTreeToolbarGroup } from './scene-tree-toolbar-group';
 
 describe('scene-tree-toolbar-group', () => {
   it('renders', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeToolbarGroup],
       html: `<vertex-scene-tree-toolbar-group></vertex-scene-tree-toolbar-group>`,
     });

@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { Viewer } from '../viewer/viewer';
 import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
@@ -14,7 +15,7 @@ describe('vertex-viewer-markup-tool', () => {
   const end = Vector3.create(1, 1, 1);
 
   it('creates default arrow markup for editing', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupArrow],
       html: `<vertex-viewer-markup-tool></vertex-viewer-markup-tool>`,
     });
@@ -26,7 +27,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates markup from arrow template if specified', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupArrow],
       html: `
         <template id="my-template">
@@ -44,7 +45,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default markup if arrow template not found', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupArrow],
       html: `
         <template id="my-template">
@@ -62,7 +63,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default markup if arrow template does not contain an arrow', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupArrow],
       html: `
         <template id="my-template">
@@ -80,7 +81,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default circle markup for editing', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupCircle],
       html: `<vertex-viewer-markup-tool tool="circle"></vertex-viewer-markup-tool>`,
     });
@@ -92,7 +93,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates markup from circle template if specified', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupCircle],
       html: `
         <template id="my-template">
@@ -110,7 +111,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default markup if circle template not found', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupCircle],
       html: `
         <template id="my-template">
@@ -128,7 +129,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default markup if circle template does not contain a circle', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupCircle],
       html: `
         <template id="my-template">
@@ -146,7 +147,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('updates markup when circle template id changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupCircle],
       html: `
       <template id="my-template">
@@ -169,7 +170,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default freeform markup for editing', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupFreeform],
       html: `<vertex-viewer-markup-tool tool="freeform"></vertex-viewer-markup-tool>`,
     });
@@ -181,7 +182,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates markup from freeform template if specified', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupFreeform],
       html: `
         <template id="my-template">
@@ -199,7 +200,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default markup if freeform template not found', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupFreeform],
       html: `
         <template id="my-template">
@@ -217,7 +218,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('creates default markup if freeform template does not contain a freeform', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupFreeform],
       html: `
         <template id="my-template">
@@ -235,7 +236,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('updates markup when freeform template id changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupFreeform],
       html: `
       <template id="my-template">
@@ -258,7 +259,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('does not have markup if disabled', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool],
       html: `<vertex-viewer-markup-tool disabled></vertex-viewer-markup-tool>`,
     });
@@ -267,7 +268,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('removes markup when disabled', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupArrow],
       html: `<vertex-viewer-markup-tool></vertex-viewer-markup-tool>`,
     });
@@ -283,7 +284,7 @@ describe('vertex-viewer-markup-tool', () => {
   });
 
   it('updates markup when props change', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkupTool, ViewerMarkupArrow],
       html: `<vertex-viewer-markup-tool></vertex-viewer-markup-tool>`,
     });
@@ -302,7 +303,7 @@ describe('vertex-viewer-markup-tool', () => {
     const onMarkupBegin = vi.fn();
     const onMarkupEnd = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupTool, ViewerMarkupArrow],
       template: () => (
         <vertex-viewer-markup-tool

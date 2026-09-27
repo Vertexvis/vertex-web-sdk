@@ -4,8 +4,9 @@ vi.mock('../viewer-markup/dom');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
@@ -29,7 +30,7 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('positions the anchors correctly', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMarkupCircle],
       template: () => (
         <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
@@ -90,7 +91,7 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('handles resizes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>
@@ -248,7 +249,7 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('should support maintaining aspect ratio', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>
@@ -288,7 +289,7 @@ describe('vertex-viewer-markup-circle', () => {
     const scale = 0.5;
     const bounds = Rectangle.create(0, 0, 0.5, 0.5);
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>
@@ -317,7 +318,7 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('defines and updates the scale property as scale changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>
@@ -359,7 +360,7 @@ describe('vertex-viewer-markup-circle', () => {
       height: 0,
     });
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>
@@ -378,7 +379,7 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('removes event listeners when the viewer changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>
@@ -409,7 +410,7 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('removes event listeners when disposed', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
       template: () => (
         <vertex-viewer>

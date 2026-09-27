@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { TextPin } from '../../../lib/pins/model';
 import { viewer } from '../../viewer/__mocks__/mocks';
@@ -25,7 +26,7 @@ describe('vertex-viewer-pin-tool', () => {
   });
 
   it('should render a label for a pin and support dragging the label', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-tool
@@ -78,7 +79,7 @@ describe('vertex-viewer-pin-tool', () => {
       0, 0, 0, 1,
     ];
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-tool
@@ -119,7 +120,7 @@ describe('vertex-viewer-pin-tool', () => {
   });
 
   it('sets the depth buffers value depending if there are pins rendered', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-tool
@@ -162,7 +163,7 @@ describe('vertex-viewer-pin-tool', () => {
   });
 
   it('sets feature maps, camera controls, and keyboard controls when changing modes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-tool
@@ -212,7 +213,7 @@ describe('vertex-viewer-pin-tool', () => {
   });
 
   it('does not set feature maps, camera controls, and keyboard controls when exiting edit mode if not overridden', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinTool, ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-tool

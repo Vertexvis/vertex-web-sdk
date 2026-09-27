@@ -202,6 +202,7 @@ export class ViewerMarkupArrow {
   );
 
   private registeredInteraction?: Disposable;
+  private resizeObserver?: ResizeObserver;
 
   /**
    * @ignore
@@ -217,8 +218,8 @@ export class ViewerMarkupArrow {
   protected componentDidLoad(): void {
     this.updatePointsFromProps();
 
-    const resize = new ResizeObserver(() => this.updateViewport());
-    resize.observe(this.hostEl);
+    this.resizeObserver = new ResizeObserver(() => this.updateViewport());
+    this.resizeObserver.observe(this.hostEl);
 
     if (this.mode === 'create') {
       window.addEventListener('pointerdown', this.handleWindowPointerDown);
@@ -226,6 +227,9 @@ export class ViewerMarkupArrow {
   }
 
   protected disconnectedCallback(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+
     this.dispose();
   }
 

@@ -6,8 +6,9 @@ vi.mock('../../lib/walk-mode/dom', () => ({
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { BoundingBox, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerStream } from '../../lib/stream/stream';
 import { FrameCamera } from '../../lib/types';
@@ -47,7 +48,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports the teleport interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -71,7 +72,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports the teleport and align interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -95,7 +96,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports the teleport toward interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -119,7 +120,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports keyboard walk movement', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -201,7 +202,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports keyboard pivot movement', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -249,7 +250,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports keyboard vertical movement', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -325,7 +326,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports a custom teleport tool', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -375,7 +376,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports adding custom keybindings', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -465,7 +466,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports overriding custom keybindings', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -543,7 +544,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('excludes input elements', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -583,7 +584,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports excluding custom elements by tag name', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -627,7 +628,7 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports excluding custom elements by predicate', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
       template: () => (
         <vertex-viewer stream={stream}>

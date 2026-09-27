@@ -1,13 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { SceneTreeSearch } from './scene-tree-search';
 
 describe('vertex-scene-tree-search', () => {
   it('renders a text input', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `
         <vertex-scene-tree-search
@@ -27,7 +28,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('makes elements disabled if search disabled', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `<vertex-scene-tree-search value="text" disabled></vertex-scene-tree-search>`,
     });
@@ -44,7 +45,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('hides clear button when value has non-zero length', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `<vertex-scene-tree-search></vertex-scene-tree-search>`,
     });
@@ -57,7 +58,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('shows clear button when value has non-zero length', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `<vertex-scene-tree-search value="text"></vertex-scene-tree-search>`,
     });
@@ -70,7 +71,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('shows textfield background when input has focus', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `<vertex-scene-tree-search></vertex-scene-tree-search>`,
     });
@@ -86,7 +87,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('shows textfield background when value is non-empty', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `<vertex-scene-tree-search value="text"></vertex-scene-tree-search>`,
     });
@@ -99,7 +100,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('shows blurred state when input blurs', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `<vertex-scene-tree-search value="text"></vertex-scene-tree-search>`,
     });
@@ -118,7 +119,7 @@ describe('vertex-scene-tree-search', () => {
   });
 
   it('clears value when clear button pressed', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       html: `<vertex-scene-tree-search value="text"></vertex-scene-tree-search>`,
     });
@@ -128,13 +129,13 @@ describe('vertex-scene-tree-search', () => {
     ) as HTMLButtonElement;
     button.dispatchEvent(new MouseEvent('mousedown'));
 
-    expect(page.root?.value).toBe('');
+    expect((page.root as HTMLVertexSceneTreeSearchElement).value).toBe('');
   });
 
   it('debounces search events', async () => {
     const onSearch = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       template: () => (
         <vertex-scene-tree-search debounce={100} onSearch={onSearch} />
@@ -161,7 +162,7 @@ describe('vertex-scene-tree-search', () => {
   it('does not emit search events without Enter press by default', async () => {
     const onSearch = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       template: () => <vertex-scene-tree-search onSearch={onSearch} />,
     });
@@ -182,7 +183,7 @@ describe('vertex-scene-tree-search', () => {
   it('emits search events when Enter is pressed', async () => {
     const onSearch = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       template: () => <vertex-scene-tree-search onSearch={onSearch} />,
     });
@@ -209,7 +210,7 @@ describe('vertex-scene-tree-search', () => {
   it('emits search events when a blur occurs, and content has not been emitted', async () => {
     const onSearch = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       template: () => <vertex-scene-tree-search onSearch={onSearch} />,
     });
@@ -236,7 +237,7 @@ describe('vertex-scene-tree-search', () => {
   it('does not emit search events when a blur occurs, and content has been emitted', async () => {
     const onSearch = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       template: () => <vertex-scene-tree-search onSearch={onSearch} />,
     });
@@ -267,7 +268,7 @@ describe('vertex-scene-tree-search', () => {
   it('emits search event when cleared', async () => {
     const onSearch = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [SceneTreeSearch],
       template: () => (
         <vertex-scene-tree-search debounce={0} onSearch={onSearch} />

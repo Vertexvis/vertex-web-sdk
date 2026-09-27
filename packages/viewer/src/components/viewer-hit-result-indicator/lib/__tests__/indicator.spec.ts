@@ -1,5 +1,6 @@
-jest.mock('regl-shape');
-jest.mock('regl');
+import type { Mock } from '#test/mock-types';
+vi.mock('regl-shape', () => import('../../../../__mocks__/regl-shape'));
+vi.mock('regl', () => import('../../../../__mocks__/regl'));
 
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 import { Color } from '@vertexvis/utils';
@@ -36,7 +37,7 @@ import {
 import { computePlaneNdcValues } from '../plane';
 import { computePointNdcValues } from '../point';
 
-type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
+type MockShapeBuilder = Mock<{ createShape: Mock }>;
 
 const mockShapeBuilder = shapeBuilder as MockShapeBuilder;
 

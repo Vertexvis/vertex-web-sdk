@@ -3,7 +3,7 @@ import { PerspectiveCamera } from '../camera';
 import { Scene } from '../scene';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SceneMocks = jest.createMockFromModule('../../scenes') as any;
+const SceneMocks = await vi.importMock<any>('../../scenes');
 
 export const cameraMock =
   new SceneMocks.PerspectiveCamera() as PerspectiveCamera;

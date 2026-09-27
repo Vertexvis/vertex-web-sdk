@@ -91,6 +91,7 @@ interface StateMap {
   stencil?: StencilBuffer;
   depthBuffer?: DepthBuffer;
   shouldClearDepthBuffers?: boolean;
+  resizeObserver?: ResizeObserver;
 }
 
 const INTERACTION_THRESHOLD = 3;
@@ -351,6 +352,9 @@ export class ViewerMeasurementDistance {
     this.stateMap.hoverCursor?.dispose();
     this.newInteractionHandler?.dispose();
     this.resetDepthBuffers();
+
+    this.stateMap.resizeObserver?.disconnect();
+    this.stateMap.resizeObserver = undefined;
   }
 
   /**
@@ -378,8 +382,10 @@ export class ViewerMeasurementDistance {
    * @ignore
    */
   protected componentDidLoad(): void {
-    const resize = new ResizeObserver(() => this.updateViewport());
-    resize.observe(this.hostEl);
+    this.stateMap.resizeObserver = new ResizeObserver(() =>
+      this.updateViewport(),
+    );
+    this.stateMap.resizeObserver.observe(this.hostEl);
   }
 
   /**

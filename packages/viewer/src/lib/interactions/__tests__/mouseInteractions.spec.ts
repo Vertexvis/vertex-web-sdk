@@ -164,6 +164,11 @@ describe('ZoomInteraction', () => {
     InteractionApiPerspective as Mock<InteractionApiPerspective>
   )();
 
+  beforeEach(() => {
+    // Vitest's automock leaves inherited async methods on the prototype.
+    vi.spyOn(api, 'zoomCameraToPoint').mockResolvedValue(undefined);
+  });
+
   const defaultConfigProvider = (): InteractionConfig => ({
     ...defaultInteractionConfig,
   });

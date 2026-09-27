@@ -3,8 +3,12 @@ vi.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Async } from '@vertexvis/utils';
+
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import {
   key1,
@@ -21,7 +25,7 @@ describe('vertex-viewer-box-query-tool', () => {
   });
 
   it('renders a vertex-viewer-layer', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerBoxQueryTool, ViewerLayer],
       html: `<vertex-viewer-box-query-tool></vertex-viewer-box-query-tool>`,
     });
@@ -41,7 +45,7 @@ describe('vertex-viewer-box-query-tool', () => {
   it('renders a default box to represent the query', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -79,8 +83,8 @@ describe('vertex-viewer-box-query-tool', () => {
   it('notifies when the controller changes', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const onControllerChanged = jest.fn();
-    const page = await newSpecPage({
+    const onControllerChanged = vi.fn();
+    const page = await renderSpecPage({
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -100,7 +104,7 @@ describe('vertex-viewer-box-query-tool', () => {
   it('sends a selection query for the frustum using exclusive', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -152,7 +156,7 @@ describe('vertex-viewer-box-query-tool', () => {
   it('sends a selection query for the frustum using inclusive', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -204,7 +208,7 @@ describe('vertex-viewer-box-query-tool', () => {
   it('sends a deselection query for the frustum using the deselect default operation', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -256,7 +260,7 @@ describe('vertex-viewer-box-query-tool', () => {
   it('sends a clear all selection and select query for the frustum using the clearAndSelect default operation', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>
@@ -324,7 +328,7 @@ describe('vertex-viewer-box-query-tool', () => {
   it('disables the interaction handler while an operation is being executed', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerBoxQueryTool, ViewerLayer],
       template: () => (
         <vertex-viewer stream={stream}>

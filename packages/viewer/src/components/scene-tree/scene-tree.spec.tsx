@@ -1,4 +1,5 @@
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock(
   '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service',
 );
 vi.mock('./lib/dom');
@@ -11,7 +12,6 @@ vi.mock('../../lib/rendering/imageLoaders');
 import { grpc } from '@improbable-eng/grpc-web';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import {
   ColumnKey,
   Node,
@@ -30,6 +30,11 @@ import {
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 import { sign } from 'jsonwebtoken';
+
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import { Config } from '../../lib/config';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
@@ -187,9 +192,13 @@ describe('<vertex-scene-tree>', () => {
       expect(rowData).toHaveBeenCalled();
     });
 
-    it('emits error if tree is not enabled', (done) => {
+    it('emits error if tree is not enabled', async () => {
       const client = mockSceneTreeClient();
       mockGetTreeError(client, grpc.Code.FailedPrecondition);
+      let resolveError!: () => void;
+      const error = new Promise<void>((resolve) => {
+        resolveError = resolve;
+      });
 
       async function test(): Promise<void> {
         const { stream, ws } = makeViewerStream();
@@ -201,7 +210,7 @@ describe('<vertex-scene-tree>', () => {
             <div>
               <vertex-scene-tree
                 controller={controller}
-                onConnectionError={() => done()}
+                onConnectionError={() => resolveError()}
                 viewerSelector="#viewer"
               ></vertex-scene-tree>
               <vertex-viewer id="viewer" stream={stream} clientId={clientId} />
@@ -211,7 +220,8 @@ describe('<vertex-scene-tree>', () => {
         await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       }
 
-      test();
+      await test();
+      await error;
     });
 
     it('renders message if load failed', async () => {
@@ -431,7 +441,11 @@ describe('<vertex-scene-tree>', () => {
       expect(tree.shadowRoot?.querySelector('.loading')).toBeNull();
     });
 
-    it('emits error if tree GetList is aborted', (done) => {
+    it('emits error if tree GetList is aborted', async () => {
+      let resolveError!: () => void;
+      const error = new Promise<void>((resolve) => {
+        resolveError = resolve;
+      });
       async function test(): Promise<void> {
         const client = mockSceneTreeClient();
         mockGetTreeError(client, grpc.Code.Aborted);
@@ -447,7 +461,7 @@ describe('<vertex-scene-tree>', () => {
                 controller={controller}
                 onConnectionError={(e) => {
                   if (e.detail.code === SceneTreeErrorCode.ABORTED) {
-                    done();
+                    resolveError();
                   }
                 }}
                 viewerSelector="#viewer"
@@ -459,7 +473,8 @@ describe('<vertex-scene-tree>', () => {
         await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       }
 
-      test();
+      await test();
+      await error;
     });
 
     it('cancels the controller when the component is disconnected', async () => {
@@ -514,7 +529,7 @@ describe('<vertex-scene-tree>', () => {
     });
 
     it('initializes the default controller with a custom transport for subscriptions by default', async () => {
-      await newSpecPage({
+      await renderSpecPage({
         components: [SceneTree],
         template: () => <vertex-scene-tree></vertex-scene-tree>,
       });
@@ -528,7 +543,7 @@ describe('<vertex-scene-tree>', () => {
     });
 
     it('initializes the default controller with a default transport if the flag is disabled', async () => {
-      await newSpecPage({
+      await renderSpecPage({
         components: [SceneTree],
         template: () => (
           <vertex-scene-tree
@@ -649,7 +664,7 @@ describe('<vertex-scene-tree>', () => {
 
       const { stream, ws } = makeViewerStream();
       const controller = new SceneTreeController(client, 100);
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [Viewer, SceneTree, SceneTreeTableLayout],
         template: () => {
           return (
@@ -1648,7 +1663,7 @@ async function newSceneTreeSpec(data: {
   page: SpecPage;
   waitForSceneTreeConnected: () => Promise<void>;
 }> {
-  const page = await newSpecPage({
+  const page = await renderSpecPage({
     components: [SceneTree, SceneTreeTableLayout, Viewer],
     template: () => {
       return (
@@ -1681,6 +1696,10 @@ async function newSceneTreeSpec(data: {
     viewer,
     page,
     waitForSceneTreeConnected: async () => {
+      if (data.controller.isConnected) {
+        await page.waitForChanges();
+        return;
+      }
       await new Promise<void>((resolve) => {
         data.controller.onStateChange.on((state) => {
           if (state.connection.type === 'connected') {

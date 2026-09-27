@@ -1,10 +1,10 @@
-import { newSpecPage } from '@stencil/core/testing';
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerIcon } from './viewer-icon';
 
 describe('<vertex-viewer-icon>', () => {
   it('renders a fit all icon', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerIcon],
       html: `<vertex-viewer-icon name="fit-all"></vertex-viewer-icon>`,
     });
@@ -14,7 +14,7 @@ describe('<vertex-viewer-icon>', () => {
   });
 
   it('render an eye open icon', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerIcon],
       html: `<vertex-viewer-icon name="eye-open"></vertex-viewer-icon>`,
     });
@@ -24,7 +24,7 @@ describe('<vertex-viewer-icon>', () => {
   });
 
   it('render a half eye icon', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerIcon],
       html: `<vertex-viewer-icon name="eye-half"></vertex-viewer-icon>`,
     });
@@ -34,7 +34,7 @@ describe('<vertex-viewer-icon>', () => {
   });
 
   it('render a half eye dotted icon', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerIcon],
       html: `<vertex-viewer-icon name="eye-half-dotted"></vertex-viewer-icon>`,
     });
@@ -44,7 +44,7 @@ describe('<vertex-viewer-icon>', () => {
   });
 
   it('renders a comments filled icon', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerIcon],
       html: `<vertex-viewer-icon name="comment-filled"></vertex-viewer-icon>`,
     });
@@ -54,7 +54,7 @@ describe('<vertex-viewer-icon>', () => {
   });
 
   it('renders empty element if no icon is found', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerIcon],
       html: `<vertex-viewer-icon name="foo"></vertex-viewer-icon>`,
     });
@@ -64,7 +64,7 @@ describe('<vertex-viewer-icon>', () => {
   });
 
   it('sets the correct size class name', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerIcon],
       html: `<vertex-viewer-icon name="fit-all"></vertex-viewer-icon>`,
     });

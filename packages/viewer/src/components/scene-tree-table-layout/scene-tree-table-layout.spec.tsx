@@ -12,10 +12,14 @@ vi.mock('../scene-tree/lib/dom');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
+
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import { readDOM } from '../../lib/stencil';
 import {
@@ -661,7 +665,7 @@ async function newSceneTreeTableSpec(data?: {
   page: SpecPage;
   waitForControllerConnected: () => Promise<void>;
 }> {
-  const page = await newSpecPage({
+  const page = await renderSpecPage({
     components: [
       SceneTreeTableLayout,
       SceneTreeTableColumn,

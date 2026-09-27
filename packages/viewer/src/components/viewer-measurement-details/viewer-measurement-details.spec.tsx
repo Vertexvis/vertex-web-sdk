@@ -1,8 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Plane, Vector3 } from '@vertexvis/geometry';
 import { Angle } from '@vertexvis/geometry';
+
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import { MeasurementModel } from '../../lib/measurement';
 import { ViewerMeasurementDetails } from './viewer-measurement-details';
@@ -82,7 +86,7 @@ describe('vertex-viewer-measurement-details', () => {
   });
 
   it('creates a default measurement model', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDetails],
       template: () => <vertex-viewer-measurement-details />,
     });
@@ -105,7 +109,7 @@ describe('vertex-viewer-measurement-details', () => {
       ],
     });
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDetails],
       template: () => (
         <vertex-viewer-measurement-details
@@ -230,7 +234,7 @@ describe('vertex-viewer-measurement-details', () => {
 
   it('hides results', async () => {
     const model = new MeasurementModel();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDetails],
       template: () => (
         <vertex-viewer-measurement-details
@@ -272,7 +276,7 @@ describe('vertex-viewer-measurement-details', () => {
     model: MeasurementModel;
   }> {
     const model = new MeasurementModel();
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementDetails],
       template: () => (
         <vertex-viewer-measurement-details measurementModel={model} />

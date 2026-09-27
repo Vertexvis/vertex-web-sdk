@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { CalloutAnnotationData } from '../../lib/annotations/annotation';
 import { ViewerAnnotationCallout } from './viewer-annotation-callout';
@@ -16,7 +17,7 @@ describe('viewer-annotation-callout', () => {
   };
 
   it('renders callout with border, fill and icon', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerAnnotationCallout],
       template: () => (
         <vertex-viewer-annotation-callout data={callout} iconSize="md" />

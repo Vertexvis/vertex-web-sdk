@@ -1,5 +1,7 @@
-const realApi = jest.requireActual('@vertexvis/stream-api');
-jest.mock('@vertexvis/stream-api');
+const realApi = await vi.importActual<typeof import('@vertexvis/stream-api')>(
+  '@vertexvis/stream-api',
+);
+vi.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {

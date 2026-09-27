@@ -1,7 +1,8 @@
-jest.mock('regl-shape');
-jest.mock('regl');
-jest.mock('../../../lib/transforms/hits', () => ({
-  testDrawable: jest.fn(),
+import type { Mock } from '#test/mock-types';
+vi.mock('regl-shape', () => import('../../../__mocks__/regl-shape'));
+vi.mock('regl', () => import('../../../__mocks__/regl'));
+vi.mock('../../../lib/transforms/hits', () => ({
+  testDrawable: vi.fn(),
 }));
 
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
@@ -40,7 +41,7 @@ import {
 import { createdPaddedFloat64Array } from '../../../testing/webgl';
 import { TransformWidget } from '../widget';
 
-type MockShapeBuilder = jest.Mock<{ createShape: jest.Mock }>;
+type MockShapeBuilder = Mock<{ createShape: Mock }>;
 
 const mockShapeBuilder = shapeBuilder as MockShapeBuilder;
 
@@ -416,7 +417,7 @@ describe(TransformWidget, () => {
     const meshes = createMeshes(positionTransform, frame, canvas);
     const hoveredListener = vi.fn();
 
-    (testDrawable as jest.Mock).mockImplementation(
+    (testDrawable as Mock).mockImplementation(
       (m) => m.identifier === 'x-translate',
     );
 

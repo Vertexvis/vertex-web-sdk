@@ -1,4 +1,4 @@
-import type { Mock } from '#test/vitest.mock-types';
+import type { Mock } from '#test/mock-types';
 vi.mock('../viewer');
 
 import { Scene } from '../../../lib/scenes';

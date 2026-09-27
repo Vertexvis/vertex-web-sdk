@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { IconPin, PinModel, TextPin } from '../../lib/pins/model';
 import { VertexPinLabel } from '../viewer-pin-label/viewer-pin-label';
@@ -26,7 +27,7 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinGroup, VertexPinLabel, VertexPinLabelLine],
       template: () => (
         <vertex-viewer-pin-group
@@ -85,7 +86,7 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinGroup, VertexPinLabel, VertexPinLabelLine],
       template: () => (
         <vertex-viewer-pin-group
@@ -135,7 +136,7 @@ describe('vertex-view-pin-group', () => {
       worldPosition,
     };
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-group
@@ -178,7 +179,7 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-group
@@ -224,7 +225,7 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-group
@@ -271,7 +272,7 @@ describe('vertex-view-pin-group', () => {
       },
     };
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerPinGroup],
       template: () => (
         <vertex-viewer-pin-group

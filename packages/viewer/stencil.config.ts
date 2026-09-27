@@ -5,8 +5,6 @@ import { Config } from '@stencil/core';
 import { reactOutputTarget } from '@stencil/react-output-target';
 import { vueOutputTarget } from '@stencil/vue-output-target';
 
-import jestConfig from './jest-shared.config';
-
 export const config: Config = {
   namespace: 'viewer',
   sourceMap: true,
@@ -63,7 +61,6 @@ export const config: Config = {
       type: 'docs-readme',
     },
   ],
-  testing: { ...jestConfig },
   extras: {
     experimentalImportInjection: true,
   },
