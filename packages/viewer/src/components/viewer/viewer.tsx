@@ -546,6 +546,7 @@ export class Viewer implements BasicViewer {
   private resizeTimer?: NodeJS.Timeout;
   private streamAttributesUpdateTimer?: NodeJS.Timeout;
   private frameRenderVersion = 0;
+  private loadVersion = 0;
 
   private interactionHandlers: InteractionHandler[] = [];
   private defaultInteractionHandlerDisposables: Array<Disposable> = [];
@@ -1062,6 +1063,7 @@ export class Viewer implements BasicViewer {
    */
   @Method()
   public async load(urn: string, options?: LoadOptions): Promise<void> {
+    const loadVersion = ++this.loadVersion;
     const shouldLoadBasedOnVisibility =
       this.experimentalSkipVisibilityCheck || this.isVisible;
 
@@ -1093,7 +1095,7 @@ export class Viewer implements BasicViewer {
         options?.cameraType,
       );
 
-      if (state.type === 'connected') {
+      if (state.type === 'connected' && loadVersion === this.loadVersion) {
         this.sceneReady.emit();
 
         if (EXPERIMENTAL_annotationPollingIntervalInMs !== undefined) {
@@ -1113,6 +1115,7 @@ export class Viewer implements BasicViewer {
    */
   @Method()
   public async unload(): Promise<void> {
+    this.loadVersion += 1;
     if (this.stream != null) {
       this.frameRenderVersion += 1;
       this.annotations?.disconnect();
