@@ -12,6 +12,7 @@ vi.mock('../../lib/rendering/imageLoaders');
 import { grpc } from '@improbable-eng/grpc-web';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
+import { render } from '@stencil/vitest';
 import {
   ColumnKey,
   Node,
@@ -108,6 +109,20 @@ describe('<vertex-scene-tree>', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Happy DOM has no layout measurements. Supply the templated cell's
+    // rectangle so the table's clientHeight fallback can measure a row.
+    const getBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+      function (this: HTMLElement) {
+        return this.tagName === 'VERTEX-SCENE-TREE-TABLE-CELL'
+          ? new DOMRect(0, 0, 0, 24)
+          : getBoundingClientRect.call(this);
+      },
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe('initialization', () => {
@@ -187,9 +202,10 @@ describe('<vertex-scene-tree>', () => {
       const key2 = `urn:vertex:stream-key:${decodeSceneTreeJwt(newJwt).view}`;
       loadViewerStreamKey(key2, { viewer, stream, ws }, { token: newJwt });
       await waitForSceneTreeConnected();
-      await page.waitForChanges();
-
-      expect(rowData).toHaveBeenCalled();
+      await vi.waitFor(async () => {
+        await page.waitForChanges();
+        expect(rowData).toHaveBeenCalled();
+      });
     });
 
     it('emits error if tree is not enabled', async () => {
@@ -529,9 +545,8 @@ describe('<vertex-scene-tree>', () => {
     });
 
     it('initializes the default controller with a custom transport for subscriptions by default', async () => {
-      await renderSpecPage({
-        components: [SceneTree],
-        template: () => <vertex-scene-tree></vertex-scene-tree>,
+      await render(<vertex-scene-tree></vertex-scene-tree>, {
+        waitForReady: false,
       });
 
       expect(SceneTreeAPIClient).toHaveBeenCalledWith(
@@ -543,21 +558,19 @@ describe('<vertex-scene-tree>', () => {
     });
 
     it('initializes the default controller with a default transport if the flag is disabled', async () => {
-      await renderSpecPage({
-        components: [SceneTree],
-        template: () => (
-          <vertex-scene-tree
-            config={
-              {
-                flags: {
-                  ...defaultFlags,
-                  grpcUseStreamingWebSocketTransport: false,
-                },
-              } as unknown as Config
-            }
-          ></vertex-scene-tree>
-        ),
-      });
+      await render(
+        <vertex-scene-tree
+          config={
+            {
+              flags: {
+                ...defaultFlags,
+                grpcUseStreamingWebSocketTransport: false,
+              },
+            } as unknown as Config
+          }
+        ></vertex-scene-tree>,
+        { waitForReady: false },
+      );
 
       expect(SceneTreeAPIClient).toHaveBeenCalledWith(
         expect.any(String),
@@ -651,11 +664,15 @@ describe('<vertex-scene-tree>', () => {
         { token: newJwt },
       );
       await waitForSceneTreeConnected();
+      await tree.invalidateRows();
 
-      const row = tree.querySelectorAll(
-        'vertex-scene-tree-table-cell',
-      )[0] as HTMLVertexSceneTreeTableCellElement;
-      expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
+      await vi.waitFor(async () => {
+        await page.waitForChanges();
+        const row = tree.querySelectorAll(
+          'vertex-scene-tree-table-cell',
+        )[0] as HTMLVertexSceneTreeTableCellElement;
+        expect(row.node?.name).toEqual(res.toObject().itemsList[0].name);
+      });
     });
 
     it('renders the scene tree data, even if the network requests completed before the scene tree render', async () => {
@@ -1442,13 +1459,14 @@ describe('<vertex-scene-tree>', () => {
         mockGrpcUnaryResult(res),
       );
 
-      const { page } = await newConnectedSceneTreeSpec({ controller, token });
-      const tree = page.rootInstance as SceneTree;
+      const { tree } = await newConnectedSceneTreeSpec({ controller, token });
 
-      const scrollToIndex = vi.spyOn(tree, 'scrollToIndex');
-
-      await tree.scrollToItem('item-id');
-      expect(scrollToIndex).toHaveBeenCalledWith(10, expect.anything());
+      await tree.scrollToItem('item-id', { position: 'start' });
+      expect(scrollToTop).toHaveBeenCalledWith(
+        expect.anything(),
+        240,
+        expect.anything(),
+      );
     });
   });
 
