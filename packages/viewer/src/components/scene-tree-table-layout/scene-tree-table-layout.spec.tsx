@@ -10,16 +10,15 @@ vi.mock('../../lib/stencil', () => ({
 }));
 vi.mock('../scene-tree/lib/dom');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from '@stencil/core';
+import '../scene-tree-table-cell/scene-tree-table-cell';
+import '../scene-tree-table-column/scene-tree-table-column';
+import '../scene-tree-table-header/scene-tree-table-header';
+import './scene-tree-table-layout';
+
+import { render } from '@stencil/vitest';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { GetTreeResponse } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb';
 import { SceneTreeAPIClient } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
-
-import {
-  type RenderSpecPage as SpecPage,
-  renderSpecPage,
-} from '#test/render-spec-page';
 
 import { readDOM } from '../../lib/stencil';
 import {
@@ -32,16 +31,12 @@ import { triggerResizeObserver } from '../../testing/resizeObserver';
 import { SceneTreeController } from '../scene-tree/lib/controller';
 import { getSceneTreeViewportHeight } from '../scene-tree/lib/dom';
 import { Row } from '../scene-tree/lib/row';
-import { SceneTreeTableCell } from '../scene-tree-table-cell/scene-tree-table-cell';
-import { SceneTreeTableColumn } from '../scene-tree-table-column/scene-tree-table-column';
-import { SceneTreeTableHeader } from '../scene-tree-table-header/scene-tree-table-header';
 import {
   getSceneTreeTableOffsetTop,
   getSceneTreeTableViewportWidth,
 } from './lib/dom';
 import { SceneTreeCellHoverController } from './lib/hover-controller';
 import { restartTimeout } from './lib/window';
-import { SceneTreeTableLayout } from './scene-tree-table-layout';
 
 describe('<vertex-scene-tree-table-layout>', () => {
   beforeEach(() => {
@@ -49,10 +44,28 @@ describe('<vertex-scene-tree-table-layout>', () => {
     (getSceneTreeViewportHeight as Mock).mockReturnValue(1000);
     (getSceneTreeTableOffsetTop as Mock).mockReturnValue(0);
     (getSceneTreeTableViewportWidth as Mock).mockReturnValue(200);
+
+    // Happy DOM cannot measure the templated cell used to determine row height.
+    const getBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+      function (this: HTMLElement) {
+        return this.tagName === 'VERTEX-SCENE-TREE-TABLE-CELL'
+          ? new DOMRect(0, 0, 0, 24)
+          : getBoundingClientRect.call(this);
+      },
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('updates the layout position on resize', async () => {
-    const { page, table } = await newSceneTreeTableSpec();
+    const page = await render('<vertex-scene-tree-table-layout />', {
+      waitForReady: false,
+    });
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    await page.waitForChanges();
 
     expect(table.layoutOffset).toBe(0);
     (getSceneTreeTableOffsetTop as Mock).mockReturnValue(1000);
@@ -69,9 +82,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
           <vertex-scene-tree-table-layout>
             <vertex-scene-tree-table-column>
               <template>
@@ -80,7 +92,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
             </vertex-scene-tree-table-column>
           </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     const mockRow = {
       index: 0,
@@ -105,9 +121,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
           <vertex-scene-tree-table-layout>
             <vertex-scene-tree-table-column>
               <template>
@@ -117,7 +132,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
             </vertex-scene-tree-table-column>
           </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     const mockRow = {
       index: 0,
@@ -129,6 +148,13 @@ describe('<vertex-scene-tree-table-layout>', () => {
     table.totalRows = table.rows.length;
 
     await page.waitForChanges();
+
+    await vi.waitFor(async () => {
+      await page.waitForChanges();
+      expect(
+        table.querySelector('vertex-scene-tree-table-cell')?.node?.id?.hex,
+      ).toBe(mockRow.node.id?.hex);
+    });
 
     const hovered = vi.fn();
     const hoverController = new SceneTreeCellHoverController();
@@ -152,9 +178,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <vertex-scene-tree-table-column>
           <template slot="header">
@@ -166,7 +191,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(table.querySelector('div.templated-header-div')).not.toBeNull();
   });
@@ -176,9 +205,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
           <template slot="divider">
             <div class="templated-divider-div" />
@@ -203,7 +231,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
           </vertex-scene-tree-table-column>
         </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(table.querySelector('div.templated-divider-div')).not.toBeNull();
   });
@@ -213,9 +245,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
           <template slot="divider">
             <div class="templated-divider-div" />
@@ -231,7 +262,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
           </vertex-scene-tree-table-column>
         </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(table.querySelector('div.templated-divider-div')).toBeNull();
   });
@@ -241,9 +276,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <template slot="divider">
           <div class="templated-divider-div" />
@@ -261,7 +295,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
@@ -287,9 +325,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <template slot="divider">
           <div class="templated-divider-div" />
@@ -307,7 +344,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
@@ -347,9 +388,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <template slot="divider">
           <div class="templated-divider-div" />
@@ -367,7 +407,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
@@ -407,9 +451,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <template slot="divider">
           <div class="templated-divider-div" />
@@ -427,7 +470,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     let resizeDetail: number[] = [];
     const resizeListener = vi.fn((event) => {
@@ -463,9 +510,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <template slot="divider">
           <div class="templated-divider-div" />
@@ -483,7 +529,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
@@ -495,9 +545,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <template slot="divider">
           <div class="templated-divider-div" />
@@ -515,7 +564,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     expect(
       table.shadowRoot?.querySelector('div.table')?.getAttribute('style'),
@@ -527,9 +580,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     mockGetTree({ client });
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout>
         <template slot="divider">
           <div class="templated-divider-div" />
@@ -547,7 +599,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
         </vertex-scene-tree-table-column>
       </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     let restartTimeoutFn: VoidFunction | undefined;
     (restartTimeout as Mock).mockImplementation((fn: VoidFunction) => {
@@ -566,6 +622,13 @@ describe('<vertex-scene-tree-table-layout>', () => {
     table.totalRows = table.rows.length;
 
     await page.waitForChanges();
+
+    await vi.waitFor(async () => {
+      await page.waitForChanges();
+      expect(
+        table.querySelector('vertex-scene-tree-table-cell')?.node?.id?.hex,
+      ).toBe(table.rows[0]?.node?.id?.hex);
+    });
 
     const tableContainer = table.shadowRoot?.querySelector(
       'div.table',
@@ -615,9 +678,8 @@ describe('<vertex-scene-tree-table-layout>', () => {
     (getSceneTreeViewportHeight as Mock).mockReturnValue(0);
 
     const controller = new SceneTreeController(client, 100);
-    const { page, table } = await newSceneTreeTableSpec({
-      controller,
-      html: `
+    const page = await render(
+      `
         <vertex-scene-tree-table-layout row-height="0">
           <vertex-scene-tree-table-column initial-width="100" max-width="100">
             <template>
@@ -626,7 +688,11 @@ describe('<vertex-scene-tree-table-layout>', () => {
           </vertex-scene-tree-table-column>
         </vertex-scene-tree-table-layout>
       `,
-    });
+      { waitForReady: false },
+    );
+    const table = page.root as HTMLVertexSceneTreeTableLayoutElement;
+    table.controller = controller;
+    await page.waitForChanges();
 
     const mockRow = {
       index: 0,
@@ -655,61 +721,6 @@ describe('<vertex-scene-tree-table-layout>', () => {
     expect(activeRowRange[1]).not.toBeNaN();
   });
 });
-
-async function newSceneTreeTableSpec(data?: {
-  controller?: SceneTreeController;
-  template?: () => unknown;
-  html?: string;
-}): Promise<{
-  table: HTMLVertexSceneTreeTableLayoutElement;
-  page: SpecPage;
-  waitForControllerConnected: () => Promise<void>;
-}> {
-  const page = await renderSpecPage({
-    components: [
-      SceneTreeTableLayout,
-      SceneTreeTableColumn,
-      SceneTreeTableCell,
-      SceneTreeTableHeader,
-    ],
-    template:
-      data?.html == null
-        ? () => {
-            return (
-              data?.template?.() || (
-                <vertex-scene-tree-table-layout controller={data?.controller} />
-              )
-            );
-          }
-        : undefined,
-    html: data?.html,
-  });
-
-  const table = page.body.querySelector(
-    'vertex-scene-tree-table-layout',
-  ) as HTMLVertexSceneTreeTableLayoutElement;
-
-  table.controller = data?.controller;
-
-  return {
-    table,
-    page,
-    waitForControllerConnected: async () => {
-      await new Promise<void>((resolve) => {
-        if (data?.controller != null) {
-          data.controller.onStateChange.on((state) => {
-            if (state.connection.type === 'connected') {
-              resolve();
-            }
-          });
-        } else {
-          resolve();
-        }
-      });
-      await page.waitForChanges();
-    },
-  };
-}
 
 interface MockGetTreeOptions {
   client: SceneTreeAPIClient;
