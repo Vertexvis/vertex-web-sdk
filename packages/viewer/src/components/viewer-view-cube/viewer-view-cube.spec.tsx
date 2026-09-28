@@ -4,9 +4,8 @@ vi.mock('../../lib/rendering/imageLoaders');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
+import { render } from '@stencil/vitest';
 import { BoundingBox, Vector3 } from '@vertexvis/geometry';
-
-import { renderSpecPage } from '#test/render-spec-page';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { FramePerspectiveCamera, Orientation } from '../../lib/types';
@@ -21,6 +20,15 @@ import { ViewerDomElement } from '../viewer-dom-element/viewer-dom-element';
 import { ViewerDomGroup } from '../viewer-dom-group/viewer-dom-group';
 import { ViewerDomRenderer } from '../viewer-dom-renderer/viewer-dom-renderer';
 import { ViewerViewCube } from './viewer-view-cube';
+
+// Register source components in the Stencil Vitest environment.
+void [
+  Viewer,
+  ViewerDomElement,
+  ViewerDomGroup,
+  ViewerDomRenderer,
+  ViewerViewCube,
+];
 
 describe('vertex-viewer-view-cube', () => {
   (loadImageBytes as Mock).mockResolvedValue({
@@ -43,69 +51,66 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   it('renders a triad', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      html: `<vertex-viewer-view-cube></vertex-viewer-view-cube>`,
+    const { root, waitForChanges } = await render(<vertex-viewer-view-cube />, {
+      waitForReady: false,
     });
+    await waitForChanges();
 
-    expect(page.root?.shadowRoot?.querySelector('.triad')).toBeDefined();
+    expect(root.shadowRoot?.querySelector('.triad')).toBeDefined();
   });
 
   it('does not render triad if disabled', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      html: `<vertex-viewer-view-cube triad-off></vertex-viewer-view-cube>`,
-    });
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-view-cube triadOff />,
+      {
+        waitForReady: false,
+      },
+    );
+    await waitForChanges();
 
-    expect(page.root?.shadowRoot?.querySelector('.triad')).toBeNull();
+    expect(root.shadowRoot?.querySelector('.triad')).toBeNull();
   });
 
   it('shows custom labels for cube', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      html: `
-        <vertex-viewer-view-cube
-          x-positive-label="x-pos"
-          x-negative-label="x-neg"
-          y-positive-label="y-pos"
-          y-negative-label="y-neg"
-          z-positive-label="z-pos"
-          z-negative-label="z-neg"
-        ></vertex-viewer-view-cube>
-      `,
-    });
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-view-cube
+        xPositiveLabel="x-pos"
+        xNegativeLabel="x-neg"
+        yPositiveLabel="y-pos"
+        yNegativeLabel="y-neg"
+        zPositiveLabel="z-pos"
+        zNegativeLabel="z-neg"
+      />,
+      { waitForReady: false },
+    );
+    await waitForChanges();
 
-    expect(
-      page.root?.shadowRoot?.querySelector('.cube-side-face-x-pos'),
-    ).toEqualText('x-pos');
-    expect(
-      page.root?.shadowRoot?.querySelector('.cube-side-face-x-neg'),
-    ).toEqualText('x-neg');
-    expect(
-      page.root?.shadowRoot?.querySelector('.cube-side-face-y-pos'),
-    ).toEqualText('y-pos');
-    expect(
-      page.root?.shadowRoot?.querySelector('.cube-side-face-y-neg'),
-    ).toEqualText('y-neg');
-    expect(
-      page.root?.shadowRoot?.querySelector('.cube-side-face-z-pos'),
-    ).toEqualText('z-pos');
-    expect(
-      page.root?.shadowRoot?.querySelector('.cube-side-face-z-neg'),
-    ).toEqualText('z-neg');
+    expect(root.shadowRoot?.querySelector('.cube-side-face-x-pos')).toEqualText(
+      'x-pos',
+    );
+    expect(root.shadowRoot?.querySelector('.cube-side-face-x-neg')).toEqualText(
+      'x-neg',
+    );
+    expect(root.shadowRoot?.querySelector('.cube-side-face-y-pos')).toEqualText(
+      'y-pos',
+    );
+    expect(root.shadowRoot?.querySelector('.cube-side-face-y-neg')).toEqualText(
+      'y-neg',
+    );
+    expect(root.shadowRoot?.querySelector('.cube-side-face-z-pos')).toEqualText(
+      'z-pos',
+    );
+    expect(root.shadowRoot?.querySelector('.cube-side-face-z-neg')).toEqualText(
+      'z-neg',
+    );
   });
 
   it('uses world orientation for cube', async () => {
     const worldOrientation = new Orientation(Vector3.left(), Vector3.down());
-    const page = await renderSpecPage({
-      components: [
-        ViewerDomRenderer,
-        ViewerDomElement,
-        ViewerDomGroup,
-        ViewerViewCube,
-      ],
-      template: () => <vertex-viewer-view-cube />,
+    const page = await render(<vertex-viewer-view-cube />, {
+      waitForReady: false,
     });
+    await page.waitForChanges();
 
     const root = page.root as HTMLVertexViewerViewCubeElement;
     const cube = root.shadowRoot?.querySelector(
@@ -127,11 +132,14 @@ describe('vertex-viewer-view-cube', () => {
       2,
       45,
     );
-    const page = await renderSpecPage({
-      components: [ViewerDomRenderer, ViewerViewCube],
-      template: () => <vertex-viewer-view-cube camera={camera} />,
-    });
-    const renderer = page.root?.shadowRoot?.querySelector(
+    const { root, waitForChanges } = await render(
+      <vertex-viewer-view-cube camera={camera} />,
+      {
+        waitForReady: false,
+      },
+    );
+    await waitForChanges();
+    const renderer = root.shadowRoot?.querySelector(
       '.renderer',
     ) as HTMLVertexViewerDomRendererElement;
 
@@ -146,19 +154,18 @@ describe('vertex-viewer-view-cube', () => {
 
   it('applies camera from viewer', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerViewCube],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-view-cube></vertex-viewer-view-cube>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-view-cube />
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
+    const viewer = document.body.querySelector(
       'vertex-viewer',
     ) as HTMLVertexViewerElement;
-    const viewCube = page.body.querySelector(
+    const viewCube = document.body.querySelector(
       'vertex-viewer-view-cube',
     ) as HTMLVertexViewerViewCubeElement;
 
@@ -171,39 +178,49 @@ describe('vertex-viewer-view-cube', () => {
   });
 });
 
-import {
-  awaitScene,
-  cameraMock,
-  resetAwaiter,
-  sceneMock,
-  viewer,
-} from '../viewer/__mocks__/mocks';
-
 describe('vertex-viewer-view-cube interactions', () => {
-  const viewerElement = viewer as unknown as HTMLVertexViewerElement;
+  const cameraMock = {
+    standardView: vi.fn(),
+    standardViewFixedLookAt: vi.fn(),
+    viewAll: vi.fn(),
+    render: vi.fn(),
+  };
+  const sceneMock = {
+    boundingBox: vi.fn(
+      (): ReturnType<typeof BoundingBox.create> | undefined => undefined,
+    ),
+    camera: vi.fn(() => cameraMock),
+  };
+  const viewerElement = {
+    scene: vi.fn(async () => sceneMock),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  } as unknown as HTMLVertexViewerElement;
 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
-    Object.assign(viewer, {
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    });
-    resetAwaiter(sceneMock);
+    cameraMock.standardView.mockReturnValue(cameraMock);
+    cameraMock.standardViewFixedLookAt.mockReturnValue(cameraMock);
+    cameraMock.viewAll.mockReturnValue(cameraMock);
+    sceneMock.boundingBox.mockReturnValue(undefined);
   });
 
   it('performs standard view when side clicked', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube viewer={viewerElement} />,
-    });
+    const page = await render(
+      <vertex-viewer-view-cube viewer={viewerElement} />,
+      {
+        waitForReady: false,
+      },
+    );
+    await page.waitForChanges();
 
-    const frontEl = page.root?.shadowRoot?.querySelector(
+    const frontEl = page.root.shadowRoot?.querySelector(
       '.cube-side-face-front',
     );
     frontEl?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
 
-    await awaitScene;
+    await vi.waitFor(() => expect(cameraMock.render).toHaveBeenCalled());
 
     expect(cameraMock.standardView).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -222,19 +239,18 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('performs a standard view without a fit all when side clicked with viewAll set to false', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      template: () => (
-        <vertex-viewer-view-cube viewer={viewerElement} viewAll={false} />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-view-cube viewer={viewerElement} viewAll={false} />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const frontEl = page.root?.shadowRoot?.querySelector(
+    const frontEl = page.root.shadowRoot?.querySelector(
       '.cube-side-face-front',
     );
     frontEl?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
 
-    await awaitScene;
+    await vi.waitFor(() => expect(cameraMock.render).toHaveBeenCalled());
 
     expect(cameraMock.standardViewFixedLookAt).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -253,21 +269,24 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('performs standard view when side clicked with no visible geometry', async () => {
-    (sceneMock.boundingBox as Mock).mockReturnValue(
+    sceneMock.boundingBox.mockReturnValue(
       BoundingBox.create(Vector3.origin(), Vector3.origin()),
     );
 
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      template: () => <vertex-viewer-view-cube viewer={viewerElement} />,
-    });
+    const page = await render(
+      <vertex-viewer-view-cube viewer={viewerElement} />,
+      {
+        waitForReady: false,
+      },
+    );
+    await page.waitForChanges();
 
-    const frontEl = page.root?.shadowRoot?.querySelector(
+    const frontEl = page.root.shadowRoot?.querySelector(
       '.cube-side-face-front',
     );
     frontEl?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
 
-    await awaitScene;
+    await vi.waitFor(() => expect(cameraMock.render).toHaveBeenCalled());
 
     expect(cameraMock.standardView).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -286,39 +305,37 @@ describe('vertex-viewer-view-cube interactions', () => {
   });
 
   it('does not animation if animation duration is 0', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      template: () => (
-        <vertex-viewer-view-cube viewer={viewerElement} animationDuration={0} />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-view-cube viewer={viewerElement} animationDuration={0} />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const frontEl = page.root?.shadowRoot?.querySelector(
+    const frontEl = page.root.shadowRoot?.querySelector(
       '.cube-side-face-front',
     );
     frontEl?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
 
-    await awaitScene;
+    await vi.waitFor(() => expect(cameraMock.render).toHaveBeenCalled());
 
     expect(cameraMock.render).toHaveBeenCalledWith({});
   });
 
   it('does not perform standard view if disabled', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerViewCube],
-      template: () => (
-        <vertex-viewer-view-cube viewer={viewerElement} standardViewsOff />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-view-cube viewer={viewerElement} standardViewsOff />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const frontEl = page.root?.shadowRoot?.querySelector(
+    const frontEl = page.root.shadowRoot?.querySelector(
       '.cube-side-face-front',
     );
     frontEl?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
 
-    await viewer.scene();
-    await awaitScene;
+    await Promise.resolve();
 
+    expect(viewerElement.scene).not.toHaveBeenCalled();
     expect(cameraMock.render).not.toHaveBeenCalled();
   });
 });
