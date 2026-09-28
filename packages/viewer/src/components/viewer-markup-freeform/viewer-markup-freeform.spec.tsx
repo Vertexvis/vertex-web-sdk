@@ -2,16 +2,16 @@ import type { Mock } from '#test/mock-types';
 vi.mock('../viewer/utils');
 vi.mock('../viewer-markup/dom');
 
+import '../viewer/viewer';
+import '../viewer-markup/viewer-markup';
+import './viewer-markup-freeform';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
+import { render } from '@stencil/vitest';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 
-import { renderSpecPage } from '#test/render-spec-page';
-
-import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import { ViewerMarkup } from '../viewer-markup/viewer-markup';
-import { ViewerMarkupFreeform } from './viewer-markup-freeform';
 
 describe('vertex-viewer-markup-freeform', () => {
   const points = [
@@ -38,16 +38,15 @@ describe('vertex-viewer-markup-freeform', () => {
   });
 
   it('positions the anchors correctly', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMarkupFreeform],
-      template: () => (
-        <vertex-viewer-markup-freeform
-          points={points}
-          bounds={bounds}
-          mode="edit"
-        ></vertex-viewer-markup-freeform>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-markup-freeform
+        points={points}
+        bounds={bounds}
+        mode="edit"
+      ></vertex-viewer-markup-freeform>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root as HTMLVertexViewerMarkupFreeformElement;
     const leftEl = el?.shadowRoot?.getElementById(
@@ -103,20 +102,19 @@ describe('vertex-viewer-markup-freeform', () => {
   });
 
   it('handles resizes', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-freeform
-              points={points}
-              bounds={bounds}
-              mode="edit"
-            />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-freeform
+            points={points}
+            bounds={bounds}
+            mode="edit"
+          />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const root = page.root as HTMLVertexViewerElement;
     const el = root.querySelector(
@@ -274,20 +272,19 @@ describe('vertex-viewer-markup-freeform', () => {
       Point.create(-0.5, 0),
     ];
 
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup
-            originatingViewport={originatingViewport}
-            offset={offset}
-            scale={scale}
-          >
-            <vertex-viewer-markup-freeform points={points} />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup
+          originatingViewport={originatingViewport}
+          offset={offset}
+          scale={scale}
+        >
+          <vertex-viewer-markup-freeform points={points} />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root?.querySelector(
       'vertex-viewer-markup-freeform',
@@ -302,16 +299,15 @@ describe('vertex-viewer-markup-freeform', () => {
   });
 
   it('defines and updates the scale property as scale changes', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-freeform mode="create" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-freeform mode="create" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root?.querySelector(
       'vertex-viewer-markup-freeform',
@@ -344,16 +340,15 @@ describe('vertex-viewer-markup-freeform', () => {
       height: 0,
     });
 
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-freeform points={points} />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-freeform points={points} />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     expect(
       page.root
@@ -362,49 +357,63 @@ describe('vertex-viewer-markup-freeform', () => {
     ).toBeNull();
   });
 
-  it('removes event listeners when the viewer changes', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
-      template: () => (
+  it('updates event listeners when the viewer changes', async () => {
+    const page = await render(
+      <div>
         <vertex-viewer>
           <vertex-viewer-markup>
             <vertex-viewer-markup-freeform mode="create" />
           </vertex-viewer-markup>
         </vertex-viewer>
-      ),
-    });
+        <vertex-viewer id="new-viewer" />
+      </div>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const root = page.root as HTMLVertexViewerElement;
+    const root = page.root.querySelector(
+      'vertex-viewer',
+    ) as HTMLVertexViewerElement;
+    const newViewer = page.root.querySelector(
+      '#new-viewer',
+    ) as HTMLVertexViewerElement;
 
     const canvas = root.shadowRoot?.querySelector(
       'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = vi.spyOn(canvas, 'removeEventListener');
+    const newCanvas = newViewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
+    const addEventListener = vi.spyOn(newCanvas, 'addEventListener');
 
     const el = root.querySelector(
       'vertex-viewer-markup-freeform',
     ) as HTMLVertexViewerMarkupFreeformElement;
 
-    el.viewer = page.doc.createElement('vertex-viewer');
+    el.viewer = newViewer;
     await page.waitForChanges();
 
     expect(removeEventListener).toHaveBeenCalledWith(
       'pointerdown',
       expect.anything(),
     );
+    expect(addEventListener).toHaveBeenCalledWith(
+      'pointerdown',
+      expect.anything(),
+    );
   });
 
   it('removes event listeners when disposed', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupFreeform],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-freeform mode="create" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-freeform mode="create" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const root = page.root as HTMLVertexViewerElement;
 

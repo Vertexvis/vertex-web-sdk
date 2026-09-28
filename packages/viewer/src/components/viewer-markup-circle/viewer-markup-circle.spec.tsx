@@ -2,16 +2,16 @@ import type { Mock } from '#test/mock-types';
 vi.mock('../viewer/utils');
 vi.mock('../viewer-markup/dom');
 
+import '../viewer/viewer';
+import '../viewer-markup/viewer-markup';
+import './viewer-markup-circle';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
+import { render } from '@stencil/vitest';
 import { Dimensions, Point, Rectangle } from '@vertexvis/geometry';
 
-import { renderSpecPage } from '#test/render-spec-page';
-
-import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import { ViewerMarkup } from '../viewer-markup/viewer-markup';
-import { ViewerMarkupCircle } from './viewer-markup-circle';
 
 describe('vertex-viewer-markup-circle', () => {
   const bounds = Rectangle.create(-0.5, -0.5, 0.5, 0.5);
@@ -30,12 +30,11 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('positions the anchors correctly', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMarkupCircle],
-      template: () => (
-        <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-markup-circle bounds={bounds} mode="edit" />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root as HTMLVertexViewerMarkupCircleElement;
     const leftEl = el?.shadowRoot?.getElementById(
@@ -91,16 +90,15 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('handles resizes', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const root = page.root as HTMLVertexViewerElement;
     const el = root.querySelector(
@@ -249,16 +247,15 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('should support maintaining aspect ratio', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-circle bounds={bounds} mode="edit" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const root = page.root as HTMLVertexViewerElement;
     const el = root.querySelector(
@@ -289,20 +286,19 @@ describe('vertex-viewer-markup-circle', () => {
     const scale = 0.5;
     const bounds = Rectangle.create(0, 0, 0.5, 0.5);
 
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup
-            originatingViewport={originatingViewport}
-            offset={offset}
-            scale={scale}
-          >
-            <vertex-viewer-markup-circle bounds={bounds} />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup
+          originatingViewport={originatingViewport}
+          offset={offset}
+          scale={scale}
+        >
+          <vertex-viewer-markup-circle bounds={bounds} />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root?.querySelector(
       'vertex-viewer-markup-circle',
@@ -318,16 +314,15 @@ describe('vertex-viewer-markup-circle', () => {
   });
 
   it('defines and updates the scale property as scale changes', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-circle mode="create" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-circle mode="create" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root?.querySelector(
       'vertex-viewer-markup-circle',
@@ -360,16 +355,15 @@ describe('vertex-viewer-markup-circle', () => {
       height: 0,
     });
 
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-circle bounds={bounds} />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-circle bounds={bounds} />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     expect(
       page.root
@@ -378,25 +372,35 @@ describe('vertex-viewer-markup-circle', () => {
     ).toBeNull();
   });
 
-  it('removes event listeners when the viewer changes', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
-      template: () => (
+  it('updates event listeners when the viewer changes', async () => {
+    const page = await render(
+      <div>
         <vertex-viewer>
           <vertex-viewer-markup>
             <vertex-viewer-markup-circle mode="create" />
           </vertex-viewer-markup>
         </vertex-viewer>
-      ),
-    });
+        <vertex-viewer id="new-viewer" />
+      </div>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const root = page.root as HTMLVertexViewerElement;
+    const root = page.root.querySelector(
+      'vertex-viewer',
+    ) as HTMLVertexViewerElement;
+    const newViewer = page.root.querySelector(
+      '#new-viewer',
+    ) as HTMLVertexViewerElement;
     const canvas = root.shadowRoot?.querySelector(
       'canvas',
     ) as HTMLCanvasElement;
     const removeEventListener = vi.spyOn(canvas, 'removeEventListener');
+    const newCanvas = newViewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
+    const addEventListener = vi.spyOn(newCanvas, 'addEventListener');
 
-    const newViewer = page.doc.createElement('vertex-viewer');
     const el = root.querySelector(
       'vertex-viewer-markup-circle',
     ) as HTMLVertexViewerMarkupCircleElement;
@@ -407,19 +411,22 @@ describe('vertex-viewer-markup-circle', () => {
       'pointerdown',
       expect.anything(),
     );
+    expect(addEventListener).toHaveBeenCalledWith(
+      'pointerdown',
+      expect.anything(),
+    );
   });
 
   it('removes event listeners when disposed', async () => {
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupCircle],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-circle mode="create" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-circle mode="create" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const root = page.root as HTMLVertexViewerElement;
     const canvas = root.shadowRoot?.querySelector(
