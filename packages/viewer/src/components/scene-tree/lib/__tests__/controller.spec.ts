@@ -91,7 +91,7 @@ function createController(
   return { controller, client, stream };
 }
 
-describe(SceneTreeController, () => {
+describe('SceneTreeController', () => {
   const sceneViewId = random.guid();
   const jwt = signJwt(sceneViewId);
   const jwtProvider = (): string => jwt;
@@ -109,7 +109,7 @@ describe(SceneTreeController, () => {
     stream.invokeOnData(resp);
   };
 
-  describe(SceneTreeController.prototype.connect, () => {
+  describe('SceneTreeController.prototype.connect', () => {
     it('emits connecting and connected state changes', async () => {
       const { controller, client, stream } = createController(10);
       const getTree = createGetTreeResponse(10, 100, (node) =>
@@ -318,10 +318,16 @@ describe(SceneTreeController, () => {
           .mockReturnValue(jwt);
 
         const connect = controller.connect(retryingJwtProvider);
-        await vi.runAllTimersAsync();
-
-        await expect(connect).resolves.toBeUndefined();
+        for (
+          let i = 0;
+          (client.getTree as Mock).mock.calls.length < 2 && i < 10;
+          i++
+        ) {
+          await vi.advanceTimersToNextTimerAsync();
+        }
         expect(client.getTree).toHaveBeenCalledTimes(2);
+        await vi.advanceTimersByTimeAsync(0);
+        await expect(connect).resolves.toBeUndefined();
         expect(retryingJwtProvider).toHaveBeenCalledTimes(4);
         expect(warn).toHaveBeenCalledWith(
           expect.stringContaining(
@@ -921,7 +927,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.expandAll, () => {
+  describe('SceneTreeController.prototype.expandAll', () => {
     it('makes call to expand all nodes', async () => {
       const { controller, client } = createController(100);
       (client.getTree as Mock).mockImplementation(
@@ -942,7 +948,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.collapseAll, () => {
+  describe('SceneTreeController.prototype.collapseAll', () => {
     it('makes call to collapse all nodes', async () => {
       const { controller, client } = createController(100);
       (client.getTree as Mock).mockImplementation(
@@ -963,7 +969,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.fetchPage, () => {
+  describe('SceneTreeController.prototype.fetchPage', () => {
     it('does nothing if index is outside bounds', async () => {
       const { controller, client } = createController(100);
       (client.getTree as Mock).mockImplementation(
@@ -1071,7 +1077,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.fetchPageAtOffset, () => {
+  describe('SceneTreeController.prototype.fetchPageAtOffset', () => {
     it('does nothing if index is outside bounds', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementationOnce(
@@ -1112,7 +1118,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.fetchRange, () => {
+  describe('SceneTreeController.prototype.fetchRange', () => {
     it('constrains range', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementation(
@@ -1167,7 +1173,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.filter, () => {
+  describe('SceneTreeController.prototype.filter', () => {
     const term = 'filter';
 
     it('defaults to including full tree and non-exact match', async () => {
@@ -1292,7 +1298,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.getNonLoadedPageIndexes, () => {
+  describe('SceneTreeController.prototype.getNonLoadedPageIndexes', () => {
     it('returns page indices for pages that have been fetched', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementation(
@@ -1307,7 +1313,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.invalidatePagesOutsideRange, () => {
+  describe('SceneTreeController.prototype.invalidatePagesOutsideRange', () => {
     it('removes pages that are furthest from start and end range', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementation(
@@ -1345,7 +1351,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.getPageForOffset, () => {
+  describe('SceneTreeController.prototype.getPageForOffset', () => {
     it('constrains offset', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementation(
@@ -1360,7 +1366,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.getPageIndexesForRange, () => {
+  describe('SceneTreeController.prototype.getPageIndexesForRange', () => {
     it('constrains ranges', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementation(
@@ -1375,7 +1381,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.expandParentNodes, () => {
+  describe('SceneTreeController.prototype.expandParentNodes', () => {
     it('reloads tree if call responds with require reload', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementation(
@@ -1425,7 +1431,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.updateActiveRowRange, () => {
+  describe('SceneTreeController.prototype.updateActiveRowRange', () => {
     it('fetches pages in active rows that have not been fetched', async () => {
       const { controller, client } = createController(10);
       (client.getTree as Mock).mockImplementation(
@@ -1474,7 +1480,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.fetchMetadataKeys, () => {
+  describe('SceneTreeController.prototype.fetchMetadataKeys', () => {
     it('returns column keys', async () => {
       const key1 = new ColumnKey();
       key1.setValue('key1');
@@ -1498,7 +1504,7 @@ describe(SceneTreeController, () => {
     });
   });
 
-  describe(SceneTreeController.prototype.setMetadataKeys, () => {
+  describe('SceneTreeController.prototype.setMetadataKeys', () => {
     it('refetches pages in active rows with additional metadata values', async () => {
       const { controller, client, stream } = createController(10);
       (client.getTree as Mock).mockImplementation(
