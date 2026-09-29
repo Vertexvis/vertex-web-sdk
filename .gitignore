@@ -66,6 +66,10 @@ temp
 # Temp build directories
 dist
 
+# TypeScript output for root Vitest helpers
+/packages/vitest.*.js
+/packages/vitest.*.js.map
+
 # VS Code files
 .shadowroot
 *.code-workspace

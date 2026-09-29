@@ -9,7 +9,7 @@ describe('vertex-viewer-layer', () => {
       html: `<vertex-viewer-layer></vertex-viewer-layer>`,
     });
     expect(page.root).toEqualHtml(`
-      <vertex-viewer-layer>
+      <vertex-viewer-layer class="hydrated">
         <mock:shadow-root>
           <slot></slot>
         </mock:shadow-root>

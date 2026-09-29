@@ -41,42 +41,11 @@ export async function renderSpecPage(
     await pending;
   };
   await waitForChanges();
-  // The source transform adds a hydration marker that newSpecPage did not add.
-  // Remove it from fixture DOM so existing class and HTML assertions keep their
-  // meaning; this does not alter the compiled component output.
-  const clearHydrationClasses = (node: Element | ShadowRoot): void => {
-    for (const child of Array.from(node.children)) {
-      if (child.tagName.includes('-')) {
-        child.removeAttribute('hydrated');
-        const names = (child.getAttribute('class') || '')
-          .split(/\s+/)
-          .filter(
-            (name) => name && name !== 'hydrated' && !name.startsWith('sc-'),
-          );
-        if (names.length) child.setAttribute('class', names.join(' '));
-        else child.removeAttribute('class');
-      }
-      if (child.shadowRoot) clearHydrationClasses(child.shadowRoot);
-      clearHydrationClasses(child);
-    }
-  };
-  if (root.tagName.includes('-')) {
-    root.removeAttribute('hydrated');
-    const names = (root.getAttribute('class') || '')
-      .split(/\s+/)
-      .filter((name) => name && name !== 'hydrated' && !name.startsWith('sc-'));
-    if (names.length) root.setAttribute('class', names.join(' '));
-    else root.removeAttribute('class');
-  }
-  if (root.shadowRoot) clearHydrationClasses(root.shadowRoot);
-  clearHydrationClasses(root);
   return {
     ...result,
     root,
     waitForChanges: async () => {
       await waitForChanges();
-      if (root.shadowRoot) clearHydrationClasses(root.shadowRoot);
-      clearHydrationClasses(root);
     },
     rootInstance: root,
     body: document.body,

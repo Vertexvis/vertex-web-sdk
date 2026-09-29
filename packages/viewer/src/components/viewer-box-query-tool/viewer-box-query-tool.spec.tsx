@@ -30,9 +30,9 @@ describe('vertex-viewer-box-query-tool', () => {
       html: `<vertex-viewer-box-query-tool></vertex-viewer-box-query-tool>`,
     });
     expect(page.root).toEqualHtml(`
-      <vertex-viewer-box-query-tool>
+      <vertex-viewer-box-query-tool class="hydrated">
         <mock:shadow-root>
-          <vertex-viewer-layer>
+          <vertex-viewer-layer class="hydrated">
             <mock:shadow-root>
               <slot></slot>
             </mock:shadow-root>

@@ -9,7 +9,7 @@ describe('scene-tree-toolbar-group', () => {
       html: `<vertex-scene-tree-toolbar-group></vertex-scene-tree-toolbar-group>`,
     });
     expect(page.root).toEqualHtml(`
-      <vertex-scene-tree-toolbar-group>
+      <vertex-scene-tree-toolbar-group class="hydrated">
         <mock:shadow-root>
           <slot></slot>
         </mock:shadow-root>

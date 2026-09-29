@@ -10,7 +10,7 @@ describe('scene-tree-toolbar', () => {
     });
     // CHANGED ASSERTION: Vitest serializes slot elements with explicit closing tags.
     expect(page.root).toEqualHtml(`
-      <vertex-scene-tree-toolbar>
+      <vertex-scene-tree-toolbar class="hydrated">
         <mock:shadow-root>
         <div class="content">
           <slot name="before"></slot>
