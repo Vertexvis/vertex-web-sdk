@@ -47,7 +47,7 @@ export async function loadViewerStreamKey(
       result: {
         token: {
           token: token,
-          expiresIn: new Date().getTime() + 10000,
+          expiresIn: 3600,
         },
       },
     }).response,

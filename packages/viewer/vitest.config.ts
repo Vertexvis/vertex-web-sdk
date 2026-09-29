@@ -50,7 +50,7 @@ export default defineVitestConfig({
   },
   test: {
     globals: true,
-    maxWorkers: 2,
+    maxWorkers: '50%',
     projects: [
       {
         test: {
