@@ -82,6 +82,10 @@ describe('vertex-viewer-transform-widget', () => {
     height: 150,
   });
 
+  const onInteractionEnded = jest.fn();
+  const onInteractionFinished = jest.fn();
+  const onInteractionStarted = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -202,14 +206,12 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
-
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(1, 1, 1);
     widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionFinished', onInteractionFinished);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
@@ -292,6 +294,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     await page.waitForChanges();
     expect(onInteractionEnded).toHaveBeenCalled();
+    expect(onInteractionFinished).toHaveBeenCalled();
     expect(onInteractionStarted).toHaveBeenCalled();
   });
 
@@ -321,14 +324,12 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
-
     const frame = makePerspectiveFrame();
     await viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(0, 0, 0);
     widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionFinished', onInteractionFinished);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
@@ -423,14 +424,12 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
-
     const frame = makePerspectiveFrame();
     await viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(0, 0, 0);
     widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionFinished', onInteractionFinished);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
@@ -541,14 +540,12 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
-
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(1, 1, 1);
     widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionFinished', onInteractionFinished);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
@@ -647,6 +644,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     widget.position = Vector3.create(1, 1, 1);
     widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionFinished', onInteractionFinished);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
@@ -753,14 +751,12 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
-
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
 
     widget.position = Vector3.create(1, 1, 1);
     widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionFinished', onInteractionFinished);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
@@ -986,13 +982,11 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
-
     const frame = makePerspectiveFrame();
     viewer.dispatchFrameDrawn(frame);
 
     widget.addEventListener('interactionEnded', onInteractionEnded);
+    widget.addEventListener('interactionFinished', onInteractionFinished);
     widget.addEventListener('interactionStarted', onInteractionStarted);
 
     await page.waitForChanges();
