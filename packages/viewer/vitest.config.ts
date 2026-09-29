@@ -58,41 +58,9 @@ export default defineVitestConfig({
           globals: true,
           environment: 'stencil',
           include: ['src/lib/**/*.spec.{ts,tsx}'],
-          setupFiles: ['./vitest-setup.ts'],
+          setupFiles: ['./vitest-unit-setup.ts'],
         },
       },
-      // {
-      //   plugins: [stencilVitestPlugin(), stencilClassExports()],
-      //   oxc: {
-      //     jsx: {
-      //       runtime: 'classic',
-      //       pragma: 'h',
-      //       pragmaFrag: 'Fragment',
-      //       development: false,
-      //     },
-      //   },
-      //   resolve: {
-      //     alias: [
-      //       {
-      //         find: /^@stencil\/core$/,
-      //         replacement: '@stencil/core/internal/client',
-      //       },
-      //       ...testHelperAliases,
-      //     ],
-      //   },
-      //   test: {
-      //     name: 'components',
-      //     globals: true,
-      //     environment: 'stencil',
-      //     include: ['src/components/**/*.spec.{ts,tsx}'],
-      //     exclude: [
-      //       'src/components/scene-tree-table-cell/scene-tree-table-cell.spec.tsx',
-      //       'src/components/viewer-pin-label/viewer-pin-label.render.spec.tsx',
-      //       'src/components/viewer-pin-label/viewer-pin-label.spec.tsx',
-      //     ],
-      //     setupFiles: ['./vitest-setup.ts'],
-      //   },
-      // },
       {
         plugins: [stencilVitestPlugin(), stencilClassExports()],
         oxc: {
@@ -113,17 +81,12 @@ export default defineVitestConfig({
           ],
         },
         test: {
-          name: 'component-dom',
+          name: 'component',
           globals: true,
           environment: 'stencil',
           environmentOptions: { stencil: { domEnvironment: 'happy-dom' } },
           include: ['src/components/**/*.spec.{ts,tsx}'],
-          // include: [
-          //   'src/components/scene-tree-table-cell/scene-tree-table-cell.spec.tsx',
-          //   'src/components/viewer-pin-label/viewer-pin-label.render.spec.tsx',
-          //   'src/components/viewer-pin-label/viewer-pin-label.spec.tsx',
-          // ],
-          setupFiles: ['./vitest-setup.ts'],
+          setupFiles: ['./vitest-component-setup.ts'],
         },
       },
     ],

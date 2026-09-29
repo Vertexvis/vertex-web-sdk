@@ -10,7 +10,9 @@ const InteractionApiMock = InteractionApi as Mock<InteractionApi>;
 
 describe('VolumeIntersectionInteractionHandler', () => {
   it('disposes of resources properly', async () => {
-    const viewer = document.createElement('vertex-viewer');
+    const viewer = document.createElement(
+      'div',
+    ) as unknown as HTMLVertexViewerElement;
     const model = new VolumeIntersectionQueryModel();
     const controller = new VolumeIntersectionQueryController(model, viewer);
     const handler = new VolumeIntersectionQueryInteractionHandler(controller);
