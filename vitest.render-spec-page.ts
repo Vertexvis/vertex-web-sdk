@@ -14,6 +14,15 @@ export interface RenderSpecPage extends RenderResult<HTMLElement> {
   doc: Document;
 }
 
+/** Render source-registered components without waiting for componentOnReady(). */
+export async function renderSource<T extends HTMLElement = HTMLElement>(
+  template: Parameters<typeof render>[0],
+): Promise<RenderResult<T>> {
+  const result = await render<T>(template, { waitForReady: false });
+  await result.waitForChanges();
+  return result;
+}
+
 export async function renderSpecPage(
   options: RenderSpecPageOptions,
 ): Promise<RenderSpecPage> {

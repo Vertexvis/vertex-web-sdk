@@ -1,7 +1,11 @@
+import '../viewer-icon/viewer-icon';
+import './viewer-annotation-callout';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { render } from '@stencil/vitest';
 import { Vector3 } from '@vertexvis/geometry';
+
+import { renderSource as render } from '#test/render-spec-page';
 
 import { CalloutAnnotationData } from '../../lib/annotations/annotation';
 

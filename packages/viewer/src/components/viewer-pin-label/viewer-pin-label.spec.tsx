@@ -1,6 +1,10 @@
+import './viewer-pin-label';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { describe, expect, h, it, render } from '@stencil/vitest';
+import { describe, expect, h, it } from '@stencil/vitest';
 import { Dimensions, Point, Vector3 } from '@vertexvis/geometry';
+
+import { renderSource as render } from '#test/render-spec-page';
 
 import { PinController } from '../../lib/pins/controller';
 import { PinModel, TextPin } from '../../lib/pins/model';

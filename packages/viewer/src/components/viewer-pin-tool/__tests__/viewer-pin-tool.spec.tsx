@@ -1,6 +1,14 @@
+import '../../viewer-dom-renderer/viewer-dom-renderer';
+import '../../viewer-pin-group/viewer-pin-group';
+import '../../viewer-pin-label/viewer-pin-label';
+import '../../viewer-pin-label-line/viewer-pin-label-line';
+import '../viewer-pin-tool';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { describe, expect, h, it, render } from '@stencil/vitest';
+import { describe, expect, h, it } from '@stencil/vitest';
 import { Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+
+import { renderSource as render } from '#test/render-spec-page';
 
 import { TextPin } from '../../../lib/pins/model';
 import { viewer } from '../../viewer/__mocks__/mocks';

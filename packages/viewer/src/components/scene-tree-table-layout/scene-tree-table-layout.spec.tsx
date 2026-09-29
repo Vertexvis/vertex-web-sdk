@@ -13,6 +13,7 @@ vi.mock('../scene-tree/lib/dom');
 import '../scene-tree-table-cell/scene-tree-table-cell';
 import '../scene-tree-table-column/scene-tree-table-column';
 import '../scene-tree-table-header/scene-tree-table-header';
+import '../scene-tree-table-resize-divider/scene-tree-table-resize-divider';
 import './scene-tree-table-layout';
 
 import { render } from '@stencil/vitest';

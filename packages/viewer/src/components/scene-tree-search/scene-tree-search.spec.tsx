@@ -1,7 +1,12 @@
+import '../viewer-icon/viewer-icon';
+import '../viewer-spinner/viewer-spinner';
+import './scene-tree-search';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { render } from '@stencil/vitest';
 import { Async } from '@vertexvis/utils';
+
+import { renderSource as render } from '#test/render-spec-page';
 
 describe('vertex-scene-tree-search', () => {
   it('renders a text input', async () => {

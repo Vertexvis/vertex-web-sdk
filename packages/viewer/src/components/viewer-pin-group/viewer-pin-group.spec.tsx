@@ -1,7 +1,13 @@
+import '../viewer-dom-element/viewer-dom-element';
+import '../viewer-pin-label/viewer-pin-label';
+import '../viewer-pin-label-line/viewer-pin-label-line';
+import './viewer-pin-group';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { render } from '@stencil/vitest';
 import { Dimensions, Matrix4, Point, Vector3 } from '@vertexvis/geometry';
+
+import { renderSource as render } from '#test/render-spec-page';
 
 import { IconPin, PinModel, TextPin } from '../../lib/pins/model';
 import { getClosestCenterToPoint } from './utils';

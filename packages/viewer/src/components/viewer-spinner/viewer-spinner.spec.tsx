@@ -1,4 +1,6 @@
-import { render } from '@stencil/vitest';
+import './viewer-spinner';
+
+import { renderSource as render } from '#test/render-spec-page';
 
 
 describe('viewer spinner', () => {

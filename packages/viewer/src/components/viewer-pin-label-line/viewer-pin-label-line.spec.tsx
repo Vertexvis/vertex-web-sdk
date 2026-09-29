@@ -1,7 +1,10 @@
+import './viewer-pin-label-line';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { render } from '@stencil/vitest';
 import { Point } from '@vertexvis/geometry';
+
+import { renderSource as render } from '#test/render-spec-page';
 
 
 describe('vertex-ViewerPinLabelLine-pin', () => {
