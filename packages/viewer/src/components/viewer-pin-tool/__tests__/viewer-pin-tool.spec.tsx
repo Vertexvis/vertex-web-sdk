@@ -21,6 +21,21 @@ describe('vertex-viewer-pin-tool', () => {
     vi.clearAllMocks();
   });
 
+  it('observes the viewport again after reattachment', async () => {
+    const page = await render(<vertex-viewer-pin-tool />);
+    await page.waitForChanges();
+
+    const observe = vi.spyOn(ResizeObserver.prototype, 'observe');
+    const parent = page.root.parentElement;
+
+    page.root.remove();
+    parent?.appendChild(page.root);
+    await page.waitForChanges();
+
+    expect(observe).toHaveBeenCalledWith(page.root);
+    observe.mockRestore();
+  });
+
   it('renders a label for a pin', async () => {
     const { root, waitForChanges } = await render(
       <vertex-viewer-pin-tool

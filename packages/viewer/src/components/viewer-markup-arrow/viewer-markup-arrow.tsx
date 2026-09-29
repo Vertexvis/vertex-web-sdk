@@ -226,9 +226,15 @@ export class ViewerMarkupArrow {
     }
   }
 
+  protected connectedCallback(): void {
+    if (this.resizeObserver != null) {
+      this.resizeObserver.observe(this.hostEl);
+      this.updateViewport();
+    }
+  }
+
   protected disconnectedCallback(): void {
     this.resizeObserver?.disconnect();
-    this.resizeObserver = undefined;
 
     this.dispose();
   }

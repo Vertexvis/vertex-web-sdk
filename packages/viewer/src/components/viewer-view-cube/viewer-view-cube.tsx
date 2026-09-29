@@ -219,12 +219,18 @@ export class ViewerViewCube {
     }
   }
 
+  protected connectedCallback(): void {
+    if (this.rendererEl != null && this.rendererResizeObserver != null) {
+      this.rendererResizeObserver.observe(this.rendererEl);
+      this.handleRendererResized();
+    }
+  }
+
   /**
    * @ignore
    */
   protected disconnectedCallback(): void {
     this.rendererResizeObserver?.disconnect();
-    this.rendererResizeObserver = undefined;
   }
 
   private handleRendererResized(): void {

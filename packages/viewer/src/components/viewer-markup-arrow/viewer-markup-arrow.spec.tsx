@@ -54,6 +54,23 @@ describe('vertex-viewer-markup-arrow', () => {
     expect(centerEl?.getAttribute('style')).toContain('top: 25px');
   });
 
+  it('observes the viewport again after reattachment', async () => {
+    const page = await render(<vertex-viewer-markup-arrow />, {
+      waitForReady: false,
+    });
+    await page.waitForChanges();
+
+    const observe = vi.spyOn(ResizeObserver.prototype, 'observe');
+    const parent = page.root.parentElement;
+
+    page.root.remove();
+    parent?.appendChild(page.root);
+    await page.waitForChanges();
+
+    expect(observe).toHaveBeenCalledWith(page.root);
+    observe.mockRestore();
+  });
+
   it('handles resizes', async () => {
     const page = await render(
       <vertex-viewer>

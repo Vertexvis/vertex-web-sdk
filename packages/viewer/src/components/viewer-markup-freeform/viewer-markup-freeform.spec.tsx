@@ -37,6 +37,23 @@ describe('vertex-viewer-markup-freeform', () => {
     vi.clearAllMocks();
   });
 
+  it('observes the viewport again after reattachment', async () => {
+    const page = await render(<vertex-viewer-markup-freeform />, {
+      waitForReady: false,
+    });
+    await page.waitForChanges();
+
+    const observe = vi.spyOn(ResizeObserver.prototype, 'observe');
+    const parent = page.root.parentElement;
+
+    page.root.remove();
+    parent?.appendChild(page.root);
+    await page.waitForChanges();
+
+    expect(observe).toHaveBeenCalledWith(page.root);
+    observe.mockRestore();
+  });
+
   it('positions the anchors correctly', async () => {
     const page = await render(
       <vertex-viewer-markup-freeform

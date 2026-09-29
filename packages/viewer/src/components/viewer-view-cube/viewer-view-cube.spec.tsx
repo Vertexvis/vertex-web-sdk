@@ -59,6 +59,24 @@ describe('vertex-viewer-view-cube', () => {
     expect(root.shadowRoot?.querySelector('.triad')).toBeDefined();
   });
 
+  it('observes the renderer again after reattachment', async () => {
+    const { root, waitForChanges } = await render(<vertex-viewer-view-cube />, {
+      waitForReady: false,
+    });
+    await waitForChanges();
+
+    const renderer = root.shadowRoot?.querySelector('.renderer');
+    const observe = vi.spyOn(ResizeObserver.prototype, 'observe');
+    const parent = root.parentElement;
+
+    root.remove();
+    parent?.appendChild(root);
+    await waitForChanges();
+
+    expect(observe).toHaveBeenCalledWith(renderer);
+    observe.mockRestore();
+  });
+
   it('does not render triad if disabled', async () => {
     const { root, waitForChanges } = await render(
       <vertex-viewer-view-cube triadOff />,

@@ -343,6 +343,10 @@ export class ViewerMeasurementDistance {
    */
   protected connectedCallback(): void {
     this.setDepthBuffers();
+    if (this.stateMap.resizeObserver != null) {
+      this.stateMap.resizeObserver.observe(this.hostEl);
+      this.updateViewport();
+    }
   }
 
   /**
@@ -354,7 +358,6 @@ export class ViewerMeasurementDistance {
     this.resetDepthBuffers();
 
     this.stateMap.resizeObserver?.disconnect();
-    this.stateMap.resizeObserver = undefined;
   }
 
   /**
