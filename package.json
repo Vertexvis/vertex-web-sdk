@@ -4,7 +4,7 @@
   "nextVersionBump": "patch",
   "devDependencies": {
     "@vitest/coverage-v8": "4.1.11",
-    "eslint": "^9.39.5",
+    "eslint": "^10.11.0",
     "happy-dom": "20.14.5",
     "lerna": "^10.0.1",
     "prettier": "^3.9.9",
