@@ -1,5 +1,6 @@
-import { render } from '@stencil/vitest';
+import './viewer-icon';
 
+import { renderSource as render } from '#test/render-spec-page';
 
 describe('<vertex-viewer-icon>', () => {
   it('renders a fit all icon', async () => {
@@ -7,7 +8,7 @@ describe('<vertex-viewer-icon>', () => {
       `<vertex-viewer-icon name="fit-all"></vertex-viewer-icon>`,
     );
 
-    const svg = page.root?.shadowRoot?.querySelector('svg');
+    const svg = page.root.shadowRoot?.querySelector('svg');
     expect(svg?.innerHTML).toContain('path');
   });
 
@@ -16,7 +17,7 @@ describe('<vertex-viewer-icon>', () => {
       `<vertex-viewer-icon name="eye-open"></vertex-viewer-icon>`,
     );
 
-    const svg = page.root?.shadowRoot?.querySelector('svg');
+    const svg = page.root.shadowRoot?.querySelector('svg');
     expect(svg?.innerHTML).toContain('path');
   });
 
@@ -25,7 +26,7 @@ describe('<vertex-viewer-icon>', () => {
       `<vertex-viewer-icon name="eye-half"></vertex-viewer-icon>`,
     );
 
-    const svg = page.root?.shadowRoot?.querySelector('svg');
+    const svg = page.root.shadowRoot?.querySelector('svg');
     expect(svg?.innerHTML).toContain('path');
   });
 
@@ -34,7 +35,7 @@ describe('<vertex-viewer-icon>', () => {
       `<vertex-viewer-icon name="eye-half-dotted"></vertex-viewer-icon>`,
     );
 
-    const svg = page.root?.shadowRoot?.querySelector('svg');
+    const svg = page.root.shadowRoot?.querySelector('svg');
     expect(svg?.innerHTML).toContain('path');
   });
 
@@ -43,7 +44,7 @@ describe('<vertex-viewer-icon>', () => {
       `<vertex-viewer-icon name="comment-filled"></vertex-viewer-icon>`,
     );
 
-    const svg = page.root?.shadowRoot?.querySelector('svg');
+    const svg = page.root.shadowRoot?.querySelector('svg');
     expect(svg?.innerHTML).toContain('path');
   });
 
@@ -52,7 +53,7 @@ describe('<vertex-viewer-icon>', () => {
       `<vertex-viewer-icon name="foo"></vertex-viewer-icon>`,
     );
 
-    const svg = page.root?.shadowRoot?.querySelector('svg');
+    const svg = page.root.shadowRoot?.querySelector('svg');
     expect(svg?.innerHTML).not.toContain('path');
   });
 
@@ -61,15 +62,15 @@ describe('<vertex-viewer-icon>', () => {
       `<vertex-viewer-icon name="fit-all"></vertex-viewer-icon>`,
     );
 
-    page.root?.setAttribute('size', 'sm');
+    page.root.setAttribute('size', 'sm');
     await page.waitForChanges();
     expect(page.root).toHaveClass('size-sm');
 
-    page.root?.setAttribute('size', 'md');
+    page.root.setAttribute('size', 'md');
     await page.waitForChanges();
     expect(page.root).toHaveClass('size-md');
 
-    page.root?.setAttribute('size', 'lg');
+    page.root.setAttribute('size', 'lg');
     await page.waitForChanges();
     expect(page.root).toHaveClass('size-lg');
   });

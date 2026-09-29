@@ -9,6 +9,18 @@ vi.mock('../viewer/utils');
 vi.mock('../../lib/stencil');
 vi.mock('../../lib/rendering/imageLoaders');
 
+import '../scene-tree-table-cell/scene-tree-table-cell';
+import '../scene-tree-table-column/scene-tree-table-column';
+import '../scene-tree-table-header/scene-tree-table-header';
+import '../scene-tree-table-resize-divider/scene-tree-table-resize-divider';
+import '../scene-tree-table-layout/scene-tree-table-layout';
+import '../scene-tree-notification-banner/scene-tree-notification-banner';
+import '../scene-tree-search/scene-tree-search';
+import '../scene-tree-toolbar/scene-tree-toolbar';
+import '../viewer-spinner/viewer-spinner';
+import '../viewer/viewer';
+import './scene-tree';
+
 import { grpc } from '@improbable-eng/grpc-web';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
@@ -107,8 +119,7 @@ describe('<vertex-scene-tree>', () => {
     dispose: () => undefined,
   });
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+  beforeAll(() => {
     // Happy DOM has no layout measurements. Supply the templated cell's
     // rectangle so the table's clientHeight fallback can measure a row.
     const getBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
@@ -121,7 +132,11 @@ describe('<vertex-scene-tree>', () => {
     );
   });
 
-  afterEach(() => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterAll(() => {
     vi.restoreAllMocks();
   });
 
@@ -1682,7 +1697,6 @@ async function newSceneTreeSpec(data: {
   waitForSceneTreeConnected: () => Promise<void>;
 }> {
   const page = await renderSpecPage({
-    components: [SceneTree, SceneTreeTableLayout, Viewer],
     template: () => {
       return (
         data.template?.() || (
