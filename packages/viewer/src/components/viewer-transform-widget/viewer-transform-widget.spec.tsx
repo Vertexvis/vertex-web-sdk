@@ -18,8 +18,12 @@ vi.mock('./util', async () => {
 });
 vi.mock('./dom');
 
+import '../viewer/viewer';
+import './viewer-transform-widget';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
+import { render } from '@stencil/vitest';
 import {
   Angle,
   Euler,
@@ -29,8 +33,6 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { Async } from '@vertexvis/utils';
-
-import { renderSpecPage } from '#test/render-spec-page';
 
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { TriangleMesh, TriangleMeshPoints } from '../../lib/transforms/mesh';
@@ -43,13 +45,11 @@ import {
   makeViewerStream,
 } from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
-import { Viewer } from '../viewer/viewer';
 import {
   computeHandleDeltaTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from './util';
-import { ViewerTransformWidget } from './viewer-transform-widget';
 import { TransformWidget } from './widget';
 
 function dispatchKeydownEvent(
@@ -89,29 +89,26 @@ describe('vertex-viewer-transform-widget', () => {
   });
 
   it('renders a canvas', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerTransformWidget],
-      html: `<vertex-viewer-transform-widget></vertex-viewer-transform-widget>`,
+    const page = await render(<vertex-viewer-transform-widget />, {
+      waitForReady: false,
     });
+    await page.waitForChanges();
 
-    expect(page.root?.shadowRoot?.querySelector('canvas')).toBeDefined();
+    expect(page.root.shadowRoot?.querySelector('canvas')).toBeDefined();
   });
 
   it('renders a widget at the provided position', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -134,19 +131,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('provides the cursor position to the internal widget if within the widget bounds', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -182,19 +176,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('performs a transform', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -297,23 +288,20 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input-based position transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -399,23 +387,20 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input+keyboard based position transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -517,23 +502,20 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input-based rotation transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -615,23 +597,20 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input+keyboard based rotation transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -733,19 +712,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports an undo of the most recent transform', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -864,25 +840,22 @@ describe('vertex-viewer-transform-widget', () => {
   it('supports scaling the transformation handles', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -912,25 +885,22 @@ describe('vertex-viewer-transform-widget', () => {
   it('falls back to default scale values for values at or below zero', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -960,25 +930,22 @@ describe('vertex-viewer-transform-widget', () => {
   it('performs a transform when initialized with a position', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(0, 0, 0);
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1087,24 +1054,21 @@ describe('vertex-viewer-transform-widget', () => {
   it('sets the widget to disabled on an interaction, and re-enables available axis', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            xRotationDisabled={true}
-            yRotationDisabled={true}
-            zRotationDisabled={true}
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          xRotationDisabled={true}
+          yRotationDisabled={true}
+          zRotationDisabled={true}
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1171,19 +1135,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('updates widget bounds when the viewer dimensions change', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1214,19 +1175,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('ends any interaction and clears the widget position if the component position is cleared', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1293,19 +1251,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('clears the widget position if the component rotation is cleared and there is no translation', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1340,19 +1295,16 @@ describe('vertex-viewer-transform-widget', () => {
   it('should dispatch an event when the position of the widget changes', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await renderSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 

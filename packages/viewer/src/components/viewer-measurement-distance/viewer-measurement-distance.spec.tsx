@@ -6,6 +6,7 @@ vi.mock('../../workers/png-decoder-pool');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
+import { render } from '@stencil/vitest';
 import { Point, Vector3 } from '@vertexvis/geometry';
 
 import { renderSpecPage } from '#test/render-spec-page';
@@ -89,19 +90,18 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions the start and end anchors as Vector3 objects', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          start={start}
-          end={end}
-          camera={camera}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        start={start}
+        end={end}
+        camera={camera}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const startEl = page.root?.shadowRoot?.getElementById('start-anchor');
-    const endEl = page.root?.shadowRoot?.getElementById('end-anchor');
+    const startEl = page.root.shadowRoot?.getElementById('start-anchor');
+    const endEl = page.root.shadowRoot?.getElementById('end-anchor');
 
     const startPt = viewport.transformVectorToViewport(startNdc);
     const endPt = viewport.transformVectorToViewport(endNdc);
@@ -115,16 +115,15 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions the start and end anchors as JSON strings', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          startJson={`[${start.x}, ${start.y}, ${start.z}]`}
-          endJson={`[${end.x}, ${end.y}, ${end.z}]`}
-          camera={camera}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        startJson={`[${start.x}, ${start.y}, ${start.z}]`}
+        endJson={`[${end.x}, ${end.y}, ${end.z}]`}
+        camera={camera}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const startEl = page.root?.shadowRoot?.getElementById('start-anchor');
     const endEl = page.root?.shadowRoot?.getElementById('end-anchor');
@@ -141,16 +140,15 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions the label between the start and end anchors', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          start={start}
-          end={end}
-          camera={camera}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        start={start}
+        end={end}
+        camera={camera}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const labelEl = page.root?.shadowRoot?.getElementById('label');
     const startPt = viewport.transformVectorToViewport(startNdc);
@@ -163,16 +161,15 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions anchors and labels to element center', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          start={start}
-          end={end}
-          camera={camera}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        start={start}
+        end={end}
+        camera={camera}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const startEl = page.root?.shadowRoot?.getElementById('start-anchor');
     const endEl = page.root?.shadowRoot?.getElementById('end-anchor');
@@ -186,16 +183,15 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('update positions of anchors when start or end changes', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          start={start}
-          end={end}
-          camera={camera}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        start={start}
+        end={end}
+        camera={camera}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const newStart = Vector3.create(0, 0, 0);
     const newEnd = Vector3.create(1, 1, 1);
@@ -229,15 +225,14 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('supports slots for anchor labels', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      html: `
-        <vertex-viewer-measurement-distance>
-          <div id="start-label" slot="start-label"></div>
-          <div id="end-label" slot="end-label"></div>
-        </vertex-viewer-measurement-distance>
-      `,
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance>
+        <div id="start-label" slot="start-label"></div>
+        <div id="end-label" slot="end-label"></div>
+      </vertex-viewer-measurement-distance>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const startLabelEl = page.root?.querySelector('#start-label');
     const endLabelEl = page.root?.querySelector('#end-label');
@@ -247,21 +242,20 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('positions anchor labels with distance property', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          anchorLabelOffset={25}
-          startJson="[0, 0, 0]"
-          endJson="[0, 0, 0]"
-          camera={camera}
-          hitProvider={hitProvider}
-        >
-          <div id="start-label" slot="start-label"></div>
-          <div id="end-label" slot="end-label"></div>
-        </vertex-viewer-measurement-distance>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        anchorLabelOffset={25}
+        startJson="[0, 0, 0]"
+        endJson="[0, 0, 0]"
+        camera={camera}
+        hitProvider={hitProvider}
+      >
+        <div id="start-label" slot="start-label"></div>
+        <div id="end-label" slot="end-label"></div>
+      </vertex-viewer-measurement-distance>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const startLabelEl = page.root?.shadowRoot?.querySelector(
       '.anchor-label-start',
@@ -275,46 +269,44 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('is empty if start and end points cant be calculated', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      html: `<vertex-viewer-measurement-distance></vertex-viewer-measurement-distance>`,
+    const page = await render(<vertex-viewer-measurement-distance />, {
+      waitForReady: false,
     });
+    await page.waitForChanges();
 
     expect(page.root?.shadowRoot?.getElementById('start-anchor')).toBeNull();
   });
 
   it('formats distance with specified units and fractional digits', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          startJson="[0, 0, 0]"
-          endJson="[25.4, 0, 0]"
-          units="inches"
-          fractionalDigits={3}
-          camera={camera}
-        ></vertex-viewer-measurement-distance>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        startJson="[0, 0, 0]"
+        endJson="[25.4, 0, 0]"
+        units="inches"
+        fractionalDigits={3}
+        camera={camera}
+      ></vertex-viewer-measurement-distance>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const labelEl = page.root?.shadowRoot?.getElementById('label');
     expect(labelEl).toEqualText(`~1.000 in`);
   });
 
   it('displays dashes if measurement invalid', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          startJson="[0, 0, 0]"
-          endJson="[25.4, 0, 0]"
-          units="inches"
-          fractionalDigits={3}
-          camera={camera}
-          invalid
-        ></vertex-viewer-measurement-distance>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        startJson="[0, 0, 0]"
+        endJson="[25.4, 0, 0]"
+        units="inches"
+        fractionalDigits={3}
+        camera={camera}
+        invalid
+      ></vertex-viewer-measurement-distance>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const labelEl = page.root?.shadowRoot?.getElementById('label');
     expect(labelEl).toEqualText('---');
@@ -322,18 +314,17 @@ describe('vertex-viewer-measurement-distance', () => {
 
   it('formats distance with provided label formatter', async () => {
     const labelFormatter = vi.fn().mockReturnValue('test');
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          startJson="[0, 0, 0]"
-          endJson="[1000, 0, 0]"
-          units="meters"
-          labelFormatter={labelFormatter}
-          camera={camera}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        startJson="[0, 0, 0]"
+        endJson="[1000, 0, 0]"
+        units="meters"
+        labelFormatter={labelFormatter}
+        camera={camera}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const labelEl = page.root?.shadowRoot?.getElementById('label');
     expect(labelEl?.textContent).toBe(`test`);
@@ -341,17 +332,16 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('updates label when units change', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          startJson="[0, 0, 0]"
-          endJson="[1000, 0, 0]"
-          units="millimeters"
-          camera={camera}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        startJson="[0, 0, 0]"
+        endJson="[1000, 0, 0]"
+        units="millimeters"
+        camera={camera}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const measurement = page.root as HTMLVertexViewerMeasurementDistanceElement;
     measurement.units = 'meters';
@@ -375,7 +365,7 @@ describe('vertex-viewer-measurement-distance', () => {
       ),
     });
 
-    const viewer = page.body.querySelector(
+    const viewer = document.body.querySelector(
       'vertex-viewer',
     ) as HTMLVertexViewerElement;
 
@@ -388,7 +378,7 @@ describe('vertex-viewer-measurement-distance', () => {
       viewer.frame!.scene.camera.projectionViewMatrix,
     );
     const startPt = viewport.transformVectorToViewport(startNdc);
-    const startEl = page.body
+    const startEl = document.body
       .querySelector('vertex-viewer-measurement-distance')
       ?.shadowRoot?.getElementById('start-anchor');
 
@@ -410,7 +400,7 @@ describe('vertex-viewer-measurement-distance', () => {
       ),
     });
 
-    const viewer = page.body.querySelector(
+    const viewer = document.body.querySelector(
       'vertex-viewer',
     ) as HTMLVertexViewerElement;
     const update = vi.spyOn(stream, 'update');
@@ -429,16 +419,15 @@ describe('vertex-viewer-measurement-distance', () => {
 
   describe(ViewerMeasurementDistance.prototype.computeElementMetrics, () => {
     it('returns metrics for rendered elements', async () => {
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer-measurement-distance
-            start={start}
-            end={end}
-            camera={camera}
-          />
-        ),
-      });
+      const page = await render(
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          camera={camera}
+        />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -452,10 +441,10 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('returns undefined if anchors are not visible', async () => {
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => <vertex-viewer-measurement-distance />,
+      const page = await render(<vertex-viewer-measurement-distance />, {
+        waitForReady: false,
       });
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -472,17 +461,16 @@ describe('vertex-viewer-measurement-distance', () => {
     );
 
     it('does not update anchor if measurement is not editable', async () => {
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer-measurement-distance
-            start={start}
-            end={end}
-            hitProvider={hitProvider}
-            camera={camera}
-          />
-        ),
-      });
+      const page = await render(
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          hitProvider={hitProvider}
+          camera={camera}
+        />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -496,18 +484,17 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('does not update anchor if not primary button', async () => {
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer-measurement-distance
-            start={start}
-            end={end}
-            hitProvider={hitProvider}
-            camera={camera}
-            mode="edit"
-          />
-        ),
-      });
+      const page = await render(
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          hitProvider={hitProvider}
+          camera={camera}
+          mode="edit"
+        />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -523,19 +510,19 @@ describe('vertex-viewer-measurement-distance', () => {
     it('emits editBegin event when anchor editing started', async () => {
       const onEditBegin = vi.fn();
 
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer-measurement-distance
-            start={start}
-            end={end}
-            hitProvider={hitProvider}
-            camera={camera}
-            mode="edit"
-            onEditBegin={onEditBegin}
-          />
-        ),
-      });
+      const page = await render(
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          hitProvider={hitProvider}
+          camera={camera}
+          mode="edit"
+          onEditBegin={onEditBegin}
+        />,
+        { waitForReady: false },
+      );
+
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -548,18 +535,17 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('updates start point when anchor is moved', async () => {
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer-measurement-distance
-            start={start}
-            end={end}
-            hitProvider={hitProvider}
-            camera={camera}
-            mode="edit"
-          />
-        ),
-      });
+      const page = await render(
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          hitProvider={hitProvider}
+          camera={camera}
+          mode="edit"
+        />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -588,18 +574,17 @@ describe('vertex-viewer-measurement-distance', () => {
     });
 
     it('updates end point when anchor is moved', async () => {
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer-measurement-distance
-            start={start}
-            end={end}
-            hitProvider={hitProvider}
-            camera={camera}
-            mode="edit"
-          />
-        ),
-      });
+      const page = await render(
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          hitProvider={hitProvider}
+          camera={camera}
+          mode="edit"
+        />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -607,13 +592,11 @@ describe('vertex-viewer-measurement-distance', () => {
       anchor?.dispatchEvent(
         new MouseEvent('pointerdown', { clientX: 0, clientY: 0, button: 0 }),
       );
-
       await page.waitForChanges();
 
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 10, clientY: 10 }),
       );
-
       await page.waitForChanges();
 
       expect(measurement.end).not.toEqual(end);
@@ -621,19 +604,18 @@ describe('vertex-viewer-measurement-distance', () => {
 
     it('emits edit end event on anchor mouse up', async () => {
       const onEditEnd = vi.fn();
-      const page = await renderSpecPage({
-        components: [ViewerMeasurementDistance],
-        template: () => (
-          <vertex-viewer-measurement-distance
-            start={start}
-            end={end}
-            hitProvider={hitProvider}
-            camera={camera}
-            onEditEnd={onEditEnd}
-            mode="edit"
-          />
-        ),
-      });
+      const page = await render(
+        <vertex-viewer-measurement-distance
+          start={start}
+          end={end}
+          hitProvider={hitProvider}
+          camera={camera}
+          onEditEnd={onEditEnd}
+          mode="edit"
+        />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const measurement =
         page.root as HTMLVertexViewerMeasurementDistanceElement;
@@ -867,7 +849,6 @@ describe('vertex-viewer-measurement-distance', () => {
       window.dispatchEvent(
         new MouseEvent('pointermove', { clientX: 20, clientY: 20 }),
       );
-
       await page.waitForChanges();
 
       expect(measurement.end).toEqual(end);
@@ -951,17 +932,16 @@ describe('vertex-viewer-measurement-distance', () => {
   });
 
   it('renders axis reference lines if enabled', async () => {
-    const page = await renderSpecPage({
-      components: [ViewerMeasurementDistance],
-      template: () => (
-        <vertex-viewer-measurement-distance
-          start={start}
-          end={end}
-          camera={camera}
-          showAxisReferenceLines
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-distance
+        start={start}
+        end={end}
+        camera={camera}
+        showAxisReferenceLines
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const comp = page.root as HTMLVertexViewerMeasurementDistanceElement;
     const overlays = comp.shadowRoot?.querySelector(
