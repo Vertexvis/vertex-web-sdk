@@ -62,6 +62,10 @@ describe(MeasurementInteractionHandler, () => {
     vi.resetAllMocks();
   });
 
+  afterEach(() => {
+    handler.dispose();
+  });
+
   it('shows measurement cursor when pointer over measurable entity', async () => {
     const addCursor = vi.spyOn(api, 'addCursor');
 

@@ -48,9 +48,9 @@ describe('rollupConfig', () => {
       const bundle = await rollup(config);
       await bundle.close();
 
-      expect(await readFile(path.join(cwd, 'dist/index.d.ts'), 'utf8')).toContain(
-        'value',
-      );
+      expect(
+        await readFile(path.join(cwd, 'dist/index.d.ts'), 'utf8'),
+      ).toContain('value');
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }

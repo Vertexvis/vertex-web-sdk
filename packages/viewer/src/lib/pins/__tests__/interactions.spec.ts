@@ -50,6 +50,10 @@ describe('PinsInteractionHandler', () => {
     vi.resetAllMocks();
   });
 
+  afterEach(() => {
+    handler.dispose();
+  });
+
   it('supports dragging pins', async () => {
     controller.setDraggable({
       id: pin.id,
