@@ -490,7 +490,7 @@ export class Viewer implements BasicViewer {
   @Event() public interactionStarted!: EventEmitter<void>;
 
   /**
-   * Emits an event when the user hs finished an interaction.
+   * Emits an event when the user has finished an interaction.
    */
   @Event() public interactionFinished!: EventEmitter<void>;
 

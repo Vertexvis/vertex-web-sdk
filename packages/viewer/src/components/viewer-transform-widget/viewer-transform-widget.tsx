@@ -67,10 +67,17 @@ export class ViewerTransformWidget {
   public rotationChanged!: EventEmitter<Euler.Euler | undefined>;
 
   /**
+   * @deprecated Use `interactionFinished`
    * An event that is emitted when the interaction has ended
    */
   @Event({ bubbles: true })
   public interactionEnded!: EventEmitter<Matrix4.Matrix4 | undefined>;
+
+  /**
+   * An event that is emitted when the interaction has finished
+   */
+  @Event({ bubbles: true })
+  public interactionFinished!: EventEmitter<Matrix4.Matrix4 | undefined>;
 
   /**
    * An event that is emitted an interaction with the widget has started
@@ -817,6 +824,7 @@ export class ViewerTransformWidget {
 
       await this.controller?.endTransform();
 
+      this.interactionFinished.emit(delta);
       this.interactionEnded.emit(delta);
     } catch (e) {
       console.error('Failed to end transform interaction', e);

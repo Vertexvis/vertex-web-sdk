@@ -761,11 +761,11 @@ describe('vertex-viewer', () => {
     });
 
     it('emits an interaction finished event on last interaction', async () => {
-      let interactionEndedPromiseResolve: VoidFunction;
-      const interactionEndedPromise = new Promise<void>((resolve) => {
-        interactionEndedPromiseResolve = resolve;
+      let interactionFinishedPromiseResolve: VoidFunction;
+      const interactionFinishedPromise = new Promise<void>((resolve) => {
+        interactionFinishedPromiseResolve = resolve;
       });
-      const onInteractionEnded = vi.fn();
+      const onInteractionFinished = vi.fn();
 
       const { stream, ws } = makeViewerStream();
       const viewer = (
@@ -777,9 +777,9 @@ describe('vertex-viewer', () => {
       const canvas = viewer.shadowRoot?.querySelector('canvas');
 
       viewer.addEventListener('interactionFinished', () =>
-        interactionEndedPromiseResolve(),
+        interactionFinishedPromiseResolve(),
       );
-      viewer.addEventListener('interactionFinished', onInteractionEnded);
+      viewer.addEventListener('interactionFinished', onInteractionFinished);
 
       canvas?.dispatchEvent(
         new PointerEvent('pointerdown', {
@@ -810,8 +810,8 @@ describe('vertex-viewer', () => {
       // Wait for `endInteraction` to fire the `interactionFinished` event.
       // `endInteraction` will wait for any `beginInteraction` to finish
       // prior to processing the call.
-      return interactionEndedPromise.then(() => {
-        expect(onInteractionEnded).toHaveBeenCalled();
+      return interactionFinishedPromise.then(() => {
+        expect(onInteractionFinished).toHaveBeenCalled();
       });
     });
   });
