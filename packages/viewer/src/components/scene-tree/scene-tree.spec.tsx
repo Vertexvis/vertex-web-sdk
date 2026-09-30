@@ -6,7 +6,14 @@ vi.mock('./lib/dom');
 vi.mock('../scene-tree-table-layout/lib/dom');
 vi.mock('./lib/viewer-ops');
 vi.mock('../viewer/utils');
-vi.mock('../../lib/stencil');
+vi.mock('../../lib/stencil', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../lib/stencil')>();
+  return {
+    ...actual,
+    readDOM: (task: () => void) => setTimeout(task, 0),
+    writeDOM: (task: () => void) => setTimeout(task, 0),
+  };
+});
 vi.mock('../../lib/rendering/imageLoaders');
 
 import '../scene-tree-table-cell/scene-tree-table-cell';
