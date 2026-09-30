@@ -10,14 +10,14 @@
     "baseUrl": ".",
     "paths": {
       "#test/mock-types": ["../../vitest.mock-types.ts"],
-      "#test/render-spec-page": ["../../vitest.render-spec-page.ts"],
-    },
+      "#test/render-spec-page": ["../../vitest.render-spec-page.ts"]
+    }
   },
   "include": [
     "src",
     "types/*.d.ts",
     "src/components.d.ts",
-    "src/regl-shape.d.ts",
+    "src/regl-shape.d.ts"
   ],
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["dist", "node_modules"]
 }

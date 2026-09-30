@@ -6,7 +6,6 @@ import { Point } from '@vertexvis/geometry';
 
 import { renderSource as render } from '#test/render-spec-page';
 
-
 describe('vertex-ViewerPinLabelLine-pin', () => {
   it('should render a line between the given points', async () => {
     const start = Point.create(0, 0);

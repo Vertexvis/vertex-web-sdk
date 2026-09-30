@@ -100,7 +100,7 @@ describe('vertex-viewer-markup', () => {
             <div></div>
           </template>
           <vertex-viewer-markup arrow-template-id="my-template"></vertex-viewer-markup>
-        `
+        `,
       );
 
       const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
@@ -116,7 +116,7 @@ describe('vertex-viewer-markup', () => {
             <vertex-viewer-markup-circle class="my-class"></vertex-viewer-markup-circle>
           </template>
           <vertex-viewer-markup circle-template-id="my-template"></vertex-viewer-markup>
-        `
+        `,
       );
 
       const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
@@ -132,7 +132,7 @@ describe('vertex-viewer-markup', () => {
             <vertex-viewer-markup-circle class="my-class"></vertex-viewer-markup-circle>
           </template>
           <vertex-viewer-markup circle-template-id="not-my-template"></vertex-viewer-markup>
-        `
+        `,
       );
 
       const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
@@ -148,7 +148,7 @@ describe('vertex-viewer-markup', () => {
             <div></div>
           </template>
           <vertex-viewer-markup circle-template-id="my-template"></vertex-viewer-markup>
-        `
+        `,
       );
 
       const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
@@ -164,7 +164,7 @@ describe('vertex-viewer-markup', () => {
             <vertex-viewer-markup-freeform class="my-class"></vertex-viewer-markup-freeform>
           </template>
           <vertex-viewer-markup freeform-template-id="my-template"></vertex-viewer-markup>
-        `
+        `,
       );
 
       const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
@@ -180,7 +180,7 @@ describe('vertex-viewer-markup', () => {
             <vertex-viewer-markup-freeform class="my-class"></vertex-viewer-markup-freeform>
           </template>
           <vertex-viewer-markup freeform-template-id="not-my-template"></vertex-viewer-markup>
-        `
+        `,
       );
 
       const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
@@ -196,7 +196,7 @@ describe('vertex-viewer-markup', () => {
             <div></div>
           </template>
           <vertex-viewer-markup freeform-template-id="my-template"></vertex-viewer-markup>
-        `
+        `,
       );
 
       const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;

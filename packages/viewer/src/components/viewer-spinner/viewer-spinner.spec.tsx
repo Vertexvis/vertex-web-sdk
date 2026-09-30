@@ -2,7 +2,6 @@ import './viewer-spinner';
 
 import { renderSource as render } from '#test/render-spec-page';
 
-
 describe('viewer spinner', () => {
   it('renders a xs spinner', async () => {
     const page = await render(
