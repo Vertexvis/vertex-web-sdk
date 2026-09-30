@@ -10,10 +10,9 @@ import { beforeAll } from 'vitest';
 beforeAll(() => {
   if ('happyDOM' in window) {
     // Stencil's setup installs mock-doc events even for the happy-dom project.
-    globalThis.Event = HappyDOMEvent as unknown as typeof Event;
-    globalThis.MouseEvent = HappyDOMMouseEvent as unknown as typeof MouseEvent;
-    globalThis.KeyboardEvent =
-      HappyDOMKeyboardEvent as unknown as typeof KeyboardEvent;
+    globalThis.Event = HappyDOMEvent;
+    globalThis.MouseEvent = HappyDOMMouseEvent;
+    globalThis.KeyboardEvent = HappyDOMKeyboardEvent;
     globalThis.HTMLTemplateElement = window.HTMLTemplateElement;
     // Happy DOM has no canvas adapter, so getContext('2d') returns null and
     // the viewer drops incoming frames before its frame events can fire.
@@ -26,5 +25,3 @@ beforeAll(() => {
     });
   }
 });
-
-export {};

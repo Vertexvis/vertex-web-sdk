@@ -17,5 +17,3 @@ beforeEach(() => {
 afterEach(() => {
   Array.from(document.body.children).forEach((child) => child.remove());
 });
-
-export {};
