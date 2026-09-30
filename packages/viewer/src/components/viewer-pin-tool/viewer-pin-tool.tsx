@@ -167,6 +167,10 @@ export class ViewerPinTool {
    * @ignore
    */
   protected connectedCallback(): void {
+    if (this.resizeObserver != null) {
+      this.resizeObserver.observe(this.hostEl);
+      this.updateViewport();
+    }
     this.setupInteractionHandler();
     this.setDepthBuffers();
     this.setFeatureMaps();
@@ -204,6 +208,8 @@ export class ViewerPinTool {
    * @ignore
    */
   protected disconnectedCallback(): void {
+    this.resizeObserver?.disconnect();
+
     this.clearInteractionHandler();
     this.clearModelListeners();
     this.resetDepthBuffers();
@@ -323,7 +329,6 @@ export class ViewerPinTool {
     this.onEntitiesChangedHandler = undefined;
     this.onEntityAddedHandler?.dispose();
     this.onEntityAddedHandler = undefined;
-    this.resizeObserver?.disconnect();
   }
 
   private updateViewport(): void {

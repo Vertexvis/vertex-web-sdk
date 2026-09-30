@@ -4,7 +4,7 @@ describe('Stream utils', () => {
   describe('retryIfNotAborted', () => {
     it('calls the provided function if not aborted', async () => {
       const abortController = new AbortController();
-      const callback = jest
+      const callback = vi
         .fn()
         .mockRejectedValueOnce(new Error())
         .mockRejectedValueOnce(new Error())
@@ -27,7 +27,7 @@ describe('Stream utils', () => {
 
     it('does not retry if the signal has been aborted', async () => {
       const abortController = new AbortController();
-      const callback = jest
+      const callback = vi
         .fn()
         .mockRejectedValueOnce(new Error())
         .mockImplementationOnce(() => {

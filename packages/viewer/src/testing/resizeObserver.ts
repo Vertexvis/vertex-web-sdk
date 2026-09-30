@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const triggerResizeObserver = jest.fn();
-(global as any).ResizeObserver = class {
+export const triggerResizeObserver = vi.fn();
+(globalThis as any).ResizeObserver = class {
   private fn;
 
-  public disconnect = jest.fn();
-  public observe = jest.fn();
+  public disconnect = vi.fn();
+  public observe = vi.fn();
   public trigger = triggerResizeObserver.mockImplementation(
     (entries: ResizeObserverEntry[]) => this.fn(entries),
   );

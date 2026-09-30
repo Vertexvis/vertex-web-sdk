@@ -1,11 +1,11 @@
+import './viewer-measurement-details';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
-import { Plane, Vector3 } from '@vertexvis/geometry';
-import { Angle } from '@vertexvis/geometry';
+import { render, type RenderResult } from '@stencil/vitest';
+import { Angle, Plane, Vector3 } from '@vertexvis/geometry';
 
 import { MeasurementModel } from '../../lib/measurement';
-import { ViewerMeasurementDetails } from './viewer-measurement-details';
 
 describe('vertex-viewer-measurement-details', () => {
   it('renders a details with measurement details', async () => {
@@ -82,10 +82,10 @@ describe('vertex-viewer-measurement-details', () => {
   });
 
   it('creates a default measurement model', async () => {
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => <vertex-viewer-measurement-details />,
+    const page = await render(<vertex-viewer-measurement-details />, {
+      waitForReady: false,
     });
+    await page.waitForChanges();
 
     const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
     expect(comp.measurementModel).toBeInstanceOf(MeasurementModel);
@@ -105,15 +105,14 @@ describe('vertex-viewer-measurement-details', () => {
       ],
     });
 
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => (
-        <vertex-viewer-measurement-details
-          distanceUnits="inches"
-          measurementModel={model}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-details
+        distanceUnits="inches"
+        measurementModel={model}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     expect(
       page.root?.shadowRoot?.querySelector('div.measurement-details-entry')
@@ -230,15 +229,14 @@ describe('vertex-viewer-measurement-details', () => {
 
   it('hides results', async () => {
     const model = new MeasurementModel();
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => (
-        <vertex-viewer-measurement-details
-          measurementModel={model}
-          resultTypes={['minimum-distance']}
-        />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-details
+        measurementModel={model}
+        resultTypes={['minimum-distance']}
+      />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const comp = page.root as HTMLVertexViewerMeasurementDetailsElement;
 
@@ -268,16 +266,15 @@ describe('vertex-viewer-measurement-details', () => {
   });
 
   async function newMeasurementDetailsSpec(): Promise<{
-    page: SpecPage;
+    page: RenderResult<HTMLElement>;
     model: MeasurementModel;
   }> {
     const model = new MeasurementModel();
-    const page = await newSpecPage({
-      components: [ViewerMeasurementDetails],
-      template: () => (
-        <vertex-viewer-measurement-details measurementModel={model} />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-measurement-details measurementModel={model} />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     return { page, model };
   }

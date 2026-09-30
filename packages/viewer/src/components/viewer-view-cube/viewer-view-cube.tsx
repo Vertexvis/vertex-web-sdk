@@ -24,6 +24,7 @@ import {
 })
 export class ViewerViewCube {
   private rendererEl?: HTMLVertexViewerDomRendererElement;
+  private rendererResizeObserver?: ResizeObserver;
 
   @State()
   private boxLength = 80;
@@ -210,10 +211,26 @@ export class ViewerViewCube {
    */
   protected componentDidLoad(): void {
     if (this.rendererEl != null) {
-      const observer = new ResizeObserver(() => this.handleRendererResized());
-      observer.observe(this.rendererEl);
+      this.rendererResizeObserver = new ResizeObserver(() =>
+        this.handleRendererResized(),
+      );
+      this.rendererResizeObserver.observe(this.rendererEl);
       this.handleRendererResized();
     }
+  }
+
+  protected connectedCallback(): void {
+    if (this.rendererEl != null && this.rendererResizeObserver != null) {
+      this.rendererResizeObserver.observe(this.rendererEl);
+      this.handleRendererResized();
+    }
+  }
+
+  /**
+   * @ignore
+   */
+  protected disconnectedCallback(): void {
+    this.rendererResizeObserver?.disconnect();
   }
 
   private handleRendererResized(): void {

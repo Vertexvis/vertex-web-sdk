@@ -59,15 +59,18 @@ existing test helpers for focused regression coverage.
 
 ```sh
 yarn build
-yarn workspace @vertexvis/viewer test --runInBand src/components/viewer/viewer.spec.tsx
+yarn workspace @vertexvis/viewer test src/components/viewer/viewer.spec.tsx
 yarn workspace @vertexvis/viewer lint
 yarn typecheck:spec
 yarn test:ci
 yarn lint
 ```
 
-Check that a copied test path exists before using it. Library packages use Jest;
-Stencil packages use `stencil test --spec`. Root `yarn validate` runs build,
+Check that a copied test path exists before using it. The geometry, stream-api,
+html-templates, utils, and internal/build suites use Vitest (`test`, `test:watch`,
+and `test:coverage`). Stencil packages use the Stencil Vitest environment and
+require built custom elements before tests.
+Root `yarn validate` runs build,
 tests, and lint, but not the separate spec typecheck or SSR import checks. For
 entrypoint or packaging changes, run the affected package's `test:ssr-import`.
 

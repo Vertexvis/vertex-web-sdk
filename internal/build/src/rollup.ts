@@ -107,11 +107,21 @@ function createTypeScriptPlugin({
         inlineSources: false,
         noEmit: false,
         outDir: path.resolve(cwd, 'dist'),
+        rootDir: path.resolve(cwd, 'src'),
         skipLibCheck: true,
         sourceMap: false,
       };
 
-      const program = ts.createProgram(parsedConfig.fileNames, compilerOptions);
+      const sourceDir = path.resolve(cwd, 'src');
+      const declarationFiles = parsedConfig.fileNames.filter(
+        (fileName) =>
+          fileName.endsWith('.d.ts') &&
+          fileName.startsWith(`${sourceDir}${path.sep}`),
+      );
+      const program = ts.createProgram(
+        [path.resolve(sourceDir, 'index.ts'), ...declarationFiles],
+        compilerOptions,
+      );
       reportDiagnostics(this, ts.getPreEmitDiagnostics(program));
 
       const emitResult = program.emit(undefined, undefined, undefined, true);

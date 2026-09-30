@@ -1,10 +1,10 @@
-const mockHitIndicatorConstructor = jest.fn();
-const mockUpdateTransform = jest.fn();
-const mockUpdateFrame = jest.fn();
-const mockUpdateColors = jest.fn();
-const mockUpdateOpacities = jest.fn();
-const mockUpdateDimensions = jest.fn();
-const mockUpdateAndDraw = jest.fn();
+const mockHitIndicatorConstructor = vi.fn();
+const mockUpdateTransform = vi.fn();
+const mockUpdateFrame = vi.fn();
+const mockUpdateColors = vi.fn();
+const mockUpdateOpacities = vi.fn();
+const mockUpdateDimensions = vi.fn();
+const mockUpdateAndDraw = vi.fn();
 
 export class HitIndicator {
   public updateTransformAndNormal = mockUpdateTransform;

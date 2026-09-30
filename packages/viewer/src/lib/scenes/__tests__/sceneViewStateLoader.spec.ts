@@ -1,4 +1,4 @@
-jest.mock('@vertexvis/stream-api');
+vi.mock('@vertexvis/stream-api');
 
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -24,8 +24,8 @@ describe('SceneViewStateLoader', () => {
 
   describe('applySceneViewState', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
-      jest.resetAllMocks();
+      vi.clearAllMocks();
+      vi.resetAllMocks();
     });
 
     it('applies a scene view state by ID', async () => {
@@ -82,8 +82,8 @@ describe('SceneViewStateLoader', () => {
       const animationId = random.guid();
       const sceneViewStateId = random.guid();
 
-      const flyToSpy = jest.spyOn(streamApi, 'flyTo');
-      const eventSpy = jest.spyOn(streamApi, 'onEvent');
+      const flyToSpy = vi.spyOn(streamApi, 'flyTo');
+      const eventSpy = vi.spyOn(streamApi, 'onEvent');
 
       flyToSpy.mockResolvedValueOnce({
         flyTo: {
@@ -108,7 +108,7 @@ describe('SceneViewStateLoader', () => {
         });
 
         return {
-          dispose: jest.fn(),
+          dispose: vi.fn(),
         };
       });
 
@@ -143,7 +143,7 @@ describe('SceneViewStateLoader', () => {
       const animationId = random.guid();
       const sceneViewStateId = random.guid();
 
-      const flyToSpy = jest.spyOn(streamApi, 'flyTo');
+      const flyToSpy = vi.spyOn(streamApi, 'flyTo');
 
       flyToSpy.mockResolvedValueOnce({
         flyTo: {
@@ -184,8 +184,8 @@ describe('SceneViewStateLoader', () => {
 
   describe('applyPartialSceneViewState', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
-      jest.resetAllMocks();
+      vi.clearAllMocks();
+      vi.resetAllMocks();
     });
 
     it('applies a partial scene view state by ID', async () => {
@@ -259,7 +259,7 @@ describe('SceneViewStateLoader', () => {
       const animationId = random.guid();
       const sceneViewStateId = random.guid();
 
-      const flyToSpy = jest.spyOn(streamApi, 'flyTo');
+      const flyToSpy = vi.spyOn(streamApi, 'flyTo');
 
       flyToSpy.mockResolvedValueOnce({
         flyTo: {
@@ -295,8 +295,8 @@ describe('SceneViewStateLoader', () => {
       const animationId = random.guid();
       const sceneViewStateId = random.guid();
 
-      const flyToSpy = jest.spyOn(streamApi, 'flyTo');
-      const eventSpy = jest.spyOn(streamApi, 'onEvent');
+      const flyToSpy = vi.spyOn(streamApi, 'flyTo');
+      const eventSpy = vi.spyOn(streamApi, 'onEvent');
 
       flyToSpy.mockResolvedValueOnce({
         flyTo: {
@@ -321,7 +321,7 @@ describe('SceneViewStateLoader', () => {
         });
 
         return {
-          dispose: jest.fn(),
+          dispose: vi.fn(),
         };
       });
 
@@ -366,7 +366,7 @@ describe('SceneViewStateLoader', () => {
       const animationId = random.guid();
       const sceneViewStateId = random.guid();
 
-      const flyToSpy = jest.spyOn(streamApi, 'flyTo');
+      const flyToSpy = vi.spyOn(streamApi, 'flyTo');
 
       flyToSpy.mockResolvedValueOnce({
         flyTo: {

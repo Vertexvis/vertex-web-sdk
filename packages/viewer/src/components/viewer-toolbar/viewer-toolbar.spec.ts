@@ -1,10 +1,10 @@
-import { newSpecPage } from '@stencil/core/testing';
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerToolbar } from './viewer-toolbar';
 
 describe('<vertex-viewer-toolbar>', () => {
   it('sets the correct placement', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerToolbar],
       html: `<vertex-viewer-toolbar>Test</vertex-viewer-button>`,
     });
@@ -51,7 +51,7 @@ describe('<vertex-viewer-toolbar>', () => {
   });
 
   it('sets the correct direction', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerToolbar],
       html: `<vertex-viewer-toolbar>Test</vertex-viewer-button>`,
     });

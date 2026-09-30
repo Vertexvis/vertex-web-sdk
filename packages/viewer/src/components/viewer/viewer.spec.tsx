@@ -1,19 +1,20 @@
-jest.mock('./utils');
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('../../workers/png-decoder-pool');
-jest.mock('../../lib/annotations/controller');
+import type { Mock } from '#test/mock-types';
+import { renderSpecPage } from '#test/render-spec-page';
+vi.mock('./utils');
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('../../workers/png-decoder-pool');
+vi.mock('../../lib/annotations/controller');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
-import { newSpecPage } from '@stencil/core/testing';
+import { render } from '@stencil/vitest';
 import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import { Dimensions } from '@vertexvis/geometry';
 import { Async, UUID } from '@vertexvis/utils';
 
-import { MouseInteractionHandler } from '../../lib/interactions/mouseInteractionHandler';
+import { MultiPointerInteractionHandler } from '../../lib/interactions/multiPointerInteractionHandler';
+import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
 import { TapInteractionHandler } from '../../lib/interactions/tapInteractionHandler';
-import { TouchInteractionHandler } from '../../lib/interactions/touchInteractionHandler';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import * as Storage from '../../lib/storage';
 import { random } from '../../testing';
@@ -32,12 +33,12 @@ import { getElementBoundingClientRect, getElementPropertyValue } from './utils';
 import { Viewer } from './viewer';
 
 describe('vertex-viewer', () => {
-  (loadImageBytes as jest.Mock).mockResolvedValue({
+  (loadImageBytes as Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
   });
-  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getElementBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 150,
@@ -53,13 +54,14 @@ describe('vertex-viewer', () => {
   const screenPos50 = { screenX: 50, screenY: 50 };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('config', () => {
     it('defaults to production', async () => {
-      const viewer = await newViewerSpec({ template: () => <vertex-viewer /> });
+      const { root } = await render(<vertex-viewer />, { waitForReady: false });
+      const viewer = root as HTMLVertexViewerElement;
 
       expect(viewer.resolvedConfig).toMatchObject({
         network: {
@@ -70,7 +72,8 @@ describe('vertex-viewer', () => {
     });
 
     it('allows for platdev via the config route', async () => {
-      const viewer = await newViewerSpec({ template: () => <vertex-viewer /> });
+      const { root } = await render(<vertex-viewer />, { waitForReady: false });
+      const viewer = root as HTMLVertexViewerElement;
       viewer.configEnv = 'platdev';
       expect(viewer.resolvedConfig).toMatchObject({
         network: {
@@ -83,13 +86,14 @@ describe('vertex-viewer', () => {
 
   describe('when camera-controls prop is not set', () => {
     it('registers camera and touch interaction handlers by default', async () => {
-      const viewer = await newViewerSpec({ template: () => <vertex-viewer /> });
+      const { root } = await render(<vertex-viewer />, { waitForReady: false });
+      const viewer = root as HTMLVertexViewerElement;
       const handlers = await viewer.getInteractionHandlers();
 
       expect(handlers).toEqual(
         expect.arrayContaining([
-          expect.any(MouseInteractionHandler),
-          expect.any(TouchInteractionHandler),
+          expect.any(PointerInteractionHandler),
+          expect.any(MultiPointerInteractionHandler),
         ]),
       );
     });
@@ -97,41 +101,43 @@ describe('vertex-viewer', () => {
 
   describe('when camera-controls prop is false', () => {
     it('does not register camera and touch interaction handlers', async () => {
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer cameraControls={false} />,
+      const { root } = await render(<vertex-viewer cameraControls={false} />, {
+        waitForReady: false,
       });
+      const viewer = root as HTMLVertexViewerElement;
       const handlers = await viewer.getInteractionHandlers();
 
       expect(handlers).not.toEqual(
         expect.arrayContaining([
-          expect.any(MouseInteractionHandler),
-          expect.any(TouchInteractionHandler),
+          expect.any(PointerInteractionHandler),
+          expect.any(MultiPointerInteractionHandler),
         ]),
       );
     });
   });
 
-  describe(Viewer.prototype.registerInteractionHandler, () => {
+  describe('Viewer.prototype.registerInteractionHandler', () => {
     const handler = {
-      dispose: jest.fn(),
-      initialize: jest.fn(),
+      dispose: vi.fn(),
+      initialize: vi.fn(),
     };
 
     it('initializes interaction handler', async () => {
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer cameraControls={false} />,
+      const { root } = await render(<vertex-viewer cameraControls={false} />, {
+        waitForReady: false,
       });
+      const viewer = root as HTMLVertexViewerElement;
 
       await viewer.registerInteractionHandler(handler);
       expect(handler.initialize).toHaveBeenCalled();
     });
 
     it('disposing registered interaction handler removes handler', async () => {
-      const viewer = await newViewerSpec({
-        template: () => (
-          <vertex-viewer cameraControls={false} keyboardControls={false} />
-        ),
-      });
+      const { root } = await render(
+        <vertex-viewer cameraControls={false} keyboardControls={false} />,
+        { waitForReady: false },
+      );
+      const viewer = root as HTMLVertexViewerElement;
 
       const disposable = await viewer.registerInteractionHandler(handler);
       disposable.dispose();
@@ -143,17 +149,19 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe(Viewer.prototype.load, () => {
+  describe('Viewer.prototype.load', () => {
     it('emits connection, frame and scene events', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const onConnectionChange = jest.fn();
-      const onSceneReady = jest.fn();
-      const onFrameReceived = jest.fn();
-      const onFrameDrawn = jest.fn();
+      const onConnectionChange = vi.fn();
+      const onSceneReady = vi.fn();
+      const onFrameReceived = vi.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('connectionChange', onConnectionChange);
       viewer.addEventListener('sceneReady', onSceneReady);
@@ -183,11 +191,13 @@ describe('vertex-viewer', () => {
 
     it('loads different stream key', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const onSceneReady = jest.fn();
+      const onSceneReady = vi.fn();
       viewer.addEventListener('sceneReady', onSceneReady);
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
@@ -206,11 +216,11 @@ describe('vertex-viewer', () => {
     });
 
     it('loads stream with correct stream attributes', async () => {
-      (getElementPropertyValue as jest.Mock).mockReturnValue('#0000ff');
+      (getElementPropertyValue as Mock).mockReturnValue('#0000ff');
 
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
@@ -223,11 +233,12 @@ describe('vertex-viewer', () => {
             featureHighlighting={{ highlightColor: 0xff0000 }}
             depthBuffers="all"
             featureMaps="all"
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       expect(update).toHaveBeenCalledWith(
@@ -250,14 +261,14 @@ describe('vertex-viewer', () => {
     });
 
     it('updates the stream with correct stream attributes', async () => {
-      (getElementPropertyValue as jest.Mock).mockReturnValue('#00ffff');
+      (getElementPropertyValue as Mock).mockReturnValue('#00ffff');
 
       /* eslint-disable @typescript-eslint/no-explicit-any */
       const mutationObserver = (global as any).MutationObserver;
       let observerFns: VoidFunction[] = [];
       (global as any).MutationObserver = class {
-        public disconnect = jest.fn();
-        public observe = jest.fn();
+        public disconnect = vi.fn();
+        public observe = vi.fn();
 
         public constructor(fn: VoidFunction) {
           observerFns = [...observerFns, fn];
@@ -266,8 +277,8 @@ describe('vertex-viewer', () => {
       /* eslint-enable @typescript-eslint/no-explicit-any */
 
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
@@ -280,11 +291,12 @@ describe('vertex-viewer', () => {
             featureHighlighting={{ highlightColor: 0xff0000 }}
             depthBuffers="all"
             featureMaps="all"
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -310,16 +322,18 @@ describe('vertex-viewer', () => {
 
     it('only emits a scene ready event if the stream connects successfully', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const onConnectionChange = jest.fn();
-      const onSceneReady = jest.fn();
+      const onConnectionChange = vi.fn();
+      const onSceneReady = vi.fn();
       viewer.addEventListener('connectionChange', onConnectionChange);
       viewer.addEventListener('sceneReady', onSceneReady);
 
-      let loadPromiseResolve: VoidFunction = jest.fn();
+      let loadPromiseResolve: VoidFunction = vi.fn();
       const loadPromise = new Promise<void>((resolve) => {
         loadPromiseResolve = resolve;
       });
@@ -362,14 +376,16 @@ describe('vertex-viewer', () => {
     });
   });
 
-  describe(Viewer.prototype.unload, () => {
+  describe('Viewer.prototype.unload', () => {
     it('disconnects the WS', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const close = jest.spyOn(ws, 'close');
+      const close = vi.spyOn(ws, 'close');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
       await viewer.unload();
 
@@ -378,9 +394,11 @@ describe('vertex-viewer', () => {
 
     it('clears scene and received frame data', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
@@ -394,11 +412,15 @@ describe('vertex-viewer', () => {
 
   describe('connection failure behavior', () => {
     it('displays a connection error with a retry button that reloads the viewer', async () => {
-      const reload = jest.spyOn(Viewer.prototype, 'reload').mockResolvedValue();
+      const reload = vi
+        .spyOn(customElements.get('vertex-viewer')!.prototype, 'reload')
+        .mockResolvedValue(undefined);
       const { stream } = makeViewerStream();
-      const { page, viewer } = await newViewerSpecWithPage({
+      const page = await renderSpecPage({
+        components: [Viewer],
         template: () => <vertex-viewer stream={stream} />,
       });
+      const viewer = page.root as HTMLVertexViewerElement;
 
       stream.stateChanged.emit({
         type: 'connection-failed',
@@ -426,10 +448,13 @@ describe('vertex-viewer', () => {
     });
 
     it('allows overriding the default retry button behavior', async () => {
-      const reload = jest.spyOn(Viewer.prototype, 'reload').mockResolvedValue();
-      const customRetryHandler = jest.fn();
+      const reload = vi
+        .spyOn(customElements.get('vertex-viewer')!.prototype, 'reload')
+        .mockResolvedValue(undefined);
+      const customRetryHandler = vi.fn();
       const { stream } = makeViewerStream();
-      const { page, viewer } = await newViewerSpecWithPage({
+      const page = await renderSpecPage({
+        components: [Viewer],
         template: () => (
           <vertex-viewer stream={stream}>
             <button slot="retry" onClick={customRetryHandler}>
@@ -438,6 +463,7 @@ describe('vertex-viewer', () => {
           </vertex-viewer>
         ),
       });
+      const viewer = page.root as HTMLVertexViewerElement;
       const retry = viewer.querySelector('[slot="retry"]') as HTMLButtonElement;
 
       stream.stateChanged.emit({
@@ -455,12 +481,14 @@ describe('vertex-viewer', () => {
   describe('disconnect behavior', () => {
     it('should pause the stream and close the websocket when disconnected', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const close = jest.spyOn(ws, 'close');
-      const pause = jest.spyOn(stream, 'pause');
+      const close = vi.spyOn(ws, 'close');
+      const pause = vi.spyOn(stream, 'pause');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
       viewer.remove();
 
@@ -472,12 +500,14 @@ describe('vertex-viewer', () => {
   describe('reconnect behavior', () => {
     it('should reconnect to a paused stream', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const pause = jest.spyOn(stream, 'pause');
-      const resume = jest.spyOn(stream, 'resume');
+      const pause = vi.spyOn(stream, 'pause');
+      const resume = vi.spyOn(stream, 'resume');
       const viewerParent = viewer.parentElement;
       await loadViewerStreamKey(key1, { stream, ws, viewer });
       viewer.remove();
@@ -492,17 +522,19 @@ describe('vertex-viewer', () => {
   describe('stream attributes', () => {
     it('updates stream when a stream attribute changes', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.depthBuffers = 'all';
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -511,10 +543,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.phantom = { opacity: 1 };
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -523,10 +555,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.featureLines = { width: 1 };
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -535,10 +567,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.featureHighlighting = { highlightColor: 0xff0000 };
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -547,10 +579,10 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.featureMaps = 'final';
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -559,12 +591,12 @@ describe('vertex-viewer', () => {
         }),
       );
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       viewer.crossSectioning = {};
       viewer.crossSectioning.endCapEnabled = true;
       viewer.crossSectioning.endCapColor = '#112233';
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(update).toHaveBeenCalledWith(
         expect.objectContaining({
           streamAttributes: expect.objectContaining({
@@ -582,17 +614,18 @@ describe('vertex-viewer', () => {
     it('generates and stores device id', async () => {
       const { stream, ws } = makeViewerStream();
       const deviceId = 'device-id';
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             deviceId={deviceId}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
-      const load = jest.spyOn(stream, 'load');
+      const load = vi.spyOn(stream, 'load');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
       expect(deviceId).toBe(viewer.deviceId);
@@ -606,16 +639,18 @@ describe('vertex-viewer', () => {
     });
 
     it('uses stored device id if available', async () => {
-      jest
-        .spyOn(Storage, 'getStorageEntry')
-        .mockImplementation(() => 'some-device-id');
+      vi.spyOn(Storage, 'getStorageEntry').mockImplementation(
+        () => 'some-device-id',
+      );
 
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
-      const load = jest.spyOn(stream, 'load');
+      const load = vi.spyOn(stream, 'load');
       await loadViewerStreamKey(key1, { stream, ws, viewer });
 
       expect(viewer.deviceId).toBe('some-device-id');
@@ -632,17 +667,18 @@ describe('vertex-viewer', () => {
   describe('rotate about tap point', () => {
     it('enables depth buffers', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             rotateAroundTapPoint={true}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       expect(update).toHaveBeenCalledWith(
@@ -656,17 +692,18 @@ describe('vertex-viewer', () => {
 
     it('disables depth buffers when disabled', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             rotateAroundTapPoint={false}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
       await loadViewerStreamKey(key1, { viewer, stream, ws });
 
       expect(update).toHaveBeenCalledWith(
@@ -681,29 +718,43 @@ describe('vertex-viewer', () => {
 
   describe('interaction events', () => {
     it('emits an interaction started event on first interaction', async () => {
-      const onInteractionStarted = jest.fn();
+      const onInteractionStarted = vi.fn();
 
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
       await loadViewerStreamKey(key1, { viewer, stream, ws });
       const canvas = viewer.shadowRoot?.querySelector('canvas');
 
       viewer.addEventListener('interactionStarted', onInteractionStarted);
 
       canvas?.dispatchEvent(
-        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }),
+        new PointerEvent('pointerdown', {
+          ...screenPos0,
+          buttons: 1,
+          pointerId: 1,
+        }),
       );
 
       const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
       await Async.delay(delay + 5);
 
       window.dispatchEvent(
-        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }),
+        new PointerEvent('pointermove', {
+          ...screenPos50,
+          buttons: 1,
+          pointerId: 1,
+        }),
       );
       window.dispatchEvent(
-        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }),
+        new PointerEvent('pointerup', {
+          ...screenPos50,
+          buttons: 1,
+          pointerId: 1,
+        }),
       );
 
       expect(onInteractionStarted).toHaveBeenCalled();
@@ -714,12 +765,14 @@ describe('vertex-viewer', () => {
       const interactionFinishedPromise = new Promise<void>((resolve) => {
         interactionFinishedPromiseResolve = resolve;
       });
-      const onInteractionFinished = jest.fn();
+      const onInteractionFinished = vi.fn();
 
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
       await loadViewerStreamKey(key1, { viewer, stream, ws });
       const canvas = viewer.shadowRoot?.querySelector('canvas');
 
@@ -729,17 +782,29 @@ describe('vertex-viewer', () => {
       viewer.addEventListener('interactionFinished', onInteractionFinished);
 
       canvas?.dispatchEvent(
-        new MouseEvent('mousedown', { ...screenPos0, buttons: 1 }),
+        new PointerEvent('pointerdown', {
+          ...screenPos0,
+          buttons: 1,
+          pointerId: 1,
+        }),
       );
 
       const delay = viewer.resolvedConfig?.interactions.interactionDelay ?? 0;
       await Async.delay(delay + 5);
 
       window.dispatchEvent(
-        new MouseEvent('mousemove', { ...screenPos50, buttons: 1 }),
+        new PointerEvent('pointermove', {
+          ...screenPos50,
+          buttons: 1,
+          pointerId: 1,
+        }),
       );
       window.dispatchEvent(
-        new MouseEvent('mouseup', { ...screenPos50, buttons: 1 }),
+        new PointerEvent('pointerup', {
+          ...screenPos50,
+          buttons: 1,
+          pointerId: 1,
+        }),
       );
 
       // Wait for `endInteraction` to fire the `interactionFinished` event.
@@ -754,7 +819,8 @@ describe('vertex-viewer', () => {
   describe('interaction handlers', () => {
     it('handles toggling cameraControls off', async () => {
       const { stream, ws } = makeViewerStream();
-      const { page, viewer } = await newViewerSpecWithPage({
+      const page = await renderSpecPage({
+        components: [Viewer],
         template: () => (
           <vertex-viewer
             clientId={clientId}
@@ -763,6 +829,7 @@ describe('vertex-viewer', () => {
           />
         ),
       });
+      const viewer = page.root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
@@ -784,7 +851,8 @@ describe('vertex-viewer', () => {
 
     it('handles toggling keyboardControls off', async () => {
       const { stream, ws } = makeViewerStream();
-      const { page, viewer } = await newViewerSpecWithPage({
+      const page = await renderSpecPage({
+        components: [Viewer],
         template: () => (
           <vertex-viewer
             clientId={clientId}
@@ -793,6 +861,7 @@ describe('vertex-viewer', () => {
           />
         ),
       });
+      const viewer = page.root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
@@ -813,13 +882,15 @@ describe('vertex-viewer', () => {
   describe('temporal AA', () => {
     it('reuses previous depth buffer if temporal correlation id matches', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
@@ -840,35 +911,31 @@ describe('vertex-viewer', () => {
 
       await Async.delay(10);
 
-      expect(onFrameDrawn).toHaveBeenNthCalledWith(
-        2,
-        expect.objectContaining({
-          detail: expect.objectContaining({
-            depthBufferBytes:
-              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
-          }),
-        }),
+      const expectedBytes = Array.from(
+        Fixtures.drawFramePayloadPerspective.depthBuffer?.value ?? [],
       );
-      expect(onFrameDrawn).toHaveBeenNthCalledWith(
-        3,
-        expect.objectContaining({
-          detail: expect.objectContaining({
-            depthBufferBytes:
-              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
-          }),
-        }),
-      );
+      expect(
+        onFrameDrawn.mock.calls.map(([event]) => event.detail.sequenceNumber),
+      ).toEqual([1, 2, 3]);
+      expect(
+        Array.from(onFrameDrawn.mock.calls[1][0].detail.depthBufferBytes ?? []),
+      ).toEqual(expectedBytes);
+      expect(
+        Array.from(onFrameDrawn.mock.calls[2][0].detail.depthBufferBytes ?? []),
+      ).toEqual(expectedBytes);
     });
 
     it('does not reuse previous depth buffer if temporal correlation id does not match', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
@@ -890,42 +957,39 @@ describe('vertex-viewer', () => {
 
       await Async.delay(10);
 
-      expect(onFrameDrawn).toHaveBeenNthCalledWith(
-        2,
-        expect.objectContaining({
-          detail: expect.objectContaining({
-            depthBufferBytes:
-              Fixtures.drawFramePayloadPerspective.depthBuffer?.value,
-          }),
-        }),
+      expect(
+        onFrameDrawn.mock.calls.map(([event]) => event.detail.sequenceNumber),
+      ).toEqual([1, 2, 3]);
+      expect(
+        Array.from(onFrameDrawn.mock.calls[1][0].detail.depthBufferBytes ?? []),
+      ).toEqual(
+        Array.from(
+          Fixtures.drawFramePayloadPerspective.depthBuffer?.value ?? [],
+        ),
       );
-      expect(onFrameDrawn).toHaveBeenNthCalledWith(
-        3,
-        expect.objectContaining({
-          detail: expect.objectContaining({
-            depthBufferBytes: undefined,
-          }),
-        }),
-      );
+      expect(
+        onFrameDrawn.mock.calls[2][0].detail.depthBufferBytes,
+      ).toBeUndefined();
     });
   });
 
   describe('resizing', () => {
     it('handles resizes', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             resizeDebounce={1000}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
-      (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+      (getElementBoundingClientRect as Mock).mockReturnValue({
         left: 0,
         top: 0,
         bottom: 150,
@@ -934,16 +998,16 @@ describe('vertex-viewer', () => {
         height: 500,
       });
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       triggerResizeObserver([
         {
           contentRect: { width: 500, height: 500 },
         },
       ]);
-      jest.advanceTimersByTime(1000);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(1000);
+      vi.useRealTimers();
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
@@ -970,17 +1034,18 @@ describe('vertex-viewer', () => {
 
     it('updates stream dimensions when connected', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             resizeDebounce={1000}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
-      const updateDimensionsSpy = jest.spyOn(stream, 'update');
+      const updateDimensionsSpy = vi.spyOn(stream, 'update');
 
       await loadViewerStreamKey(
         key1,
@@ -988,7 +1053,7 @@ describe('vertex-viewer', () => {
         {
           token,
           beforeConnected: () => {
-            (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+            (getElementBoundingClientRect as Mock).mockReturnValue({
               left: 0,
               top: 0,
               bottom: 150,
@@ -997,14 +1062,14 @@ describe('vertex-viewer', () => {
               height: 500,
             });
 
-            jest.useFakeTimers();
+            vi.useFakeTimers();
             triggerResizeObserver([
               {
                 contentRect: { width: 500, height: 500 },
               },
             ]);
-            jest.advanceTimersByTime(1000);
-            jest.useRealTimers();
+            vi.advanceTimersByTime(1000);
+            vi.useRealTimers();
           },
         },
       );
@@ -1020,25 +1085,26 @@ describe('vertex-viewer', () => {
   describe('frame timing', () => {
     it('handles small and large frames received nearly simultaneously', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             resizeDebounce={1000}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
       await Async.delay(1);
 
-      const onFrameDrawn = jest.fn();
+      const onFrameDrawn = vi.fn();
 
       viewer.addEventListener('frameDrawn', onFrameDrawn);
 
-      (loadImageBytes as jest.Mock).mockImplementation(async () => {
+      (loadImageBytes as Mock).mockImplementation(async () => {
         await Async.delay(5);
 
         return {
@@ -1060,7 +1126,7 @@ describe('vertex-viewer', () => {
 
       await Async.delay(1);
 
-      (loadImageBytes as jest.Mock).mockImplementation(async () => ({
+      (loadImageBytes as Mock).mockImplementation(async () => ({
         width: 200,
         height: 150,
         dispose: () => undefined,
@@ -1092,15 +1158,16 @@ describe('vertex-viewer', () => {
   describe('scene', () => {
     it('handles reconnect behavior', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             resizeDebounce={1000}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
@@ -1122,8 +1189,8 @@ describe('vertex-viewer', () => {
       const interval = random.integer();
 
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
@@ -1131,12 +1198,13 @@ describe('vertex-viewer', () => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               { EXPERIMENTAL_annotationPollingIntervalInMs: interval } as any
             }
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const connectSpy = jest.spyOn(viewer.annotations!, 'connect');
+      const connectSpy = vi.spyOn(viewer.annotations!, 'connect');
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await Async.delay(1);
@@ -1146,12 +1214,14 @@ describe('vertex-viewer', () => {
 
     it('does not poll for annotations by default', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => <vertex-viewer clientId={clientId} stream={stream} />,
-      });
+      const viewer = (
+        await render(<vertex-viewer clientId={clientId} stream={stream} />, {
+          waitForReady: false,
+        })
+      ).root as HTMLVertexViewerElement;
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const connectSpy = jest.spyOn(viewer.annotations!, 'connect');
+      const connectSpy = vi.spyOn(viewer.annotations!, 'connect');
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
       await Async.delay(1);
@@ -1161,17 +1231,18 @@ describe('vertex-viewer', () => {
 
     it('sets the depth buffers value depending if annotations are present', async () => {
       const { stream, ws } = makeViewerStream();
-      const viewer = await newViewerSpec({
-        template: () => (
+      const viewer = (
+        await render(
           <vertex-viewer
             clientId={clientId}
             stream={stream}
             rotateAroundTapPoint={false}
-          />
-        ),
-      });
+          />,
+          { waitForReady: false },
+        )
+      ).root as HTMLVertexViewerElement;
 
-      const update = jest.spyOn(stream, 'update');
+      const update = vi.spyOn(stream, 'update');
 
       await loadViewerStreamKey(key1, { viewer, stream, ws }, { token });
 
@@ -1208,18 +1279,4 @@ describe('vertex-viewer', () => {
       );
     });
   });
-
-  async function newViewerSpec(
-    opts: Pick<NewSpecPageOptions, 'template' | 'html'>,
-  ): Promise<HTMLVertexViewerElement> {
-    const page = await newSpecPage({ components: [Viewer], ...opts });
-    return page.root as HTMLVertexViewerElement;
-  }
-
-  async function newViewerSpecWithPage(
-    opts: Pick<NewSpecPageOptions, 'template' | 'html'>,
-  ): Promise<{ page: SpecPage; viewer: HTMLVertexViewerElement }> {
-    const page = await newSpecPage({ components: [Viewer], ...opts });
-    return { page, viewer: page.root as HTMLVertexViewerElement };
-  }
 });

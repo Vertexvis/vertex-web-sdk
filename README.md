@@ -34,7 +34,7 @@ for a list of components and their READMEs.
 
 This repository contains a script to generate a VS Code workspace file. With VS
 Code workspaces, extensions are run within the context of sub-projects, so
-features like Jest debugging still work.
+features like Vitest debugging work in each package.
 
 The workspace file will be created automatically when running `yarn install`.
 Otherwise you can generate the file manually by running `yarn generate:vscode-workspace`.
@@ -74,6 +74,14 @@ to execute any NPM `test` scripts present for each package.
 
 Additionally, the project exposes a top-level script to check code coverage
 (`yarn test:coverage`).
+
+All workspace suites use Vitest. Build the SDK before running the Stencil
+component specs; their setup loads custom elements from `dist/components`.
+Run `yarn workspace @vertexvis/utils test` for a single package,
+`yarn workspace @vertexvis/utils test:watch` to watch it, or
+`yarn workspace @vertexvis/utils test:coverage` to enforce its coverage
+thresholds. The Stencil packages offer the same `test`, `test:watch`, and
+`test:coverage` scripts, with the Stencil Vitest environment for specs.
 
 ## Bumping Versions
 

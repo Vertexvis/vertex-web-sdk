@@ -3,13 +3,13 @@ import { EventDispatcher } from '@vertexvis/utils';
 export class AnnotationController {
   public onStateChange = new EventDispatcher();
 
-  public addAnnotationSet = jest.fn();
-  public connect = jest.fn();
-  public disconnect = jest.fn();
-  public fetch = jest.fn();
-  public removeAnnotationSet = jest.fn();
+  public addAnnotationSet = vi.fn();
+  public connect = vi.fn();
+  public disconnect = vi.fn();
+  public fetch = vi.fn();
+  public removeAnnotationSet = vi.fn();
 
   public constructor(...args: unknown[]) {
-    jest.fn()(...args);
+    vi.fn()(...args);
   }
 }

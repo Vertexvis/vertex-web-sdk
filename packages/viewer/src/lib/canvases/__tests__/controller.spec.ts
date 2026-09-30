@@ -1,4 +1,5 @@
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock(
   '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 
@@ -34,7 +35,7 @@ describe(CanvasController, () => {
       const { controller, client } = makeCanvasController(jwt, deviceId);
       const expected = makeGetCanvasResponse();
 
-      (client.getCanvas as jest.Mock).mockImplementationOnce(
+      (client.getCanvas as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(expected),
       );
 
@@ -72,7 +73,7 @@ describe(CanvasController, () => {
         makeCanvas(undefined, [line, oval, freeform, pin, callout]),
       );
 
-      (client.getCanvas as jest.Mock).mockImplementationOnce(
+      (client.getCanvas as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(expected),
       );
 

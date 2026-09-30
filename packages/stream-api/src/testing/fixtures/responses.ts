@@ -60,7 +60,7 @@ export function startStream(
     sceneViewId: { hex: UUID.create() },
     sessionId: { hex: UUID.create() },
     jwt: 'jwt',
-    token: { token: 'token', expiresIn: new Date().getTime() + 10000 },
+    token: { token: 'token', expiresIn: 3600 },
     worldOrientation: {
       front: { x: 0, y: 0, z: 1 },
       up: { x: 0, y: 1, z: 0 },
@@ -92,7 +92,7 @@ export function reconnect(
 ): ResponseMessage {
   const def: ReconnectResult = {
     jwt: 'jwt',
-    token: { token: 'token', expiresIn: new Date().getTime() + 10000 },
+    token: { token: 'token', expiresIn: 3600 },
   };
   return response(
     {
@@ -122,7 +122,7 @@ export function refreshToken(
   meta?: Metadata,
 ): ResponseMessage {
   const def: RefreshTokenResult = {
-    token: { token: 'token', expiresIn: new Date().getTime() + 10000 },
+    token: { token: 'token', expiresIn: 3600 },
   };
   return response(
     {

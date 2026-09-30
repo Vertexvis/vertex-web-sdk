@@ -1,4 +1,5 @@
-jest.mock('../imageLoaders');
+import type { Mock } from '#test/mock-types';
+vi.mock('../imageLoaders');
 
 import { Dimensions } from '@vertexvis/geometry';
 import { Async } from '@vertexvis/utils';
@@ -17,12 +18,12 @@ import { loadImageBytes } from '../imageLoaders';
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas = new HTMLCanvasElement().getContext('2d')!;
 const image = {
-  image: { width: 100, height: 50, close: jest.fn() },
-  dispose: jest.fn(),
+  image: { width: 100, height: 50, close: vi.fn() },
+  dispose: vi.fn(),
 };
 const image2 = {
-  image: { width: 100, height: 50, close: jest.fn() },
-  dispose: jest.fn(),
+  image: { width: 100, height: 50, close: vi.fn() },
+  dispose: vi.fn(),
 };
 
 const drawFrame1: DrawFrame = {
@@ -44,7 +45,7 @@ const drawFrame3: DrawFrame = {
   canvasDimensions: Dimensions.create(100, 50),
   frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
-  beforeDraw: jest.fn(),
+  beforeDraw: vi.fn(),
 };
 
 const drawFrame4: DrawFrame = {
@@ -52,8 +53,8 @@ const drawFrame4: DrawFrame = {
   canvasDimensions: Dimensions.create(100, 50),
   frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
-  beforeDraw: jest.fn(),
-  predicate: jest.fn(() => false),
+  beforeDraw: vi.fn(),
+  predicate: vi.fn(() => false),
 };
 
 const drawFrame5: DrawFrame = {
@@ -61,7 +62,7 @@ const drawFrame5: DrawFrame = {
   canvasDimensions: Dimensions.create(100, 50),
   frame: Fixtures.makePerspectiveFrame(),
   viewport: new Viewport(100, 50),
-  beforeDraw: jest.fn(),
+  beforeDraw: vi.fn(),
 };
 
 const drawFrame6: DrawFrame = {
@@ -72,7 +73,7 @@ const drawFrame6: DrawFrame = {
     sequenceNumber: 2,
   }),
   viewport: new Viewport(100, 50),
-  beforeDraw: jest.fn(),
+  beforeDraw: vi.fn(),
 };
 
 const drawFrame7: DrawFrame = {
@@ -83,7 +84,7 @@ const drawFrame7: DrawFrame = {
     frameCorrelationIds: ['corr-id-1'],
   }),
   viewport: new Viewport(100, 50),
-  beforeDraw: jest.fn(),
+  beforeDraw: vi.fn(),
 };
 
 const drawFrame8: DrawFrame = {
@@ -95,18 +96,18 @@ const drawFrame8: DrawFrame = {
     frameCorrelationIds: ['corr-id-2'],
   }),
   viewport: new Viewport(100, 50),
-  beforeDraw: jest.fn(),
+  beforeDraw: vi.fn(),
 };
 
 describe(createCanvasRenderer, () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (loadImageBytes as jest.Mock).mockResolvedValue(image);
+    vi.clearAllMocks();
+    (loadImageBytes as Mock).mockResolvedValue(image);
   });
 
   it('draws the next frame', async () => {
     const renderer = createCanvasRenderer();
-    const drawImage = jest.spyOn(canvas, 'drawImage');
+    const drawImage = vi.spyOn(canvas, 'drawImage');
     const result = await renderer(drawFrame1);
     expect(result).toBeDefined();
     expect(drawImage).toHaveBeenCalled();
@@ -114,7 +115,7 @@ describe(createCanvasRenderer, () => {
 
   it('skips drawing previous frames', async () => {
     const renderer = createCanvasRenderer();
-    const drawImage = jest.spyOn(canvas, 'drawImage');
+    const drawImage = vi.spyOn(canvas, 'drawImage');
 
     await renderer(drawFrame2);
     await renderer(drawFrame1);
@@ -124,7 +125,7 @@ describe(createCanvasRenderer, () => {
 
   it('calls provided before draw callback', async () => {
     const renderer = createCanvasRenderer();
-    const drawImage = jest.spyOn(canvas, 'drawImage');
+    const drawImage = vi.spyOn(canvas, 'drawImage');
 
     await renderer(drawFrame3);
 
@@ -134,7 +135,7 @@ describe(createCanvasRenderer, () => {
 
   it('skips loading and drawing if the predicate fails', async () => {
     const renderer = createCanvasRenderer();
-    const drawImage = jest.spyOn(canvas, 'drawImage');
+    const drawImage = vi.spyOn(canvas, 'drawImage');
 
     await renderer(drawFrame4);
 
@@ -144,9 +145,9 @@ describe(createCanvasRenderer, () => {
 
   it('skips drawing if the frame to be drawn is older', async () => {
     const renderer = createCanvasRenderer();
-    const drawImage = jest.spyOn(canvas, 'drawImage');
+    const drawImage = vi.spyOn(canvas, 'drawImage');
 
-    (loadImageBytes as jest.Mock)
+    (loadImageBytes as Mock)
       .mockImplementationOnce(async () => {
         await Async.delay(5);
 
@@ -172,7 +173,7 @@ describe(createCanvasRenderer, () => {
   it('tracks predicate skipped correlation ids and appends to following frames', async () => {
     const renderer = createCanvasRenderer();
 
-    (loadImageBytes as jest.Mock)
+    (loadImageBytes as Mock)
       .mockImplementationOnce(async () => {
         await Async.delay(5);
 
@@ -195,7 +196,7 @@ describe(createCanvasRenderer, () => {
   it('tracks sequence number skipped correlation ids and appends to following frames', async () => {
     const renderer = createCanvasRenderer();
 
-    (loadImageBytes as jest.Mock)
+    (loadImageBytes as Mock)
       .mockImplementationOnce(async () => {
         await Async.delay(5);
 
@@ -229,20 +230,20 @@ describe(measureCanvasRenderer, () => {
   const meter = new TimingMeter('timer');
   const measurement = { startTime: 0, duration: 1000 };
 
-  jest.spyOn(meter, 'takeMeasurements').mockReturnValue([measurement]);
+  vi.spyOn(meter, 'takeMeasurements').mockReturnValue([measurement]);
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('reports timings to api', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
-    const callback = jest.fn();
+    const callback = vi.fn();
     const render = measureCanvasRenderer(
       meter,
       renderer,
@@ -252,7 +253,7 @@ describe(measureCanvasRenderer, () => {
     );
 
     render(drawFrame1);
-    jest.advanceTimersByTime(reportIntervalInMs);
+    vi.advanceTimersByTime(reportIntervalInMs);
 
     expect(callback).toHaveBeenCalledWith(
       expect.arrayContaining([measurement]),
@@ -260,9 +261,9 @@ describe(measureCanvasRenderer, () => {
   });
 
   it('stops reporting timer after last render', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
-    const callback = jest.fn();
+    const callback = vi.fn();
     const render = measureCanvasRenderer(
       meter,
       renderer,
@@ -273,7 +274,7 @@ describe(measureCanvasRenderer, () => {
 
     render(drawFrame1);
     await render(drawFrame2);
-    jest.advanceTimersByTime(reportIntervalInMs);
+    vi.advanceTimersByTime(reportIntervalInMs);
 
     expect(callback).toHaveBeenCalledTimes(1);
   });

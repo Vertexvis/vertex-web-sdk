@@ -65,7 +65,7 @@ describe('MeasurementModel', () => {
       const model = new MeasurementModel();
       const outcome: MeasurementOutcome = { isApproximate: false, results: [] };
 
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       model.setOutcome(outcome);
       model.onOutcomeChanged(onChange);
 
@@ -85,7 +85,7 @@ describe('MeasurementModel', () => {
         isApproximate: false,
         results: [result1, result2],
       };
-      const onChange = jest.fn();
+      const onChange = vi.fn();
 
       model.onOutcomeChanged(onChange);
 
@@ -98,7 +98,7 @@ describe('MeasurementModel', () => {
   describe(MeasurementModel.prototype.setEntities, () => {
     it('replaces all entities with the supplied set', () => {
       const model = new MeasurementModel();
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       model.onEntitiesChanged(onChange);
 
       model.addEntity(measureEntity);

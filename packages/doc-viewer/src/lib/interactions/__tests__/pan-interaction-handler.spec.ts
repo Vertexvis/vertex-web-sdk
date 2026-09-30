@@ -9,12 +9,12 @@ describe('PanInteractionHandler', () => {
 
   function mockWindowEventListeners(): void {
     Object.defineProperty(window, 'addEventListener', {
-      value: jest.fn(),
+      value: vi.fn(),
       writable: true,
       configurable: true,
     });
     Object.defineProperty(window, 'removeEventListener', {
-      value: jest.fn(),
+      value: vi.fn(),
       writable: true,
       configurable: true,
     });
@@ -39,7 +39,7 @@ describe('PanInteractionHandler', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     unmockWindowEventListeners();
   });
@@ -51,7 +51,7 @@ describe('PanInteractionHandler', () => {
   it('should create an instance and bind listeners to the element and window', () => {
     mockWindowEventListeners();
 
-    const mockAddEventListener = jest.fn();
+    const mockAddEventListener = vi.fn();
     const element = document.createElement('div');
     const hostElement = document.createElement('div');
 
@@ -83,7 +83,7 @@ describe('PanInteractionHandler', () => {
   it('should remove listeners when disposed', () => {
     mockWindowEventListeners();
 
-    const mockRemoveEventListener = jest.fn();
+    const mockRemoveEventListener = vi.fn();
     const element = document.createElement('div');
     const hostElement = document.createElement('div');
 
@@ -158,7 +158,7 @@ describe('PanInteractionHandler', () => {
       new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) }),
     );
 
-    hostElement.dispatchEvent(new Event('wheel', { deltaX: 100, deltaY: 100 } as unknown as EventInit));
+    hostElement.dispatchEvent(new WheelEvent('wheel', { deltaX: 100, deltaY: 100 }));
 
     expect(mockPanByDelta).toHaveBeenCalledWith(Point.create(-50, -50));
 
@@ -177,7 +177,7 @@ describe('PanInteractionHandler', () => {
 
     element.dispatchEvent(new MouseEvent('pointerdown', { button: 2, clientX: 10, clientY: 10 }));
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 10, clientY: 10 }));
-    hostElement.dispatchEvent(new Event('wheel', { deltaX: 100, deltaY: 100 } as unknown as EventInit));
+    hostElement.dispatchEvent(new WheelEvent('wheel', { deltaX: 100, deltaY: 100 }));
 
     expect(mockPanByDelta).toHaveBeenCalledWith(Point.create(-50, -50));
 

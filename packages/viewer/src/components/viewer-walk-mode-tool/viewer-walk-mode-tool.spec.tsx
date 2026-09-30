@@ -1,12 +1,16 @@
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('../../workers/png-decoder-pool');
-jest.mock('../../lib/walk-mode/dom', () => ({
-  targetIsElement: jest.fn(() => true),
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('../../workers/png-decoder-pool');
+vi.mock('../../lib/walk-mode/dom', () => ({
+  targetIsElement: vi.fn(() => true),
 }));
+
+import '../viewer/viewer';
+import '../viewer-teleport-tool/viewer-teleport-tool';
+import './viewer-walk-mode-tool';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
+import { render } from '@stencil/vitest';
 import { BoundingBox, Vector3 } from '@vertexvis/geometry';
 
 import { ViewerStream } from '../../lib/stream/stream';
@@ -17,13 +21,10 @@ import {
   loadViewerStreamKey,
   makeViewerStream,
 } from '../../testing/viewer';
-import { Viewer } from '../viewer/viewer';
-import { ViewerTeleportTool } from '../viewer-teleport-tool/viewer-teleport-tool';
-import { ViewerWalkModeTool } from './viewer-walk-mode-tool';
 
 describe('vertex-viewer-walk-mode-tool', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const mockHit = {
@@ -32,29 +33,28 @@ describe('vertex-viewer-walk-mode-tool', () => {
   };
 
   function mockHitInteraction(stream: ViewerStream): void {
-    jest.spyOn(stream, 'beginInteraction').mockResolvedValueOnce({
+    vi.spyOn(stream, 'beginInteraction').mockResolvedValueOnce({
       beginInteraction: {},
     });
-    jest.spyOn(stream, 'hitItems').mockResolvedValueOnce({
+    vi.spyOn(stream, 'hitItems').mockResolvedValueOnce({
       hitItems: {
         hits: [mockHit],
       },
     });
-    jest.spyOn(stream, 'endInteraction').mockResolvedValueOnce({
+    vi.spyOn(stream, 'endInteraction').mockResolvedValueOnce({
       endInteraction: {},
     });
   }
 
   it('supports the teleport interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -71,14 +71,13 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports the teleport and align interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport-and-align"></vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport-and-align"></vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -95,14 +94,13 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports the teleport toward interaction', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport-toward"></vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport-toward"></vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -119,17 +117,16 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports keyboard walk movement', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -201,17 +198,16 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports keyboard pivot movement', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -249,17 +245,16 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports keyboard vertical movement', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport"></vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -325,22 +320,21 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports a custom teleport tool', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport">
-            <vertex-viewer-teleport-tool
-              slot="teleport-tool"
-              animationMs={5000}
-            ></vertex-viewer-teleport-tool>
-          </vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport">
+          <vertex-viewer-teleport-tool
+            slot="teleport-tool"
+            animationMs={5000}
+          ></vertex-viewer-teleport-tool>
+        </vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'flyTo');
+    const streamSpy = vi.spyOn(stream, 'flyTo');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -375,22 +369,21 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports adding custom keybindings', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport">
-            <vertex-viewer-teleport-tool
-              slot="teleport-tool"
-              animationMs={5000}
-            ></vertex-viewer-teleport-tool>
-          </vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport">
+          <vertex-viewer-teleport-tool
+            slot="teleport-tool"
+            animationMs={5000}
+          ></vertex-viewer-teleport-tool>
+        </vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -465,22 +458,21 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports overriding custom keybindings', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport">
-            <vertex-viewer-teleport-tool
-              slot="teleport-tool"
-              animationMs={5000}
-            ></vertex-viewer-teleport-tool>
-          </vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport">
+          <vertex-viewer-teleport-tool
+            slot="teleport-tool"
+            animationMs={5000}
+          ></vertex-viewer-teleport-tool>
+        </vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -543,23 +535,22 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('excludes input elements', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <input></input>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport">
-            <vertex-viewer-teleport-tool
-              slot="teleport-tool"
-              animationMs={5000}
-            ></vertex-viewer-teleport-tool>
-          </vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <input></input>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport">
+          <vertex-viewer-teleport-tool
+            slot="teleport-tool"
+            animationMs={5000}
+          ></vertex-viewer-teleport-tool>
+        </vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -583,23 +574,22 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports excluding custom elements by tag name', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <div></div>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport">
-            <vertex-viewer-teleport-tool
-              slot="teleport-tool"
-              animationMs={5000}
-            ></vertex-viewer-teleport-tool>
-          </vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <div></div>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport">
+          <vertex-viewer-teleport-tool
+            slot="teleport-tool"
+            animationMs={5000}
+          ></vertex-viewer-teleport-tool>
+        </vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
@@ -627,24 +617,23 @@ describe('vertex-viewer-walk-mode-tool', () => {
 
   it('supports excluding custom elements by predicate', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerWalkModeTool, ViewerTeleportTool],
-      template: () => (
-        <vertex-viewer stream={stream}>
-          <div id="ignored"></div>
-          <div id="standard"></div>
-          <vertex-viewer-walk-mode-tool teleportMode="teleport">
-            <vertex-viewer-teleport-tool
-              slot="teleport-tool"
-              animationMs={5000}
-            ></vertex-viewer-teleport-tool>
-          </vertex-viewer-walk-mode-tool>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream}>
+        <div id="ignored"></div>
+        <div id="standard"></div>
+        <vertex-viewer-walk-mode-tool teleportMode="teleport">
+          <vertex-viewer-teleport-tool
+            slot="teleport-tool"
+            animationMs={5000}
+          ></vertex-viewer-teleport-tool>
+        </vertex-viewer-walk-mode-tool>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const viewer = page.root as HTMLVertexViewerElement;
-    const streamSpy = jest.spyOn(stream, 'replaceCamera');
+    const streamSpy = vi.spyOn(stream, 'replaceCamera');
     mockHitInteraction(stream);
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });

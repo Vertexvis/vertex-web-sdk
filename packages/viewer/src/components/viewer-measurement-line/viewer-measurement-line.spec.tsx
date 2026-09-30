@@ -1,7 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Point } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerMeasurementLine } from './viewer-measurement-line';
 
@@ -10,7 +11,7 @@ describe('vertex-viewer-measurement-line', () => {
   const end = Point.create(100, 0);
 
   it('renders a line between start and end', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementLine],
       template: () => (
         <vertex-viewer-measurement-line start={start} end={end} />
@@ -26,15 +27,15 @@ describe('vertex-viewer-measurement-line', () => {
       ?.querySelector('.line');
 
     expect(strokeLineEl).toEqualHtml(`
-      <line class="line" x1="0" x2="100" y1="0" y2="0" />
+      <line class="line" x1="0" y1="0" x2="100" y2="0"></line>
     `);
     expect(fillLineEl).toEqualHtml(`
-      <line class="line" x1="0" x2="100" y1="0" y2="0" />
+      <line class="line" x1="0" y1="0" x2="100" y2="0"></line>
     `);
   });
 
   it('renders line caps', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerMeasurementLine],
       template: () => (
         <vertex-viewer-measurement-line

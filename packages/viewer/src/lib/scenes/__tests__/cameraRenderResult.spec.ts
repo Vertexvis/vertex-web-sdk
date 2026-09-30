@@ -30,11 +30,11 @@ describe(CameraRenderResult, () => {
 
   afterEach(() => {
     mockWs.reset();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should support animation completed events', async () => {
-    const listener = jest.fn();
+    const listener = vi.fn();
     result.onAnimationCompleted.on(listener);
     const res = result.onAnimationCompleted.once();
 
@@ -47,7 +47,7 @@ describe(CameraRenderResult, () => {
   });
 
   it('should support frame received events', async () => {
-    const listener = jest.fn();
+    const listener = vi.fn();
     result.onFrameReceived.on(listener);
     const res = result.onFrameReceived.once();
 

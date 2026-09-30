@@ -7,10 +7,10 @@ import { TapEventDetails } from '../tapEventDetails';
 
 describe(FlyToPartKeyInteraction, () => {
   const streamApi = new StreamApi();
-  streamApi.hitItems = jest.fn(async () => ({
+  streamApi.hitItems = vi.fn(async () => ({
     hitItems: { hits: [{ itemId: { hex: 'item-id' } }] },
   }));
-  streamApi.flyTo = jest.fn(async () => ({ flyTo: {} }));
+  streamApi.flyTo = vi.fn(async () => ({ flyTo: {} }));
   const flyToPartKeyInteraction = new FlyToPartKeyInteraction(
     streamApi,
     () => ({ animation: { durationMs: 500 } }) as Config,

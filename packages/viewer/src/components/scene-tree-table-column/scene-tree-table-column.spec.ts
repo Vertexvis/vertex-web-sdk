@@ -1,4 +1,7 @@
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import { SceneTreeTableColumn } from './scene-tree-table-column';
 
@@ -20,7 +23,7 @@ describe('<vertex-scene-tree-table-column>', () => {
 async function newComponentSpec(data: {
   html: string;
 }): Promise<{ page: SpecPage; column: HTMLVertexSceneTreeTableColumnElement }> {
-  const page = await newSpecPage({
+  const page = await renderSpecPage({
     components: [SceneTreeTableColumn],
     html: data.html,
   });

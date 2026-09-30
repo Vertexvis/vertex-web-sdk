@@ -72,11 +72,11 @@
     "dev": "yarn start",
     "format": "yarn lint --fix",
     "lint": "eslint .",
-    "test": "stencil test --spec --runInBand",
+    "test": "vitest run",
     "test:ssr-import": "node ./scripts/test-ssr-import.mjs",
-    "test:watch": "stencil test --spec --watchAll --maxWorkers=50%",
-    "test:ci": "stencil test --spec --coverage --runInBand",
-    "test:coverage": "stencil test --spec --coverage --runInBand",
+    "test:watch": "vitest",
+    "test:ci": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage",
     "generate": "stencil generate",
     "generate:docs": "../../scripts/generate_docs.sh",
     "release:stage": "yarn generate:docs"
@@ -84,16 +84,15 @@
   "devDependencies": {
     "@stencil/core": "^4.43.5",
     "@stencil/react-output-target": "^1.6.2",
+    "@stencil/vitest": "1.15.1",
     "@stencil/vue-output-target": "^0.14.1",
-    "@types/jest": "^29.5.14",
     "@types/node": "^22.20.4",
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
-    "abortcontroller-polyfill": "^1.7.8",
-    "eslint": "^9.39.5",
-    "jest": "^29.7.0",
-    "jest-cli": "^29.7.0",
+    "eslint": "^10.11.0",
+    "happy-dom": "20.14.5",
     "tslib": "^2.8.1",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "4.1.11"
   },
   "dependencies": {
     "@vertexvis/geometry": "1.1.0",

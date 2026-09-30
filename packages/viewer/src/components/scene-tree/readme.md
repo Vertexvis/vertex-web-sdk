@@ -819,7 +819,7 @@ otherwise `undefined` is returned.
 
 | Name    | Type                         | Description                                                   |
 | ------- | ---------------------------- | ------------------------------------------------------------- |
-| `event` | `MouseEvent \| PointerEvent` | A mouse or pointer event that originated from this component. |
+| `event` | `PointerEvent \| MouseEvent` | A mouse or pointer event that originated from this component. |
 
 #### Returns
 

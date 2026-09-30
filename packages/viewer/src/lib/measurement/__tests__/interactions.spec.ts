@@ -1,7 +1,8 @@
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock(
   '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
-jest.mock('@vertexvis/stream-api');
+vi.mock('@vertexvis/stream-api');
 
 import { Vector3 } from '@vertexvis/geometry';
 import { MeasurementResult } from '@vertexvis/scene-view-protos/core/protos/measurement_pb';
@@ -43,26 +44,30 @@ describe(MeasurementInteractionHandler, () => {
   const api = new InteractionApiPerspective(
     new StreamApi(),
     new CursorManager(),
-    jest.fn(),
-    jest.fn(),
-    jest.fn(),
-    jest.fn(),
-    { emit: jest.fn() },
-    { emit: jest.fn() },
-    { emit: jest.fn() },
-    { emit: jest.fn() },
-    { emit: jest.fn() },
+    vi.fn(),
+    vi.fn(),
+    vi.fn(),
+    vi.fn(),
+    { emit: vi.fn() },
+    { emit: vi.fn() },
+    { emit: vi.fn() },
+    { emit: vi.fn() },
+    { emit: vi.fn() },
   );
 
   beforeEach(() => {
     handler.dispose();
     handler.initialize(element, api);
 
-    jest.resetAllMocks();
+    vi.resetAllMocks();
+  });
+
+  afterEach(() => {
+    handler.dispose();
   });
 
   it('shows measurement cursor when pointer over measurable entity', async () => {
-    const addCursor = jest.spyOn(api, 'addCursor');
+    const addCursor = vi.spyOn(api, 'addCursor');
 
     function reset(): void {
       addCursor.mockClear();
@@ -150,9 +155,9 @@ describe(MeasurementInteractionHandler, () => {
   });
 
   it('does nothing if viewer has interaction between down and up', async () => {
-    (api.hitItems as jest.Mock).mockResolvedValue([]);
-    const addEntities = jest.spyOn(controller, 'addEntity');
-    const clearEntities = jest.spyOn(controller, 'clearEntities');
+    (api.hitItems as Mock).mockResolvedValue([]);
+    const addEntities = vi.spyOn(controller, 'addEntity');
+    const clearEntities = vi.spyOn(controller, 'clearEntities');
 
     const down = new MouseEvent('pointerdown', { clientX: 0, clientY: 0 });
     const move = new MouseEvent('pointermove', { clientX: 10, clientY: 10 });
@@ -168,31 +173,31 @@ describe(MeasurementInteractionHandler, () => {
   });
 
   function mockHit(): void {
-    jest
-      .spyOn(api, 'hitItems')
-      .mockResolvedValue([{ hitPoint: Vector3.create(), modelEntity: {} }]);
+    vi.spyOn(api, 'hitItems').mockResolvedValue([
+      { hitPoint: Vector3.create(), modelEntity: {} },
+    ]);
   }
 
   function mockNoHit(): void {
-    jest.spyOn(api, 'hitItems').mockResolvedValue([]);
+    vi.spyOn(api, 'hitItems').mockResolvedValue([]);
   }
 
   function mockMeasurableEntityAtPoint(
     type = EntityType.PRECISE_SURFACE,
   ): void {
-    const getEntityTypeAtPoint = jest.spyOn(api, 'getEntityTypeAtPoint');
+    const getEntityTypeAtPoint = vi.spyOn(api, 'getEntityTypeAtPoint');
     getEntityTypeAtPoint.mockResolvedValue(type);
   }
 
   function mockUnmeasurableEntityAtPoint(): void {
-    const getEntityTypeAtPoint = jest.spyOn(api, 'getEntityTypeAtPoint');
+    const getEntityTypeAtPoint = vi.spyOn(api, 'getEntityTypeAtPoint');
     getEntityTypeAtPoint.mockResolvedValue(EntityType.GENERIC_GEOMETRY);
   }
 
   function mockMeasureResponse(
     result: MeasurementResult = makeMinimumDistanceResult(),
   ): void {
-    (client.measure as jest.Mock).mockImplementation(
+    (client.measure as Mock).mockImplementation(
       mockGrpcUnaryResult(makeMeasureResponse(result)),
     );
   }

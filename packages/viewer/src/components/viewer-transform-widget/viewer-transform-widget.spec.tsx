@@ -1,25 +1,29 @@
-jest.mock('../viewer/utils');
-jest.mock('../../lib/rendering/imageLoaders');
-jest.mock('./widget');
-jest.mock('../../lib/stencil', () => ({
-  readDOM: jest.fn((callback) => callback()),
-  writeDOM: jest.fn((callback) => callback()),
+import type { Mock } from '#test/mock-types';
+vi.mock('../viewer/utils');
+vi.mock('../../lib/rendering/imageLoaders');
+vi.mock('./widget', () => import('./__mocks__/widget'));
+vi.mock('../../lib/stencil', () => ({
+  readDOM: vi.fn((callback) => callback()),
+  writeDOM: vi.fn((callback) => callback()),
 }));
-jest.mock('./util', () => {
-  const actual = jest.requireActual('./util');
+vi.mock('./util', async () => {
+  const actual = await vi.importActual('./util');
 
   return {
     ...actual,
-    convertPointToCanvas: jest.fn(),
-    convertCanvasPointToWorld: jest.fn(),
-    computeHandleDeltaTransform: jest.fn(),
+    convertPointToCanvas: vi.fn(),
+    convertCanvasPointToWorld: vi.fn(),
+    computeHandleDeltaTransform: vi.fn(),
   };
 });
-jest.mock('./dom');
+vi.mock('./dom');
+
+import '../viewer/viewer';
+import './viewer-transform-widget';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
+import { render } from '@stencil/vitest';
 import {
   Angle,
   Euler,
@@ -30,10 +34,10 @@ import {
 } from '@vertexvis/geometry';
 import { Async } from '@vertexvis/utils';
 
-import { Viewport } from '../..';
 import { loadImageBytes } from '../../lib/rendering/imageLoaders';
 import { TriangleMesh, TriangleMeshPoints } from '../../lib/transforms/mesh';
 import { StencilBufferManager } from '../../lib/types';
+import { Viewport } from '../../lib/types/viewport';
 import { makePerspectiveFrame } from '../../testing/fixtures';
 import {
   key1,
@@ -41,13 +45,11 @@ import {
   makeViewerStream,
 } from '../../testing/viewer';
 import { getElementBoundingClientRect } from '../viewer/utils';
-import { Viewer } from '../viewer/viewer';
 import {
   computeHandleDeltaTransform,
   convertCanvasPointToWorld,
   convertPointToCanvas,
 } from './util';
-import { ViewerTransformWidget } from './viewer-transform-widget';
 import { TransformWidget } from './widget';
 
 function dispatchKeydownEvent(
@@ -68,12 +70,12 @@ describe('vertex-viewer-transform-widget', () => {
     document.createElement('canvas'),
   );
 
-  (loadImageBytes as jest.Mock).mockResolvedValue({
+  (loadImageBytes as Mock).mockResolvedValue({
     width: 200,
     height: 150,
     dispose: () => undefined,
   });
-  (getElementBoundingClientRect as jest.Mock).mockReturnValue({
+  (getElementBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 150,
@@ -82,38 +84,35 @@ describe('vertex-viewer-transform-widget', () => {
     height: 150,
   });
 
-  const onInteractionEnded = jest.fn();
-  const onInteractionFinished = jest.fn();
-  const onInteractionStarted = jest.fn();
+  const onInteractionEnded = vi.fn();
+  const onInteractionFinished = vi.fn();
+  const onInteractionStarted = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders a canvas', async () => {
-    const page = await newSpecPage({
-      components: [ViewerTransformWidget],
-      html: `<vertex-viewer-transform-widget></vertex-viewer-transform-widget>`,
+    const page = await render(<vertex-viewer-transform-widget />, {
+      waitForReady: false,
     });
+    await page.waitForChanges();
 
-    expect(page.root?.shadowRoot?.querySelector('canvas')).toBeDefined();
+    expect(page.root.shadowRoot?.querySelector('canvas')).toBeDefined();
   });
 
   it('renders a widget at the provided position', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -136,19 +135,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('provides the cursor position to the internal widget if within the widget bounds', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -163,12 +159,10 @@ describe('vertex-viewer-transform-widget', () => {
 
     await page.waitForChanges();
 
-    (mockTransformWidget.boundsContainsPoint as jest.Mock).mockImplementation(
+    (mockTransformWidget.boundsContainsPoint as Mock).mockImplementation(
       () => true,
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
-      Point.create(0, 0),
-    );
+    (convertPointToCanvas as Mock).mockImplementation(() => Point.create(0, 0));
 
     window.dispatchEvent(new MouseEvent('pointermove'));
 
@@ -176,7 +170,7 @@ describe('vertex-viewer-transform-widget', () => {
       Point.create(0, 0),
     );
 
-    (mockTransformWidget.boundsContainsPoint as jest.Mock).mockImplementation(
+    (mockTransformWidget.boundsContainsPoint as Mock).mockImplementation(
       () => false,
     );
     window.dispatchEvent(new MouseEvent('pointermove'));
@@ -186,19 +180,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('performs a transform', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -217,7 +208,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -233,21 +224,21 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    const beginSpy = jest
+    const beginSpy = vi
       .spyOn(stream, 'beginInteraction')
       .mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    const endSpy = jest
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    const endSpy = vi
       .spyOn(stream, 'endInteraction')
       .mockReturnValue(Promise.resolve({}));
 
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(2, 2, 2)),
     );
 
@@ -300,29 +291,29 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input-based position transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+    (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
     await page.waitForChanges();
     await page.waitForChanges();
+
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     await viewer.dispatchFrameDrawn(frame);
@@ -335,7 +326,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -351,15 +342,15 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    vi.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
@@ -400,23 +391,20 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input+keyboard based position transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+    (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -435,7 +423,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -451,15 +439,15 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    vi.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
@@ -516,23 +504,20 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input-based rotation transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+    (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -551,7 +536,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-rotate',
       new TriangleMeshPoints(
         true,
@@ -567,15 +552,15 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    vi.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
@@ -612,23 +597,20 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports input+keyboard based rotation transforms', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+    (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -636,8 +618,8 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
     await page.waitForChanges();
 
-    const onInteractionEnded = jest.fn();
-    const onInteractionStarted = jest.fn();
+    const onInteractionEnded = vi.fn();
+    const onInteractionStarted = vi.fn();
 
     const frame = makePerspectiveFrame();
     await viewer.dispatchFrameDrawn(frame);
@@ -650,7 +632,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-rotate',
       new TriangleMeshPoints(
         true,
@@ -666,16 +648,16 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    jest.spyOn(stream, 'endInteraction').mockReturnValue(Promise.resolve({}));
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    vi.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    vi.spyOn(stream, 'endInteraction').mockReturnValue(Promise.resolve({}));
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(0, 0, 0)),
     );
 
@@ -731,19 +713,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('supports an undo of the most recent transform', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -762,7 +741,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -778,21 +757,21 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    const beginSpy = jest
+    const beginSpy = vi
       .spyOn(stream, 'beginInteraction')
       .mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    const endSpy = jest
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    const endSpy = vi
       .spyOn(stream, 'endInteraction')
       .mockReturnValue(Promise.resolve({}));
 
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(2, 2, 2)),
     );
 
@@ -860,25 +839,22 @@ describe('vertex-viewer-transform-widget', () => {
   it('supports scaling the transformation handles', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+    (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -908,25 +884,22 @@ describe('vertex-viewer-transform-widget', () => {
   it('falls back to default scale values for values at or below zero', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+    (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -956,25 +929,22 @@ describe('vertex-viewer-transform-widget', () => {
   it('performs a transform when initialized with a position', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(0, 0, 0);
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    (mockTransformWidget.getFullBounds as jest.Mock).mockReturnValue(
+    (mockTransformWidget.getFullBounds as Mock).mockReturnValue(
       Rectangle.create(0, 0, 100, 100),
     );
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -992,7 +962,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -1008,21 +978,21 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
       '#000000',
     );
-    const beginSpy = jest
+    const beginSpy = vi
       .spyOn(stream, 'beginInteraction')
       .mockReturnValue(Promise.resolve({}));
-    const updateSpy = jest.spyOn(stream, 'updateInteraction');
-    const endSpy = jest
+    const updateSpy = vi.spyOn(stream, 'updateInteraction');
+    const endSpy = vi
       .spyOn(stream, 'endInteraction')
       .mockReturnValue(Promise.resolve({}));
 
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(1, 1, 1)),
     );
 
@@ -1081,24 +1051,21 @@ describe('vertex-viewer-transform-widget', () => {
   it('sets the widget to disabled on an interaction, and re-enables available axis', async () => {
     const { stream, ws } = makeViewerStream();
     const position = Vector3.create(1, 1, 1);
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget
-            xRotationDisabled={true}
-            yRotationDisabled={true}
-            zRotationDisabled={true}
-            position={position}
-          ></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget
+          xRotationDisabled={true}
+          yRotationDisabled={true}
+          zRotationDisabled={true}
+          position={position}
+        ></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1111,7 +1078,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -1165,19 +1132,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('updates widget bounds when the viewer dimensions change', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1208,19 +1172,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('ends any interaction and clears the widget position if the component position is cleared', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1236,7 +1197,7 @@ describe('vertex-viewer-transform-widget', () => {
     await page.waitForChanges();
 
     widget.hovered = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,
@@ -1253,16 +1214,16 @@ describe('vertex-viewer-transform-widget', () => {
       '#000000',
     );
 
-    jest.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
-    const endSpy = jest.spyOn(stream, 'endInteraction');
+    vi.spyOn(stream, 'beginInteraction').mockReturnValue(Promise.resolve({}));
+    const endSpy = vi.spyOn(stream, 'endInteraction');
 
-    (convertCanvasPointToWorld as jest.Mock).mockImplementation(() =>
+    (convertCanvasPointToWorld as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (convertPointToCanvas as jest.Mock).mockImplementation(() =>
+    (convertPointToCanvas as Mock).mockImplementation(() =>
       Vector3.create(1, 1, 1),
     );
-    (computeHandleDeltaTransform as jest.Mock).mockImplementation(() =>
+    (computeHandleDeltaTransform as Mock).mockImplementation(() =>
       Matrix4.makeTranslation(Vector3.create(2, 2, 2)),
     );
 
@@ -1276,7 +1237,7 @@ describe('vertex-viewer-transform-widget', () => {
 
     await page.waitForChanges();
 
-    (mockTransformWidget.updateTransform as jest.Mock).mockClear();
+    (mockTransformWidget.updateTransform as Mock).mockClear();
     widget.position = undefined;
 
     await page.waitForChanges();
@@ -1287,19 +1248,16 @@ describe('vertex-viewer-transform-widget', () => {
 
   it('clears the widget position if the component rotation is cleared and there is no translation', async () => {
     const { stream, ws } = makeViewerStream();
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
@@ -1315,7 +1273,7 @@ describe('vertex-viewer-transform-widget', () => {
     widget.rotation = Euler.create({ x: 1, y: 1, z: 1 });
     await page.waitForChanges();
 
-    (mockTransformWidget.updateTransform as jest.Mock).mockClear();
+    (mockTransformWidget.updateTransform as Mock).mockClear();
     widget.position = undefined;
     await page.waitForChanges();
     widget.rotation = undefined;
@@ -1334,25 +1292,22 @@ describe('vertex-viewer-transform-widget', () => {
   it('should dispatch an event when the position of the widget changes', async () => {
     const { stream, ws } = makeViewerStream();
 
-    const page = await newSpecPage({
-      components: [Viewer, ViewerTransformWidget],
-      template: () => (
-        <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
-          <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer stream={stream} stencilBuffer={stencilBuffer}>
+        <vertex-viewer-transform-widget></vertex-viewer-transform-widget>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const viewer = page.body.querySelector(
-      'vertex-viewer',
-    ) as HTMLVertexViewerElement;
-    const widget = page.body.querySelector(
+    const viewer = page.root as HTMLVertexViewerElement;
+    const widget = viewer.querySelector(
       'vertex-viewer-transform-widget',
     ) as HTMLVertexViewerTransformWidgetElement;
 
     await loadViewerStreamKey(key1, { viewer, stream, ws });
 
-    const onPositionChanged = jest.fn();
+    const onPositionChanged = vi.fn();
     widget.addEventListener('positionChanged', onPositionChanged);
 
     const position1 = Vector3.create(1, 1, 1);

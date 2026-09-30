@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { abort, delay, retry, timeout } from '../async';
 
 describe(delay, () => {
@@ -48,7 +50,7 @@ describe(retry, () => {
 
   it('rethrows error after max retries', async () => {
     const error = new Error('Failure');
-    const process = jest.fn().mockRejectedValue(error);
+    const process = vi.fn().mockRejectedValue(error);
 
     await expect(retry(process, { maxRetries: 2 })).rejects.toThrow(error);
     expect(process).toHaveBeenCalledTimes(3);
@@ -56,7 +58,7 @@ describe(retry, () => {
 
   it('delays retries', async () => {
     const error = new Error('Failure');
-    const process = jest.fn().mockRejectedValue(error);
+    const process = vi.fn().mockRejectedValue(error);
 
     retry(process, { delaysInMs: [10], maxRetries: 2 }).catch(() => undefined);
 

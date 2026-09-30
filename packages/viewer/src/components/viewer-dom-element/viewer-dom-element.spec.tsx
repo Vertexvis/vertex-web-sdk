@@ -1,13 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerDomElement } from './viewer-dom-element';
 
 describe('vertex-viewer-dom-element', () => {
   it('sets position, rotation and scale properties on init', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerDomElement],
       html: `
         <vertex-viewer-dom-element
@@ -33,9 +34,9 @@ describe('vertex-viewer-dom-element', () => {
   });
 
   it('syncs properties when json attributes change', async () => {
-    const onPropertyChanged = jest.fn();
+    const onPropertyChanged = vi.fn();
 
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerDomElement],
       html: `<vertex-viewer-dom-element></vertex-viewer-dom-element>`,
     });
@@ -70,7 +71,7 @@ describe('vertex-viewer-dom-element', () => {
   });
 
   it('updates quaternion when rotation changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerDomElement],
       html: `<vertex-viewer-dom-element></vertex-viewer-dom-element>`,
     });
@@ -84,7 +85,7 @@ describe('vertex-viewer-dom-element', () => {
   });
 
   it('sets occluded attribute if occluded', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerDomElement],
       html: `<vertex-viewer-dom-element></vertex-viewer-dom-element>`,
     });

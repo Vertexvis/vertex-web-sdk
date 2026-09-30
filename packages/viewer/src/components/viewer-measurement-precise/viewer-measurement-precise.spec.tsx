@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { MeasurementInteractionHandler } from '../../lib/measurement/interactions';
 import { Viewer } from '../viewer/viewer';
@@ -8,7 +9,7 @@ import { ViewerMeasurementPrecise } from './viewer-measurement-precise';
 
 describe('vertex-viewer-measurement-precise', () => {
   it('registers interaction handler', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMeasurementPrecise],
       html: `
       <vertex-viewer>
@@ -25,7 +26,7 @@ describe('vertex-viewer-measurement-precise', () => {
   });
 
   it('registers and deregisters interaction handler when component added or removed', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [Viewer, ViewerMeasurementPrecise],
       html: `
       <vertex-viewer>

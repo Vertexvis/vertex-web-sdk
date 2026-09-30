@@ -1,4 +1,5 @@
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock(
   '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 
@@ -28,11 +29,11 @@ describe(AnnotationController, () => {
       const { controller, client } = makeAnnotationController(jwt, deviceId);
 
       const expected = mockFetchAnnotationState(client);
-      (client.createSceneViewAnnotationSet as jest.Mock).mockImplementationOnce(
+      (client.createSceneViewAnnotationSet as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(makeCreateSceneViewAnnotationSetResponse()),
       );
 
-      const onStateChange = jest.fn();
+      const onStateChange = vi.fn();
       controller.onStateChange.on(onStateChange);
 
       const res = await controller.addAnnotationSet(setId);
@@ -50,7 +51,7 @@ describe(AnnotationController, () => {
         callback: (v: unknown) => void;
       } {
         let resolve: ((v: unknown) => unknown) | undefined = undefined;
-        const callback = jest.fn((v) => resolve?.(v));
+        const callback = vi.fn((v) => resolve?.(v));
         const promise = new Promise((r) => (resolve = r));
         return { callback, promise };
       }
@@ -87,7 +88,7 @@ describe(AnnotationController, () => {
       const { controller, client } = makeAnnotationController(jwt, deviceId);
 
       const expected = mockFetchAnnotationState(client);
-      const onStateChange = jest.fn();
+      const onStateChange = vi.fn();
       controller.onStateChange.on(onStateChange);
 
       const res = await controller.fetch();
@@ -101,11 +102,11 @@ describe(AnnotationController, () => {
       const { controller, client } = makeAnnotationController(jwt, deviceId);
 
       const expected = mockFetchAnnotationState(client);
-      (client.deleteSceneViewAnnotationSet as jest.Mock).mockImplementationOnce(
+      (client.deleteSceneViewAnnotationSet as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(makeDeleteSceneViewAnnotationSetResponse()),
       );
 
-      const onStateChange = jest.fn();
+      const onStateChange = vi.fn();
       controller.onStateChange.on(onStateChange);
 
       const res = await controller.removeAnnotationSet(setId);
@@ -143,12 +144,12 @@ function mockFetchAnnotationState(client: SceneViewAPIClient): AnnotationState {
   const ann1 = makeSceneAnnotation({ id: annId1 });
   const ann2 = makeSceneAnnotation({ id: annId2 });
 
-  (client.listSceneViewAnnotationSets as jest.Mock).mockImplementationOnce(
+  (client.listSceneViewAnnotationSets as Mock).mockImplementationOnce(
     mockGrpcUnaryResult(
       makeListSceneViewAnnotationSetsResponse(annotationSets),
     ),
   );
-  (client.listSceneAnnotations as jest.Mock)
+  (client.listSceneAnnotations as Mock)
     .mockImplementationOnce(
       mockGrpcUnaryResult(makeListSceneAnnotationsResponse([ann1])),
     )

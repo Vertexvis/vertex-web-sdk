@@ -1,5 +1,6 @@
-jest.mock('../interactionApi');
-jest.mock('../mouseInteractions');
+import type { Mock } from '#test/mock-types';
+vi.mock('../interactionApi');
+vi.mock('../mouseInteractions');
 
 import { Point } from '@vertexvis/geometry';
 
@@ -7,7 +8,7 @@ import { parseConfig } from '../../config';
 import { InteractionApi } from '../interactionApi';
 import { TapInteractionHandler } from '../tapInteractionHandler';
 
-const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
+const InteractionApiMock = InteractionApi as Mock<InteractionApi>;
 
 describe(TapInteractionHandler, () => {
   const api = new InteractionApiMock();
@@ -72,10 +73,10 @@ describe(TapInteractionHandler, () => {
   );
 
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.clearAllMocks();
-    jest.useRealTimers();
-    jest.clearAllTimers();
+    vi.resetAllMocks();
+    vi.clearAllMocks();
+    vi.useRealTimers();
+    vi.clearAllTimers();
 
     handler.initialize(div, api);
   });

@@ -1,11 +1,15 @@
-jest.mock('./utils');
+vi.mock('./utils');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { Node } from '@vertexvis/scene-tree-protos/scenetree/protos/domain_pb';
 import { Async } from '@vertexvis/utils';
 import Chance from 'chance';
+
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import { SceneTreeCellHoverController } from '../scene-tree-table-layout/lib/hover-controller';
 import { SceneTreeTableCell } from './scene-tree-table-cell';
@@ -19,7 +23,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders empty element if node is undefined', async () => {
@@ -268,16 +272,17 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
   it('toggles expansion', async () => {
     const node = createNode({ expanded: false });
-    const { cell } = await newComponentSpec({
+    const { cell, page } = await newComponentSpec({
       html: `
         <vertex-scene-tree-table-cell expand-toggle></vertex-scene-tree-table-cell>
       `,
       node,
     });
 
-    const tree = { toggleExpandItem: jest.fn() };
+    const tree = { toggleExpandItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
+    await page.waitForChanges();
 
     const expandBtn = cell.shadowRoot?.querySelector('.expand-btn');
     const originalEvent = new MouseEvent('pointerup');
@@ -301,7 +306,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { toggleExpandItem: jest.fn() };
+    const tree = { toggleExpandItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -320,7 +325,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { toggleItemVisibility: jest.fn() };
+    const tree = { toggleItemVisibility: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -345,7 +350,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { toggleItemVisibility: jest.fn() };
+    const tree = { toggleItemVisibility: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -364,7 +369,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { isolateItem: jest.fn() };
+    const tree = { isolateItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -389,7 +394,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { isolateItem: jest.fn() };
+    const tree = { isolateItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -408,7 +413,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -428,7 +433,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -442,7 +447,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
 
   it('supports custom selection handling', async () => {
     const node = createNode({ selected: false });
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
 
     const { cell } = await newComponentSpec({
       template: () => (
@@ -479,7 +484,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -506,7 +511,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -530,7 +535,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -552,7 +557,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { deselectItem: jest.fn() };
+    const tree = { deselectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -574,7 +579,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { deselectItem: jest.fn() };
+    const tree = { deselectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -597,7 +602,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
       node,
     });
 
-    const tree = { selectItem: jest.fn() };
+    const tree = { selectItem: vi.fn() };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (cell as any).tree = tree;
 
@@ -618,7 +623,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     });
 
     const hoverController = new SceneTreeCellHoverController();
-    const hovered = jest.fn();
+    const hovered = vi.fn();
     const disposable = hoverController.stateChanged(hovered);
     cell.hoverController = hoverController;
 
@@ -639,7 +644,7 @@ describe('<vertex-scene-tree-table-cell>', () => {
     });
 
     const hoverController = new SceneTreeCellHoverController();
-    const hovered = jest.fn();
+    const hovered = vi.fn();
     const disposable = hoverController.stateChanged(hovered);
     cell.hoverController = hoverController;
 
@@ -680,7 +685,7 @@ async function newComponentSpec(data: {
   template?: () => any;
   node?: Node.AsObject;
 }): Promise<{ page: SpecPage; cell: HTMLVertexSceneTreeTableCellElement }> {
-  const page = await newSpecPage({
+  const page = await renderSpecPage({
     components: [SceneTreeTableCell],
     template: data.template,
     html: data.html,

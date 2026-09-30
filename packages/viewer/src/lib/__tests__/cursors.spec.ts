@@ -4,7 +4,7 @@ describe(CursorManager, () => {
   it('can add a cursor', () => {
     const cursors = new CursorManager();
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     cursors.onChanged.on(listener);
 
     cursors.add('crosshair');
@@ -16,7 +16,7 @@ describe(CursorManager, () => {
   it('does not add a duplicate cursor', () => {
     const cursors = new CursorManager();
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     cursors.onChanged.on(listener);
 
     cursors.add(measurementCursor);
