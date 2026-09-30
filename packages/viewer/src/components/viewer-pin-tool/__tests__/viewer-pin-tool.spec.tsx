@@ -56,6 +56,7 @@ describe('vertex-viewer-pin-tool', () => {
     toolEl.viewer = {
       ...viewer,
       addEventListener,
+      getInteractionHandlers: vi.fn().mockResolvedValue([]),
       frame: {
         scene: {
           camera: {
@@ -152,6 +153,7 @@ describe('vertex-viewer-pin-tool', () => {
     toolEl.viewer = {
       ...viewer,
       addEventListener: vi.fn(),
+      getInteractionHandlers: vi.fn().mockResolvedValue([]),
       frame: {
         scene: {
           camera: {
@@ -192,6 +194,7 @@ describe('vertex-viewer-pin-tool', () => {
     toolEl.viewer = {
       ...viewer,
       addEventListener: vi.fn(),
+      getInteractionHandlers: vi.fn().mockResolvedValue([]),
       frame: {
         scene: {
           camera: {
@@ -239,6 +242,7 @@ describe('vertex-viewer-pin-tool', () => {
     toolEl.viewer = {
       ...viewer,
       addEventListener: vi.fn(),
+      getInteractionHandlers: vi.fn().mockResolvedValue([]),
       frame: {
         scene: {
           camera: {
