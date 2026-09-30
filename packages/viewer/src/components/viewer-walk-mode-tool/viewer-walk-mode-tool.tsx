@@ -101,12 +101,16 @@ export class ViewerWalkModeTool {
 
   private stateMap: StateMap = {};
 
+  private initialized = false;
+
   /**
    * @ignore
    */
-  protected componentWillLoad(): void {
+  protected async componentWillLoad(): Promise<void> {
     this.setupController();
-    this.setupInteractionHandler();
+    await this.setupInteractionHandler();
+
+    this.initialized = true;
   }
 
   /**
@@ -121,17 +125,19 @@ export class ViewerWalkModeTool {
   /**
    * @ignore
    */
-  protected connectedCallback(): void {
-    this.setupInteractionHandler();
-    this.setPivotInteractionMode();
+  protected async connectedCallback(): Promise<void> {
+    if (this.initialized) {
+      await this.setupInteractionHandler();
+      await this.setPivotInteractionMode();
+    }
   }
 
   /**
    * @ignore
    */
-  protected disconnectedCallback(): void {
+  protected async disconnectedCallback(): Promise<void> {
     this.clearInteractionHandler();
-    this.resetInteractionMode();
+    await this.resetInteractionMode();
   }
 
   /**
@@ -253,11 +259,11 @@ export class ViewerWalkModeTool {
     }
   }
 
-  private toggleInteractionMode(): void {
+  private async toggleInteractionMode(): Promise<void> {
     if (this.enabled) {
-      this.setPivotInteractionMode();
+      await this.setPivotInteractionMode();
     } else {
-      this.resetInteractionMode();
+      await this.resetInteractionMode();
     }
   }
 
