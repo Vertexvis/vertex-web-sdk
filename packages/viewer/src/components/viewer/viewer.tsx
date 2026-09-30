@@ -543,8 +543,8 @@ export class Viewer implements BasicViewer {
   private isResizeUpdate?: boolean;
   private isVisible = false;
 
-  private resizeTimer?: NodeJS.Timeout;
-  private streamAttributesUpdateTimer?: NodeJS.Timeout;
+  private resizeTimer?: ReturnType<typeof setTimeout>;
+  private streamAttributesUpdateTimer?: ReturnType<typeof setTimeout>;
   private frameRenderVersion = 0;
   private loadVersion = 0;
 

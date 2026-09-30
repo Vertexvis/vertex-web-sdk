@@ -6,7 +6,7 @@ export class TransformController {
   private isTransforming = false;
   private previousDelta?: Matrix4.Matrix4;
   private currentDelta: Matrix4.Matrix4 = Matrix4.makeIdentity();
-  private endDebounceTimeout?: NodeJS.Timeout;
+  private endDebounceTimeout?: ReturnType<typeof setTimeout>;
 
   public constructor(private stream: StreamApi) {}
 
