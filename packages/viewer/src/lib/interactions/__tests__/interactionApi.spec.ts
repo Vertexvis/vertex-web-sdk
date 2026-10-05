@@ -191,7 +191,7 @@ describe(InteractionApi, () => {
       await api.zoomCameraToPoint(Point.create(10, 10), 1);
       await api.endInteraction();
 
-      const correlationIds = (streamApi.replaceCamera as jest.Mock).mock.calls
+      const correlationIds = (streamApi.replaceCamera as Mock).mock.calls
         .map(([payload]) => payload.frameCorrelationId?.value)
         .filter((id) => id != null);
 

@@ -270,6 +270,7 @@ describe('ZoomInteraction', () => {
 
   describe(ZoomInteraction.prototype.zoom, () => {
     const timeoutDelay = 50;
+    const wheelZoomDelay = 48;
 
     const interactionConfigProvider = (): InteractionConfig => {
       return {
@@ -277,25 +278,25 @@ describe('ZoomInteraction', () => {
         mouseWheelInteractionEndDebounce: timeoutDelay,
       };
     };
-    function delay(extraDelayMs = 0): Promise<void> {
-      return new Promise((resolve) =>
-        setTimeout(resolve, timeoutDelay + extraDelayMs + 10),
-      );
-    }
-
     it('only begins interaction once within interaction timeout', async () => {
+      vi.useFakeTimers();
       const interaction = new ZoomInteraction(interactionConfigProvider);
-      interaction.zoom(1, api);
-      interaction.zoom(1, api);
+      await Promise.all([interaction.zoom(1, api), interaction.zoom(1, api)]);
 
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
-      await delay();
+      await vi.advanceTimersByTimeAsync(timeoutDelay + wheelZoomDelay);
+      expect(api.endInteraction).toHaveBeenCalledTimes(1);
     });
 
     it('ends interaction after interaction timeout', async () => {
+      vi.useFakeTimers();
       const interaction = new ZoomInteraction(interactionConfigProvider);
-      interaction.zoom(1, api);
-      await delay(48); // zoom has extra delay of approx 3 frames at 60fp
+      await interaction.zoom(1, api);
+
+      await vi.advanceTimersByTimeAsync(timeoutDelay + wheelZoomDelay - 1);
+      expect(api.endInteraction).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1);
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
     });
   });
