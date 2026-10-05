@@ -1,13 +1,20 @@
-jest.mock('./dom', () => ({
-  getMarkupBoundingClientRect: jest.fn(() => ({
+vi.mock('./dom', () => ({
+  getMarkupBoundingClientRect: vi.fn(() => ({
     width: 100,
     height: 100,
   })),
 }));
 
+import '../viewer/viewer';
+import '../viewer-markup-arrow/viewer-markup-arrow';
+import '../viewer-markup-circle/viewer-markup-circle';
+import '../viewer-markup-freeform/viewer-markup-freeform';
+import '../viewer-markup-tool/viewer-markup-tool';
+import './viewer-markup';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
+import { render } from '@stencil/vitest';
 import { Point, Rectangle } from '@vertexvis/geometry';
 
 import {
@@ -15,12 +22,6 @@ import {
   CircleMarkup,
   FreeformMarkup,
 } from '../../lib/types/markup';
-import { Viewer } from '../viewer/viewer';
-import { ViewerMarkupArrow } from '../viewer-markup-arrow/viewer-markup-arrow';
-import { ViewerMarkupCircle } from '../viewer-markup-circle/viewer-markup-circle';
-import { ViewerMarkupFreeform } from '../viewer-markup-freeform/viewer-markup-freeform';
-import { ViewerMarkupTool } from '../viewer-markup-tool/viewer-markup-tool';
-import { ViewerMarkup } from './viewer-markup';
 
 describe('vertex-viewer-markup', () => {
   const arrowMarkup = new ArrowMarkup({
@@ -44,10 +45,10 @@ describe('vertex-viewer-markup', () => {
 
   describe('adding markup', () => {
     it('adds a markup element with default arrow markup', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `<vertex-viewer-markup></vertex-viewer-markup>`,
+      const page = await render(<vertex-viewer-markup></vertex-viewer-markup>, {
+        waitForReady: false,
       });
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const markupElement = (await el.addMarkup(
@@ -61,164 +62,156 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('adds an arrow markup element with arrow template', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <vertex-viewer-markup-arrow class="my-class"></vertex-viewer-markup-arrow>
           </template>
           <vertex-viewer-markup arrow-template-id="my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
 
       expect(markupEl).toHaveClass('my-class');
     });
 
     it('adds a default arrow markup element if arrow template not found', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <vertex-viewer-markup-arrow class="my-class"></vertex-viewer-markup-arrow>
           </template>
           <vertex-viewer-markup arrow-template-id="not-my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
 
       expect(markupEl).not.toHaveClass('my-class');
     });
 
     it('adds a default arrow markup element if arrow template does not contain an arrow markup', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <div></div>
           </template>
           <vertex-viewer-markup arrow-template-id="my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
 
       expect(markupEl).not.toHaveClass('my-class');
     });
 
     it('adds a circle markup element with circle template', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <vertex-viewer-markup-circle class="my-class"></vertex-viewer-markup-circle>
           </template>
           <vertex-viewer-markup circle-template-id="my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(circleMarkup);
 
       expect(markupEl).toHaveClass('my-class');
     });
 
     it('adds a default circle markup element if circle template not found', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <vertex-viewer-markup-circle class="my-class"></vertex-viewer-markup-circle>
           </template>
           <vertex-viewer-markup circle-template-id="not-my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(circleMarkup);
 
       expect(markupEl).not.toHaveClass('my-class');
     });
 
     it('adds a default circle markup element if circle template does not contain an circle markup', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <div></div>
           </template>
           <vertex-viewer-markup circle-template-id="my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(circleMarkup);
 
       expect(markupEl).not.toHaveClass('my-class');
     });
 
     it('adds a freeform markup element with freeform template', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupFreeform],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <vertex-viewer-markup-freeform class="my-class"></vertex-viewer-markup-freeform>
           </template>
           <vertex-viewer-markup freeform-template-id="my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(freeformMarkup);
 
       expect(markupEl).toHaveClass('my-class');
     });
 
     it('adds a default freeform markup element if freeform template not found', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupFreeform],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <vertex-viewer-markup-freeform class="my-class"></vertex-viewer-markup-freeform>
           </template>
           <vertex-viewer-markup freeform-template-id="not-my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(freeformMarkup);
 
       expect(markupEl).not.toHaveClass('my-class');
     });
 
     it('adds a default freeform markup element if freeform template does not contain a freeform markup', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupFreeform],
-        html: `
+      const page = await render(
+        `
           <template id="my-template">
             <div></div>
           </template>
           <vertex-viewer-markup freeform-template-id="my-template"></vertex-viewer-markup>
         `,
-      });
+      );
 
-      const el = page.root as HTMLVertexViewerMarkupElement;
+      const el = page.root.nextElementSibling as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(freeformMarkup);
 
       expect(markupEl).not.toHaveClass('my-class');
     });
 
     it('emits event when markup added programmatically', async () => {
-      const onMarkupAdded = jest.fn();
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        template: () => <vertex-viewer-markup onMarkupAdded={onMarkupAdded} />,
-      });
+      const onMarkupAdded = vi.fn();
+      const page = await render(
+        <vertex-viewer-markup onMarkupAdded={onMarkupAdded} />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
@@ -231,16 +224,15 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('emits event when markup added through user interaction', async () => {
-      const onMarkupAdded = jest.fn();
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        template: () => (
-          <vertex-viewer-markup
-            onMarkupAdded={onMarkupAdded}
-            select-new={false}
-          />
-        ),
-      });
+      const onMarkupAdded = vi.fn();
+      const page = await render(
+        <vertex-viewer-markup
+          onMarkupAdded={onMarkupAdded}
+          select-new={false}
+        />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       el.dispatchEvent(new CustomEvent('markupEnd', { detail: arrowMarkup }));
@@ -255,10 +247,10 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('selects new markup if select-new is enabled', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        template: () => <vertex-viewer-markup select-new={true} />,
+      const page = await render(<vertex-viewer-markup select-new={true} />, {
+        waitForReady: false,
       });
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       el.dispatchEvent(new CustomEvent('markupEnd', { detail: arrowMarkup }));
@@ -270,23 +262,15 @@ describe('vertex-viewer-markup', () => {
 
   describe('creating markup', () => {
     it('resets the internal markup tool when markup renders', async () => {
-      const page = await newSpecPage({
-        components: [
-          Viewer,
-          ViewerMarkup,
-          ViewerMarkupTool,
-          ViewerMarkupArrow,
-          ViewerMarkupCircle,
-          ViewerMarkupFreeform,
-        ],
-        template: () => (
-          <vertex-viewer>
-            <vertex-viewer-markup>
-              <vertex-viewer-markup-tool />
-            </vertex-viewer-markup>
-          </vertex-viewer>
-        ),
-      });
+      const page = await render(
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-tool />
+          </vertex-viewer-markup>
+        </vertex-viewer>,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const root = page.root as HTMLVertexViewerElement;
 
@@ -361,10 +345,11 @@ describe('vertex-viewer-markup', () => {
 
   describe('removing markup', () => {
     it('removes markup containing id', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `<vertex-viewer-markup></vertex-viewer-markup>`,
-      });
+      const page = await render(
+        `<vertex-viewer-markup></vertex-viewer-markup>`,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       await el.addMarkup(arrowMarkup);
@@ -374,13 +359,12 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('emits event when markup removed programmatically', async () => {
-      const onMarkupRemoved = jest.fn();
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        template: () => (
-          <vertex-viewer-markup onMarkupRemoved={onMarkupRemoved} />
-        ),
-      });
+      const onMarkupRemoved = vi.fn();
+      const page = await render(
+        <vertex-viewer-markup onMarkupRemoved={onMarkupRemoved} />,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
@@ -396,19 +380,15 @@ describe('vertex-viewer-markup', () => {
 
   describe('scaling markup', () => {
     it('scales markup shadows up in size when scaled up', async () => {
-      const page = await newSpecPage({
-        components: [
-          ViewerMarkup,
-          ViewerMarkupArrow,
-          ViewerMarkupCircle,
-          ViewerMarkupFreeform,
-        ],
-        html: `<vertex-viewer-markup>
+      const page = await render(
+        `<vertex-viewer-markup>
           <vertex-viewer-markup-arrow start="[-0.25, 0]" end="[0, 0]"></vertex-viewer-markup-arrow>
           <vertex-viewer-markup-circle bounds="[0,0,0.5,0.5]"></vertex-viewer-markup-circle>
           <vertex-viewer-markup-freeform points="[[0,0],[0.5,0.5]]"></vertex-viewer-markup-freeform>
         </vertex-viewer-markup>`,
-      });
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const arrow = el.querySelector(
@@ -441,19 +421,15 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('keeps markup shadows at the default size when scaled down', async () => {
-      const page = await newSpecPage({
-        components: [
-          ViewerMarkup,
-          ViewerMarkupArrow,
-          ViewerMarkupCircle,
-          ViewerMarkupFreeform,
-        ],
-        html: `<vertex-viewer-markup>
+      const page = await render(
+        `<vertex-viewer-markup>
           <vertex-viewer-markup-arrow start="[-0.25, 0]" end="[0, 0]"></vertex-viewer-markup-arrow>
           <vertex-viewer-markup-circle bounds="[0,0,0.5,0.5]"></vertex-viewer-markup-circle>
           <vertex-viewer-markup-freeform points="[[0,0],[0.5,0.5]]"></vertex-viewer-markup-freeform>
         </vertex-viewer-markup>`,
-      });
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const arrow = el.querySelector(
@@ -488,10 +464,11 @@ describe('vertex-viewer-markup', () => {
 
   describe('query markup', () => {
     it('returns markup with id', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `<vertex-viewer-markup></vertex-viewer-markup>`,
-      });
+      const page = await render(
+        `<vertex-viewer-markup></vertex-viewer-markup>`,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       await el.addMarkup(arrowMarkup);
@@ -502,10 +479,11 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('returns all markups', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `<vertex-viewer-markup></vertex-viewer-markup>`,
-      });
+      const page = await render(
+        `<vertex-viewer-markup></vertex-viewer-markup>`,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       await el.addMarkup(arrowMarkup);
@@ -518,10 +496,11 @@ describe('vertex-viewer-markup', () => {
 
   describe('selecting markups', () => {
     it('sets editing mode on selected markup', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `<vertex-viewer-markup></vertex-viewer-markup>`,
-      });
+      const page = await render(
+        `<vertex-viewer-markup></vertex-viewer-markup>`,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       await el.addMarkup(arrowMarkup);
@@ -535,17 +514,18 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('selects markup when pressed and not disabled', async () => {
-      const selectionChangedListener = jest.fn();
+      const selectionChangedListener = vi.fn();
 
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `
+      const page = await render(
+        `
           <vertex-viewer-markup>
             <vertex-viewer-markup-arrow id="m1" class="provided"></vertex-viewer-markup-arrow>
             <vertex-viewer-markup-arrow class="provided"></vertex-viewer-markup-arrow>
           </vertex-viewer-markup>
         `,
-      });
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const provided = el.querySelectorAll('.provided');
@@ -572,7 +552,7 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
       expect(el.selectedMarkupId).toBeUndefined();
       expect(selectionChangedListener).toHaveBeenCalledWith(
-        expect.objectContaining({ detail: undefined }),
+        expect.objectContaining({ detail: null }),
       );
 
       // Should select, markup has ID
@@ -588,10 +568,11 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('does not select markup when pressed and disabled', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow, ViewerMarkupCircle],
-        html: `<vertex-viewer-markup disabled></vertex-viewer-markup>`,
-      });
+      const page = await render(
+        `<vertex-viewer-markup disabled></vertex-viewer-markup>`,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
@@ -602,14 +583,15 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('does not select markup if movement occurs', async () => {
-      const page = await newSpecPage({
-        components: [ViewerMarkup, ViewerMarkupArrow],
-        html: `
+      const page = await render(
+        `
           <vertex-viewer-markup>
             <vertex-viewer-markup-arrow id="m1" class="provided"></vertex-viewer-markup-arrow>
           </vertex-viewer-markup>
         `,
-      });
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root as HTMLVertexViewerMarkupElement;
       const markup = el.querySelector('vertex-viewer-markup-arrow');
@@ -643,25 +625,18 @@ describe('vertex-viewer-markup', () => {
 
   describe('markup tool', () => {
     it('sets markup tool with correct props', async () => {
-      const page = await newSpecPage({
-        components: [
-          Viewer,
-          ViewerMarkup,
-          ViewerMarkupTool,
-          ViewerMarkupArrow,
-          ViewerMarkupCircle,
-        ],
-        template: () => (
-          <vertex-viewer>
-            <vertex-viewer-markup
-              arrowTemplateId="my-arrow-template"
-              circleTemplateId="my-circle-template"
-            >
-              <vertex-viewer-markup-tool />
-            </vertex-viewer-markup>
-          </vertex-viewer>
-        ),
-      });
+      const page = await render(
+        <vertex-viewer>
+          <vertex-viewer-markup
+            arrowTemplateId="my-arrow-template"
+            circleTemplateId="my-circle-template"
+          >
+            <vertex-viewer-markup-tool />
+          </vertex-viewer-markup>
+        </vertex-viewer>,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const viewer = page.root as HTMLVertexViewerElement;
       const toolEl = viewer.querySelector(
@@ -676,22 +651,15 @@ describe('vertex-viewer-markup', () => {
     });
 
     it('updates tool props when props change', async () => {
-      const page = await newSpecPage({
-        components: [
-          Viewer,
-          ViewerMarkup,
-          ViewerMarkupTool,
-          ViewerMarkupArrow,
-          ViewerMarkupCircle,
-        ],
-        template: () => (
-          <vertex-viewer>
-            <vertex-viewer-markup>
-              <vertex-viewer-markup-tool />
-            </vertex-viewer-markup>
-          </vertex-viewer>
-        ),
-      });
+      const page = await render(
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-tool />
+          </vertex-viewer-markup>
+        </vertex-viewer>,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
       const el = page.root?.querySelector(
         'vertex-viewer-markup',
@@ -712,36 +680,33 @@ describe('vertex-viewer-markup', () => {
       await page.waitForChanges();
       expect(toolEl.disabled).toBe(true);
 
-      const viewer = page.doc.createElement('vertex-viewer');
+      const viewer = page.root as HTMLVertexViewerElement;
+      el.viewer = undefined;
+      await page.waitForChanges();
       el.viewer = viewer;
       await page.waitForChanges();
       expect(toolEl.viewer).toBe(viewer);
     });
 
     it('updates markup props when props change', async () => {
-      const page = await newSpecPage({
-        components: [
-          Viewer,
-          ViewerMarkup,
-          ViewerMarkupTool,
-          ViewerMarkupArrow,
-          ViewerMarkupCircle,
-        ],
-        template: () => (
-          <vertex-viewer>
-            <vertex-viewer-markup>
-              <vertex-viewer-markup-tool />
-            </vertex-viewer-markup>
-          </vertex-viewer>
-        ),
-      });
+      const page = await render(
+        <vertex-viewer>
+          <vertex-viewer-markup>
+            <vertex-viewer-markup-tool />
+          </vertex-viewer-markup>
+        </vertex-viewer>,
+        { waitForReady: false },
+      );
+      await page.waitForChanges();
 
-      const el = page.root?.querySelector(
+      const el = page.root.querySelector(
         'vertex-viewer-markup',
       ) as HTMLVertexViewerMarkupElement;
       const markupEl = await el.addMarkup(arrowMarkup);
 
-      const viewer = page.doc.createElement('vertex-viewer');
+      const viewer = page.root as HTMLVertexViewerElement;
+      el.viewer = undefined;
+      await page.waitForChanges();
       el.viewer = viewer;
       await page.waitForChanges();
       expect(markupEl.viewer).toBe(viewer);

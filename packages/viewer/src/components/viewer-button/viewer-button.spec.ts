@@ -1,13 +1,14 @@
-import { newSpecPage } from '@stencil/core/testing';
+import './viewer-button';
 
-import { ViewerButton } from './viewer-button';
+import { render } from '@stencil/vitest';
 
 describe('<vertex-viewer-button>', () => {
   it('contains a button with a slot for content', async () => {
-    const page = await newSpecPage({
-      components: [ViewerButton],
-      html: `<vertex-viewer-button>Test</vertex-viewer-button>`,
-    });
+    const page = await render(
+      '<vertex-viewer-button>Test</vertex-viewer-button>',
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const btn = page.root?.shadowRoot?.querySelector('button');
     const slot = btn?.querySelector('slot');
@@ -18,10 +19,11 @@ describe('<vertex-viewer-button>', () => {
   });
 
   it('forwards its accessible name to the internal button', async () => {
-    const page = await newSpecPage({
-      components: [ViewerButton],
-      html: `<vertex-viewer-button aria-label="Fit all"></vertex-viewer-button>`,
-    });
+    const page = await render(
+      '<vertex-viewer-button aria-label="Fit all"></vertex-viewer-button>',
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const btn = page.root?.shadowRoot?.querySelector('button');
     expect(btn).toEqualAttribute('aria-label', 'Fit all');

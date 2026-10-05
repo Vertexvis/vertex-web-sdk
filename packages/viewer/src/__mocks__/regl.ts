@@ -1,3 +1,3 @@
-const frame = jest.fn((callback) => callback());
+const frame = vi.fn((callback) => callback());
 
-export default jest.fn(() => ({ frame }));
+export default vi.fn(() => ({ frame }));

@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import {
   AttributeBinding,
   Binding,
@@ -16,7 +18,7 @@ class NoOpBinding implements Binding {
 describe(CollectionBinding, () => {
   it('calls bind on each child', () => {
     const binding = new NoOpBinding();
-    const bind = jest.spyOn(binding, 'bind');
+    const bind = vi.spyOn(binding, 'bind');
 
     const data = {};
     const collection = new CollectionBinding([binding]);
@@ -105,7 +107,7 @@ describe(AttributeBinding, () => {
     const node = document.createElement('div');
     node.setAttribute('title', '123 {{data.name}} 456');
 
-    const setAttribute = jest.spyOn(node, 'setAttribute');
+    const setAttribute = vi.spyOn(node, 'setAttribute');
     const binding = new AttributeBinding(
       node,
       '123 {{data.name}} 456',
@@ -126,7 +128,7 @@ describe(EventHandlerBinding, () => {
   it('adds event handler', () => {
     const node = document.createElement('div');
 
-    const data = { func: jest.fn() };
+    const data = { func: vi.fn() };
     const binding = new EventHandlerBinding(node, '{{data.func}}', 'click');
     binding.bind(data);
 
@@ -137,7 +139,7 @@ describe(EventHandlerBinding, () => {
   it('does nothing if binding expression invalid', () => {
     const node = document.createElement('div');
 
-    const data = { func: jest.fn() };
+    const data = { func: vi.fn() };
     const binding = new EventHandlerBinding(node, '{{data.func', 'click');
     binding.bind(data);
 
@@ -148,8 +150,8 @@ describe(EventHandlerBinding, () => {
   it('replaces existing listener', () => {
     const node = document.createElement('div');
 
-    const data1 = { func: jest.fn() };
-    const data2 = { func: jest.fn() };
+    const data1 = { func: vi.fn() };
+    const data2 = { func: vi.fn() };
     const binding = new EventHandlerBinding(node, '{{data.func}}', 'click');
 
     binding.bind(data1);
@@ -201,8 +203,8 @@ describe(generateBindings, () => {
     const data = {
       attr: 'attr',
       text: 'text',
-      click: jest.fn(),
-      clickMe: jest.fn(),
+      click: vi.fn(),
+      clickMe: vi.fn(),
       child: { attr: 'attr-child' },
       value: 'foo',
     };
@@ -220,6 +222,6 @@ describe(generateBindings, () => {
     expect(data.click).toHaveBeenCalled();
     expect(data.clickMe).toHaveBeenCalled();
     expect(input1.value).toBe('foo');
-    expect(input2.formAction).toBe('foo');
+    expect(input2.getAttribute('formaction')).toBe('foo');
   });
 });

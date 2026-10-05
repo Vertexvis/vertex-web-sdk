@@ -4,12 +4,12 @@ import { MockDocumentApi } from '../../../testing/mock-document-api';
 
 describe('DocumentApi', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('zoomTo', () => {
     it('zooms to the specified percentage and maintains the same center point', async () => {
-      const mockStateChanged = jest.fn();
+      const mockStateChanged = vi.fn();
       const api = new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) });
 
       api.onStateChanged(mockStateChanged);
@@ -19,7 +19,7 @@ describe('DocumentApi', () => {
     });
 
     it('constrains the zoom percentage to the min and max values', async () => {
-      const mockStateChanged = jest.fn();
+      const mockStateChanged = vi.fn();
       const api = new MockDocumentApi({ zoomPercentage: 100, panOffset: Point.create(0, 0), viewport: Dimensions.create(100, 100) });
 
       api.onStateChanged(mockStateChanged);
@@ -28,7 +28,7 @@ describe('DocumentApi', () => {
     });
 
     it('constrains the pan offset to the original content viewport', async () => {
-      const mockStateChanged = jest.fn();
+      const mockStateChanged = vi.fn();
       const api = new MockDocumentApi({
         zoomPercentage: 100,
         panOffset: Point.create(-100, -100),
@@ -51,7 +51,7 @@ describe('DocumentApi', () => {
 
   describe('panByDelta', () => {
     it('constrains the pan offset to the original content viewport', async () => {
-      const mockStateChanged = jest.fn();
+      const mockStateChanged = vi.fn();
       const api = new MockDocumentApi({
         zoomPercentage: 150,
         panOffset: Point.create(0, 0),
@@ -67,7 +67,7 @@ describe('DocumentApi', () => {
 
     it('incorporates the device pixel ratio when constraining the pan offset', async () => {
       const originalDevicePixelRatio = window.devicePixelRatio;
-      const mockStateChanged = jest.fn();
+      const mockStateChanged = vi.fn();
       const api = new MockDocumentApi({
         zoomPercentage: 150,
         panOffset: Point.create(0, 0),

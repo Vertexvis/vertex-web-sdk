@@ -15,12 +15,12 @@ import { TapEventDetails } from '../tapEventDetails';
 
 describe(FlyToPositionKeyInteraction, () => {
   const streamApi = new StreamApi();
-  streamApi.hitItems = jest.fn(async () => ({
+  streamApi.hitItems = vi.fn(async () => ({
     hitItems: {
       hits: [{ itemId: { hex: 'item-id' }, hitPoint: { x: 10, y: 20, z: 30 } }],
     },
   }));
-  streamApi.flyTo = jest.fn(async () => ({ flyTo: {} }));
+  streamApi.flyTo = vi.fn(async () => ({ flyTo: {} }));
 
   const sceneId = random.guid();
   const sceneViewId = random.guid();

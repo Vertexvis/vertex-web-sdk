@@ -1,4 +1,5 @@
-jest.mock('../viewer');
+import type { Mock } from '#test/mock-types';
+vi.mock('../viewer');
 
 import { Scene } from '../../../lib/scenes';
 import { Viewer } from '../viewer';
@@ -12,7 +13,7 @@ export let resolveScene: (() => void) | undefined = undefined;
 export const viewer = new Viewer();
 
 export function resetAwaiter(scene: Scene): void {
-  (viewer.scene as jest.Mock).mockImplementation(() => {
+  (viewer.scene as Mock).mockImplementation(() => {
     if (resolveScene) {
       resolveScene();
     }

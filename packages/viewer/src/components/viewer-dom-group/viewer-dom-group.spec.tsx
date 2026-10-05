@@ -1,11 +1,12 @@
-import { newSpecPage } from '@stencil/core/testing';
 import { Euler, Matrix4, Quaternion, Vector3 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { ViewerDomGroup } from './viewer-dom-group';
 
 describe('vertex-viewer-dom-group', () => {
   it('sets position, rotation and scale properties on init', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerDomGroup],
       html: `
         <vertex-viewer-dom-group
@@ -31,8 +32,8 @@ describe('vertex-viewer-dom-group', () => {
   });
 
   it('syncs properties when json attributes change', async () => {
-    const onPropertyChanged = jest.fn();
-    const page = await newSpecPage({
+    const onPropertyChanged = vi.fn();
+    const page = await renderSpecPage({
       components: [ViewerDomGroup],
       html: `<vertex-viewer-dom-group></vertex-viewer-dom-group>`,
     });
@@ -69,7 +70,7 @@ describe('vertex-viewer-dom-group', () => {
   });
 
   it('updates quaternion when rotation changes', async () => {
-    const page = await newSpecPage({
+    const page = await renderSpecPage({
       components: [ViewerDomGroup],
       html: `<vertex-viewer-dom-group></vertex-viewer-dom-group>`,
     });

@@ -1,5 +1,5 @@
-jest.mock('@vertexvis/stream-api');
-jest.mock('../../../workers/png-decoder-pool');
+vi.mock('@vertexvis/stream-api');
+vi.mock('../../../workers/png-decoder-pool');
 
 import {
   Angle,
@@ -27,12 +27,12 @@ import { Frame } from '../../types/frame';
 import { InteractionApi } from '../interactionApi';
 import { InteractionApiOrthographic } from '../interactionApiOrthographic';
 
-describe(InteractionApiOrthographic, () => {
-  const emitTap = jest.fn();
-  const emitDoubleTap = jest.fn();
-  const emitLongPress = jest.fn();
-  const emitInteractionStarted = jest.fn();
-  const emitInteractionFinished = jest.fn();
+describe('InteractionApiOrthographic', () => {
+  const emitTap = vi.fn();
+  const emitDoubleTap = vi.fn();
+  const emitLongPress = vi.fn();
+  const emitInteractionStarted = vi.fn();
+  const emitInteractionFinished = vi.fn();
   const streamApi = new StreamApi();
   const sceneId = random.guid();
   const sceneViewId = random.guid();
@@ -59,8 +59,8 @@ describe(InteractionApiOrthographic, () => {
   let api: InteractionApi;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
 
     api = new InteractionApiOrthographic(
       streamApi,
@@ -82,7 +82,7 @@ describe(InteractionApiOrthographic, () => {
     () => {
       it('uses an orthographic ray to determine a world point', async () => {
         const depthBuffer = (await frame.depthBuffer()) as DepthBuffer;
-        jest.spyOn(depthBuffer, 'getDepthAtPoint').mockImplementation(() => 0);
+        vi.spyOn(depthBuffer, 'getDepthAtPoint').mockImplementation(() => 0);
 
         const expectedRay = viewport.transformPointToRay(
           Point.create(1, 1),
@@ -109,10 +109,10 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest
-        .spyOn(scene, 'camera')
-        .mockImplementation(() => mockOrthographicCamera);
-      const moveBy = jest.spyOn(mockOrthographicCamera, 'moveBy');
+      vi.spyOn(scene, 'camera').mockImplementation(
+        () => mockOrthographicCamera,
+      );
+      const moveBy = vi.spyOn(mockOrthographicCamera, 'moveBy');
 
       await api.beginInteraction();
       await api.panCameraByDelta(
@@ -134,10 +134,10 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest
-        .spyOn(scene, 'camera')
-        .mockImplementation(() => mockOrthographicCamera);
-      const update = jest
+      vi.spyOn(scene, 'camera').mockImplementation(
+        () => mockOrthographicCamera,
+      );
+      const update = vi
         .spyOn(mockOrthographicCamera, 'update')
         .mockImplementation(() => mockOrthographicCamera);
 
@@ -167,10 +167,10 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 50)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest
-        .spyOn(scene, 'camera')
-        .mockImplementation(() => mockOrthographicCamera);
-      const update = jest.spyOn(mockOrthographicCamera, 'update');
+      vi.spyOn(scene, 'camera').mockImplementation(
+        () => mockOrthographicCamera,
+      );
+      const update = vi.spyOn(mockOrthographicCamera, 'update');
 
       await api.beginInteraction();
       await api.zoomCameraToPoint(
@@ -199,10 +199,10 @@ describe(InteractionApiOrthographic, () => {
         BoundingBox.create(Vector3.create(), Vector3.create(50, 50, 100)),
         fromPbFrameOrThrow(Orientation.DEFAULT),
       );
-      jest
-        .spyOn(scene, 'camera')
-        .mockImplementation(() => mockOrthographicCamera);
-      const update = jest.spyOn(mockOrthographicCamera, 'update');
+      vi.spyOn(scene, 'camera').mockImplementation(
+        () => mockOrthographicCamera,
+      );
+      const update = vi.spyOn(mockOrthographicCamera, 'update');
 
       await api.beginInteraction();
       await api.rotateCamera(Point.create(10, 0));

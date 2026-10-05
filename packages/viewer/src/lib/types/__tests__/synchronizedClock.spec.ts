@@ -7,11 +7,11 @@ describe(SynchronizedClock, () => {
 
   const clock = new SynchronizedClock(remoteTime, localTime);
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
 
   describe(SynchronizedClock.prototype.localOffset, () => {
     it('returns local offset from when clock was instantiated', () => {
-      jest.spyOn(global.Date, 'now').mockReturnValue(localNow.getTime());
+      vi.spyOn(global.Date, 'now').mockReturnValue(localNow.getTime());
 
       const offset = clock.localOffset();
       expect(offset).toBe(2000);
@@ -44,7 +44,7 @@ describe(SynchronizedClock, () => {
 
   describe(SynchronizedClock.prototype.remoteNow, () => {
     it('approximates the current time on the remote', () => {
-      jest.spyOn(global.Date, 'now').mockReturnValue(localNow.getTime());
+      vi.spyOn(global.Date, 'now').mockReturnValue(localNow.getTime());
 
       const remote = clock.remoteNow();
       const expected = localNow.getTime() + 1000;

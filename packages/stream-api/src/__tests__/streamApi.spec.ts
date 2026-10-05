@@ -1,8 +1,12 @@
-jest.mock('@vertexvis/utils', () => {
-  const utils = jest.requireActual('@vertexvis/utils');
+import { type Mock, vi } from 'vitest';
+vi.mock('@vertexvis/utils', async () => {
+  const utils =
+    await vi.importActual<typeof import('@vertexvis/utils')>(
+      '@vertexvis/utils',
+    );
   return {
     ...utils,
-    UUID: { create: jest.fn() },
+    UUID: { create: vi.fn() },
   };
 });
 
@@ -19,12 +23,12 @@ describe(StreamApi, () => {
   const streamApi = new StreamApi(ws, { loggingEnabled: false });
   const descriptor = { url: 'ws://foo.com' };
 
-  const connect = jest.spyOn(ws, 'connect');
-  const close = jest.spyOn(ws, 'close');
-  const send = jest.spyOn(ws, 'send');
+  const connect = vi.spyOn(ws, 'connect');
+  const close = vi.spyOn(ws, 'close');
+  const send = vi.spyOn(ws, 'send');
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     ws.reset();
   });
 
@@ -132,7 +136,7 @@ describe(StreamApi, () => {
     beforeEach(() => streamApi.connect(descriptor));
 
     it('invokes callback when request is received', () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       streamApi.onRequest(handler);
       ws.receiveMessage(
         vertexvis.protobuf.stream.StreamMessage.encode({
@@ -547,6 +551,6 @@ describe(StreamApi, () => {
 
 function mockRequestId(): string {
   const requestId = (Math.random() * 100000).toString();
-  (UUID.create as jest.Mock).mockReturnValueOnce(requestId);
+  (UUID.create as Mock).mockReturnValueOnce(requestId);
   return requestId;
 }

@@ -1,7 +1,7 @@
-const draw = jest.fn();
+const draw = vi.fn();
 
-const createShape = jest.fn(() => draw);
+const createShape = vi.fn(() => draw);
 
-export default jest.fn(() => ({
+export default vi.fn(() => ({
   createShape,
 }));

@@ -1,4 +1,5 @@
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock(
   '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 
@@ -44,12 +45,12 @@ describe('MeasurementController', () => {
   beforeEach(() => {
     model.clearOutcome();
     model.clearEntities();
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   describe(MeasurementController.prototype.addEntity, () => {
     it('returns measurement results if entity unregistered', async () => {
-      (client.measure as jest.Mock).mockImplementation(
+      (client.measure as Mock).mockImplementation(
         mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
@@ -62,7 +63,7 @@ describe('MeasurementController', () => {
     });
 
     it('returns cached results', async () => {
-      (client.measure as jest.Mock).mockImplementation(
+      (client.measure as Mock).mockImplementation(
         mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
@@ -79,7 +80,7 @@ describe('MeasurementController', () => {
 
   describe(MeasurementController.prototype.clearEntities, () => {
     it('clears entities and results', async () => {
-      (client.measure as jest.Mock).mockImplementation(
+      (client.measure as Mock).mockImplementation(
         mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
@@ -94,14 +95,14 @@ describe('MeasurementController', () => {
 
   describe(MeasurementController.prototype.removeEntity, () => {
     it('returns measurement results if entity registered', async () => {
-      (client.measure as jest.Mock).mockImplementation(
+      (client.measure as Mock).mockImplementation(
         mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 
       await controller.addEntity(entity1);
       await controller.addEntity(entity2);
 
-      (client.measure as jest.Mock).mockImplementation(
+      (client.measure as Mock).mockImplementation(
         mockGrpcUnaryResult(makeMeasureResponse()),
       );
 
@@ -112,7 +113,7 @@ describe('MeasurementController', () => {
 
   describe(MeasurementController.prototype.setEntities, () => {
     it('replaces entities and returns measurement results', async () => {
-      (client.measure as jest.Mock).mockImplementation(
+      (client.measure as Mock).mockImplementation(
         mockGrpcUnaryResult(makeMeasureResponse(makeMinimumDistanceResult())),
       );
 

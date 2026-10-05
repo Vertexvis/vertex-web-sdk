@@ -8,7 +8,7 @@ import { ViewerWalkModeOperation, WalkModeModel } from './model';
 export class WalkInteractionHandler implements InteractionHandler {
   private api?: InteractionApiPerspective;
 
-  private interval?: NodeJS.Timeout;
+  private interval?: ReturnType<typeof setInterval>;
   private pressed: Record<string, boolean> = {};
   private handlers: Record<ViewerWalkModeOperation, VoidFunction>;
 

@@ -9,12 +9,19 @@ import {
 } from '../webSocketClient';
 
 export class WebSocketClientMock implements WebSocketClient {
+  private closing = false;
   private closeHandlers = new Set<CloseHandler>();
   private msgHandlers = new Set<MessageHandler>();
   private sentMessages = new Array<WebSocketSendData>();
 
   public close(): void {
-    this.closeHandlers.forEach((handler) => handler(new CloseEvent('close')));
+    if (this.closing) return;
+    this.closing = true;
+    try {
+      this.closeHandlers.forEach((handler) => handler(new CloseEvent('close')));
+    } finally {
+      this.closing = false;
+    }
   }
 
   public connect(descriptor: ConnectionDescriptor): Promise<void> {

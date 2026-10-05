@@ -1,7 +1,8 @@
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock(
   '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
-jest.mock('@vertexvis/stream-api');
+vi.mock('@vertexvis/stream-api');
 
 import { SceneViewAPIClient } from '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -29,7 +30,7 @@ describe(ModelViewController, () => {
       const { controller, client } = makeModelViewController(jwt, deviceId);
       const expected = makeListItemModelViewsResponse();
 
-      (client.listItemModelViews as jest.Mock).mockImplementationOnce(
+      (client.listItemModelViews as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(expected),
       );
 
@@ -44,7 +45,7 @@ describe(ModelViewController, () => {
     it('updates the scene view with the provided model view id', async () => {
       const { controller, streamApi } = makeModelViewController(jwt, deviceId);
 
-      (streamApi.updateModelView as jest.Mock).mockImplementationOnce(() =>
+      (streamApi.updateModelView as Mock).mockImplementationOnce(() =>
         Promise.resolve({}),
       );
 
@@ -61,7 +62,7 @@ describe(ModelViewController, () => {
     it('updates the scene view with an empty model view id and resets the scene', async () => {
       const { controller, streamApi } = makeModelViewController(jwt, deviceId);
 
-      (streamApi.updateModelView as jest.Mock).mockImplementationOnce(() =>
+      (streamApi.updateModelView as Mock).mockImplementationOnce(() =>
         Promise.resolve({}),
       );
 

@@ -30,7 +30,7 @@ describe(Line3.distance, () => {
   });
 });
 
-describe(Line3.direction, () => {
+it('Line3.direction returns the direction from start to end', () => {
   const direction = Line3.direction(line);
   const expected = Vector3.create(1, 1, 1);
   expect(direction).toEqual(expected);

@@ -1,11 +1,14 @@
-const dispose = jest.fn();
-const mockRegisterAdditionalElement = jest.fn();
-jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
-  const { MultiElementInteractionHandler } = jest.requireActual(
-    '../../lib/interactions/multiElementInteractionHandler',
-  );
+const { dispose, mockRegisterAdditionalElement } = vi.hoisted(() => ({
+  dispose: vi.fn(),
+  mockRegisterAdditionalElement: vi.fn(),
+}));
+vi.mock('../../lib/interactions/pointerInteractionHandler', async () => {
+  const { MultiElementInteractionHandler } = await vi.importActual<
+    typeof import('../../lib/interactions/multiElementInteractionHandler')
+  >('../../lib/interactions/multiElementInteractionHandler');
   return {
     PointerInteractionHandler: class extends MultiElementInteractionHandler {
+      public addEventListenersToElement = vi.fn(() => ({ dispose: vi.fn() }));
       public registerAdditionalElement =
         mockRegisterAdditionalElement.mockReturnValue({
           dispose,
@@ -16,13 +19,14 @@ jest.mock('../../lib/interactions/pointerInteractionHandler', () => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
 import {
   BoundingBox,
   Dimensions,
   Rectangle,
   Vector3,
 } from '@vertexvis/geometry';
+
+import { renderSpecPage } from '#test/render-spec-page';
 
 import { parseConfig } from '../../lib/config';
 import { PointerInteractionHandler } from '../../lib/interactions/pointerInteractionHandler';
@@ -53,11 +57,11 @@ describe('<vertex-viewer-dom-renderer>', () => {
     makeDepthImageBytes(100, 100, 0),
   );
 
-  beforeEach(() => jest.resetAllMocks());
+  beforeEach(() => vi.resetAllMocks());
 
   describe('2d draw mode', () => {
     it('positions children using matrix3d', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomGroup, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer drawMode="2d" camera={camera}>
@@ -75,10 +79,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('unsets occluded attribute if element no occluded', async () => {
-      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(false);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -98,10 +102,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('sets occluded attribute if element is occluded', async () => {
-      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -121,10 +125,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('does not set occluded if element has occlusion disabled', async () => {
-      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -146,7 +150,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
   describe('3d draw mode', () => {
     it('positions children using matrix3d', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomGroup, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
@@ -165,7 +169,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('rotates element when bill boarding is off', async () => {
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer camera={camera} drawMode="3d">
@@ -184,10 +188,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
   describe('occlusion', () => {
     it('unsets occluded attribute if element not occluded', async () => {
-      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(false);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -207,10 +211,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('sets occluded attribute if element is occluded', async () => {
-      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -230,10 +234,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('does not set occluded if element occlusion disabled', async () => {
-      const isOccluded = jest.spyOn(depthBuffer, 'isOccluded');
+      const isOccluded = vi.spyOn(depthBuffer, 'isOccluded');
       isOccluded.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -255,10 +259,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
   describe('detached', () => {
     it('unsets detached attribute if element not detached', async () => {
-      const isDetached = jest.spyOn(depthBuffer, 'isDetached');
+      const isDetached = vi.spyOn(depthBuffer, 'isDetached');
       isDetached.mockReturnValue(false);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -280,10 +284,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('sets detached attribute if element is detached', async () => {
-      const isDetached = jest.spyOn(depthBuffer, 'isDetached');
+      const isDetached = vi.spyOn(depthBuffer, 'isDetached');
       isDetached.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -305,10 +309,10 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('does not set detached if element detached is disabled', async () => {
-      const isDetached = jest.spyOn(depthBuffer, 'isDetached');
+      const isDetached = vi.spyOn(depthBuffer, 'isDetached');
       isDetached.mockReturnValue(true);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -330,7 +334,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
   describe('initialization', () => {
     it('initializes the current camera when loaded with a populated viewer.frame', async () => {
-      const addEventListener = jest.fn();
+      const addEventListener = vi.fn();
       // prettier-ignore
       const matrix = [
         0, 0.5, 0.5, 0,
@@ -345,11 +349,11 @@ describe('<vertex-viewer-dom-renderer>', () => {
         far: 100,
         near: 1,
 
-        isOrthographic: jest.fn().mockReturnValue(false),
+        isOrthographic: vi.fn().mockReturnValue(false),
       };
 
-      const getInteractionHandlers = jest.fn();
-      const page = await newSpecPage({
+      const getInteractionHandlers = vi.fn();
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -361,7 +365,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
                   scene: {
                     camera,
                   },
-                  depthBuffer: jest.fn().mockReturnValue(undefined),
+                  depthBuffer: vi.fn().mockReturnValue(undefined),
                 },
                 getInteractionHandlers,
               } as unknown as HTMLVertexViewerElement
@@ -382,13 +386,13 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('will register itself with any multielement interaction handlers', async () => {
-      const getInteractionHandlers = jest
+      const getInteractionHandlers = vi
         .fn()
         .mockResolvedValue([
           new PointerInteractionHandler(() => parseConfig('platdev')),
         ]);
 
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer
@@ -397,7 +401,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
                 addEventListener,
                 frame: {
                   scene: {},
-                  depthBuffer: jest.fn().mockReturnValue(undefined),
+                  depthBuffer: vi.fn().mockReturnValue(undefined),
                 },
                 getInteractionHandlers,
               } as unknown as HTMLVertexViewerElement
@@ -414,7 +418,7 @@ describe('<vertex-viewer-dom-renderer>', () => {
     });
 
     it('dispose any handlers on the old viewer', async () => {
-      const getInteractionHandlers = jest
+      const getInteractionHandlers = vi
         .fn()
         .mockResolvedValue([
           new PointerInteractionHandler(() => parseConfig('platdev')),
@@ -422,14 +426,14 @@ describe('<vertex-viewer-dom-renderer>', () => {
 
       const viewer = {
         addEventListener,
-        removeEventListener: jest.fn(),
+        removeEventListener: vi.fn(),
         frame: {
           scene: {},
-          depthBuffer: jest.fn().mockReturnValue(undefined),
+          depthBuffer: vi.fn().mockReturnValue(undefined),
         },
         getInteractionHandlers,
       } as unknown as HTMLVertexViewerElement;
-      const page = await newSpecPage({
+      const page = await renderSpecPage({
         components: [ViewerDomRenderer, ViewerDomElement],
         template: () => (
           <vertex-viewer-dom-renderer

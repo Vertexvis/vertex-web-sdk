@@ -24,14 +24,12 @@ describe(acknowledgeFrameRequests, () => {
 
   afterEach(() => {
     mockWs.reset();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('sends a result when a draw frame request is received', () => {
     const receivedAt = new Date(localTime.getTime() + 1000);
-    jest
-      .spyOn(global.Date, 'now')
-      .mockImplementation(() => receivedAt.getTime());
+    vi.spyOn(global.Date, 'now').mockImplementation(() => receivedAt.getTime());
 
     mockWs.receiveMessage(
       encode(

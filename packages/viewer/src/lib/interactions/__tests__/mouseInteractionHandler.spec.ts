@@ -1,5 +1,6 @@
-jest.mock('../interactionApi');
-jest.mock('../mouseInteractions');
+import type { Mock } from '#test/mock-types';
+vi.mock('../interactionApi');
+vi.mock('../mouseInteractions');
 
 import { parseConfig } from '../../config';
 import { InteractionApi } from '../interactionApi';
@@ -12,13 +13,13 @@ import {
   ZoomInteraction,
 } from '../mouseInteractions';
 
-const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
-const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
-const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
-const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
+const InteractionApiMock = InteractionApi as Mock<InteractionApi>;
+const PanInteractionMock = PanInteraction as Mock<PanInteraction>;
+const ZoomInteractionMock = ZoomInteraction as Mock<ZoomInteraction>;
+const RotateInteractionMock = RotateInteraction as Mock<RotateInteraction>;
 const RotatePointInteractionMock =
-  RotateInteraction as jest.Mock<RotatePointInteraction>;
-const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
+  RotateInteraction as Mock<RotatePointInteraction>;
+const TwistInteractionMock = TwistInteraction as Mock<TwistInteraction>;
 describe(MouseInteractionHandler, () => {
   const rotateInteraction = new RotateInteractionMock();
   const rotatePointInteraction = new RotatePointInteractionMock();
@@ -96,10 +97,10 @@ describe(MouseInteractionHandler, () => {
   );
 
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.clearAllMocks();
+    vi.resetAllMocks();
+    vi.clearAllMocks();
 
-    api.pixelThreshold = jest.fn(() => 2);
+    api.pixelThreshold = vi.fn(() => 2);
     handler.setPrimaryInteractionType('rotate');
     handler.initialize(div, api);
   });
@@ -222,7 +223,7 @@ describe(MouseInteractionHandler, () => {
   });
 
   it('converts line-mode wheel deltas using computed line-height pixels', () => {
-    jest.spyOn(window, 'getComputedStyle').mockReturnValue({
+    vi.spyOn(window, 'getComputedStyle').mockReturnValue({
       getPropertyValue: (property: string) => {
         if (property === 'fontSize') {
           return '16px';
@@ -296,7 +297,7 @@ describe(MouseInteractionHandler, () => {
     });
 
     it('emits event when interaction type changes', () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
       const subscription = handler.onPrimaryInteractionTypeChange(listener);
       handler.setPrimaryInteractionType('zoom');
       subscription.dispose();

@@ -3,14 +3,17 @@
   "private": true,
   "nextVersionBump": "patch",
   "devDependencies": {
-    "eslint": "^9.39.5",
+    "@vitest/coverage-v8": "4.1.11",
+    "eslint": "^10.11.0",
+    "happy-dom": "20.14.5",
     "lerna": "^10.0.1",
     "prettier": "^3.9.9",
     "rollup": "^4.63.5",
     "semver": "^7.8.5",
     "typedoc": "^0.28.20",
     "typescript": "^5.9.3",
-    "vite": "^8.3.1"
+    "vite": "^8.3.1",
+    "vitest": "4.1.11"
   },
   "scripts": {
     "postinstall": "yarn generate:vscode-workspace && yarn generate:npmrc",

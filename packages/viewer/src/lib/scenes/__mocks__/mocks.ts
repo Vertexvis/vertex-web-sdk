@@ -1,21 +1,22 @@
+import type { Mock } from '../../../../../../vitest.mock-types';
 import { PerspectiveCamera } from '../camera';
 import { Scene } from '../scene';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SceneMocks = jest.createMockFromModule('../../scenes') as any;
+const SceneMocks = await vi.importMock<any>('../../scenes');
 
 export const cameraMock =
   new SceneMocks.PerspectiveCamera() as PerspectiveCamera;
 
-(cameraMock.fitToBoundingBox as jest.Mock).mockReturnValue(cameraMock);
-(cameraMock.flyTo as jest.Mock).mockReturnValue(cameraMock);
-(cameraMock.moveBy as jest.Mock).mockReturnValue(cameraMock);
-(cameraMock.rotateAroundAxis as jest.Mock).mockReturnValue(cameraMock);
-(cameraMock.standardView as jest.Mock).mockReturnValue(cameraMock);
-(cameraMock.standardViewFixedLookAt as jest.Mock).mockReturnValue(cameraMock);
-(cameraMock.update as jest.Mock).mockReturnValue(cameraMock);
-(cameraMock.viewAll as jest.Mock).mockReturnValue(cameraMock);
+(cameraMock.fitToBoundingBox as Mock).mockReturnValue(cameraMock);
+(cameraMock.flyTo as Mock).mockReturnValue(cameraMock);
+(cameraMock.moveBy as Mock).mockReturnValue(cameraMock);
+(cameraMock.rotateAroundAxis as Mock).mockReturnValue(cameraMock);
+(cameraMock.standardView as Mock).mockReturnValue(cameraMock);
+(cameraMock.standardViewFixedLookAt as Mock).mockReturnValue(cameraMock);
+(cameraMock.update as Mock).mockReturnValue(cameraMock);
+(cameraMock.viewAll as Mock).mockReturnValue(cameraMock);
 
 export const sceneMock = new SceneMocks.Scene() as Scene;
 
-(sceneMock.camera as jest.Mock).mockReturnValue(cameraMock);
+(sceneMock.camera as Mock).mockReturnValue(cameraMock);

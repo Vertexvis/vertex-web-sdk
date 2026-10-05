@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import * as Async from '../async';
 import { EventDispatcher } from '../eventDispatcher';
 
@@ -10,14 +12,14 @@ describe('EventDispatcher', () => {
 
   describe('EventDispatcher.prototype.on', () => {
     it('invokes event listener when event emitted', () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
       dispatcher.on(listener);
       dispatcher.emit('event');
       expect(listener).toHaveBeenCalledWith('event');
     });
 
     it('disposes of listener when subscription is disposed', () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
       const subscription = dispatcher.on(listener);
       subscription.dispose();
       dispatcher.emit('event');
@@ -26,7 +28,7 @@ describe('EventDispatcher', () => {
 
     it('disposes of listener when aborted', () => {
       const controller = new AbortController();
-      const listener = jest.fn();
+      const listener = vi.fn();
       dispatcher.on(listener, { abort: controller.signal });
       controller.abort();
       dispatcher.emit('event');
@@ -71,7 +73,7 @@ describe('EventDispatcher', () => {
 
   describe('EventDispatcher.prototype.when', () => {
     it('invokes listener when event matches predicate', async () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
       dispatcher.when((e) => e === 'event', listener);
       dispatcher.emit('nope');
       dispatcher.emit('event');
@@ -81,7 +83,7 @@ describe('EventDispatcher', () => {
 
     it('disposes listener when aborted', () => {
       const controller = new AbortController();
-      const listener = jest.fn();
+      const listener = vi.fn();
       dispatcher.when((e) => e === 'event', listener, {
         abort: controller.signal,
       });
@@ -91,7 +93,7 @@ describe('EventDispatcher', () => {
     });
 
     it('disposes listener when subscription disposed', () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
       const sub = dispatcher.when((e) => e === 'event', listener);
       sub.dispose();
       dispatcher.emit('event');
@@ -101,7 +103,7 @@ describe('EventDispatcher', () => {
 
   describe('EventDispatcher.prototype.off', () => {
     it('should remove event listener', () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
       dispatcher.on(listener);
       dispatcher.off(listener);
       dispatcher.emit('event');

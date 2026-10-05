@@ -1,5 +1,6 @@
-jest.mock('../hitTest');
-jest.mock('../../../lib/scenes');
+import type { Mock } from '#test/mock-types';
+vi.mock('../hitTest');
+vi.mock('../../../lib/scenes');
 
 import { Vector3 } from '@vertexvis/geometry';
 import { Async } from '@vertexvis/utils';
@@ -31,14 +32,14 @@ describe(PointToPointInteractionController, () => {
     model = PointToPointInteractionModel.empty();
     controller = new PointToPointInteractionController(model);
 
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe(PointToPointInteractionController.prototype.newMeasurement, () => {
     it('returns interaction handler if pt is over geometry', () => {
       const hitTester = makeHitTester();
       const hits = makeHitProvider({ hitTester });
-      (hitTester.transformPointToWorld as jest.Mock).mockReturnValue(vec);
+      (hitTester.transformPointToWorld as Mock).mockReturnValue(vec);
 
       const interaction = controller.newMeasurement(pt, hits);
       expect(interaction).toBeDefined();
@@ -47,7 +48,7 @@ describe(PointToPointInteractionController, () => {
     it('does not return interaction handler if world pt cannot be found', () => {
       const hitTester = makeHitTester();
       const hits = makeHitProvider({ hitTester });
-      (hitTester.transformPointToWorld as jest.Mock).mockReturnValue(undefined);
+      (hitTester.transformPointToWorld as Mock).mockReturnValue(undefined);
 
       const interaction = controller.newMeasurement(pt, hits);
       expect(interaction).toBeUndefined();
@@ -58,22 +59,22 @@ describe(PointToPointInteractionController, () => {
       const raycaster = makeRaycaster();
       const hits = makeHitProvider({ hitTester, raycaster });
 
-      (hitTester.hitTest as jest.Mock).mockReturnValue(true);
-      (hitTester.transformPointToWorld as jest.Mock).mockReturnValue(start);
-      (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
+      (hitTester.hitTest as Mock).mockReturnValue(true);
+      (hitTester.transformPointToWorld as Mock).mockReturnValue(start);
+      (raycaster.hitItems as Mock).mockReturnValueOnce(
         Async.delay(50, Promise.resolve({ hits: [{ hitPoint: hitStart }] })),
       );
 
       const interaction = controller.newMeasurement(pt, hits);
 
-      (hitTester.transformPointToWorld as jest.Mock).mockReturnValue(end);
+      (hitTester.transformPointToWorld as Mock).mockReturnValue(end);
       interaction?.update(pt, hits);
       let res = model.getMeasurement();
       expect(res).toMatchObject({ start, end, valid: true });
       expect(model.getMeasurement()).toMatchObject({ start, end, valid: true });
       expect(model.getIndicator()).toEqual(end);
 
-      (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
+      (raycaster.hitItems as Mock).mockReturnValueOnce(
         Promise.resolve({ hits: [{ hitPoint: hitEnd }] }),
       );
       res = await interaction?.finish(pt, hits);
@@ -91,8 +92,8 @@ describe(PointToPointInteractionController, () => {
       const raycaster = makeRaycaster();
       const hits = makeHitProvider({ hitTester, raycaster });
 
-      (hitTester.hitTest as jest.Mock).mockReturnValue(true);
-      (hitTester.transformPointToWorld as jest.Mock)
+      (hitTester.hitTest as Mock).mockReturnValue(true);
+      (hitTester.transformPointToWorld as Mock)
         .mockReturnValueOnce(start)
         .mockReturnValueOnce(end)
         .mockReturnValueOnce(start)
@@ -100,7 +101,7 @@ describe(PointToPointInteractionController, () => {
 
       const interaction = controller.newMeasurement(pt, hits);
 
-      (hitTester.hitTest as jest.Mock).mockReturnValue(false);
+      (hitTester.hitTest as Mock).mockReturnValue(false);
       interaction?.update(pt, hits);
       let res = model.getMeasurement();
       expect(res).toMatchObject({ start, end, valid: false });
@@ -137,10 +138,8 @@ describe(PointToPointInteractionController, () => {
         const raycaster = makeRaycaster();
         const hits = makeHitProvider({ hitTester, raycaster });
 
-        (hitTester.hitTest as jest.Mock).mockReturnValue(true);
-        (hitTester.transformPointToWorld as jest.Mock).mockReturnValueOnce(
-          start,
-        );
+        (hitTester.hitTest as Mock).mockReturnValue(true);
+        (hitTester.transformPointToWorld as Mock).mockReturnValueOnce(start);
 
         const interaction = controller.editMeasurement('start');
 
@@ -154,7 +153,7 @@ describe(PointToPointInteractionController, () => {
         });
         expect(model.getIndicator()).toEqual(start);
 
-        (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
+        (raycaster.hitItems as Mock).mockReturnValueOnce(
           Promise.resolve({ hits: [{ hitPoint: hitStart }] }),
         );
         res = await interaction.finish(pt, hits);
@@ -171,8 +170,8 @@ describe(PointToPointInteractionController, () => {
         const raycaster = makeRaycaster();
         const hits = makeHitProvider({ hitTester, raycaster });
 
-        (hitTester.hitTest as jest.Mock).mockReturnValue(false);
-        (hitTester.transformPointToWorld as jest.Mock)
+        (hitTester.hitTest as Mock).mockReturnValue(false);
+        (hitTester.transformPointToWorld as Mock)
           .mockReturnValueOnce(start)
           .mockReturnValueOnce(start);
 
@@ -208,8 +207,8 @@ describe(PointToPointInteractionController, () => {
         const raycaster = makeRaycaster();
         const hits = makeHitProvider({ hitTester, raycaster });
 
-        (hitTester.hitTest as jest.Mock).mockReturnValue(true);
-        (hitTester.transformPointToWorld as jest.Mock).mockReturnValueOnce(end);
+        (hitTester.hitTest as Mock).mockReturnValue(true);
+        (hitTester.transformPointToWorld as Mock).mockReturnValueOnce(end);
 
         const interaction = controller.editMeasurement('end');
 
@@ -227,7 +226,7 @@ describe(PointToPointInteractionController, () => {
         });
         expect(model.getIndicator()).toEqual(end);
 
-        (raycaster.hitItems as jest.Mock).mockReturnValueOnce(
+        (raycaster.hitItems as Mock).mockReturnValueOnce(
           Promise.resolve({ hits: [{ hitPoint: hitEnd }] }),
         );
         res = await interaction.finish(pt, hits);
@@ -244,8 +243,8 @@ describe(PointToPointInteractionController, () => {
         const raycaster = makeRaycaster();
         const hits = makeHitProvider({ hitTester, raycaster });
 
-        (hitTester.hitTest as jest.Mock).mockReturnValue(false);
-        (hitTester.transformPointToWorld as jest.Mock)
+        (hitTester.hitTest as Mock).mockReturnValue(false);
+        (hitTester.transformPointToWorld as Mock)
           .mockReturnValueOnce(end)
           .mockReturnValueOnce(end);
 
@@ -296,7 +295,7 @@ describe(PointToPointInteractionModel, () => {
 
   describe(PointToPointInteractionModel.prototype.setIndicator, () => {
     it('updates indicator and emits event', () => {
-      const handleIndicatorChanged = jest.fn();
+      const handleIndicatorChanged = vi.fn();
 
       model.onIndicatorChanged(handleIndicatorChanged);
       model.setIndicator(vec);
@@ -306,7 +305,7 @@ describe(PointToPointInteractionModel, () => {
     });
 
     it('does not emit event if value is same', () => {
-      const handleIndicatorChanged = jest.fn();
+      const handleIndicatorChanged = vi.fn();
 
       model.onIndicatorChanged(handleIndicatorChanged);
       model.setIndicator(vec);
@@ -319,7 +318,7 @@ describe(PointToPointInteractionModel, () => {
 
   describe(PointToPointInteractionModel.prototype.setMeasurement, () => {
     it('updates measurement and emits event', () => {
-      const handleMeasurementChanged = jest.fn();
+      const handleMeasurementChanged = vi.fn();
 
       model.onMeasurementChanged(handleMeasurementChanged);
       model.setMeasurement(measurement);
@@ -329,7 +328,7 @@ describe(PointToPointInteractionModel, () => {
     });
 
     it('does not emit event if value is same', () => {
-      const handleMeasurementChanged = jest.fn();
+      const handleMeasurementChanged = vi.fn();
 
       model.onMeasurementChanged(handleMeasurementChanged);
       model.setMeasurement(measurement);
@@ -344,7 +343,7 @@ describe(PointToPointInteractionModel, () => {
     PointToPointInteractionModel.prototype.setMeasurementFromValues,
     () => {
       it('sets measurement if start and end defined', () => {
-        const handleMeasurementChanged = jest.fn();
+        const handleMeasurementChanged = vi.fn();
 
         model.onMeasurementChanged(handleMeasurementChanged);
         model.setMeasurementFromValues(start, end, true);
@@ -354,7 +353,7 @@ describe(PointToPointInteractionModel, () => {
       });
 
       it('does not set measurement if start or end undefined', () => {
-        const handleMeasurementChanged = jest.fn();
+        const handleMeasurementChanged = vi.fn();
 
         model.onMeasurementChanged(handleMeasurementChanged);
         model.setMeasurementFromValues(undefined, end, true);

@@ -3664,6 +3664,7 @@ declare global {
     positionChanged: Vector3.Vector3 | undefined;
     rotationChanged: Euler.Euler | undefined;
     interactionEnded: Matrix4.Matrix4 | undefined;
+    interactionFinished: Matrix4.Matrix4 | undefined;
     interactionStarted: void;
   }
   interface HTMLVertexViewerTransformWidgetElement
@@ -4324,7 +4325,7 @@ declare namespace LocalJSX {
      */
     onFrameReceived?: (event: VertexViewerCustomEvent<Frame>) => void;
     /**
-     * Emits an event when the user hs finished an interaction.
+     * Emits an event when the user has finished an interaction.
      */
     onInteractionFinished?: (event: VertexViewerCustomEvent<void>) => void;
     /**
@@ -5607,9 +5608,17 @@ declare namespace LocalJSX {
      */
     interactionThrottle?: number;
     /**
-     * An event that is emitted when the interaction has ended
+     * @deprecated Use `interactionFinished` An event that is emitted when the interaction has ended
      */
     onInteractionEnded?: (
+      event: VertexViewerTransformWidgetCustomEvent<
+        Matrix4.Matrix4 | undefined
+      >,
+    ) => void;
+    /**
+     * An event that is emitted when the interaction has finished
+     */
+    onInteractionFinished?: (
       event: VertexViewerTransformWidgetCustomEvent<
         Matrix4.Matrix4 | undefined
       >,

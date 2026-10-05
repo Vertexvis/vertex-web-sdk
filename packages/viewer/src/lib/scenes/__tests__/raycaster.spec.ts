@@ -1,4 +1,5 @@
-jest.mock('@vertexvis/stream-api');
+import type { Mock } from '#test/mock-types';
+vi.mock('@vertexvis/stream-api');
 
 import { Point } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -12,7 +13,7 @@ describe(Raycaster, () => {
 
   describe(Raycaster.prototype.hitItems, () => {
     const raycaster = new Raycaster(api, imageScaleProvider(1, 1));
-    (api.hitItems as jest.Mock).mockResolvedValue({
+    (api.hitItems as Mock).mockResolvedValue({
       hitItems: 'sandy',
     });
     it('returns hit items', () => {

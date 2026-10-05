@@ -1,14 +1,15 @@
-const mockTransformWidgetConstructor = jest.fn();
-const mockGetFullBounds = jest.fn();
-const mockBoundsContainsPoint = jest.fn();
-const mockOnHoveredChanged = jest.fn();
-const mockUpdateTransform = jest.fn();
-const mockUpdateFrame = jest.fn();
-const mockUpdateCursor = jest.fn();
-const mockUpdateColors = jest.fn();
-const mockUpdateScalars = jest.fn();
-const mockUpdateDimensions = jest.fn();
-const mockUpdateDisabledAxis = jest.fn();
+const mockTransformWidgetConstructor = vi.fn();
+const mockGetFullBounds = vi.fn();
+const mockBoundsContainsPoint = vi.fn();
+const mockOnHoveredChanged = vi.fn();
+const mockUpdateTransform = vi.fn();
+const mockUpdateFrame = vi.fn();
+const mockUpdateCursor = vi.fn();
+const mockUpdateColors = vi.fn();
+const mockUpdateScalars = vi.fn();
+const mockUpdateDimensions = vi.fn();
+const mockUpdateDisabledAxis = vi.fn();
+const mockDispose = vi.fn();
 
 export class TransformWidget {
   public getFullBounds = mockGetFullBounds;
@@ -21,6 +22,7 @@ export class TransformWidget {
   public updateScalars = mockUpdateScalars;
   public updateDimensions = mockUpdateDimensions;
   public updateDisabledAxis = mockUpdateDisabledAxis;
+  public dispose = mockDispose;
 
   public constructor(...args: unknown[]) {
     mockTransformWidgetConstructor(...args);

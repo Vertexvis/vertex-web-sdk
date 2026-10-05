@@ -24,7 +24,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: 'Install'
-        run: 'yarn install --mode=skip-build --immutable'
+        run: 'yarn install --immutable'
       - name: 'Build'
         run: 'yarn build'
       - name: 'Upload build artifacts'
@@ -73,7 +73,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: 'Install'
-        run: 'yarn install --mode=skip-build'
+        run: 'yarn install '
       - name: 'Test'
         run: 'yarn test:ci'
   docs:

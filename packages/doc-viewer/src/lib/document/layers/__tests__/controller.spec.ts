@@ -6,9 +6,9 @@ import { DocumentApi } from '../../api';
 import { DocumentLayersController } from '..';
 
 class MockApiWithoutLayers extends DocumentApi {
-  public dispose = jest.fn();
-  public load = jest.fn();
-  public loadPage = jest.fn();
+  public dispose = vi.fn();
+  public load = vi.fn();
+  public loadPage = vi.fn();
 
   public constructor() {
     super({
@@ -43,7 +43,7 @@ describe('DocumentLayersController', () => {
       const mockPdfDocument = {
         numPages: 1,
         getPage: mockGetPage,
-        getOptionalContentConfig: jest.fn(() => Promise.resolve(mockOptionalContentConfig)),
+        getOptionalContentConfig: vi.fn(() => Promise.resolve(mockOptionalContentConfig)),
       };
 
       mockLayerIds.forEach(layerId => {
@@ -74,7 +74,7 @@ describe('DocumentLayersController', () => {
       const mockPdfDocument = {
         numPages: 1,
         getPage: mockGetPage,
-        getOptionalContentConfig: jest.fn(() => Promise.resolve(mockOptionalContentConfig)),
+        getOptionalContentConfig: vi.fn(() => Promise.resolve(mockOptionalContentConfig)),
       };
 
       mockOptionalContentConfig.set(mockLayerId, { name: mockLayerId, visible: true });

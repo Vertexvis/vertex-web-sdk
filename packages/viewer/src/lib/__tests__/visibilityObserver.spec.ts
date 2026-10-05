@@ -1,10 +1,12 @@
+import type { Mock } from '#test/mock-types';
+
 import { VisibilityObserver } from '../visibilityObserver';
 
 function createObserver(): {
   observer: VisibilityObserver;
-  callback: jest.Mock;
+  callback: Mock;
 } {
-  const callback = jest.fn();
+  const callback = vi.fn();
 
   return { observer: new VisibilityObserver(callback), callback };
 }
@@ -16,9 +18,9 @@ function createMockElement(partial?: Partial<HTMLElement>): HTMLElement {
 }
 
 describe('VisibilityObserver', () => {
-  const mutationDisconnect = jest.fn();
-  const mutationObserve = jest.fn();
-  const mutationObserverConstructor = jest.fn();
+  const mutationDisconnect = vi.fn();
+  const mutationObserve = vi.fn();
+  const mutationObserverConstructor = vi.fn();
   let baseMutationObserver: typeof MutationObserver;
   let mutationObserverCallback: VoidFunction;
 
@@ -42,16 +44,16 @@ describe('VisibilityObserver', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('supports checking for visibility of an element', () => {
     const { observer } = createObserver();
     const mockElement1 = createMockElement({
-      checkVisibility: jest.fn(() => true),
+      checkVisibility: vi.fn(() => true),
     });
     const mockElement2 = createMockElement({
-      checkVisibility: jest.fn(() => false),
+      checkVisibility: vi.fn(() => false),
     });
 
     expect(observer.isVisible(mockElement1)).toBe(true);
@@ -67,28 +69,28 @@ describe('VisibilityObserver', () => {
 
   describe('MutationObservers', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it('observes the class and style changes of the element and its parents', () => {
       const { observer } = createObserver();
       const mockElement1 = createMockElement({
-        checkVisibility: jest.fn(() => false),
+        checkVisibility: vi.fn(() => false),
       });
       const mockElement2 = createMockElement({
-        checkVisibility: jest.fn(() => false),
+        checkVisibility: vi.fn(() => false),
         parentElement: mockElement1,
       });
       const mockElement3 = createMockElement({
-        checkVisibility: jest.fn(() => false),
+        checkVisibility: vi.fn(() => false),
         parentElement: mockElement2,
       });
       const mockElement4 = createMockElement({
-        checkVisibility: jest.fn(() => false),
+        checkVisibility: vi.fn(() => false),
         parentElement: mockElement3,
       });
       const mockElement5 = createMockElement({
-        checkVisibility: jest.fn(() => false),
+        checkVisibility: vi.fn(() => false),
         parentElement: mockElement4,
       });
 
@@ -134,7 +136,7 @@ describe('VisibilityObserver', () => {
     it('emits a visibility change if a mutation observer is triggered', () => {
       const { observer, callback } = createObserver();
       const mockElement = createMockElement({
-        checkVisibility: jest.fn(() => true),
+        checkVisibility: vi.fn(() => true),
       });
 
       observer.observe(mockElement);
@@ -146,10 +148,10 @@ describe('VisibilityObserver', () => {
     it('disconnects mutation observers on disconnect', () => {
       const { observer } = createObserver();
       const mockElement1 = createMockElement({
-        checkVisibility: jest.fn(() => false),
+        checkVisibility: vi.fn(() => false),
       });
       const mockElement2 = createMockElement({
-        checkVisibility: jest.fn(() => false),
+        checkVisibility: vi.fn(() => false),
         parentElement: mockElement1,
       });
 

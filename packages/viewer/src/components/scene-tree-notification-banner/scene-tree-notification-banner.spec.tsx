@@ -1,4 +1,7 @@
-import { newSpecPage, SpecPage } from '@stencil/core/testing';
+import {
+  type RenderSpecPage as SpecPage,
+  renderSpecPage,
+} from '#test/render-spec-page';
 
 import { SceneTreeNotificationBanner } from './scene-tree-notification-banner';
 
@@ -14,7 +17,7 @@ describe('<vertex-scene-tree-notification-banner>', () => {
   });
 
   it('emits an action event when the action button is clicked', async () => {
-    const onActionMock = jest.fn();
+    const onActionMock = vi.fn();
     const { banner } = await newComponentSpec({
       html: `<vertex-scene-tree-notification-banner action-label="My Action"></vertex-scene-tree-notification-banner>`,
     });
@@ -43,7 +46,7 @@ async function newComponentSpec(data: { html: string }): Promise<{
   page: SpecPage;
   banner: HTMLVertexSceneTreeNotificationBannerElement;
 }> {
-  const page = await newSpecPage({
+  const page = await renderSpecPage({
     components: [SceneTreeNotificationBanner],
     html: data.html,
   });

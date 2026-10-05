@@ -3,9 +3,16 @@
   "extends": "./internal/build/tsconfig-web.json",
   "compilerOptions": {
     "noEmit": true,
+    "skipLibCheck": true,
     "experimentalDecorators": true,
     "jsx": "react",
-    "jsxFactory": "h"
+    "jsxFactory": "h",
+    "types": ["vitest/globals", "@stencil/vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "#test/mock-types": ["./vitest.mock-types.ts"],
+      "#test/render-spec-page": ["./vitest.render-spec-page.ts"]
+    }
   },
   "include": [
     "packages/**/*.spec.ts",

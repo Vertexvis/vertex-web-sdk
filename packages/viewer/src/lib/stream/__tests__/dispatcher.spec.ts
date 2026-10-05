@@ -32,7 +32,7 @@ describe(StreamApiEventDispatcher, () => {
 
   afterEach(() => {
     mockWs.reset();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('invokes listeners if a message matching the predicate comes across the WS', async () => {

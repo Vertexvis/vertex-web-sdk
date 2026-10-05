@@ -1,4 +1,5 @@
-jest.mock(
+import type { Mock } from '#test/mock-types';
+vi.mock(
   '@vertexvis/scene-view-protos/sceneview/protos/scene_view_api_pb_service',
 );
 
@@ -18,7 +19,7 @@ describe(PmiController, () => {
       const { controller, client } = makePmiController(jwt, deviceId);
       const expected = makeListPmiAnnotationsResponse();
 
-      (client.listPmiAnnotations as jest.Mock).mockImplementationOnce(
+      (client.listPmiAnnotations as Mock).mockImplementationOnce(
         mockGrpcUnaryResult(expected),
       );
 

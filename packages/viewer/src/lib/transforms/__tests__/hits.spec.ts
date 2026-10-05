@@ -8,7 +8,7 @@ import { TriangleMesh, TriangleMeshPoints } from '../mesh';
 
 describe(testDrawable, () => {
   const triangle = new TriangleMesh(
-    jest.fn(),
+    vi.fn(),
     'x-translate',
     new TriangleMeshPoints(
       true,
@@ -25,7 +25,7 @@ describe(testDrawable, () => {
     '#000000',
   );
   const axis = new AxisLine(
-    jest.fn(),
+    vi.fn(),
     'x-translate',
     new AxisLinePoints(
       true,
@@ -65,7 +65,7 @@ describe(testDrawable, () => {
 
 describe(testTriangleMesh, () => {
   const mesh = new TriangleMesh(
-    jest.fn(),
+    vi.fn(),
     'x-translate',
     new TriangleMeshPoints(
       true,
@@ -101,7 +101,7 @@ describe(testTriangleMesh, () => {
       Vector3.create(100, 0, 0),
     );
     const meshRightOfCamera = new TriangleMesh(
-      jest.fn(),
+      vi.fn(),
       'x-translate',
       new TriangleMeshPoints(
         true,

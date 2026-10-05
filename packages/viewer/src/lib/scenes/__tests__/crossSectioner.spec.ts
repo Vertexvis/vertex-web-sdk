@@ -1,4 +1,5 @@
-jest.mock('@vertexvis/stream-api');
+import type { Mock } from '#test/mock-types';
+vi.mock('@vertexvis/stream-api');
 
 import { Vector3 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
@@ -24,7 +25,7 @@ describe(CrossSectioner, () => {
       ],
     };
 
-    (api.updateCrossSectioning as jest.Mock).mockResolvedValue({
+    (api.updateCrossSectioning as Mock).mockResolvedValue({
       updateCrossSectioning: 'sandy',
     });
 

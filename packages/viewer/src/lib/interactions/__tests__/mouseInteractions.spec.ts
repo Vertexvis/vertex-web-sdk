@@ -1,5 +1,6 @@
-jest.mock('../interactionApi');
-jest.mock('../interactionApiPerspective');
+import type { Mock } from '#test/mock-types';
+vi.mock('../interactionApi');
+vi.mock('../interactionApiPerspective');
 
 import { Point } from '@vertexvis/geometry';
 
@@ -16,16 +17,16 @@ import {
   ZoomInteraction,
 } from '../mouseInteractions';
 
-const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
+const InteractionApiMock = InteractionApi as Mock<InteractionApi>;
 const element = document.createElement('canvas');
 
 beforeEach(() => {
-  jest.resetAllMocks();
-  jest.clearAllMocks();
+  vi.resetAllMocks();
+  vi.clearAllMocks();
 });
 
 afterEach(() => {
-  jest.useRealTimers();
+  vi.useRealTimers();
 });
 
 describe(RotateInteraction, () => {
@@ -158,10 +159,15 @@ describe(PanInteraction, () => {
   });
 });
 
-describe(ZoomInteraction, () => {
+describe('ZoomInteraction', () => {
   const api = new (
-    InteractionApiPerspective as jest.Mock<InteractionApiPerspective>
+    InteractionApiPerspective as Mock<InteractionApiPerspective>
   )();
+
+  beforeEach(() => {
+    // Vitest's automock leaves inherited async methods on the prototype.
+    vi.spyOn(api, 'zoomCameraToPoint').mockResolvedValue(undefined);
+  });
 
   const defaultConfigProvider = (): InteractionConfig => ({
     ...defaultInteractionConfig,
@@ -212,7 +218,7 @@ describe(ZoomInteraction, () => {
     });
 
     it('supports customizing the zoom direction by inverting the delta', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       const interaction = new ZoomInteraction(() => ({
         ...defaultInteractionConfig,
@@ -220,15 +226,15 @@ describe(ZoomInteraction, () => {
       }));
       await interaction.zoom(10, api);
 
-      jest.advanceTimersToNextTimer();
+      vi.advanceTimersToNextTimer();
 
       expect(api.zoomCamera).toHaveBeenCalledWith(-10);
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('supports customizing the zoomToPoint direction by inverting the delta', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       const interaction = new ZoomInteraction(() => ({
         ...defaultInteractionConfig,
@@ -237,11 +243,11 @@ describe(ZoomInteraction, () => {
       const pt = Point.create(event1.clientX, event1.clientY);
       await interaction.zoomToPoint(pt, 10, api);
 
-      jest.advanceTimersToNextTimer();
+      vi.advanceTimersToNextTimer();
 
       expect(api.zoomCameraToPoint).toHaveBeenCalledWith(pt, -10);
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 

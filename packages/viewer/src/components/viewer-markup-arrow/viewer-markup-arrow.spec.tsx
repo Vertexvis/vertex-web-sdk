@@ -1,21 +1,23 @@
-jest.mock('../viewer/utils');
-jest.mock('../viewer-markup/dom');
+import type { Mock } from '#test/mock-types';
+vi.mock('../viewer/utils');
+vi.mock('../viewer-markup/dom');
+
+import '../viewer/viewer';
+import '../viewer-markup/viewer-markup';
+import './viewer-markup-arrow';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from '@stencil/core';
-import { newSpecPage } from '@stencil/core/testing';
+import { render } from '@stencil/vitest';
 import { Dimensions, Point } from '@vertexvis/geometry';
 
-import { Viewer } from '../viewer/viewer';
 import { getMarkupBoundingClientRect } from '../viewer-markup/dom';
-import { ViewerMarkup } from '../viewer-markup/viewer-markup';
-import { ViewerMarkupArrow } from './viewer-markup-arrow';
 
 describe('vertex-viewer-markup-arrow', () => {
   const start = Point.create(0, -0.5);
   const end = Point.create(0, 0);
 
-  (getMarkupBoundingClientRect as jest.Mock).mockReturnValue({
+  (getMarkupBoundingClientRect as Mock).mockReturnValue({
     left: 0,
     top: 0,
     bottom: 0,
@@ -25,16 +27,15 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('positions the anchors correctly', async () => {
-    const page = await newSpecPage({
-      components: [ViewerMarkupArrow],
-      template: () => (
-        <vertex-viewer-markup-arrow start={start} end={end} mode="edit" />
-      ),
-    });
+    const page = await render(
+      <vertex-viewer-markup-arrow start={start} end={end} mode="edit" />,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root as HTMLVertexViewerMarkupArrowElement;
     const startEl = el?.shadowRoot?.getElementById(
@@ -53,17 +54,33 @@ describe('vertex-viewer-markup-arrow', () => {
     expect(centerEl?.getAttribute('style')).toContain('top: 25px');
   });
 
-  it('handles resizes', async () => {
-    const page = await newSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-arrow start={start} end={end} mode="edit" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
+  it('observes the viewport again after reattachment', async () => {
+    const page = await render(<vertex-viewer-markup-arrow />, {
+      waitForReady: false,
     });
+    await page.waitForChanges();
+
+    const observe = vi.spyOn(ResizeObserver.prototype, 'observe');
+    const parent = page.root.parentElement;
+
+    page.root.remove();
+    parent?.appendChild(page.root);
+    await page.waitForChanges();
+
+    expect(observe).toHaveBeenCalledWith(page.root);
+    observe.mockRestore();
+  });
+
+  it('handles resizes', async () => {
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-arrow start={start} end={end} mode="edit" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root?.querySelector(
       'vertex-viewer-markup-arrow',
@@ -115,20 +132,19 @@ describe('vertex-viewer-markup-arrow', () => {
     const bottomCenter = Point.create(0, -0.5);
     const topCenter = Point.create(0, 0.5);
 
-    const page = await newSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup
-            originatingViewport={originatingViewport}
-            offset={offset}
-            scale={scale}
-          >
-            <vertex-viewer-markup-arrow start={bottomCenter} end={topCenter} />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup
+          originatingViewport={originatingViewport}
+          offset={offset}
+          scale={scale}
+        >
+          <vertex-viewer-markup-arrow start={bottomCenter} end={topCenter} />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root?.querySelector(
       'vertex-viewer-markup-arrow',
@@ -144,16 +160,15 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('defines and updates the scale property as scale changes', async () => {
-    const page = await newSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-arrow mode="create" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-arrow mode="create" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const el = page.root?.querySelector(
       'vertex-viewer-markup-arrow',
@@ -176,7 +191,7 @@ describe('vertex-viewer-markup-arrow', () => {
   });
 
   it('does not render svg content when the element width or height is 0', async () => {
-    (getMarkupBoundingClientRect as jest.Mock).mockReturnValueOnce({
+    (getMarkupBoundingClientRect as Mock).mockReturnValueOnce({
       left: 0,
       top: 0,
       bottom: 0,
@@ -185,16 +200,15 @@ describe('vertex-viewer-markup-arrow', () => {
       height: 0,
     });
 
-    const page = await newSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-arrow start={start} end={end} />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-arrow start={start} end={end} />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     expect(
       page.root
@@ -203,25 +217,35 @@ describe('vertex-viewer-markup-arrow', () => {
     ).toBeNull();
   });
 
-  it('removes event listeners when the viewer changes', async () => {
-    const page = await newSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
-      template: () => (
+  it('updates event listeners when the viewer changes', async () => {
+    const page = await render(
+      <div>
         <vertex-viewer>
           <vertex-viewer-markup>
             <vertex-viewer-markup-arrow mode="create" />
           </vertex-viewer-markup>
         </vertex-viewer>
-      ),
-    });
+        <vertex-viewer id="new-viewer" />
+      </div>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
-    const root = page.root as HTMLVertexViewerElement;
-    const newViewer = page.doc.createElement('vertex-viewer');
+    const root = page.root.querySelector(
+      'vertex-viewer',
+    ) as HTMLVertexViewerElement;
+    const newViewer = page.root.querySelector(
+      '#new-viewer',
+    ) as HTMLVertexViewerElement;
 
     const canvas = root.shadowRoot?.querySelector(
       'canvas',
     ) as HTMLCanvasElement;
-    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+    const removeEventListener = vi.spyOn(canvas, 'removeEventListener');
+    const newCanvas = newViewer.shadowRoot?.querySelector(
+      'canvas',
+    ) as HTMLCanvasElement;
+    const addEventListener = vi.spyOn(newCanvas, 'addEventListener');
 
     const markup = root.querySelector(
       'vertex-viewer-markup-arrow',
@@ -233,26 +257,29 @@ describe('vertex-viewer-markup-arrow', () => {
       'pointerdown',
       expect.anything(),
     );
+    expect(addEventListener).toHaveBeenCalledWith(
+      'pointerdown',
+      expect.anything(),
+    );
   });
 
   it('removes event listeners when disposed', async () => {
-    const page = await newSpecPage({
-      components: [Viewer, ViewerMarkup, ViewerMarkupArrow],
-      template: () => (
-        <vertex-viewer>
-          <vertex-viewer-markup>
-            <vertex-viewer-markup-arrow mode="create" />
-          </vertex-viewer-markup>
-        </vertex-viewer>
-      ),
-    });
+    const page = await render(
+      <vertex-viewer>
+        <vertex-viewer-markup>
+          <vertex-viewer-markup-arrow mode="create" />
+        </vertex-viewer-markup>
+      </vertex-viewer>,
+      { waitForReady: false },
+    );
+    await page.waitForChanges();
 
     const root = page.root as HTMLVertexViewerElement;
 
     const canvas = root.shadowRoot?.querySelector(
       'canvas',
     ) as HTMLCanvasElement;
-    const removeEventListener = jest.spyOn(canvas, 'removeEventListener');
+    const removeEventListener = vi.spyOn(canvas, 'removeEventListener');
 
     const el = root.querySelector(
       'vertex-viewer-markup-arrow',

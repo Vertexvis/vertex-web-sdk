@@ -1,5 +1,4 @@
 import vertexvisTypescript from '@vertexvis/eslint-config-vertexvis-typescript';
-import react from 'eslint-plugin-react';
 
 // eslint-plugin-prettier was removed from the shared config. Keep legacy
 // disable comments valid while formatting remains a separate Prettier step.
@@ -21,9 +20,8 @@ export default [
         ecmaFeatures: { jsx: true },
       },
     },
-    plugins: { prettier: prettierCompatibilityPlugin, react },
+    plugins: { prettier: prettierCompatibilityPlugin },
     rules: {
-      'react/jsx-uses-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',

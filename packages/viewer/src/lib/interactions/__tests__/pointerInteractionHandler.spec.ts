@@ -1,5 +1,6 @@
-jest.mock('../interactionApi');
-jest.mock('../mouseInteractions');
+import type { Mock } from '#test/mock-types';
+vi.mock('../interactionApi');
+vi.mock('../mouseInteractions');
 
 import { parseConfig } from '../../config';
 import { InteractionApi } from '../interactionApi';
@@ -12,13 +13,13 @@ import {
 } from '../mouseInteractions';
 import { PointerInteractionHandler } from '../pointerInteractionHandler';
 
-const InteractionApiMock = InteractionApi as jest.Mock<InteractionApi>;
-const PanInteractionMock = PanInteraction as jest.Mock<PanInteraction>;
-const ZoomInteractionMock = ZoomInteraction as jest.Mock<ZoomInteraction>;
-const RotateInteractionMock = RotateInteraction as jest.Mock<RotateInteraction>;
+const InteractionApiMock = InteractionApi as Mock<InteractionApi>;
+const PanInteractionMock = PanInteraction as Mock<PanInteraction>;
+const ZoomInteractionMock = ZoomInteraction as Mock<ZoomInteraction>;
+const RotateInteractionMock = RotateInteraction as Mock<RotateInteraction>;
 const RotatePointInteractionMock =
-  RotateInteraction as jest.Mock<RotatePointInteraction>;
-const TwistInteractionMock = TwistInteraction as jest.Mock<TwistInteraction>;
+  RotateInteraction as Mock<RotatePointInteraction>;
+const TwistInteractionMock = TwistInteraction as Mock<TwistInteraction>;
 
 describe(PointerInteractionHandler, () => {
   const rotateInteraction = new RotateInteractionMock();
@@ -72,10 +73,10 @@ describe(PointerInteractionHandler, () => {
   );
 
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.clearAllMocks();
+    vi.resetAllMocks();
+    vi.clearAllMocks();
 
-    api.pixelThreshold = jest.fn(() => 2);
+    api.pixelThreshold = vi.fn(() => 2);
     handler.setPrimaryInteractionType('rotate');
     handler.initialize(div, api);
   });
@@ -113,7 +114,7 @@ describe(PointerInteractionHandler, () => {
 
     expect(zoomInteraction.zoomToPoint).toHaveBeenCalled();
 
-    (zoomInteraction.zoomToPoint as jest.Mock).mockReset();
+    (zoomInteraction.zoomToPoint as Mock).mockReset();
     additionalDiv.dispatchEvent(wheelEvent);
 
     await delay(50);
