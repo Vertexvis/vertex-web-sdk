@@ -56,7 +56,7 @@ export class RotateInteraction extends MouseInteraction {
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
-      api.beginInteraction();
+      api.beginInteraction({ skipCameraValidation: true });
     }
   }
 
@@ -88,7 +88,7 @@ export class RotatePointInteraction extends MouseInteraction {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
       this.startingPosition = canvasPosition;
-      api.beginInteraction();
+      api.beginInteraction({ skipCameraValidation: true });
     }
   }
 
@@ -131,7 +131,7 @@ export class ZoomInteraction extends MouseInteraction {
       const rect = element.getBoundingClientRect();
       const point = getMouseClientPosition(event, rect);
       this.startPt = point;
-      await api.beginInteraction();
+      await api.beginInteraction({ skipCameraValidation: true });
     }
   }
 
@@ -154,15 +154,9 @@ export class ZoomInteraction extends MouseInteraction {
     this.startPt = undefined;
   }
 
-  public async zoom(
-    delta: number,
-    api: InteractionApi,
-    extraDelayMs?: number,
-  ): Promise<void> {
-    await this.runWheelZoomInteraction(
-      api,
-      () => api.zoomCamera(this.getDirectionalDelta(delta)),
-      extraDelayMs,
+  public async zoom(delta: number, api: InteractionApi): Promise<void> {
+    await this.runWheelZoomInteraction(api, () =>
+      api.zoomCamera(this.getDirectionalDelta(delta)),
     );
   }
 
@@ -170,23 +164,20 @@ export class ZoomInteraction extends MouseInteraction {
     pt: Point.Point,
     delta: number,
     api: InteractionApi,
-    extraDelayMs?: number,
   ): Promise<void> {
-    await this.runWheelZoomInteraction(
-      api,
-      () => api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta)),
-      extraDelayMs,
-    );
+    await this.runWheelZoomInteraction(api, async () => {
+      await api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta));
+    });
   }
 
   private async beginInteraction(api: InteractionApi): Promise<void> {
     this.isTransforming = true;
-    await api.beginInteraction();
+    await api.beginInteraction({ skipCameraValidation: true });
   }
 
   private async endInteraction(api: InteractionApi): Promise<void> {
-    this.isTransforming = false;
     await api.endInteraction();
+    this.isTransforming = false;
   }
 
   private resetInteractionTimer(
@@ -204,14 +195,15 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   /**
-   * If this value gets too low, can cause animation jitter in certain scenarios
+   * the amount of delay until interaction is considered done or paused so final frames will be fetched
+   * If this value gets too low, can cause animation jitter in certain scenarios due to latency differences
+   * between partial and final frames
    */
-  private getInteractionDelay(): number {
-    return this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
-  }
+  private getInteractionDelay = (): number =>
+    this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
 
   /**
-   * Uses a configured interaction delay, but certain interactions like wheel zoom benefit from extra delay
+   * Will use configured mouseWheelInteractionEndDebounce delay, certain interactions like wheel zoom benefit from extra delay
    */
   private startInteractionTimer(api: InteractionApi, extraDelayMs = 0): void {
     this.interactionTimer = window.setTimeout(async () => {
@@ -230,14 +222,13 @@ export class ZoomInteraction extends MouseInteraction {
   private async runWheelZoomInteraction(
     api: InteractionApi,
     f: () => void | Promise<void>,
-    extraDelayMs?: number,
   ): Promise<void> {
     if (!this.isTransforming) {
       await this.beginInteraction(api);
     }
 
-    this.resetInteractionTimer(api, extraDelayMs);
-    f();
+    this.resetInteractionTimer(api, 48); // extra delay of approx 3 frames at 60fps
+    await f();
   }
 }
 
@@ -255,7 +246,7 @@ export class PanInteraction extends MouseInteraction {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
       this.canvasRect = element.getBoundingClientRect();
-      api.beginInteraction();
+      api.beginInteraction({ skipCameraValidation: true });
     }
   }
 
@@ -285,7 +276,7 @@ export class TwistInteraction extends MouseInteraction {
   ): void {
     this.currentPosition = Point.create(event.offsetX, event.offsetY);
     this.canvasRect = element.getBoundingClientRect();
-    api.beginInteraction();
+    api.beginInteraction({ skipCameraValidation: true });
   }
 
   public drag(event: MouseEvent, api: InteractionApi): void {
@@ -310,7 +301,7 @@ export class PivotInteraction extends MouseInteraction {
   ): void {
     if (this.currentPosition == null) {
       this.currentPosition = Point.create(event.screenX, event.screenY);
-      api.beginInteraction();
+      api.beginInteraction({ skipCameraValidation: true });
     }
   }
 
