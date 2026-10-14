@@ -1,5 +1,4 @@
 import { loadViewerWithQueryParams } from '../helpers.js';
-import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.24.x/dist/esm/loader.mjs';
 
 // Keep track of selected columns at module scope
 const selectedColumns = new Set();
@@ -8,12 +7,21 @@ const selectedColumns = new Set();
 let searchInput = '';
 
 document.addEventListener('DOMContentLoaded', () => {
-  defineCustomElements(window).then(() => main());
+  main();
 });
 
 async function main() {
+  await Promise.all([
+    window.customElements.whenDefined('vertex-viewer'),
+    window.customElements.whenDefined('vertex-scene-tree'),
+  ]);
+
   const viewer = document.getElementById('viewer');
   const sceneTree = document.getElementById('scene-tree');
+  const configEnv = import.meta.env.VITE_CONFIG_ENV || 'platdev';
+
+  viewer.configEnv = configEnv;
+  sceneTree.configEnv = configEnv;
   const expandAllBtn = document.getElementById('expand-all-btn');
   const collapseAllBtn = document.getElementById('collapse-all-btn');
   const searchMetadataBtn = document.getElementById('search-metadata-btn');
@@ -111,7 +119,9 @@ async function main() {
     };
   };
 
-  await loadViewerWithQueryParams(viewer);
+  await loadViewerWithQueryParams(viewer, {
+    env: import.meta.env.VITE_CONFIG_ENV || 'platdev',
+  });
 }
 
 async function findAvailableKeys(sceneTree) {
