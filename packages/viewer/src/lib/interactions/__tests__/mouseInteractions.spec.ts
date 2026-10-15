@@ -179,7 +179,7 @@ describe('ZoomInteraction', () => {
 
   const canvasPoint = Point.create(0, 0);
 
-  describe(ZoomInteraction.prototype.beginDrag, () => {
+  describe('ZoomInteraction.prototype.beginDrag', () => {
     it('begins interaction once for multiple begin drag calls', () => {
       const interaction = new ZoomInteraction(defaultConfigProvider);
       interaction.beginDrag(event1, canvasPoint, api, element);
@@ -189,7 +189,7 @@ describe('ZoomInteraction', () => {
     });
   });
 
-  describe(ZoomInteraction.prototype.drag, () => {
+  describe('ZoomInteraction.prototype.drag', () => {
     it('first drag zooms camera using delta between begin drag and drag', () => {
       const interaction = new ZoomInteraction(defaultConfigProvider);
       interaction.beginDrag(event1, canvasPoint, api, element);
@@ -251,7 +251,7 @@ describe('ZoomInteraction', () => {
     });
   });
 
-  describe(ZoomInteraction.prototype.endDrag, () => {
+  describe('ZoomInteraction.prototype.endDrag', () => {
     it('ends interaction if begin drag has been called', () => {
       const interaction = new ZoomInteraction(defaultConfigProvider);
       interaction.beginDrag(event1, canvasPoint, api, element);
@@ -268,8 +268,9 @@ describe('ZoomInteraction', () => {
     });
   });
 
-  describe(ZoomInteraction.prototype.zoom, () => {
+  describe('ZoomInteraction.prototype.zoom', () => {
     const timeoutDelay = 50;
+    const wheelZoomDelay = 48;
 
     const interactionConfigProvider = (): InteractionConfig => {
       return {
@@ -277,29 +278,32 @@ describe('ZoomInteraction', () => {
         mouseWheelInteractionEndDebounce: timeoutDelay,
       };
     };
-    function delay(): Promise<void> {
-      return new Promise((resolve) => setTimeout(resolve, timeoutDelay + 10));
-    }
-
     it('only begins interaction once within interaction timeout', async () => {
+      vi.useFakeTimers();
       const interaction = new ZoomInteraction(interactionConfigProvider);
       interaction.zoom(1, api);
       interaction.zoom(1, api);
 
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
-      await delay();
+      await vi.advanceTimersByTimeAsync(timeoutDelay + wheelZoomDelay);
+      expect(api.endInteraction).toHaveBeenCalledTimes(1);
     });
 
     it('ends interaction after interaction timeout', async () => {
+      vi.useFakeTimers();
       const interaction = new ZoomInteraction(interactionConfigProvider);
       interaction.zoom(1, api);
-      await delay();
+
+      await vi.advanceTimersByTimeAsync(timeoutDelay - 1);
+      expect(api.endInteraction).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1);
       expect(api.endInteraction).toHaveBeenCalledTimes(1);
     });
   });
 });
 
-describe(TwistInteraction, () => {
+describe('TwistInteraction', () => {
   const api = new InteractionApiMock();
 
   const event1 = new MouseEvent('mousemove', { clientX: 10, clientY: 5 });
@@ -319,7 +323,7 @@ describe(TwistInteraction, () => {
     },
   } as unknown as HTMLElement;
 
-  describe(TwistInteraction.prototype.beginDrag, () => {
+  describe('TwistInteraction.prototype.beginDrag', () => {
     it('should start an interaction', () => {
       const interaction = new TwistInteraction();
       interaction.beginDrag(event1, canvasPoint, api, mockElement);
@@ -328,7 +332,7 @@ describe(TwistInteraction, () => {
     });
   });
 
-  describe(TwistInteraction.prototype.drag, () => {
+  describe('TwistInteraction.prototype.drag', () => {
     it('should transform the camera for each drag event using bounding rect values', () => {
       const interaction = new TwistInteraction();
       interaction.beginDrag(event1, canvasPoint, api, mockElement);
@@ -341,7 +345,7 @@ describe(TwistInteraction, () => {
     });
   });
 
-  describe(TwistInteraction.prototype.endDrag, () => {
+  describe('TwistInteraction.prototype.endDrag', () => {
     it('ends interaction if begin drag has been called', () => {
       const interaction = new TwistInteraction();
       interaction.beginDrag(event1, canvasPoint, api, mockElement);
