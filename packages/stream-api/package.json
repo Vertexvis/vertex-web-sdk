@@ -53,13 +53,13 @@
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
     "@vertexvis/utils": "1.1.1",
     "@vertexwebsdk/build": "1.1.1",
-    "@vitest/coverage-v8": "4.1.11",
-    "eslint": "^10.11.0",
+    "@vitest/coverage-v8": "4.1.12",
+    "eslint": "^10.13.0",
     "protobufjs": "^7.6.6",
-    "rollup": "^4.63.5",
+    "rollup": "^4.64.7",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   },
   "peerDependencies": {
     "@vertexvis/utils": ">=0.23.0",

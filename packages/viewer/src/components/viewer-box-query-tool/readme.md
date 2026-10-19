@@ -67,6 +67,12 @@ contained by and intersecting with (inclusive) the box.
 | ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | `controllerChanged` | Event emitted when the `VolumeIntersectionQueryController` associated with this tool changes. | `CustomEvent<VolumeIntersectionQueryController>` |
 
+## Slots
+
+| Slot       | Description |
+| ---------- | ----------- |
+| `"bounds"` |             |
+
 ## CSS Custom Properties
 
 | Name                                                | Description                                                                                                                                                                                                     |

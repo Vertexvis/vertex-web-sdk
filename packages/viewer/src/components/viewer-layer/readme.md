@@ -36,6 +36,12 @@ viewport of a `<vertex-viewer>`.
 | ------------ | ------------- | ---------------------------------------------------------------------------------------------------- | --------- | ------- |
 | `stretchOff` | `stretch-off` | Indicates if the layer should stretch to fill the size of its container's nearest positioned parent. | `boolean` | `false` |
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## Dependencies
 
 ### Used by

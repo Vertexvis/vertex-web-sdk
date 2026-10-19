@@ -36,6 +36,7 @@ the group with a fractional gap size of this component.
 
 | Slot                                                                                                                 | Description                                        |
 | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+|                                                                                                                      | The default slot                                   |
 | `"The primary content that will be placed in the center of the toolbar and stretch to container's available width."` |                                                    |
 | `"after"`                                                                                                            | Content that is placed after the primary content.  |
 | `"before"`                                                                                                           | Content that is placed before the primary content. |

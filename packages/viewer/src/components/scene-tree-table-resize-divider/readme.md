@@ -2,6 +2,12 @@
 
 <!-- Auto Generated Below -->
 
+## Slots
+
+| Slot        | Description |
+| ----------- | ----------- |
+| `"divider"` |             |
+
 ---
 
 _Built with [StencilJS](https://stenciljs.com/)_
