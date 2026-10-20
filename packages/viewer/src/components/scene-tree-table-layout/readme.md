@@ -33,6 +33,14 @@ Scrolls the table to the provided top value.
 
 Type: `Promise<void>`
 
+## Slots
+
+| Slot        | Description      |
+| ----------- | ---------------- |
+|             | The default slot |
+| `"divider"` |                  |
+| `"header"`  |                  |
+
 ## CSS Custom Properties
 
 | Name                                      | Description                                                                                 |

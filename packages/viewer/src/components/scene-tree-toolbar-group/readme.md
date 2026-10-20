@@ -7,9 +7,10 @@ layout children. Spacing is added between each child.
 
 ## Slots
 
-| Slot                          | Description |
-| ----------------------------- | ----------- |
-| `"The content of the group."` |             |
+| Slot                          | Description      |
+| ----------------------------- | ---------------- |
+|                               | The default slot |
+| `"The content of the group."` |                  |
 
 ## CSS Custom Properties
 

@@ -286,6 +286,12 @@ objects in a local 3D scene that is synced with a remote rendered scene.
 | `propagateEventsToViewer` | `propagate-events-to-viewer` | Specifies whether to propagate events to the viewer's interaction handlers When `true` this <vertex-viewer-dom-renderer> will be registered as a valid event target for the viewer. This enables camera interactions to be initiated from elements within this renderer. When `false` this <vertex-viewer-dom-renderer> will _not_ be registered as a target for the viewer. | `boolean`                              | `true`      |
 | `viewer`                  | --                           | The viewer synced to this renderer. This property will automatically be assigned if the renderer is a child of `<vertex-viewer>`.                                                                                                                                                                                                                                            | `HTMLVertexViewerElement \| undefined` | `undefined` |
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## Dependencies
 
 ### Used by

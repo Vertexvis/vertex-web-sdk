@@ -30,6 +30,15 @@
 | `selectionToggled`  | An event that is emitted when a user requests to change the node's selection state. This event is emitted even if interactions are disabled. | `CustomEvent<SceneTreeTableCellEventDetails>` |
 | `visibilityToggled` | An event that is emitted when a user requests to change the node's visibility. This event is emitted even if interactions are disabled.      | `CustomEvent<SceneTreeTableCellEventDetails>` |
 
+## Slots
+
+| Slot             | Description      |
+| ---------------- | ---------------- |
+|                  | The default slot |
+| `"left-gutter"`  |                  |
+| `"placeholder"`  |                  |
+| `"right-gutter"` |                  |
+
 ## CSS Custom Properties
 
 | Name                                    | Description                                                                             |

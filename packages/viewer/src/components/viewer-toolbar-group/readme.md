@@ -42,6 +42,12 @@ the `direction` property.
 | ----------- | ----------- | ----------- | ---------------------------- | -------------- |
 | `direction` | `direction` |             | `"horizontal" \| "vertical"` | `'horizontal'` |
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## Dependencies
 
 ### Used by

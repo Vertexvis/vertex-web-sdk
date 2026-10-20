@@ -98,6 +98,12 @@ same center point of the document where possible.
 
 Type: `Promise<void>`
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## CSS Custom Properties
 
 | Name                  | Description                                                                                                                                 |

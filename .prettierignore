@@ -3,6 +3,10 @@ node_modules/
 
 dist/
 **/dist/
+**/loader/
+**/www/
+packages/viewer/geometry/
+packages/doc-viewer/assets/pdf.worker.min.mjs
 
 coverage/
 **/coverage/

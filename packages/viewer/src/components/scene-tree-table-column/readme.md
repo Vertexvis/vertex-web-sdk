@@ -10,6 +10,13 @@
 | `maxWidth`     | `max-width`     | The maximum width of this column. | `number \| undefined` | `undefined` |
 | `minWidth`     | `min-width`     | The minimum width of this column. | `number \| undefined` | `undefined` |
 
+## Slots
+
+| Slot       | Description      |
+| ---------- | ---------------- |
+|            | The default slot |
+| `"header"` |                  |
+
 ---
 
 _Built with [StencilJS](https://stenciljs.com/)_
