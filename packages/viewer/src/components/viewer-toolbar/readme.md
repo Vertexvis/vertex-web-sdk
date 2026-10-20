@@ -41,6 +41,12 @@ right of the viewer.
 | `direction` | `direction` |                                            | `"horizontal" \| "vertical"`                                                                                                         | `'horizontal'`    |
 | `placement` | `placement` | Specifies where the toolbar is positioned. | `"bottom-center" \| "bottom-left" \| "bottom-right" \| "middle-left" \| "middle-right" \| "top-center" \| "top-left" \| "top-right"` | `'bottom-center'` |
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## Dependencies
 
 ### Used by

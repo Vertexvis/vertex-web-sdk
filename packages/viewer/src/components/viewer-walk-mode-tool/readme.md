@@ -23,6 +23,12 @@ intended for walking through a model instead of orbiting a model.
 | ------------------- | ------------------------------------------------------------------------------ | --------------------------------- |
 | `controllerChanged` | Event emitted when the `WalkModeController` associated with this tool changes. | `CustomEvent<WalkModeController>` |
 
+## Slots
+
+| Slot              | Description |
+| ----------------- | ----------- |
+| `"teleport-tool"` |             |
+
 ## Dependencies
 
 ### Depends on

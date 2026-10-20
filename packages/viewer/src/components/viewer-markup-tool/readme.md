@@ -39,6 +39,12 @@ managed when this element is placed as a child of a
 
 Type: `Promise<void>`
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## Dependencies
 
 ### Depends on

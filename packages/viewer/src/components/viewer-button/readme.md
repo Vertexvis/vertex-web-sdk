@@ -44,6 +44,12 @@ to assistive technology.
 | ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- | ------- |
 | `ariaLabel` | `aria-label` | Accessible name applied to the internal native button. Use this for icon-only buttons or when the slotted content does not provide a name. | `null \| string` | `null`  |
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## Dependencies
 
 ### Used by

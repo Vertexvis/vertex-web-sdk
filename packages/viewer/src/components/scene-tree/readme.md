@@ -1008,10 +1008,14 @@ Type: `Promise<void>`
 
 ## Slots
 
-| Slot       | Description                                                                                                                                                                           |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `"footer"` | A slot that places content below the rows in the tree. Elements can be stacked by assigning multiple elements to this slot.                                                           |
-| `"header"` | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. Elements can be stacked by assigning multiple elements to this slot. |
+| Slot                              | Description                                                                                                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                                   | The default slot                                                                                                                                                                      |
+| `"empty-results"`                 |                                                                                                                                                                                       |
+| `"footer"`                        | A slot that places content below the rows in the tree. Elements can be stacked by assigning multiple elements to this slot.                                                           |
+| `"header"`                        | A slot that places content above the rows in the tree. By default, a search toolbar will be placed in this slot. Elements can be stacked by assigning multiple elements to this slot. |
+| `"loading"`                       |                                                                                                                                                                                       |
+| `"partial-filter-results-banner"` |                                                                                                                                                                                       |
 
 ## CSS Custom Properties
 

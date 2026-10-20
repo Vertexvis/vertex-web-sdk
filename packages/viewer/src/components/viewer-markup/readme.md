@@ -243,6 +243,12 @@ Type: `Promise<HTMLVertexViewerMarkupArrowElement | HTMLVertexViewerMarkupCircle
 
 The markup element, or undefined.
 
+## Slots
+
+| Slot | Description      |
+| ---- | ---------------- |
+|      | The default slot |
+
 ## Dependencies
 
 ### Depends on
