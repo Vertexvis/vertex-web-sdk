@@ -204,9 +204,11 @@ export class ZoomInteraction extends MouseInteraction {
   }
 
   /**
-   * the amount of delay until interaction is considered done or paused so final frames will be fetched
-   * If this value gets too low, can cause animation jitter in certain scenarios due to latency differences
-   * between partial and final frames
+   * Delay between interaction animation complete and interaction being considered done.
+   * Final frames will be fetched after this delay.
+   * If this value gets too low, final frames can be generated and displayed unnecessarily.
+   * With small latency differences between partial and final frames there can 
+   * be some visual jitter as a result 
    */
   private getInteractionDelay = (): number =>
     this.interactionConfigProvider().mouseWheelInteractionEndDebounce;
