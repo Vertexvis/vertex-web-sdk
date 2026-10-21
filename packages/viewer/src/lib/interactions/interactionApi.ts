@@ -9,7 +9,7 @@ import {
   Vector3,
 } from '@vertexvis/geometry';
 import { StreamApi } from '@vertexvis/stream-api';
-import { Disposable } from '@vertexvis/utils';
+import { Disposable, UUID } from '@vertexvis/utils';
 
 import { ReceivedFrame } from '../..';
 import { Cursor, CursorManager } from '../cursors';
@@ -209,9 +209,10 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * mark the end of an interaction.
    */
   public async beginInteraction(
-    renderOptions: CameraRenderOptions = {},
+    renderOptions = this.activeRenderOptions ?? {},
   ): Promise<void> {
     if (!this.isInteracting()) {
+      renderOptions.correlationId ??= UUID.create();
       this.activeRenderOptions = renderOptions;
       this.interactionStartedEmitter.emit();
       this.sceneLoadingPromise = this.getScene();
