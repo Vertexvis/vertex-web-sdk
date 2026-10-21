@@ -5,10 +5,10 @@
   "devDependencies": {
     "@vitest/coverage-v8": "4.1.12",
     "eslint": "^10.13.0",
-    "happy-dom": "20.14.6",
+    "happy-dom": "21.0.4",
     "lerna": "^10.1.1",
     "prettier": "^3.9.10",
-    "rollup": "^4.64.7",
+    "rollup": "^4.64.12",
     "semver": "^7.8.5",
     "typedoc": "^0.28.20",
     "typescript": "^5.9.3",
@@ -48,7 +48,6 @@
     ]
   },
   "resolutions": {
-    "protobufjs": "^7.6.6",
     "semver": "^7.8.4"
   },
   "engines": {

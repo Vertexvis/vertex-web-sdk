@@ -62,7 +62,7 @@
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
     "@vitest/coverage-v8": "4.1.12",
     "eslint": "^10.13.0",
-    "rollup": "^4.64.7",
+    "rollup": "^4.64.12",
     "vitest": "4.1.12"
   },
   "peerDependencies": {
