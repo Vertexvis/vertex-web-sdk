@@ -19,8 +19,9 @@ update_workspace_projects() {
 
   folders='[ '
   for package_path in "${package_directories[@]}"; do
+    [[ -d "$package_path" ]] || continue
     package_json="$package_path/package.json"
-    package_name=`jq '.name' -r $package_json`
+    package_name=`jq '.name' -r "$package_json"`
     folders="$folders { \"name\": \"$package_name\", \"path\": \"$package_path\" },"
   done
   folders="${folders%?} ]"
