@@ -64,7 +64,21 @@ export class WebSocketClientImpl implements WebSocketClient {
 
   public send(data: WebSocketSendData): void {
     if (this.webSocket != null) {
-      this.webSocket.send(data);
+      if (typeof SharedArrayBuffer !== 'undefined') {
+        if (data instanceof SharedArrayBuffer) {
+          this.webSocket.send(new Uint8Array(data).slice());
+          return;
+        }
+
+        if (ArrayBuffer.isView(data) && data.buffer instanceof SharedArrayBuffer) {
+          this.webSocket.send(
+            new Uint8Array(data.buffer, data.byteOffset, data.byteLength).slice(),
+          );
+          return;
+        }
+      }
+
+      this.webSocket.send(data as string | Blob | BufferSource);
     }
   }
 
