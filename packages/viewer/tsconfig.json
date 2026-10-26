@@ -6,7 +6,6 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "target": "ES2019",
     "paths": {
       "#test/mock-types": ["../../vitest.mock-types.ts"],
       "#test/render-spec-page": ["../../vitest.render-spec-page.ts"]
