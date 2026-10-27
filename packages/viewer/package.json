@@ -115,7 +115,7 @@
     "eslint": "^10.13.0",
     "happy-dom": "21.0.4",
     "jsonwebtoken": "^9.0.3",
-    "rollup": "^4.65.0",
+    "rollup": "^4.65.1",
     "ts-toolbelt": "^9.6.0",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
