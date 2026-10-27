@@ -1,6 +1,6 @@
 {
   "name": "@vertexvis/html-templates",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "HTML templating library for Viewer SDK.",
   "license": "MIT",
   "author": "Vertex Developers <support@vertex3d.com> (https://developer.vertex3d.com)",
@@ -46,11 +46,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@vertexvis/utils": "1.1.1"
+    "@vertexvis/utils": "1.1.2"
   },
   "devDependencies": {
     "@vertexvis/eslint-config-vertexvis-typescript": "^0.6.2",
-    "@vertexwebsdk/build": "1.1.1",
+    "@vertexwebsdk/build": "1.1.2",
     "@vitest/coverage-v8": "4.1.12",
     "eslint": "^10.13.0",
     "rollup": "^4.65.0",
