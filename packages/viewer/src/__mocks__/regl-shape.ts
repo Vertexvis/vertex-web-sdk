@@ -1,7 +1,11 @@
+import { type Mock, vi } from 'vitest';
+
 const draw = vi.fn();
 
 const createShape = vi.fn(() => draw);
 
-export default vi.fn(() => ({
+const mockShapeBuilder: Mock = vi.fn(() => ({
   createShape,
 }));
+
+export default mockShapeBuilder;

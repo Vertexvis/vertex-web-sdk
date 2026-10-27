@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const triggerResizeObserver = vi.fn();
+import { type Mock, vi } from 'vitest';
+
+export const triggerResizeObserver: Mock = vi.fn();
 (globalThis as any).ResizeObserver = class {
   private fn;
 

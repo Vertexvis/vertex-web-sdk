@@ -53,7 +53,7 @@ describe(StreamApiEventDispatcher, () => {
     );
   });
 
-  it('does not invoke listeners if a message failing the predicate comes across the WS', () => {
+  it('does not invoke listeners if a message failing the predicate comes across the WS', async () => {
     const res = dispatcher.once();
 
     mockWs.receiveMessage(
@@ -64,6 +64,6 @@ describe(StreamApiEventDispatcher, () => {
       ),
     );
 
-    expect(res).rejects.toEqual(new Error('Promise timed out after 5ms'));
+    await expect(res).rejects.toEqual(new Error('Promise timed out after 5ms'));
   });
 });
