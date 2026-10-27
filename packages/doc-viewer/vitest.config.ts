@@ -23,6 +23,7 @@ export default defineVitestConfig({
   },
   test: {
     globals: true,
+    onConsoleLog: log => !log.startsWith('[happy-dom-upgrade] found 0') && !log.startsWith('[happy-dom-upgrade] customElements.define called'),
     environment: 'stencil',
     environmentOptions: { stencil: { domEnvironment: 'happy-dom' } },
     include: ['src/**/*.spec.{ts,tsx}'],

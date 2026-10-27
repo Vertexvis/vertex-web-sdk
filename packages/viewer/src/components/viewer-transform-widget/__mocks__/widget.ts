@@ -1,3 +1,5 @@
+import { type Mock, vi } from 'vitest';
+
 const mockTransformWidgetConstructor = vi.fn();
 const mockGetFullBounds = vi.fn();
 const mockBoundsContainsPoint = vi.fn();
@@ -12,17 +14,17 @@ const mockUpdateDisabledAxis = vi.fn();
 const mockDispose = vi.fn();
 
 export class TransformWidget {
-  public getFullBounds = mockGetFullBounds;
-  public boundsContainsPoint = mockBoundsContainsPoint;
-  public onHoveredChanged = mockOnHoveredChanged;
-  public updateTransform = mockUpdateTransform;
-  public updateFrame = mockUpdateFrame;
-  public updateCursor = mockUpdateCursor;
-  public updateColors = mockUpdateColors;
-  public updateScalars = mockUpdateScalars;
-  public updateDimensions = mockUpdateDimensions;
-  public updateDisabledAxis = mockUpdateDisabledAxis;
-  public dispose = mockDispose;
+  public getFullBounds: Mock = mockGetFullBounds;
+  public boundsContainsPoint: Mock = mockBoundsContainsPoint;
+  public onHoveredChanged: Mock = mockOnHoveredChanged;
+  public updateTransform: Mock = mockUpdateTransform;
+  public updateFrame: Mock = mockUpdateFrame;
+  public updateCursor: Mock = mockUpdateCursor;
+  public updateColors: Mock = mockUpdateColors;
+  public updateScalars: Mock = mockUpdateScalars;
+  public updateDimensions: Mock = mockUpdateDimensions;
+  public updateDisabledAxis: Mock = mockUpdateDisabledAxis;
+  public dispose: Mock = mockDispose;
 
   public constructor(...args: unknown[]) {
     mockTransformWidgetConstructor(...args);

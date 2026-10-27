@@ -51,6 +51,9 @@ export default defineVitestConfig({
   test: {
     globals: true,
     maxWorkers: '50%',
+    onConsoleLog: (log) =>
+      !log.startsWith('[happy-dom-upgrade] found 0') &&
+      !log.startsWith('[happy-dom-upgrade] customElements.define called'),
     projects: [
       {
         test: {
@@ -62,7 +65,6 @@ export default defineVitestConfig({
         },
       },
       {
-        plugins: [stencilVitestPlugin(), stencilClassExports()],
         oxc: {
           jsx: {
             runtime: 'classic',

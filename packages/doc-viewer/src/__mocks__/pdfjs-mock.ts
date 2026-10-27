@@ -1,7 +1,8 @@
 import type { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { type Mock, vi } from 'vitest';
 
 export class MockOptionalContentConfig extends Map {
-  public setVisibility = vi.fn();
+  public setVisibility: Mock = vi.fn();
 }
 
 export const mockGetViewport = vi.fn(() => ({ width: 100, height: 100 }));
@@ -17,7 +18,7 @@ export const mockGetPage = vi.fn(() => ({
   getViewport: mockGetViewport,
 }));
 
-export const mockDestroy = vi.fn();
+export const mockDestroy: Mock = vi.fn();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const mockGetDocument = vi.fn((): any => ({
