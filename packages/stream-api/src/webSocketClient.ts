@@ -70,9 +70,16 @@ export class WebSocketClientImpl implements WebSocketClient {
           return;
         }
 
-        if (ArrayBuffer.isView(data) && data.buffer instanceof SharedArrayBuffer) {
+        if (
+          ArrayBuffer.isView(data) &&
+          data.buffer instanceof SharedArrayBuffer
+        ) {
           this.webSocket.send(
-            new Uint8Array(data.buffer, data.byteOffset, data.byteLength).slice(),
+            new Uint8Array(
+              data.buffer,
+              data.byteOffset,
+              data.byteLength,
+            ).slice(),
           );
           return;
         }
