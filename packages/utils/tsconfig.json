@@ -2,7 +2,6 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@vertexwebsdk/build/tsconfig",
   "compilerOptions": {
-    "downlevelIteration": true,
     "lib": ["ES2020", "DOM", "WebWorker"],
     "types": ["vitest/globals"]
   },

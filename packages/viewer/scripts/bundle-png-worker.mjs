@@ -36,7 +36,7 @@ const bundle = await rollup({
         const output = ts.transpileModule(code, {
           compilerOptions: {
             module: ts.ModuleKind.ESNext,
-            target: ts.ScriptTarget.ES2019,
+            target: ts.ScriptTarget.ES2020,
           },
           fileName: id,
         });
