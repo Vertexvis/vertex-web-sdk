@@ -15,7 +15,7 @@
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/esm/index.js",
-  "es2019": "dist/esm/index.js",
+  "es2020": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
@@ -115,10 +115,10 @@
     "eslint": "^10.13.0",
     "happy-dom": "21.0.4",
     "jsonwebtoken": "^9.0.3",
-    "rollup": "^4.65.0",
+    "rollup": "^4.65.1",
     "ts-toolbelt": "^9.6.0",
     "typedoc": "^0.28.20",
-    "typescript": "^5.9.3",
-    "vitest": "5.0.5"
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
   }
 }

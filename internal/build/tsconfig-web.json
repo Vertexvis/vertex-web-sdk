@@ -3,7 +3,6 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "importHelpers": true,
-    "target": "ES2019",
     "jsx": "react-jsx",
     "lib": ["DOM", "es2020"]
   },
