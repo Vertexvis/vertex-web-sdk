@@ -24,7 +24,7 @@ import {
   fromPbVector3f,
 } from './geometry';
 import { fromPbRGBi } from './material';
-import { fromPbBoolValue, fromPbBytesValue } from './scalar';
+import { fromPbBoolValue, fromPbBytesValue, fromPbStringValue } from './scalar';
 
 export const fromPbPerspectiveCamera: M.Func<
   vertexvis.protobuf.stream.IPerspectiveCamera,
@@ -404,6 +404,7 @@ export const fromPbStartStreamResponse: M.Func<
     sessionId: string;
     worldOrientation: Orientation;
     token: Token;
+    comparisonStreamKey?: string;
   }
 > = M.defineMapper(
   M.read(
@@ -431,14 +432,29 @@ export const fromPbStartStreamResponse: M.Func<
       M.requiredProp('startStream'),
       M.mapRequiredProp('token', fromPbToken),
     ),
+    M.compose(
+      M.requiredProp('startStream'),
+      M.ifDefined(
+        M.mapProp('comparisonStreamKey', M.ifDefined(fromPbStringValue)),
+      ),
+    ),
   ),
-  ([streamId, sceneId, sceneViewId, sessionId, worldOrientation, token]) => ({
+  ([
     streamId,
     sceneId,
     sceneViewId,
-    sessionId: sessionId,
+    sessionId,
     worldOrientation,
     token,
+    comparisonStreamKey,
+  ]) => ({
+    streamId,
+    sceneId,
+    sceneViewId,
+    sessionId,
+    worldOrientation,
+    token,
+    comparisonStreamKey: comparisonStreamKey ?? undefined,
   }),
 );
 
@@ -448,15 +464,24 @@ export const fromPbStartStreamResponseOrThrow = M.ifInvalidThrow(
 
 export const fromPbReconnectResponse: M.Func<
   vertexvis.protobuf.stream.IStreamResponse,
-  { token: Token }
+  { token: Token; comparisonStreamKey?: string }
 > = M.defineMapper(
   M.read(
     M.compose(
       M.requiredProp('reconnect'),
       M.mapRequiredProp('token', fromPbToken),
     ),
+    M.compose(
+      M.requiredProp('reconnect'),
+      M.ifDefined(
+        M.mapProp('comparisonStreamKey', M.ifDefined(fromPbStringValue)),
+      ),
+    ),
   ),
-  ([token]) => ({ token }),
+  ([token, comparisonStreamKey]) => ({
+    token,
+    comparisonStreamKey: comparisonStreamKey ?? undefined,
+  }),
 );
 
 export const fromPbReconnectResponseOrThrow = M.ifInvalidThrow(
