@@ -281,8 +281,7 @@ describe('ZoomInteraction', () => {
     it('only begins interaction once within interaction timeout', async () => {
       vi.useFakeTimers();
       const interaction = new ZoomInteraction(interactionConfigProvider);
-      interaction.zoom(1, api);
-      interaction.zoom(1, api);
+      await Promise.all([interaction.zoom(1, api), interaction.zoom(1, api)]);
 
       expect(api.beginInteraction).toHaveBeenCalledTimes(1);
       await vi.advanceTimersByTimeAsync(timeoutDelay + wheelZoomDelay);
@@ -292,9 +291,9 @@ describe('ZoomInteraction', () => {
     it('ends interaction after interaction timeout', async () => {
       vi.useFakeTimers();
       const interaction = new ZoomInteraction(interactionConfigProvider);
-      interaction.zoom(1, api);
+      await interaction.zoom(1, api);
 
-      await vi.advanceTimersByTimeAsync(timeoutDelay - 1);
+      await vi.advanceTimersByTimeAsync(timeoutDelay + wheelZoomDelay - 1);
       expect(api.endInteraction).not.toHaveBeenCalled();
 
       await vi.advanceTimersByTimeAsync(1);
