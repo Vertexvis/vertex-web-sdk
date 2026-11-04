@@ -2537,12 +2537,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vertexvis/frame-streaming-protos@npm:^0.18.9":
-  version: 0.18.9
-  resolution: "@vertexvis/frame-streaming-protos@npm:0.18.9"
+"@vertexvis/frame-streaming-protos@npm:^0.18.11":
+  version: 0.18.11
+  resolution: "@vertexvis/frame-streaming-protos@npm:0.18.11"
   dependencies:
     protobufjs: "npm:^7.6.6"
-  checksum: 10c0/da2a9d73d7fc37b7e2b4dd772e960b3dd70bc17f961f5d6e136d8fb204f9d9a614bcbb9804bd59e061aac95d493bd456d7684570a37452218326573524368ab7
+  checksum: 10c0/5e1d2d270c8cb187b4b349d292c5661defd84027b3ba01ad8d91fe2fbbb429f06b52f1d9f3da4028bb846bb4390db4cc9fe9504e6b089aa4c70b9c51755c0b3f
   languageName: node
   linkType: hard
 
@@ -2615,7 +2615,7 @@ __metadata:
   resolution: "@vertexvis/stream-api@workspace:packages/stream-api"
   dependencies:
     "@vertexvis/eslint-config-vertexvis-typescript": "npm:^0.6.2"
-    "@vertexvis/frame-streaming-protos": "npm:^0.18.9"
+    "@vertexvis/frame-streaming-protos": "npm:^0.18.11"
     "@vertexvis/utils": "npm:1.1.2"
     "@vertexwebsdk/build": "npm:1.1.2"
     "@vitest/coverage-v8": "npm:5.0.5"
@@ -2713,7 +2713,7 @@ __metadata:
     "@types/google-protobuf": "npm:^3.15.12"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@vertexvis/eslint-config-vertexvis-typescript": "npm:^0.6.2"
-    "@vertexvis/frame-streaming-protos": "npm:^0.18.9"
+    "@vertexvis/frame-streaming-protos": "npm:^0.18.11"
     "@vertexvis/geometry": "npm:1.1.2"
     "@vertexvis/html-templates": "npm:1.1.2"
     "@vertexvis/scene-tree-protos": "npm:^0.1.35"

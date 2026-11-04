@@ -46,7 +46,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@vertexvis/frame-streaming-protos": "^0.18.9",
+    "@vertexvis/frame-streaming-protos": "^0.18.11",
     "long": "^5.3.2"
   },
   "devDependencies": {
