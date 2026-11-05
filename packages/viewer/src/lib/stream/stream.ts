@@ -520,6 +520,20 @@ export class ViewerStream extends StreamApi {
       }),
     );
 
+    if (
+      this.streamAttributes.sceneComparison?.streamKeyToCompare != null &&
+      res.comparisonStreamKey == null
+    ) {
+      console.warn(
+        'The stream key given in the sceneComparison parameter is invalid. The scenes will not be compared.',
+      );
+
+      this.streamAttributes = {
+        ...this.streamAttributes,
+        sceneComparison: undefined,
+      };
+    }
+
     return {
       resource: resource,
       streamId: res.streamId,
@@ -545,6 +559,21 @@ export class ViewerStream extends StreamApi {
         clientSupportsTemporalRefinement: this.enableTemporalRefinement,
       }),
     );
+
+    if (
+      this.streamAttributes.sceneComparison?.streamKeyToCompare != null &&
+      res.comparisonStreamKey == null
+    ) {
+      console.warn(
+        'The stream key given in the sceneComparison parameter is invalid. The scenes will not be compared.',
+      );
+
+      this.streamAttributes = {
+        ...this.streamAttributes,
+        sceneComparison: undefined,
+      };
+    }
+
     return { ...state, token: res.token };
   }
 
