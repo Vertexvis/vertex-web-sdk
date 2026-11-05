@@ -177,7 +177,7 @@ export class ViewerViewCube {
           // Check to see if any geometry is visible. If not, don't perform viewAll
           const currentBoundingBox = scene.boundingBox();
           if (!this.viewAll) {
-            scene
+            await scene
               .camera()
               .standardViewFixedLookAt(worldStandardView)
               .render(animation);
@@ -186,9 +186,12 @@ export class ViewerViewCube {
             Vector3.isEqual(currentBoundingBox.max, Vector3.origin()) &&
             Vector3.isEqual(currentBoundingBox.min, Vector3.origin())
           ) {
-            scene.camera().standardView(worldStandardView).render(animation);
+            await scene
+              .camera()
+              .standardView(worldStandardView)
+              .render(animation);
           } else {
-            scene
+            await scene
               .camera()
               .standardView(worldStandardView)
               .viewAll()
@@ -291,6 +294,7 @@ export class ViewerViewCube {
               side="front"
               onPointerDown={this.handleStandardView(StandardView.FRONT)}
               disabled={this.standardViewsOff}
+              isLeftHanded={this.worldOrientation.isLeftHanded}
             />
             <ViewCubeSide
               label={this.zNegativeLabel}
@@ -298,6 +302,7 @@ export class ViewerViewCube {
               side="back"
               onPointerDown={this.handleStandardView(StandardView.BACK)}
               disabled={this.standardViewsOff}
+              isLeftHanded={this.worldOrientation.isLeftHanded}
             />
             <ViewCubeSide
               label={this.xNegativeLabel}
@@ -305,6 +310,7 @@ export class ViewerViewCube {
               side="left"
               onPointerDown={this.handleStandardView(StandardView.LEFT)}
               disabled={this.standardViewsOff}
+              isLeftHanded={this.worldOrientation.isLeftHanded}
             />
             <ViewCubeSide
               label={this.xPositiveLabel}
@@ -312,6 +318,7 @@ export class ViewerViewCube {
               side="right"
               onPointerDown={this.handleStandardView(StandardView.RIGHT)}
               disabled={this.standardViewsOff}
+              isLeftHanded={this.worldOrientation.isLeftHanded}
             />
             <ViewCubeSide
               label={this.yPositiveLabel}
@@ -319,6 +326,7 @@ export class ViewerViewCube {
               side="top"
               onPointerDown={this.handleStandardView(StandardView.TOP)}
               disabled={this.standardViewsOff}
+              isLeftHanded={this.worldOrientation.isLeftHanded}
             />
             <ViewCubeSide
               label={this.yNegativeLabel}
@@ -326,6 +334,7 @@ export class ViewerViewCube {
               side="bottom"
               onPointerDown={this.handleStandardView(StandardView.BOTTOM)}
               disabled={this.standardViewsOff}
+              isLeftHanded={this.worldOrientation.isLeftHanded}
             />
 
             {/* Edges */}

@@ -124,7 +124,11 @@ describe('vertex-viewer-view-cube', () => {
   });
 
   it('uses world orientation for cube', async () => {
-    const worldOrientation = new Orientation(Vector3.left(), Vector3.down());
+    const worldOrientation = new Orientation(
+      Vector3.left(),
+      Vector3.down(),
+      Vector3.right(),
+    );
     const page = await render(<vertex-viewer-view-cube />, {
       waitForReady: false,
     });

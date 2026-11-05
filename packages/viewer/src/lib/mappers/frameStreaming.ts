@@ -330,6 +330,19 @@ export function fromPbFrameOrThrow(
   return M.ifInvalidThrow(fromPbFrame(worldOrientation));
 }
 
+function createOrientationWithIsLeftHanded(
+  up: Vector3.Vector3,
+  forward: Vector3.Vector3,
+  isLeftHanded: boolean,
+): Orientation {
+  const upForwardCrossProduct = Vector3.cross(up, forward);
+  const right = isLeftHanded
+    ? Vector3.negate(upForwardCrossProduct)
+    : upForwardCrossProduct;
+
+  return new Orientation(up, forward, right);
+}
+
 export const fromPbWorldOrientation: M.Func<
   vertexvis.protobuf.stream.IOrientation | null | undefined,
   Orientation
@@ -339,9 +352,11 @@ export const fromPbWorldOrientation: M.Func<
     M.read(
       M.mapProp('up', M.compose(M.required('up'), fromPbVector3f)),
       M.mapProp('front', M.compose(M.required('front'), fromPbVector3f)),
+      M.mapProp('isLeftHanded', M.ifDefined(fromPbBoolValue)),
     ),
   ),
-  ([up, front]) => new Orientation(up, front),
+  ([up, front, isLeftHanded]) =>
+    createOrientationWithIsLeftHanded(up, front, isLeftHanded ?? false),
 );
 
 export const fromPbWorldOrientationOrThrow: M.ThrowIfInvalidFunc<

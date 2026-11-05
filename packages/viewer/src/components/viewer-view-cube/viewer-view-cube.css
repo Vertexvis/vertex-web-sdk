@@ -244,3 +244,18 @@
 .cube-side.disabled {
   pointer-events: none;
 }
+
+.cube-left-handed-label-top,
+.cube-left-handed-label-right {
+  transform: matrix3d(-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+
+.cube-left-handed-label-front,
+.cube-left-handed-label-bottom {
+  transform: matrix3d(-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1);
+}
+
+.cube-left-handed-label-back,
+.cube-left-handed-label-left {
+  transform: matrix3d(-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1);
+}
