@@ -1,5 +1,4 @@
 import { EventEmitter } from '@stencil/core';
-import { vertexvis } from '@vertexvis/frame-streaming-protos';
 import {
   Angle,
   BoundingBox,
@@ -16,6 +15,7 @@ import { Cursor, CursorManager } from '../cursors';
 import {
   Camera,
   CameraRenderOptions,
+  Hit,
   OrthographicCamera,
   Scene,
 } from '../scenes';
@@ -660,12 +660,25 @@ export abstract class InteractionApi<T extends Camera = Camera> {
    * Performs a hit test at the given point and returns a list of hit results
    * indicating any scene items that exist at the given point.
    *
+   * Each hit passes through `partInstanceId`, `leafPartInstanceId`, and
+   * `ancestors[].partInstanceId` from the stream. `partInstanceId` is the
+   * part revision instance the hit scene item was created from, and
+   * `leafPartInstanceId` is the instance the leaf scene item was created
+   * from. These can differ when an end item collapses the path. A child
+   * instance id belongs to its parent revision, so the ancestor chain is
+   * what tells copies of a sub-assembly apart.
+   *
+   * Each instance id is unset for a root item and for a `-geom` surrogate
+   * item (a revision's own geometry when it also has children). When set,
+   * `hex` matches the id `GET /part-revision-instances` returns.
+   *
+   * Tap, double-tap, and long-press events carry the pointer position and
+   * modifiers. Call this method with that position to read the hit.
+   *
    * @param pt A point, in viewport coordinates.
    * @returns A promise that resolves with the list of hit results.
    */
-  public async hitItems(
-    pt: Point.Point,
-  ): Promise<vertexvis.protobuf.stream.IHit[]> {
+  public async hitItems(pt: Point.Point): Promise<Hit[]> {
     const res = await (await this.getScene()).raycaster().hitItems(pt);
     return res?.hits ?? [];
   }

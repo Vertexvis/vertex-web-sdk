@@ -4,6 +4,7 @@
 /* istanbul ignore file */
 export * from './camera';
 export * from './crossSectioner';
+export * from './hitResult';
 export {
   ItemOperationBuilder,
   PmiAnnotationOperationBuilder,

@@ -1112,6 +1112,11 @@ export class Scene {
 
   /**
    * Raycaster to request items that intersect a point.
+   *
+   * Hit results include `partInstanceId`, `leafPartInstanceId`, and each
+   * ancestor's `partInstanceId`. An instance id is unset for a root item and
+   * for a `-geom` surrogate item (a revision's own geometry when it also has
+   * children). See {@link Raycaster.hitItems}.
    */
   public raycaster(): Raycaster {
     return new Raycaster(this.stream, this.imageScaleProvider);
