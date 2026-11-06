@@ -27,9 +27,6 @@ export { SceneViewItem } from './lib/scene-items';
 export {
   Camera,
   CrossSectioner,
-  Hit,
-  HitItemAncestor,
-  HitItemsResult,
   ItemOperationBuilder,
   PmiAnnotationOperationsBuilder,
   PmiAnnotationsQueryExecutor,

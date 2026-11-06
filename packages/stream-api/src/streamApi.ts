@@ -419,20 +419,6 @@ export class StreamApi {
   /**
    * Sends a request to perform hit detection.
    *
-   * The response `hitItems.hits` pass through the stream `Hit` fields,
-   * including `partInstanceId`, `leafPartInstanceId`, and
-   * `ancestors[].partInstanceId`. `partInstanceId` is the part revision
-   * instance the hit scene item (`itemId`) was created from.
-   * `leafPartInstanceId` is the instance the leaf scene item (`leafItemId`)
-   * was created from. These can differ when an end item collapses the path.
-   * A child instance id belongs to its parent revision, so the ancestor
-   * chain is what tells copies of a sub-assembly apart.
-   *
-   * Each instance id is unset for a root item and for a `-geom` surrogate
-   * item (a revision's own geometry when it also has children). When set, it
-   * is a `vertexvis.protobuf.core.Uuid` and `hex` matches the id
-   * `GET /part-revision-instances` returns.
-   *
    * Use `withResponse` to indicate if the server should reply with a response.
    * If `false`, the returned promise will complete immediately. Otherwise,
    * it'll complete when a response is received.

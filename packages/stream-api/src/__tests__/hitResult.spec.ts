@@ -37,7 +37,7 @@ describe('hit part revision instance ids', () => {
       ),
     );
 
-    const hit = decoded.response?.hitItems?.hits?.[0] as DecodedHit | undefined;
+    const hit = decoded.response?.hitItems?.hits?.[0];
     expect(
       hit?.partInstanceId,
       'Hit.partInstanceId is field 14 on @vertexvis/frame-streaming-protos >= 0.18.13',
@@ -58,17 +58,9 @@ describe('hit part revision instance ids', () => {
       ),
     );
 
-    const hit = decoded.response?.hitItems?.hits?.[0] as DecodedHit | undefined;
+    const hit = decoded.response?.hitItems?.hits?.[0];
     expect(hit?.partInstanceId ?? null).toBeNull();
     expect(hit?.leafPartInstanceId ?? null).toBeNull();
     expect(hit?.ancestors?.[0]?.partInstanceId ?? null).toBeNull();
   });
 });
-
-interface DecodedHit {
-  partInstanceId?: { hex?: string | null } | null;
-  leafPartInstanceId?: { hex?: string | null } | null;
-  ancestors?: Array<{
-    partInstanceId?: { hex?: string | null } | null;
-  } | null> | null;
-}
