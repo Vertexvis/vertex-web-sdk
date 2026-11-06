@@ -47,5 +47,35 @@ describe(Raycaster, () => {
         true,
       );
     });
+
+    it('passes part revision instance ids through on hit results', async () => {
+      const hitItems = {
+        hits: [
+          {
+            itemId: { hex: 'item-id' },
+            leafItemId: { hex: 'leaf-item-id' },
+            partInstanceId: { hex: 'part-instance-id' },
+            leafPartInstanceId: { hex: 'leaf-part-instance-id' },
+            ancestors: [
+              {
+                itemId: { hex: 'ancestor-id' },
+                partInstanceId: { hex: 'ancestor-instance-id' },
+              },
+            ],
+          },
+          {
+            itemId: { hex: 'root-or-geom-surrogate' },
+            partInstanceId: null,
+            leafPartInstanceId: null,
+            ancestors: [{ itemId: { hex: 'root' }, partInstanceId: null }],
+          },
+        ],
+      };
+      (api.hitItems as Mock).mockResolvedValue({ hitItems });
+
+      await expect(raycaster.hitItems(Point.create(10, 10))).resolves.toBe(
+        hitItems,
+      );
+    });
   });
 });
