@@ -1,7 +1,7 @@
 import { Matrix4, Vector3 } from '@vertexvis/geometry';
 
 /**
- * Represents an orientation using an `up``, `forward`, and `right` vector.
+ * Represents an orientation using an `up`, `forward`, and `right` vector.
  */
 export class Orientation {
   /**
