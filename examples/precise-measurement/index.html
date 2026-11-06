@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" xml:lang="en">
+  <head>
+    <title>Precise Measurement</title>
+
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="stylesheet" href="/packages/viewer/dist/viewer/viewer.css" />
+    <script
+      type="module"
+      src="/packages/viewer/dist/viewer/viewer.esm.js"
+    ></script>
+    <script type="module" src="main.js"></script>
+  </head>
+  <body class="app">
+    <vertex-scene-tree
+      id="scene-tree"
+      class="tree"
+      viewer-selector="#viewer"
+      config-env="platdev"
+    >
+      <vertex-scene-tree-table-layout>
+        <vertex-scene-tree-table-column>
+          <template>
+            <vertex-scene-tree-table-cell
+              prop:value="{{row.node.name}}"
+              expand-toggle
+            ></vertex-scene-tree-table-cell>
+          </template>
+        </vertex-scene-tree-table-column>
+      </vertex-scene-tree-table-layout>
+    </vertex-scene-tree>
+
+    <vertex-viewer
+      id="viewer"
+      class="viewer"
+      config-env="platdev"
+      feature-maps="final"
+    >
+    </vertex-viewer>
+
+    <aside class="panel">
+      <h1>Precise measurement</h1>
+      <p id="status" class="status"></p>
+      <p class="hint">
+        Turn precise measurement on, then click a surface. Click a second
+        surface to measure between them. A third click replaces the selection.
+        Click empty space to clear.
+      </p>
+      <div class="actions">
+        <button id="toggle" type="button" aria-pressed="false">
+          Precise measurement
+        </button>
+        <button id="reset" type="button" hidden>Reset</button>
+      </div>
+      <p id="message" class="message"></p>
+      <p id="error" class="error" hidden></p>
+      <vertex-viewer-measurement-details
+        id="details"
+      ></vertex-viewer-measurement-details>
+
+      <h2>Property metadata</h2>
+      <p id="metadata-keys" class="metadata">Waiting for the scene…</p>
+    </aside>
+  </body>
+</html>

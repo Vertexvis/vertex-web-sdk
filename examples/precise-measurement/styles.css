@@ -1,0 +1,110 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: #132238;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+.app {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background: #f5f7fb;
+}
+
+.tree {
+  width: 280px;
+  height: 100vh;
+  flex: none;
+  background: #fff;
+  border-right: 1px solid #d8e1ec;
+}
+
+.viewer {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+}
+
+.panel {
+  width: 320px;
+  height: 100vh;
+  box-sizing: border-box;
+  flex: none;
+  overflow: auto;
+  padding: 20px;
+  background: #fff;
+  border-left: 1px solid #d8e1ec;
+}
+
+h1,
+h2 {
+  margin: 0 0 8px;
+}
+
+h1 {
+  font-size: 1.25rem;
+}
+
+h2 {
+  margin-top: 28px;
+  font-size: 0.95rem;
+}
+
+.hint,
+.status,
+.message,
+.metadata {
+  margin: 0 0 12px;
+  line-height: 1.45;
+  font-size: 0.875rem;
+}
+
+.status {
+  color: #4b6078;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+button {
+  border: 1px solid #9ab3cf;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  padding: 8px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button[aria-pressed='true'] {
+  background: #16324f;
+  border-color: #16324f;
+  color: #fff;
+}
+
+.error {
+  margin: 0 0 12px;
+  color: #9b1c1c;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+#details {
+  display: block;
+}

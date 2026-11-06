@@ -4,16 +4,12 @@
     <title>Scene Tree Columns</title>
 
     <link rel="stylesheet" type="text/css" href="styles.css" />
-    <script type="module" src="main.js"></script>
-
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.6-canary.3/dist/viewer/viewer.css"
-    />
+    <link rel="stylesheet" href="/packages/viewer/dist/viewer/viewer.css" />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@vertexvis/viewer@0.23.6-canary.3/dist/viewer/viewer.esm.js"
+      src="/packages/viewer/dist/viewer/viewer.esm.js"
     ></script>
+    <script type="module" src="main.js"></script>
 
     <style>
       body {
@@ -29,7 +25,11 @@
   <body class="app">
     <div class="left-panel">
       <div class="tree">
-        <vertex-scene-tree id="scene-tree" viewer-selector="#viewer">
+        <vertex-scene-tree
+          id="scene-tree"
+          viewer-selector="#viewer"
+          config-env="platdev"
+        >
           <vertex-scene-tree-table-layout id="table-layout">
             <vertex-scene-tree-table-column>
               <template>
@@ -46,7 +46,7 @@
     </div>
 
     <div class="center-panel">
-      <vertex-viewer id="viewer" class="viewer">
+      <vertex-viewer id="viewer" class="viewer" config-env="platdev">
         <vertex-viewer-toolbar data-viewer="viewer"> </vertex-viewer-toolbar>
         <div class="viewer-overlay">
           <button id="expand-all-btn" class="overlay-button">Expand All</button>
