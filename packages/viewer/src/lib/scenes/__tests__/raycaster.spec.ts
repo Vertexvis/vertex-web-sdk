@@ -56,18 +56,11 @@ describe(Raycaster, () => {
             leafItemId: { hex: 'leaf-item-id' },
             partInstanceId: { hex: 'part-instance-id' },
             leafPartInstanceId: { hex: 'leaf-part-instance-id' },
-            ancestors: [
-              {
-                itemId: { hex: 'ancestor-id' },
-                partInstanceId: { hex: 'ancestor-instance-id' },
-              },
-            ],
           },
           {
             itemId: { hex: 'root-or-geom-surrogate' },
             partInstanceId: null,
             leafPartInstanceId: null,
-            ancestors: [{ itemId: { hex: 'root' }, partInstanceId: null }],
           },
         ],
       };
