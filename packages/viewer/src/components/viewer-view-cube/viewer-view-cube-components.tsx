@@ -90,6 +90,7 @@ interface ViewCubeSideProps {
   side: ViewCubeSide;
   disabled: boolean;
   onPointerDown?: (event: MouseEvent) => void;
+  isLeftHanded: boolean;
 }
 
 export const ViewCubeSide: FunctionalComponent<ViewCubeSideProps> = ({
@@ -98,6 +99,7 @@ export const ViewCubeSide: FunctionalComponent<ViewCubeSideProps> = ({
   side,
   disabled,
   onPointerDown,
+  isLeftHanded,
 }) => {
   const { direction, quaternion } = viewCubeSides[side];
   const position = Vector3.scale(length / 2 - 0.1, direction);
@@ -111,7 +113,19 @@ export const ViewCubeSide: FunctionalComponent<ViewCubeSideProps> = ({
       onPointerDown={onPointerDown}
       billboardOff
     >
-      <div class={`cube-side-face cube-side-face-${label.toLowerCase()}`}>
+      <div
+        class={classNames(
+          `cube-side-face cube-side-face-${label.toLowerCase()}`,
+          {
+            'cube-left-handed-label-top': isLeftHanded && side === 'top',
+            'cube-left-handed-label-bottom': isLeftHanded && side === 'bottom',
+            'cube-left-handed-label-front': isLeftHanded && side === 'front',
+            'cube-left-handed-label-back': isLeftHanded && side === 'back',
+            'cube-left-handed-label-left': isLeftHanded && side === 'left',
+            'cube-left-handed-label-right': isLeftHanded && side === 'right',
+          },
+        )}
+      >
         {label}
       </div>
     </vertex-viewer-dom-element>
