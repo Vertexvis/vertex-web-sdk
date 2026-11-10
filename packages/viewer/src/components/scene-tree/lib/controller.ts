@@ -30,6 +30,7 @@ import {
   UnaryResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Async, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
+import throttle from 'lodash.throttle';
 
 import { MetadataKey } from '../types';
 import {
@@ -49,6 +50,7 @@ export interface ConnectOptions {
   idleReconnectInSeconds?: number;
   lostConnectionReconnectInSeconds?: number;
   subscriptionHandshakeGracePeriodInMs?: number;
+  pageRefreshThrottleMs?: number;
 }
 
 export type JwtProvider = () => string | undefined;
@@ -75,6 +77,11 @@ interface Page {
   metadataKeys: MetadataKey[];
   res: Promise<GetTreeResponse>;
   done?: Promise<void>;
+}
+
+interface ThrottledPageRefresh {
+  (): void;
+  cancel(): void;
 }
 
 export interface DisconnectedState {
@@ -170,6 +177,7 @@ export class SceneTreeController {
   private reconnectTimer?: number;
   private loadingTimer?: number;
   private subscriptionHandshakeTimer?: number;
+  private throttledPageRefresh: ThrottledPageRefresh;
 
   /**
    * A dispatcher that emits an event whenever the internal state has changed.
@@ -205,7 +213,16 @@ export class SceneTreeController {
       spinnerDelay: 2000,
       subscriptionHandshakeGracePeriodInMs: 5000,
     },
-  ) {}
+  ) {
+    // Throttles refreshes of loaded pages when receiving a ListChange. This
+    // prevents excessive GetTree requests when these come in rapidly.
+    // See https://lodash.com/docs/#throttle for more details.
+    this.throttledPageRefresh = throttle(
+      () => this.refreshPagesAfterSubscriptionUpdate(),
+      this.connectOptions.pageRefreshThrottleMs ?? 1000,
+      { leading: true, trailing: true },
+    );
+  }
 
   /**
    * Registers an event listener that will be invoked when the state changes
@@ -442,6 +459,7 @@ export class SceneTreeController {
     this.clearHandshakeTimer();
     this.clearReconnectTimer();
     this.clearLoadingTimer();
+    this.throttledPageRefresh.cancel();
 
     if (reset) {
       this.pages.clear();
@@ -478,6 +496,7 @@ export class SceneTreeController {
     this.clearHandshakeTimer();
     this.clearReconnectTimer();
     this.clearLoadingTimer();
+    this.throttledPageRefresh.cancel();
 
     this.pages.clear();
     this.activeRowRange = [];
@@ -934,8 +953,7 @@ export class SceneTreeController {
 
         if (change?.listChange != null) {
           this.log('Received list change', change.listChange.start);
-          this.invalidateAfterOffset(change.listChange.start);
-          this.fetchUnloadedPagesInActiveRows();
+          this.handleSubscriptionListChange(change.listChange.start);
         }
 
         const {
@@ -1029,6 +1047,23 @@ export class SceneTreeController {
 
     const pages = this.getNonLoadedPageIndexes(startPage - 1, endPage + 1);
     await Promise.all(pages.map((page) => this.fetchPage(page)));
+  }
+
+  private handleSubscriptionListChange(start: number): void {
+    this.invalidateAfterOffset(start);
+
+    if (this.connectOptions.pageRefreshThrottleMs === 0) {
+      this.refreshPagesAfterSubscriptionUpdate();
+      return;
+    }
+
+    this.throttledPageRefresh();
+  }
+
+  private refreshPagesAfterSubscriptionUpdate(): void {
+    void this.fetchUnloadedPagesInActiveRows().catch((error: unknown) => {
+      this.log('Failed to refresh pages after subscription update', error);
+    });
   }
 
   private patchNodesInRange(
