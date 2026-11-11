@@ -30,7 +30,7 @@ import {
   UnaryResponse,
 } from '@vertexvis/scene-tree-protos/scenetree/protos/scene_tree_api_pb_service';
 import { Async, Disposable, EventDispatcher, Listener } from '@vertexvis/utils';
-import throttle from 'lodash.throttle';
+import { throttle } from 'throttle-debounce';
 
 import { MetadataKey } from '../types';
 import {
@@ -216,11 +216,13 @@ export class SceneTreeController {
   ) {
     // Throttles refreshes of loaded pages when receiving a ListChange. This
     // prevents excessive GetTree requests when these come in rapidly.
-    // See https://lodash.com/docs/#throttle for more details.
-    this.throttledPageRefresh = throttle(
-      () => this.refreshPagesAfterSubscriptionUpdate(),
+    this.throttledPageRefresh = this.createThrottledPageRefresh();
+  }
+
+  private createThrottledPageRefresh(): ThrottledPageRefresh {
+    return throttle(
       this.connectOptions.pageRefreshThrottleMs ?? 1000,
-      { leading: true, trailing: true },
+      this.refreshPagesAfterSubscriptionUpdate.bind(this),
     );
   }
 
@@ -460,6 +462,7 @@ export class SceneTreeController {
     this.clearReconnectTimer();
     this.clearLoadingTimer();
     this.throttledPageRefresh.cancel();
+    this.throttledPageRefresh = this.createThrottledPageRefresh();
 
     if (reset) {
       this.pages.clear();
@@ -497,6 +500,7 @@ export class SceneTreeController {
     this.clearReconnectTimer();
     this.clearLoadingTimer();
     this.throttledPageRefresh.cancel();
+    this.throttledPageRefresh = this.createThrottledPageRefresh();
 
     this.pages.clear();
     this.activeRowRange = [];

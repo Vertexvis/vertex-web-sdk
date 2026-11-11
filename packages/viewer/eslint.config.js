@@ -40,7 +40,7 @@ export default [
                 'This function does not work in tests. Use imports from ./src/utils/stencil instead.',
             },
           ],
-          patterns: ['lodash', 'lodash/*'],
+          patterns: ['lodash', 'lodash/*', 'lodash.*'],
         },
       ],
       '@typescript-eslint/member-ordering': [
