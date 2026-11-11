@@ -404,6 +404,27 @@ describe(InteractionApi, () => {
     });
   });
 
+  describe(InteractionApi.prototype.hitItems, () => {
+    it('returns part revision instance ids from the raycast', async () => {
+      const hits = [
+        {
+          itemId: { hex: 'item-id' },
+          leafItemId: { hex: 'leaf-item-id' },
+          partInstanceId: { hex: 'part-instance-id' },
+          leafPartInstanceId: { hex: 'leaf-part-instance-id' },
+        },
+        {
+          itemId: { hex: 'root-or-geom-surrogate' },
+          partInstanceId: null,
+          leafPartInstanceId: null,
+        },
+      ];
+      vi.spyOn(streamApi, 'hitItems').mockResolvedValue({ hitItems: { hits } });
+
+      await expect(api.hitItems(Point.create(4, 5))).resolves.toBe(hits);
+    });
+  });
+
   describe(InteractionApi.prototype.tap, () => {
     beforeEach(() => {
       api = new InteractionApiPerspective(
