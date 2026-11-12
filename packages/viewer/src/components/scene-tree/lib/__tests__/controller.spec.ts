@@ -26,6 +26,7 @@ import {
   FilterResponse,
   GetAvailableColumnsResponse,
   GetTreeRequest,
+  GetTreeResponse,
   Handshake,
   LocateItemResponse,
   SubscribeRequest,
@@ -50,6 +51,7 @@ import {
   random,
   ResponseStreamMock,
 } from '../../../../testing';
+import type { ConnectOptions } from '../controller';
 import { SceneTreeController, SceneTreeState } from '../controller';
 import { SceneTreeErrorCode, SceneTreeErrorDetails } from '../errors';
 import { fromNodeProto, Row } from '../row';
@@ -71,7 +73,7 @@ function signJwt(viewId: string): string {
 
 function createController(
   rowLimit: number,
-  subscriptionHandshakeGracePeriodInMs?: number,
+  connectOptions: Partial<ConnectOptions> = {},
 ): {
   controller: SceneTreeController;
   client: SceneTreeAPIClient;
@@ -81,8 +83,8 @@ function createController(
   const controller = new SceneTreeController(client, rowLimit, {
     lostConnectionReconnectInSeconds: 0.025,
     spinnerDelay: 2000,
-    subscriptionHandshakeGracePeriodInMs:
-      subscriptionHandshakeGracePeriodInMs || 1000,
+    subscriptionHandshakeGracePeriodInMs: 1000,
+    ...connectOptions,
   });
 
   const stream = new ResponseStreamMock<SubscribeResponse>();
@@ -107,6 +109,13 @@ describe('SceneTreeController', () => {
     resp.setHandshake(new Handshake());
 
     stream.invokeOnData(resp);
+  };
+
+  const sendListChange = (
+    stream: ResponseStreamMock<unknown>,
+    start = 0,
+  ): void => {
+    stream.invokeOnData(createSubscribeResponse(createListChange(start)));
   };
 
   describe('SceneTreeController.prototype.connect', () => {
@@ -408,10 +417,9 @@ describe('SceneTreeController', () => {
 
     it('emits subscription failure if no handshake is received within the timeout', async () => {
       const subscriptionHandshakeTimeout = 50;
-      const { controller, client } = createController(
-        10,
-        subscriptionHandshakeTimeout,
-      );
+      const { controller, client } = createController(10, {
+        subscriptionHandshakeGracePeriodInMs: subscriptionHandshakeTimeout,
+      });
       const getTree = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false),
       );
@@ -441,10 +449,9 @@ describe('SceneTreeController', () => {
 
     it('does not retry the subscription if a handshake was received before before the first page', async () => {
       const subscriptionHandshakeTimeout = 50;
-      const { controller, client, stream } = createController(
-        10,
-        subscriptionHandshakeTimeout,
-      );
+      const { controller, client, stream } = createController(10, {
+        subscriptionHandshakeGracePeriodInMs: subscriptionHandshakeTimeout,
+      });
       const getTree = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false),
       );
@@ -467,10 +474,9 @@ describe('SceneTreeController', () => {
 
     it('handles the subscription handshake', async () => {
       const subscriptionHandshakeTimeout = 50;
-      const { controller, client, stream } = createController(
-        10,
-        subscriptionHandshakeTimeout,
-      );
+      const { controller, client, stream } = createController(10, {
+        subscriptionHandshakeGracePeriodInMs: subscriptionHandshakeTimeout,
+      });
       const getTree = createGetTreeResponse(10, 100, (node) =>
         node.setVisible(false),
       );
@@ -631,6 +637,176 @@ describe('SceneTreeController', () => {
           totalRows: 20,
         }),
       );
+    });
+
+    describe('ListChange GetTree throttling', () => {
+      beforeEach(() => {
+        vi.useFakeTimers();
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      async function connectWithThrottle(
+        pageRefreshThrottleMs?: number,
+      ): Promise<{
+        controller: SceneTreeController;
+        client: SceneTreeAPIClient;
+        stream: ResponseStreamMock<unknown>;
+      }> {
+        const result = createController(100, {
+          pageRefreshThrottleMs,
+          // Prevent subscriptions from retrying during these tests
+          subscriptionHandshakeGracePeriodInMs: 100000,
+        });
+        (result.client.getTree as Mock).mockImplementation(
+          mockGrpcUnaryResult(createGetTreeResponse(100, 100), 0),
+        );
+
+        const connect = result.controller.connect(jwtProvider);
+
+        await vi.advanceTimersByTimeAsync(0);
+        await connect;
+
+        return result;
+      }
+
+      it('calls GetTree immediately then once at the end of a burst of ListChanges', async () => {
+        const { client, stream } = await connectWithThrottle();
+        expect(client.getTree).toHaveBeenCalledTimes(1);
+
+        // Immediate GetTree request in throttle window
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(0);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Delayed GetTree requests after initial request
+        sendListChange(stream);
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(999);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Advance to the end of the throttle window expecting the two delayed requests
+        // to be reduced to a single request
+        await vi.advanceTimersByTimeAsync(1);
+        expect(client.getTree).toHaveBeenCalledTimes(3);
+      });
+
+      it('sends a GetTree request again after the throttle period', async () => {
+        const { client, stream } = await connectWithThrottle();
+
+        // Expect two GetTree requests during the first throttle window
+        sendListChange(stream);
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(client.getTree).toHaveBeenCalledTimes(3);
+
+        // Expect a third GetTree request after the next throttle window
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(client.getTree).toHaveBeenCalledTimes(4);
+      });
+
+      it('uses a custom throttle duration', async () => {
+        const { client, stream } = await connectWithThrottle(50);
+
+        // Expect only a single GetTree request before the throttle window has expired
+        sendListChange(stream);
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(49);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Advance to the end of the throttle window expecting the delayed request
+        // to be sent
+        await vi.advanceTimersByTimeAsync(1);
+        expect(client.getTree).toHaveBeenCalledTimes(3);
+      });
+
+      it('sends GetTree requests immediately for every update when throttling is disabled', async () => {
+        const { client, stream } = await connectWithThrottle(0);
+
+        // Expect immediate GetTreeRequests when throttling is disabled (set to `0`)
+        sendListChange(stream);
+        sendListChange(stream);
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(0);
+        expect(client.getTree).toHaveBeenCalledTimes(4);
+      });
+
+      it('invalidates affected pages immediately even if a GetTree request is delayed', async () => {
+        const { controller, client, stream } = await connectWithThrottle();
+        let slowResponseHandler:
+          | ((
+              error: ServiceError | null,
+              response: GetTreeResponse | null,
+            ) => void)
+          | undefined;
+        (client.getTree as Mock).mockImplementationOnce((_, __, handler) => {
+          slowResponseHandler = handler;
+        });
+
+        // Initial GetTree request is intentionally slowed, so the initially loaded
+        // page should not be invalidated
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(0);
+        expect(controller.isPageLoaded(0)).toBe(true);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Expect a later GetTree request to properly invalidate the page even if
+        // an earlier request is still in flight
+        sendListChange(stream);
+        expect(controller.isPageLoaded(0)).toBe(false);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Complete the initial slow request and expect the page to be invalidated
+        slowResponseHandler?.(null, createGetTreeResponse(100, 100));
+        await vi.advanceTimersByTimeAsync(0);
+        expect(controller.isPageLoaded(0)).toBe(false);
+
+        // Complete the delayed request and expect the page to be loaded
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(controller.isPageLoaded(0)).toBe(true);
+        expect(client.getTree).toHaveBeenCalledTimes(3);
+      });
+
+      it('skips delayed GetTree requests on disconnect', async () => {
+        const { controller, client, stream } = await connectWithThrottle();
+
+        // Expect one initial GetTree request
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(0);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Expect an intentionally delayed GetTree request
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(0);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Disconnect and expect the delayed request to be dropped
+        controller.disconnect();
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+      });
+
+      it('skips delayed GetTree requests on disconnect', async () => {
+        const { controller, client, stream } = await connectWithThrottle();
+
+        // Expect one initial GetTree request
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(0);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Expect an intentionally delayed GetTree request
+        sendListChange(stream);
+        await vi.advanceTimersByTimeAsync(0);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+
+        // Cancel the controller and expect the delayed request to be dropped
+        controller.cancel();
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(client.getTree).toHaveBeenCalledTimes(2);
+      });
     });
 
     it('patches data that has been hidden', async () => {
