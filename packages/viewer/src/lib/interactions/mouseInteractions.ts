@@ -154,15 +154,9 @@ export class ZoomInteraction extends MouseInteraction {
     this.startPt = undefined;
   }
 
-  public async zoom(
-    delta: number,
-    api: InteractionApi,
-    extraDelayMs?: number,
-  ): Promise<void> {
-    await this.runWheelZoomInteraction(
-      api,
-      () => api.zoomCamera(this.getDirectionalDelta(delta)),
-      extraDelayMs,
+  public async zoom(delta: number, api: InteractionApi): Promise<void> {
+    await this.runWheelZoomInteraction(api, () =>
+      api.zoomCamera(this.getDirectionalDelta(delta)),
     );
   }
 
@@ -170,13 +164,10 @@ export class ZoomInteraction extends MouseInteraction {
     pt: Point.Point,
     delta: number,
     api: InteractionApi,
-    extraDelayMs?: number,
   ): Promise<void> {
-    await this.runWheelZoomInteraction(
-      api,
-      () => api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta)),
-      extraDelayMs,
-    );
+    await this.runWheelZoomInteraction(api, async () => {
+      await api.zoomCameraToPoint(pt, this.getDirectionalDelta(delta));
+    });
   }
 
   private async beginInteraction(api: InteractionApi): Promise<void> {
@@ -233,14 +224,13 @@ export class ZoomInteraction extends MouseInteraction {
   private async runWheelZoomInteraction(
     api: InteractionApi,
     f: () => void | Promise<void>,
-    extraDelayMs?: number,
   ): Promise<void> {
     if (!this.isTransforming) {
       await this.beginInteraction(api);
     }
 
-    this.resetInteractionTimer(api, extraDelayMs);
-    f();
+    this.resetInteractionTimer(api, 48); // extra delay of approx 3 frames at 60fps
+    await f();
   }
 }
 
